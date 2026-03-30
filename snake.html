@@ -146,6 +146,72 @@
     .diff-btn:hover {
       background: #4ecca322;
     }
+
+    /* Virtual D-pad */
+    #dpad {
+      display: none;
+      margin-top: 20px;
+      position: relative;
+      width: 180px;
+      height: 180px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .dpad-btn {
+      position: absolute;
+      width: 56px;
+      height: 56px;
+      background: #4ecca322;
+      border: 2px solid #4ecca366;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.4rem;
+      color: #4ecca3;
+      transition: background 0.1s, transform 0.08s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    .dpad-btn:active, .dpad-btn.pressed {
+      background: #4ecca355;
+      transform: scale(0.92);
+      border-color: #4ecca3;
+    }
+
+    #btn-up    { top: 0;    left: 50%; transform: translateX(-50%); }
+    #btn-down  { bottom: 0; left: 50%; transform: translateX(-50%); }
+    #btn-left  { left: 0;   top: 50%;  transform: translateY(-50%); }
+    #btn-right { right: 0;  top: 50%;  transform: translateY(-50%); }
+
+    #btn-up:active    { transform: translateX(-50%) scale(0.92); }
+    #btn-down:active  { transform: translateX(-50%) scale(0.92); }
+    #btn-left:active  { transform: translateY(-50%) scale(0.92); }
+    #btn-right:active { transform: translateY(-50%) scale(0.92); }
+
+    #btn-pause-touch {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 48px;
+      height: 48px;
+      background: #ffffff11;
+      border: 1px solid #ffffff22;
+      border-radius: 50%;
+      font-size: 1rem;
+      color: #666;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    @media (pointer: coarse) {
+      #dpad { display: flex; }
+      #controls { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -185,6 +251,14 @@
 
 <div id="controls">
   方向键 / WASD 移动 &nbsp;|&nbsp; P 暂停 &nbsp;|&nbsp; 吃食物得分并加速
+</div>
+
+<div id="dpad">
+  <button class="dpad-btn" id="btn-up">▲</button>
+  <button class="dpad-btn" id="btn-left">◀</button>
+  <button class="dpad-btn" id="btn-right">▶</button>
+  <button class="dpad-btn" id="btn-down">▼</button>
+  <button class="dpad-btn" id="btn-pause-touch">⏸</button>
 </div>
 
 <script>
@@ -553,6 +627,30 @@
   }, { passive: false });
 
   startBtn.addEventListener('click', startGame);
+
+  // Virtual D-pad
+  function bindDpadBtn(id, action) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    const press = e => { e.preventDefault(); action(); btn.classList.add('pressed'); };
+    const release = e => { e.preventDefault(); btn.classList.remove('pressed'); };
+    btn.addEventListener('touchstart', press, { passive: false });
+    btn.addEventListener('touchend', release, { passive: false });
+    btn.addEventListener('mousedown', press);
+    btn.addEventListener('mouseup', release);
+  }
+
+  bindDpadBtn('btn-up',    () => { if (!gameOver && dir.y !== 1)  nextDir = { x: 0, y: -1 }; });
+  bindDpadBtn('btn-down',  () => { if (!gameOver && dir.y !== -1) nextDir = { x: 0, y: 1 }; });
+  bindDpadBtn('btn-left',  () => { if (!gameOver && dir.x !== 1)  nextDir = { x: -1, y: 0 }; });
+  bindDpadBtn('btn-right', () => { if (!gameOver && dir.x !== -1) nextDir = { x: 1, y: 0 }; });
+
+  bindDpadBtn('btn-pause-touch', () => {
+    if (gameOver) return;
+    paused = !paused;
+    if (!paused) { draw(); gameLoop = setTimeout(step, speed); }
+    else { clearTimeout(gameLoop); draw(); }
+  });
 
   // Initial draw
   initGame();
