@@ -275,7 +275,10 @@
   function step() {
     if (paused || gameOver) return;
 
-    dir = { ...nextDir };
+    // Prevent 180-degree reversal (safety check in case of rapid input)
+    if (nextDir.x !== -dir.x || nextDir.y !== -dir.y) {
+      dir = { ...nextDir };
+    }
     const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
 
     // Wall collision
@@ -290,6 +293,7 @@
     snake.unshift(head);
 
     let ate = false;
+    let ateBonus = false;
     if (head.x === food.x && head.y === food.y) {
       score += food.value;
       ate = true;
@@ -299,6 +303,7 @@
     } else if (bonus && head.x === bonus.x && head.y === bonus.y) {
       score += bonus.value;
       ate = true;
+      ateBonus = true;
       bonus = null;
     } else {
       snake.pop();
@@ -317,8 +322,8 @@
         bestEl.textContent = best;
         localStorage.setItem('snakeBest', best);
       }
-      // Maybe spawn bonus
-      if (score > 0 && score % 50 === 0 && !bonus) spawnBonus();
+      // Spawn bonus only when eating regular food (not the bonus itself)
+      if (!ateBonus && score > 0 && score % 50 === 0 && !bonus) spawnBonus();
     }
 
     draw();
