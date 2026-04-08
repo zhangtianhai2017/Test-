@@ -6,24 +6,28 @@ import numpy as np
 
 @dataclass
 class BodyConfig:
-    """Reference female body measurements (in meters, roughly MetaHuman scale)."""
-    height: float = 1.68
-    shoulder_width: float = 0.36
+    """Reference female body measurements (meters), extracted from ZBrush base_body.obj."""
+    height: float = 1.729
+    shoulder_width: float = 0.317  # left_shoulder to right_shoulder X distance
     bust_circumference: float = 0.88
     underbust_circumference: float = 0.74
     waist_circumference: float = 0.66
     hip_circumference: float = 0.94
-    torso_length: float = 0.42  # shoulder to waist
-    breast_radius: float = 0.07
-    breast_projection: float = 0.05
-    breast_spacing: float = 0.18  # center to center
+    torso_length: float = 0.39  # shoulder to waist
+    breast_radius: float = 0.043  # apex to outer edge distance
+    breast_projection: float = 0.015  # apex Z beyond sternum Z
+    breast_spacing: float = 0.144  # center to center (apex X distance)
 
-    # Vertical positions (Y axis, from ground)
-    shoulder_height: float = 1.40
-    bust_height: float = 1.25
-    waist_height: float = 1.05
-    hip_height: float = 0.95
-    crotch_height: float = 0.78
+    # Vertical positions (Y axis, from ground) — from real mesh
+    shoulder_height: float = 1.422
+    bust_height: float = 1.298
+    waist_height: float = 1.032
+    hip_height: float = 0.976
+    crotch_height: float = 0.781
+
+    # Path to the real body mesh (OBJ)
+    mesh_path: str = "assets/base_body.obj"
+    mesh_scale: float = 0.01  # ZBrush cm -> meters
 
 
 @dataclass

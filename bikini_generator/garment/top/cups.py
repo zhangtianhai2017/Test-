@@ -15,19 +15,31 @@ def _breast_surface(x_sign: float, u: float, v: float, depth: float = 1.0) -> np
 
     u: latitude (0=top, 1=bottom)
     v: longitude (0=inner, 1=outer)
+
+    Coordinates calibrated to real ZBrush body mesh.
     """
-    b = BODY
-    cx = x_sign * b.breast_spacing / 2
-    cy = b.bust_height
-    cz = 0.10
+    lm = get_landmarks()
+    side = "left" if x_sign < 0 else "right"
+    apex = lm[f"{side}_breast_apex"]
+    outer = lm[f"{side}_breast_outer"]
+    inner = lm[f"{side}_breast_inner"]
+
+    # Breast center and radii from real landmarks
+    cx = apex[0]
+    cy = apex[1]
+    cz_base = (inner[2] + outer[2]) / 2  # base Z (on ribcage)
+
+    r_lateral = abs(outer[0] - inner[0]) / 2  # half-width
+    r_vertical = 0.04  # approximate vertical extent
+    r_forward = apex[2] - cz_base  # projection depth
 
     theta = u * np.pi * 0.6  # latitude angle
     phi = (v - 0.5) * np.pi * 0.8  # longitude angle
 
-    r = b.breast_radius * (1.0 + depth * 0.3)
-    x = cx + r * np.sin(theta) * np.sin(phi) * x_sign
-    y = cy + r * np.cos(theta) * 0.5 - r * (1 - np.cos(theta)) * 0.3
-    z = cz + (b.breast_projection + 0.01) * np.sin(theta) * np.cos(phi)
+    r_scale = 1.0 + depth * 0.3
+    x = cx + r_lateral * r_scale * np.sin(theta) * np.sin(phi) * x_sign
+    y = cy + r_vertical * r_scale * np.cos(theta) * 0.5 - r_vertical * (1 - np.cos(theta)) * 0.3
+    z = cz_base + (r_forward + 0.005) * r_scale * np.sin(theta) * np.cos(phi)
 
     return np.array([x, y, z])
 

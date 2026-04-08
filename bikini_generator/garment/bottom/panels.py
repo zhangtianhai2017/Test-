@@ -12,34 +12,44 @@ from ...config import BODY
 def _body_surface_bottom(u: float, v: float, is_front: bool = True) -> np.ndarray:
     """Map (u,v) to a point on the lower body surface.
 
-    u: vertical (0=waist, 1=crotch)
+    u: vertical (0=hip, 1=crotch)
     v: horizontal (0=left, 1=right)
+
+    Calibrated to real ZBrush body mesh landmarks.
     """
-    b = BODY
     lm = get_landmarks()
 
-    y_top = b.hip_height + 0.02
-    y_bottom = b.crotch_height
+    # Real landmark coordinates
+    if is_front:
+        top_point = lm["hip_front"]
+        bottom_point = lm["crotch_front"]
+    else:
+        top_point = lm["hip_back"]
+        bottom_point = lm["crotch_back"]
 
+    y_top = top_point[1]
+    y_bottom = bottom_point[1]
     y = y_top + u * (y_bottom - y_top)
 
-    # Width varies: wider at hips, narrow at crotch
-    hip_half_width = 0.16
-    crotch_half_width = 0.05
+    # Width: from real hip landmarks, narrows to crotch
+    hip_half_width = abs(lm["hip_left"][0]) * 0.4  # don't use full hip width for panels
+    crotch_half_width = 0.04
     half_width = hip_half_width + u * (crotch_half_width - hip_half_width)
 
     x = (v - 0.5) * 2 * half_width
 
-    # Z depth — front or back
+    # Z depth from real landmarks
     if is_front:
-        z_base = 0.10 - u * 0.06  # curves inward toward crotch
-        # Belly curve
-        belly = 0.01 * np.sin(u * np.pi) * (1 - abs(v - 0.5) * 2)
+        z_top = top_point[2]
+        z_bottom = bottom_point[2]
+        z_base = z_top + u * (z_bottom - z_top)
+        belly = 0.008 * np.sin(u * np.pi) * (1 - abs(v - 0.5) * 2)
         z = z_base + belly
     else:
-        z_base = -0.10 + u * 0.06
-        # Buttock curve
-        butt_curve = -0.02 * np.sin(u * np.pi * 0.8) * (1 - abs(v - 0.5) * 1.5)
+        z_top = top_point[2]
+        z_bottom = bottom_point[2]
+        z_base = z_top + u * (z_bottom - z_top)
+        butt_curve = -0.015 * np.sin(u * np.pi * 0.8) * (1 - abs(v - 0.5) * 1.5)
         z = z_base + butt_curve
 
     return np.array([x, y, z])

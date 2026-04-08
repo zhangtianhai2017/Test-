@@ -1,79 +1,68 @@
-"""Anatomical landmark positions on the reference body.
+"""Anatomical landmark positions extracted from the real ZBrush body mesh.
 
-All coordinates in meters. Y is up, Z is forward (facing direction).
-Origin at center of body at ground level.
+All coordinates in meters (original mesh was in cm, scaled by 0.01).
+Y is up, Z is forward (facing direction).
 """
 
 import numpy as np
-from ..config import BODY
 
 
 def get_landmarks() -> dict[str, np.ndarray]:
-    """Return dictionary of named anatomical landmark 3D positions."""
-    b = BODY
-    half_spacing = b.breast_spacing / 2
+    """Return dictionary of named anatomical landmark 3D positions.
 
+    These coordinates were extracted from assets/base_body.obj by analyzing
+    vertex positions in each anatomical region.
+    """
     return {
         # --- Shoulder / Neck ---
-        "neck_front": np.array([0.0, b.shoulder_height + 0.04, 0.06]),
-        "neck_back": np.array([0.0, b.shoulder_height + 0.04, -0.06]),
-        "left_shoulder": np.array([-b.shoulder_width / 2, b.shoulder_height, 0.0]),
-        "right_shoulder": np.array([b.shoulder_width / 2, b.shoulder_height, 0.0]),
+        "neck_front": np.array([0.0, 1.567, 0.092]),
+        "neck_back": np.array([0.0, 1.580, -0.097]),
+        "left_shoulder": np.array([-0.155, 1.424, -0.037]),
+        "right_shoulder": np.array([0.162, 1.421, -0.045]),
 
         # --- Chest / Bust ---
-        "sternum_top": np.array([0.0, b.bust_height + 0.06, 0.08]),
-        "sternum_center": np.array([0.0, b.bust_height, 0.10]),
-        "left_breast_apex": np.array(
-            [-half_spacing, b.bust_height, 0.10 + b.breast_projection]
-        ),
-        "right_breast_apex": np.array(
-            [half_spacing, b.bust_height, 0.10 + b.breast_projection]
-        ),
-        "left_breast_outer": np.array(
-            [-half_spacing - b.breast_radius, b.bust_height, 0.08]
-        ),
-        "right_breast_outer": np.array(
-            [half_spacing + b.breast_radius, b.bust_height, 0.08]
-        ),
-        "left_breast_inner": np.array(
-            [-half_spacing + b.breast_radius * 0.6, b.bust_height, 0.09]
-        ),
-        "right_breast_inner": np.array(
-            [half_spacing - b.breast_radius * 0.6, b.bust_height, 0.09]
-        ),
-        "left_underbust": np.array([-half_spacing, b.bust_height - 0.06, 0.08]),
-        "right_underbust": np.array([half_spacing, b.bust_height - 0.06, 0.08]),
+        "sternum_top": np.array([0.0, 1.350, 0.095]),
+        "sternum_center": np.array([-0.020, 1.287, 0.103]),
+        "left_breast_apex": np.array([-0.073, 1.298, 0.118]),
+        "right_breast_apex": np.array([0.072, 1.297, 0.118]),
+        "left_breast_outer": np.array([-0.116, 1.283, 0.082]),
+        "right_breast_outer": np.array([0.116, 1.283, 0.082]),
+        "left_breast_inner": np.array([-0.030, 1.290, 0.108]),
+        "right_breast_inner": np.array([0.030, 1.290, 0.108]),
+        "left_underbust": np.array([-0.050, 1.270, 0.114]),
+        "right_underbust": np.array([0.048, 1.268, 0.113]),
 
         # --- Torso / Back ---
-        "spine_upper": np.array([0.0, b.bust_height, -0.10]),
-        "spine_mid": np.array([0.0, b.waist_height + 0.05, -0.09]),
-        "left_ribcage": np.array([-0.14, b.bust_height - 0.04, -0.02]),
-        "right_ribcage": np.array([0.14, b.bust_height - 0.04, -0.02]),
+        "spine_upper": np.array([-0.032, 1.355, -0.102]),
+        "spine_mid": np.array([0.022, 1.192, -0.080]),
+        "left_ribcage": np.array([-0.265, 1.253, -0.048]),
+        "right_ribcage": np.array([0.264, 1.253, -0.043]),
 
         # --- Waist ---
-        "waist_front": np.array([0.0, b.waist_height, 0.09]),
-        "waist_back": np.array([0.0, b.waist_height, -0.09]),
-        "waist_left": np.array([-0.14, b.waist_height, 0.0]),
-        "waist_right": np.array([0.14, b.waist_height, 0.0]),
+        "waist_front": np.array([-0.013, 1.034, 0.088]),
+        "waist_back": np.array([0.033, 1.031, -0.098]),
+        "waist_left": np.array([-0.428, 1.030, 0.146]),
+        "waist_right": np.array([0.429, 1.030, 0.146]),
 
         # --- Hip ---
-        "hip_front": np.array([0.0, b.hip_height, 0.10]),
-        "hip_back": np.array([0.0, b.hip_height, -0.12]),
-        "hip_left": np.array([-0.17, b.hip_height, 0.0]),
-        "hip_right": np.array([0.17, b.hip_height, 0.0]),
+        "hip_front": np.array([-0.007, 0.996, 0.086]),
+        "hip_back": np.array([0.032, 0.926, -0.136]),
+        "hip_left": np.array([-0.452, 0.976, 0.185]),
+        "hip_right": np.array([0.451, 0.975, 0.185]),
 
         # --- Buttocks ---
-        "left_buttock_apex": np.array([-0.08, b.hip_height - 0.04, -0.13]),
-        "right_buttock_apex": np.array([0.08, b.hip_height - 0.04, -0.13]),
-        "buttock_crease_left": np.array([-0.07, b.crotch_height + 0.02, -0.10]),
-        "buttock_crease_right": np.array([0.07, b.crotch_height + 0.02, -0.10]),
+        "left_buttock_apex": np.array([-0.062, 0.926, -0.140]),
+        "right_buttock_apex": np.array([0.061, 0.929, -0.140]),
+        "buttock_crease_left": np.array([-0.058, 0.871, -0.129]),
+        "buttock_crease_right": np.array([0.057, 0.874, -0.129]),
 
         # --- Crotch / Pubic ---
-        "crotch_center": np.array([0.0, b.crotch_height, 0.04]),
-        "pubic_top": np.array([0.0, b.crotch_height + 0.06, 0.09]),
-        "crotch_back": np.array([0.0, b.crotch_height, -0.04]),
-        "inner_thigh_left": np.array([-0.06, b.crotch_height, 0.0]),
-        "inner_thigh_right": np.array([0.06, b.crotch_height, 0.0]),
+        "crotch_center": np.array([0.0, 0.781, -0.007]),
+        "pubic_top": np.array([0.048, 0.865, 0.051]),
+        "crotch_front": np.array([0.041, 0.846, 0.043]),
+        "crotch_back": np.array([-0.047, 0.849, -0.108]),
+        "inner_thigh_left": np.array([-0.022, 0.766, -0.010]),
+        "inner_thigh_right": np.array([0.021, 0.782, 0.010]),
     }
 
 
