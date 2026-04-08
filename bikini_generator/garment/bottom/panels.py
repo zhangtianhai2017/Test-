@@ -17,22 +17,26 @@ def _body_surface_bottom(u: float, v: float, is_front: bool = True) -> np.ndarra
     v: horizontal (0=left, 1=right)
 
     Calibrated to real ZBrush body mesh landmarks.
+    Front and back panels both extend fully to crotch_center at u=1
+    so they connect seamlessly at the bottom.
     """
     lm = get_landmarks()
+    crotch_center = lm["crotch_center"]
 
     if is_front:
         top_point = lm["hip_front"]
-        bottom_point = lm["crotch_front"]
+        # At u=1 both front and back converge to crotch_center
+        bottom_point = crotch_center + np.array([0, 0, 0.008])  # slightly forward
     else:
         top_point = lm["hip_back"]
-        bottom_point = lm["crotch_back"]
+        bottom_point = crotch_center + np.array([0, 0, -0.008])  # slightly backward
 
     y_top = top_point[1]
     y_bottom = bottom_point[1]
     y = y_top + u * (y_bottom - y_top)
 
-    hip_half_width = abs(lm["hip_left"][0]) * 0.4
-    crotch_half_width = 0.04
+    hip_half_width = abs(lm["hip_left"][0]) * 0.35
+    crotch_half_width = 0.03
     half_width = hip_half_width + u * (crotch_half_width - hip_half_width)
 
     x = (v - 0.5) * 2 * half_width
@@ -41,13 +45,13 @@ def _body_surface_bottom(u: float, v: float, is_front: bool = True) -> np.ndarra
         z_top = top_point[2]
         z_bottom = bottom_point[2]
         z_base = z_top + u * (z_bottom - z_top)
-        belly = 0.008 * np.sin(u * np.pi) * (1 - abs(v - 0.5) * 2)
+        belly = 0.006 * np.sin(u * np.pi) * (1 - abs(v - 0.5) * 2)
         z = z_base + belly
     else:
         z_top = top_point[2]
         z_bottom = bottom_point[2]
         z_base = z_top + u * (z_bottom - z_top)
-        butt_curve = -0.015 * np.sin(u * np.pi * 0.8) * (1 - abs(v - 0.5) * 1.5)
+        butt_curve = -0.012 * np.sin(u * np.pi * 0.8) * (1 - abs(v - 0.5) * 1.5)
         z = z_base + butt_curve
 
     return np.array([x, y, z])
@@ -67,6 +71,8 @@ def _anchor_panel(patch: GarmentPatch, nv: int, nu: int, is_front: bool):
     bottom_right = nu * nv - 1
     bottom_center = (nu - 1) * nv + nv // 2
 
+    crotch_c = lm["crotch_center"]
+
     if is_front:
         patch.anchor_vertex_ids = [top_left, top_right, top_center,
                                    bottom_left, bottom_right, bottom_center]
@@ -74,9 +80,9 @@ def _anchor_panel(patch: GarmentPatch, nv: int, nu: int, is_front: bool):
             lm["hip_left"] + np.array([0.06, 0, 0.04]),
             lm["hip_right"] + np.array([-0.06, 0, 0.04]),
             lm["hip_front"],
-            lm["crotch_center"] + np.array([-0.02, 0, 0.01]),
-            lm["crotch_center"] + np.array([0.02, 0, 0.01]),
-            lm["crotch_front"],
+            crotch_c + np.array([-0.02, 0, 0.008]),
+            crotch_c + np.array([0.02, 0, 0.008]),
+            crotch_c + np.array([0, 0, 0.008]),
         ]
     else:
         patch.anchor_vertex_ids = [top_left, top_right, top_center,
@@ -85,9 +91,9 @@ def _anchor_panel(patch: GarmentPatch, nv: int, nu: int, is_front: bool):
             lm["hip_left"] + np.array([0.06, 0, -0.04]),
             lm["hip_right"] + np.array([-0.06, 0, -0.04]),
             lm["hip_back"],
-            lm["crotch_center"] + np.array([-0.02, 0, -0.01]),
-            lm["crotch_center"] + np.array([0.02, 0, -0.01]),
-            lm["crotch_back"],
+            crotch_c + np.array([-0.02, 0, -0.008]),
+            crotch_c + np.array([0.02, 0, -0.008]),
+            crotch_c + np.array([0, 0, -0.008]),
         ]
 
 
@@ -97,9 +103,9 @@ def classic_front(coverage: float = 0.7, rise: float = 0.5,
                   nu: int = 20, nv: int = 20) -> GarmentPatch:
     """Classic triangle front panel."""
     def func(u, v):
-        width_factor = 1.0 - u * (1.0 - 0.3) * (1 - coverage * 0.3)
+        width_factor = 1.0 - u * (1.0 - 0.2) * (1 - coverage * 0.3)
         v_adj = 0.5 + (v - 0.5) * width_factor * coverage
-        u_adj = u * (0.5 + rise * 0.5)
+        u_adj = u  # full range hip to crotch
         return _body_surface_bottom(u_adj, v_adj, is_front=True)
 
     patch = GarmentPatch.from_parametric("bottom_front_classic", func, (0, 1), (0, 1), nu, nv)
@@ -112,8 +118,8 @@ def v_front(coverage: float = 0.5, nu: int = 20, nv: int = 20) -> GarmentPatch:
     """V-shaped front panel — lower, more daring cut."""
     def func(u, v):
         v_center_dist = abs(v - 0.5) * 2
-        u_offset = 0.3 * (1 - v_center_dist)
-        u_adj = (u_offset + u * (1 - u_offset)) * 0.6
+        u_offset = 0.2 * (1 - v_center_dist)
+        u_adj = u_offset + u * (1 - u_offset)  # full range to crotch
         width_factor = coverage * (0.4 + 0.6 * (1 - u * 0.5))
         v_adj = 0.5 + (v - 0.5) * width_factor
         return _body_surface_bottom(u_adj, v_adj, is_front=True)
@@ -128,7 +134,7 @@ def high_cut_front(coverage: float = 0.6, nu: int = 20, nv: int = 20) -> Garment
     """High-cut front — leg openings cut high on the hip."""
     def func(u, v):
         side_cut = (abs(v - 0.5) * 2) ** 1.5
-        u_adj = u * (0.7 + side_cut * 0.3)
+        u_adj = u * (1.0 - side_cut * 0.15)  # full range, sides cut higher
         width_factor = coverage * (1 - u * 0.4)
         v_adj = 0.5 + (v - 0.5) * width_factor
         return _body_surface_bottom(u_adj, v_adj, is_front=True)
@@ -143,7 +149,7 @@ def ruched_front(coverage: float = 0.6, nu: int = 24, nv: int = 24) -> GarmentPa
     """Ruched/gathered front panel with fabric bunching."""
     def func(u, v):
         v_adj = 0.5 + (v - 0.5) * coverage
-        pos = _body_surface_bottom(u * 0.6, v_adj, is_front=True)
+        pos = _body_surface_bottom(u, v_adj, is_front=True)  # full range
         ruch = 0.004 * np.sin(u * np.pi * 8) * np.sin(v * np.pi * 3)
         pos[2] += ruch
         return pos
@@ -161,9 +167,9 @@ def skirt_front(coverage: float = 0.8, nu: int = 24, nv: int = 32) -> GarmentPat
     def func(u, v):
         flare = 1.0 + u * 0.4
         v_adj = 0.5 + (v - 0.5) * coverage * flare
-        u_adj = u * 0.5
+        u_adj = u  # full range
         pos = _body_surface_bottom(u_adj, v_adj, is_front=True)
-        pos[2] += u * 0.02
+        pos[2] += u * 0.015
         return pos
 
     patch = GarmentPatch.from_parametric("bottom_front_skirt", func, (0, 1), (0, 1), nu, nv)
@@ -188,7 +194,7 @@ def classic_back(coverage: float = 0.6, nu: int = 20, nv: int = 20) -> GarmentPa
     def func(u, v):
         width_factor = coverage * (1.0 - u * 0.3)
         v_adj = 0.5 + (v - 0.5) * width_factor
-        return _body_surface_bottom(u * 0.6, v_adj, is_front=False)
+        return _body_surface_bottom(u, v_adj, is_front=False)
 
     patch = GarmentPatch.from_parametric("bottom_back_classic", func, (0, 1), (0, 1), nu, nv)
     _anchor_panel(patch, nv, nu, is_front=False)
@@ -201,7 +207,7 @@ def thong_back(nu: int = 16, nv: int = 10) -> GarmentPatch:
     def func(u, v):
         width = 0.08 * (1 - u * 0.7)
         v_adj = 0.5 + (v - 0.5) * width / 0.16
-        return _body_surface_bottom(u * 0.6, v_adj, is_front=False)
+        return _body_surface_bottom(u, v_adj, is_front=False)
 
     patch = GarmentPatch.from_parametric("bottom_back_thong", func, (0, 1), (0, 1), nu, nv)
     _anchor_panel(patch, nv, nu, is_front=False)
@@ -214,7 +220,7 @@ def brazilian_back(coverage: float = 0.4, nu: int = 20, nv: int = 20) -> Garment
     def func(u, v):
         width_factor = coverage * (1.0 - u * 0.5)
         v_adj = 0.5 + (v - 0.5) * width_factor
-        pos = _body_surface_bottom(u * 0.6, v_adj, is_front=False)
+        pos = _body_surface_bottom(u, v_adj, is_front=False)
         if abs(v - 0.5) < 0.2:
             pos[2] -= 0.003 * np.sin(u * np.pi * 4)
         return pos
@@ -229,7 +235,7 @@ def full_back(coverage: float = 0.9, nu: int = 20, nv: int = 24) -> GarmentPatch
     """Full coverage back panel."""
     def func(u, v):
         v_adj = 0.5 + (v - 0.5) * coverage
-        return _body_surface_bottom(u * 0.55, v_adj, is_front=False)
+        return _body_surface_bottom(u, v_adj, is_front=False)
 
     patch = GarmentPatch.from_parametric("bottom_back_full", func, (0, 1), (0, 1), nu, nv)
     _anchor_panel(patch, nv, nu, is_front=False)

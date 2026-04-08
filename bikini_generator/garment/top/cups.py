@@ -23,23 +23,24 @@ def _breast_surface(x_sign: float, u: float, v: float, depth: float = 1.0) -> np
     apex = lm[f"{side}_breast_apex"]
     outer = lm[f"{side}_breast_outer"]
     inner = lm[f"{side}_breast_inner"]
+    underbust = lm[f"{side}_underbust"]
 
-    # Breast center and radii from real landmarks
+    # Breast center and radii from real landmarks — scaled up for proper coverage
     cx = apex[0]
-    cy = apex[1]
+    cy = (apex[1] + underbust[1]) / 2 + 0.01  # center between apex and underbust
     cz_base = (inner[2] + outer[2]) / 2  # base Z (on ribcage)
 
-    r_lateral = abs(outer[0] - inner[0]) / 2  # half-width
-    r_vertical = 0.04  # approximate vertical extent
-    r_forward = apex[2] - cz_base  # projection depth
+    r_lateral = abs(outer[0] - inner[0]) / 2 + 0.02  # half-width + padding
+    r_vertical = abs(apex[1] - underbust[1]) / 2 + 0.015  # real vertical extent
+    r_forward = apex[2] - cz_base + 0.005  # projection depth
 
-    theta = u * np.pi * 0.6  # latitude angle
-    phi = (v - 0.5) * np.pi * 0.8  # longitude angle
+    theta = u * np.pi * 0.7  # latitude angle (wider sweep)
+    phi = (v - 0.5) * np.pi * 0.9  # longitude angle (wider sweep)
 
     r_scale = 1.0 + depth * 0.3
     x = cx + r_lateral * r_scale * np.sin(theta) * np.sin(phi) * x_sign
-    y = cy + r_vertical * r_scale * np.cos(theta) * 0.5 - r_vertical * (1 - np.cos(theta)) * 0.3
-    z = cz_base + (r_forward + 0.005) * r_scale * np.sin(theta) * np.cos(phi)
+    y = cy + r_vertical * r_scale * np.cos(theta) - r_vertical * (1 - np.cos(theta)) * 0.2
+    z = cz_base + r_forward * r_scale * np.sin(theta) * np.cos(phi)
 
     return np.array([x, y, z])
 
