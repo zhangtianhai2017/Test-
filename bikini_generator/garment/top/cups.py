@@ -60,6 +60,11 @@ def triangle_cup(side: str = "left", coverage: float = 0.7, nu: int = 20, nv: in
         f"cup_{side}_triangle", func, (0.05, 0.95), (0.05, 0.95), nu, nv
     )
 
+    # Fix winding for left side (X mirrored surface flips normals)
+    if side == "left":
+        patch.faces = patch.faces[:, [0, 2, 1]]
+        patch.compute_normals()
+
     # Anchor: top center vertex (strap attachment)
     top_center = nu // 2
     apex_name = f"{side}_breast_apex"
@@ -85,6 +90,9 @@ def round_cup(side: str = "left", coverage: float = 0.8, nu: int = 24, nv: int =
     patch = GarmentPatch.from_parametric(
         f"cup_{side}_round", func, (0.0, 1.0), (0.0, 1.0), nu, nv
     )
+    if side == "left":
+        patch.faces = patch.faces[:, [0, 2, 1]]
+        patch.compute_normals()
     patch.anchor_vertex_ids = [0, nv - 1]
     patch.anchor_body_positions = [
         landmarks[f"{side}_breast_inner"],
@@ -108,6 +116,9 @@ def bandeau_cup(side: str = "left", coverage: float = 0.6, nu: int = 16, nv: int
     patch = GarmentPatch.from_parametric(
         f"cup_{side}_bandeau", func, (0.0, 1.0), (0.0, 1.0), nu, nv
     )
+    if side == "left":
+        patch.faces = patch.faces[:, [0, 2, 1]]
+        patch.compute_normals()
     # Bandeau: anchor along the band (bottom edge + sides)
     bottom_ids = list(range((nu - 1) * nv, nu * nv))
     side_ids = [0, nv - 1, (nu - 1) * nv, nu * nv - 1]
@@ -140,6 +151,9 @@ def scallop_cup(side: str = "left", coverage: float = 0.75, nu: int = 24, nv: in
     patch = GarmentPatch.from_parametric(
         f"cup_{side}_scallop", func, (0.05, 0.95), (0.05, 0.95), nu, nv
     )
+    if side == "left":
+        patch.faces = patch.faces[:, [0, 2, 1]]
+        patch.compute_normals()
     patch.anchor_vertex_ids = [0, nv - 1]
     patch.anchor_body_positions = [
         landmarks[f"{side}_breast_inner"],
@@ -166,6 +180,9 @@ def cone_cup(side: str = "left", coverage: float = 0.7, sharpness: float = 0.6,
     patch = GarmentPatch.from_parametric(
         f"cup_{side}_cone", func, (0.05, 0.95), (0.05, 0.95), nu, nv
     )
+    if side == "left":
+        patch.faces = patch.faces[:, [0, 2, 1]]
+        patch.compute_normals()
     patch.anchor_vertex_ids = [0, nv - 1]
     patch.anchor_body_positions = [
         landmarks[f"{side}_breast_inner"],
