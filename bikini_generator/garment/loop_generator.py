@@ -241,6 +241,7 @@ class LoopCurve:
     y_center: float          # base height
     harmonics_y: list        # [(amplitude, frequency, phase), ...]
     harmonics_r: list        # [(amplitude, frequency, phase), ...] radius offset
+    harmonics_w: list = None # [(amplitude, frequency, phase), ...] width modulation
     tilt_x: float = 0.0     # tilt of loop plane in X
     tilt_z: float = 0.0     # tilt of loop plane in Z
 
@@ -288,13 +289,13 @@ def sample_loop_curve(
     curve: LoopCurve,
     body: BodySurface,
     n_samples: int = 128,
-    garment_offset: float = 0.008,
+    garment_offset: float = 0.005,
 ) -> np.ndarray:
-    """Sample a loop curve into 3D points projected onto the body surface.
+    """Sample a loop curve into 3D points on the body surface.
 
-    The curve wraps around the body in cylindrical coordinates.
-    At each angle θ, the height Y is modulated by Fourier harmonics.
-    The radius follows the body surface contour.
+    Uses ONLY the smooth ellipsoidal torso model — no mesh projection
+    on the centerline. This guarantees jitter-free, mathematically
+    smooth curves.
 
     Returns: (n_samples, 3) array of 3D points forming a closed loop.
     """
@@ -302,57 +303,28 @@ def sample_loop_curve(
     points = np.zeros((n_samples, 3))
 
     for i, t in enumerate(theta):
-        # Compute Y from Fourier series (smooth periodic height variation)
+        # Y from Fourier series
         y = curve.y_center
         for amp, freq, phase in curve.harmonics_y:
             y += amp * np.sin(freq * t + phase)
-
-        # Clamp Y to valid body range
         y = np.clip(y, 0.75, 1.55)
 
-        # Compute radius offset from Fourier series
+        # Radius offset from Fourier series
         r_offset = 0.0
         for amp, freq, phase in curve.harmonics_r:
             r_offset += amp * np.sin(freq * t + phase)
 
-        # Get body surface radius at this (y, theta) and add offset
+        # Smooth ellipsoidal body radius (no mesh = no jitter)
         body_r = body.get_surface_radius(y, t)
         r = body_r + garment_offset + r_offset
 
-        # Convert cylindrical to Cartesian
-        center = body.get_center_at_height(y)
-        x = center[0] + (-np.sin(t)) * r
-        z = center[2] + np.cos(t) * r
-
-        # Clamp X to torso width (no arm penetration)
-        max_x = body.get_max_torso_x(y)
-        if abs(x) > max_x:
-            x = np.sign(x) * max_x
+        # Cylindrical → Cartesian
+        x = (-np.sin(t)) * r
+        z = np.cos(t) * r
 
         points[i] = np.array([x, y, z])
 
-    # Smooth the loop to remove any jitter from clamping
-    # Circular Gaussian smoothing
-    kernel_size = max(3, n_samples // 30)
-    if kernel_size % 2 == 0:
-        kernel_size += 1
-    half_k = kernel_size // 2
-    smoothed = np.zeros_like(points)
-    for i in range(n_samples):
-        weights = np.zeros(kernel_size)
-        for j in range(kernel_size):
-            offset = j - half_k
-            weights[j] = np.exp(-0.5 * (offset / (half_k / 2)) ** 2)
-        weights /= weights.sum()
-        for j in range(kernel_size):
-            idx = (i + j - half_k) % n_samples
-            smoothed[i] += points[idx] * weights[j]
-
-    # Project each point onto body surface for tight fit
-    for i in range(n_samples):
-        smoothed[i] = body.project_point_to_surface(smoothed[i], garment_offset)
-
-    return smoothed
+    return points
 
 
 # ── Coverage detection and width modulation ─────────────────────────
@@ -360,19 +332,27 @@ def sample_loop_curve(
 def compute_strip_widths(
     loop_points: np.ndarray,
     coverage_zones: list[CoverageZone],
-    base_width: float = 0.012,
-    max_width: float = 0.08,
+    base_width: float = 0.015,
+    curve: LoopCurve | None = None,
 ) -> np.ndarray:
-    """Compute width at each point of the loop based on coverage zone proximity.
+    """Compute width at each point using coverage zones + periodic modulation.
+
+    Width varies smoothly along the loop in two ways:
+    1. Coverage zones widen the strip where it passes private areas
+    2. Fourier width harmonics (from curve.harmonics_w) add periodic
+       gradual variation — max 2-3 cycles per revolution
 
     Returns: (n_points,) array of widths.
     """
     n = len(loop_points)
+    theta = np.linspace(0, 2 * np.pi, n, endpoint=False)
+
+    # Start with base width
     widths = np.full(n, base_width)
 
+    # 1. Coverage zone widening
     for zone in coverage_zones:
         for i, pt in enumerate(loop_points):
-            # Distance from zone center (ellipsoidal)
             dy = (pt[1] - zone.center[1]) / zone.radius_y
             dxz = np.sqrt(
                 (pt[0] - zone.center[0])**2 + (pt[2] - zone.center[2])**2
@@ -380,21 +360,20 @@ def compute_strip_widths(
             dist = np.sqrt(dy**2 + dxz**2)
 
             if dist < 1.5:
-                # Smooth falloff: full width at center, tapering to base
                 blend = max(0, 1.0 - dist / 1.5)
-                blend = blend ** 0.5  # square root for smoother transition
+                blend = blend ** 0.5
                 zone_width = base_width + (zone.min_strip_width - base_width) * blend
                 widths[i] = max(widths[i], zone_width)
 
-    # Smooth the widths to avoid abrupt changes
-    kernel_size = max(3, n // 20)
-    if kernel_size % 2 == 0:
-        kernel_size += 1
-    # Circular smoothing
-    padded = np.concatenate([widths[-kernel_size:], widths, widths[:kernel_size]])
-    kernel = np.ones(kernel_size) / kernel_size
-    smoothed = np.convolve(padded, kernel, mode='same')
-    widths = smoothed[kernel_size:kernel_size + n]
+    # 2. Periodic width modulation (Fourier — smooth, 2-3 cycles max)
+    if curve is not None and curve.harmonics_w:
+        for amp, freq, phase in curve.harmonics_w:
+            # Multiplicative: width *= (1 + a*sin(k*θ + φ))
+            modulation = amp * np.sin(freq * theta + phase)
+            widths *= (1.0 + modulation)
+
+    # Ensure minimum width
+    widths = np.clip(widths, base_width * 0.5, 0.15)
 
     return widths
 
@@ -473,17 +452,10 @@ def generate_strip_mesh(
         if side_norm > 1e-6:
             side = side / side_norm
 
-        # Generate width vertices
+        # Generate width vertices (pure math, no mesh projection = no jitter)
         for j in range(n_width):
             t = (j / (n_width - 1)) - 0.5  # -0.5 to 0.5
-            offset_pt = pt + side * t * w
-
-            # Project onto body surface to follow contours
-            projected = body.project_point_to_surface(offset_pt, garment_offset)
-
-            # Blend between projected and offset (more projection at edges)
-            blend = abs(t) * 0.6  # edges follow body more
-            final_pt = offset_pt * (1 - blend) + projected * blend
+            final_pt = pt + side * t * w
 
             verts.append(final_pt)
             uvs.append([i / n_length, j / (n_width - 1)])
@@ -520,14 +492,95 @@ def generate_strip_mesh(
 @dataclass
 class LoopBikiniConfig:
     """Configuration for loop-based bikini generation."""
-    n_loops: int = 8               # total number of loops
+    n_loops: int = 6               # total loops (2 mandatory + extras)
     base_width: float = 0.015      # strap width (meters)
     garment_offset: float = 0.005  # distance above body
     n_samples: int = 128           # points per loop curve
     n_width: int = 6               # vertices across strip
-    n_harmonics: int = 3           # Fourier harmonics (1-3)
-    max_amp_y: float = 0.08        # max height variation
-    max_amp_r: float = 0.015       # max radius variation
+
+
+def _generate_base_coverage(body: BodySurface, garment_offset: float = 0.005) -> list[GarmentPatch]:
+    """Generate minimal coverage patches for the three privacy zones.
+
+    These are small fabric pieces that GUARANTEE coverage regardless
+    of how the decorative loops are placed. They sit directly on the
+    body surface as the bottom layer.
+    """
+    lm = get_landmarks()
+    patches = []
+
+    # ── Breast patches (one per side) ───────────────────────────
+    for side in ["left", "right"]:
+        x_sign = -1.0 if side == "left" else 1.0
+        apex = lm[f"{side}_breast_apex"]
+        outer = lm[f"{side}_breast_outer"]
+        inner = lm[f"{side}_breast_inner"]
+        underbust = lm[f"{side}_underbust"]
+
+        cx = apex[0]
+        cy = (apex[1] + underbust[1]) / 2
+        rx = abs(outer[0] - inner[0]) / 2 + 0.015
+        ry = abs(apex[1] - underbust[1]) / 2 + 0.01
+        cz_base = (inner[2] + outer[2]) / 2
+        rz = apex[2] - cz_base + 0.005
+
+        nu, nv = 16, 16
+
+        def make_breast_func(cx, cy, cz_base, rx, ry, rz, x_sign):
+            def func(u, v):
+                theta = u * np.pi * 0.65
+                phi = (v - 0.5) * np.pi * 0.8
+                x = cx + rx * np.sin(theta) * np.sin(phi) * x_sign
+                y = cy + ry * np.cos(theta)
+                z = cz_base + rz * np.sin(theta) * np.cos(phi) + garment_offset
+                return np.array([x, y, z])
+            return func
+
+        patch = GarmentPatch.from_parametric(
+            f"base_cup_{side}",
+            make_breast_func(cx, cy, cz_base, rx, ry, rz, x_sign),
+            (0.05, 0.95), (0.05, 0.95), nu, nv,
+        )
+        if side == "left":
+            patch.faces = patch.faces[:, [0, 2, 1]]
+            patch.compute_normals()
+        patches.append(patch)
+
+    # ── Crotch patch ────────────────────────────────────────────
+    crotch_c = lm["crotch_center"]
+    pubic = lm["pubic_top"]
+    crotch_f = lm["crotch_front"]
+    crotch_b = lm["crotch_back"]
+
+    nu, nv = 12, 10
+
+    def crotch_func(u, v):
+        # u: front-to-back (0=front, 1=back)
+        # v: left-to-right (-0.5 to 0.5)
+        front = crotch_f + np.array([0, 0.02, garment_offset])
+        back = crotch_b + np.array([0, 0.02, -garment_offset])
+        center = crotch_c + np.array([0, 0, 0])
+        # Path from front → crotch center → back
+        if u < 0.5:
+            t = u * 2
+            pt = front * (1 - t) + center * t
+        else:
+            t = (u - 0.5) * 2
+            pt = center * (1 - t) + back * t
+        # Width narrows at center
+        width = 0.04 * (1.0 - 0.5 * np.exp(-((u - 0.5) / 0.3) ** 2))
+        lateral = (v - 0.5) * width
+        pt[0] += lateral
+        pt[2] += garment_offset
+        return pt
+
+    patch = GarmentPatch.from_parametric(
+        "base_crotch", crotch_func,
+        (0.0, 1.0), (0.0, 1.0), nu, nv,
+    )
+    patches.append(patch)
+
+    return patches
 
 
 def generate_loop_bikini(
@@ -536,23 +589,17 @@ def generate_loop_bikini(
 ) -> list[GarmentPatch]:
     """Generate a bikini using the loop-based algorithm.
 
-    Algorithm:
-    1. Generate mandatory loops that cover breast and crotch zones
-    2. Generate additional decorative/structural loops
-    3. Project all loops onto body surface
-    4. Widen strips at coverage zones
-    5. Return list of GarmentPatch meshes
+    Structure:
+    - Base layer: 3 small coverage patches (2 breast cups + 1 crotch)
+      guaranteeing the three privacy zones are always covered
+    - Loop layer: N closed Fourier-harmonic loops with periodic width
+      modulation — these create the strappy design aesthetic
 
-    The breast loop is a gentle horizontal ring at bust height.
-    The crotch loop uses -cos(2θ) to dip at front AND back (crotch)
-    while staying high at the sides (hips).
+    Curves are purely mathematical (ellipsoidal model, no mesh projection)
+    ensuring perfectly smooth, jitter-free lines.
 
-    Args:
-        seed: random seed for reproducibility
-        config: generation parameters
-
-    Returns:
-        List of GarmentPatch (one per loop strip)
+    Width varies along each loop using Fourier harmonics (max 2-3 cycles
+    per revolution) for beautiful periodic gradients.
     """
     rng = np.random.default_rng(seed)
     cfg = config or LoopBikiniConfig()
@@ -562,71 +609,80 @@ def generate_loop_bikini(
 
     patches = []
 
+    # ── Base coverage patches (always present) ──────────────────
+    base_patches = _generate_base_coverage(body, cfg.garment_offset)
+    patches.extend(base_patches)
+
+    # ── Helper: make a loop patch with width harmonics ──────────
     def make_patch(loop, name):
         pts = sample_loop_curve(loop, body, cfg.n_samples, cfg.garment_offset)
-        widths = compute_strip_widths(pts, zones, cfg.base_width)
+        widths = compute_strip_widths(pts, zones, cfg.base_width, curve=loop)
         patch = generate_strip_mesh(pts, widths, body, cfg.n_width, cfg.garment_offset)
         patch.name = name
         return patch
 
-    # ── Phase 1: Mandatory breast loop ──────────────────────────
+    def rand_width_harmonics():
+        """Random periodic width modulation: 1-2 harmonics, freq 1-3."""
+        h = []
+        n = rng.integers(1, 3)  # 1 or 2 harmonics
+        for _ in range(n):
+            amp = rng.uniform(0.15, 0.5)   # ±15-50% width variation
+            freq = rng.integers(1, 4)       # 1, 2, or 3 cycles per revolution
+            phase = rng.uniform(0, 2 * np.pi)
+            h.append((amp, int(freq), phase))
+        return h
 
+    # ── Breast loop ─────────────────────────────────────────────
     breast_y = (lm["left_breast_apex"][1] + lm["right_breast_apex"][1]) / 2
     breast_loop = LoopCurve(
         y_center=breast_y,
         harmonics_y=[
-            # Gentle undulation, stay near breast height
-            (rng.uniform(0.005, 0.02), 1, rng.uniform(0, 2 * np.pi)),
-            (rng.uniform(0.003, 0.01), 2, rng.uniform(0, 2 * np.pi)),
-        ],
-        harmonics_r=[
+            (rng.uniform(0.005, 0.015), 1, rng.uniform(0, 2 * np.pi)),
             (rng.uniform(0.002, 0.008), 2, rng.uniform(0, 2 * np.pi)),
         ],
+        harmonics_r=[
+            (rng.uniform(0.002, 0.006), 1, rng.uniform(0, 2 * np.pi)),
+        ],
+        harmonics_w=rand_width_harmonics(),
     )
     patches.append(make_patch(breast_loop, "loop_breast"))
 
-    # ── Phase 2: Mandatory crotch loop ──────────────────────────
-    # Key: use -cos(2θ) so it dips at front (θ=0) and back (θ=π),
-    # stays high at sides (θ=π/2, 3π/2) = hip height
-    #
-    # Y_side (hip) ≈ 0.97,  Y_dip (crotch) ≈ 0.82
-    # Y_mid = 0.895,  amplitude = 0.075
-    # -cos(2θ) = sin(2θ + π/2) → use freq=2, phase=-π/2
-
-    hip_y = (lm["hip_left"][1] + lm["hip_right"][1]) / 2  # ~0.975
-    crotch_y = lm["crotch_center"][1]  # ~0.781
-    y_mid = (hip_y + crotch_y) / 2 + 0.02  # slightly higher
-    dip_amp = (hip_y - crotch_y) / 2 - 0.01  # how deep it dips
+    # ── Crotch loop (dips at front and back) ────────────────────
+    hip_y = (lm["hip_left"][1] + lm["hip_right"][1]) / 2
+    crotch_y = lm["crotch_center"][1]
+    y_mid = (hip_y + crotch_y) / 2 + 0.02
+    dip_amp = (hip_y - crotch_y) / 2 - 0.01
 
     crotch_loop = LoopCurve(
         y_center=y_mid,
         harmonics_y=[
-            # Primary: -cos(2θ) → dip at front and back
-            (dip_amp, 2, -np.pi / 2 + rng.uniform(-0.15, 0.15)),
-            # Small k=1 for asymmetry (front vs back can differ slightly)
-            (rng.uniform(0.005, 0.02), 1, rng.uniform(0, 2 * np.pi)),
+            (dip_amp, 2, -np.pi / 2 + rng.uniform(-0.1, 0.1)),
+            (rng.uniform(0.005, 0.015), 1, rng.uniform(0, 2 * np.pi)),
         ],
         harmonics_r=[
-            (rng.uniform(0.003, 0.008), 2, rng.uniform(0, 2 * np.pi)),
+            (rng.uniform(0.002, 0.006), 1, rng.uniform(0, 2 * np.pi)),
         ],
+        harmonics_w=rand_width_harmonics(),
     )
     patches.append(make_patch(crotch_loop, "loop_crotch"))
 
-    # ── Phase 3: Additional structural/decorative loops ─────────
-
+    # ── Extra decorative loops ──────────────────────────────────
     n_extra = max(0, cfg.n_loops - 2)
-    # Constrain extras to torso range (not below hip, not above shoulder)
     y_low = lm["hip_front"][1]
     y_high = lm["left_shoulder"][1] - 0.03
 
     for i in range(n_extra):
         y_center = rng.uniform(y_low, y_high)
-        loop = generate_loop_curve(
+        loop = LoopCurve(
             y_center=y_center,
-            n_harmonics=min(cfg.n_harmonics, 2),  # keep it smooth
-            max_amp_y=min(cfg.max_amp_y, 0.05),    # less wild
-            max_amp_r=cfg.max_amp_r,
-            rng=rng,
+            harmonics_y=[
+                (rng.uniform(0.005, 0.03), 1, rng.uniform(0, 2 * np.pi)),
+                (rng.uniform(0.003, 0.015), 2, rng.uniform(0, 2 * np.pi)),
+            ],
+            harmonics_r=[
+                (rng.uniform(0.002, 0.008), 1, rng.uniform(0, 2 * np.pi)),
+            ],
+            harmonics_w=rand_width_harmonics(),
         )
         patches.append(make_patch(loop, f"loop_extra_{i}"))
 
