@@ -1,7 +1,7 @@
 """Waist/hip strap generators for bikini bottoms.
 
-Straps connect front and back panels by going over the hips,
-holding the bottom together as a wearable garment.
+Straps connect front and back panels by arcing around the body
+surface at hip height, holding the bottom together.
 """
 
 import numpy as np
@@ -41,7 +41,7 @@ def _strip_between(
         if i == 0:
             tangent = path[min(1, n_seg - 1)] - path[0]
         elif i == n_seg - 1:
-            tangent = path[-1] - path[max(0, -2)]
+            tangent = path[-1] - path[max(0, n_seg - 2)]
         else:
             tangent = path[i + 1] - path[i - 1]
         tlen = np.linalg.norm(tangent)
@@ -86,62 +86,72 @@ def _strip_between(
     return patch
 
 
-def _get_panel_side_points(lm):
-    """Get the side edge points where front/back panels end.
+def _hip_arc_waypoints(lm, side, n_points=5):
+    """Generate waypoints that arc around the body surface at hip height.
 
-    Returns (left_front, left_back, right_front, right_back) positions.
-    These are at the top edge of the panels, at hip height.
+    Creates a smooth path from front to back, staying outside the body.
+    The arc follows an elliptical cross-section at hip height.
     """
     hip_y = lm["hip_front"][1]
-    # Front panel top-left/right edges
-    front_half_w = abs(lm["hip_left"][0]) * 0.35 * 0.7  # match panel coverage
+    x_sign = -1.0 if side == "left" else 1.0
+
+    # Body ellipse radii at hip height
+    rx = abs(lm[f"hip_{side}"][0]) * 0.5  # half hip width
+    rz_front = lm["hip_front"][2] + 0.015  # stay outside body surface
+    rz_back = abs(lm["hip_back"][2]) + 0.015
+
+    waypoints = []
+    for i in range(n_points):
+        t = (i + 1) / (n_points + 1)
+        angle = t * np.pi  # 0=front, pi=back
+        x = x_sign * rx * np.sin(angle)
+        rz = rz_front if np.cos(angle) > 0 else rz_back
+        z = rz * np.cos(angle)
+        waypoints.append(np.array([x, hip_y, z]))
+
+    return waypoints
+
+
+def _get_panel_side_points(lm):
+    """Get the side edge points where front/back panels end."""
+    hip_y = lm["hip_front"][1]
+    front_half_w = abs(lm["hip_left"][0]) * 0.35 * 0.7
     back_half_w = abs(lm["hip_left"][0]) * 0.35 * 0.6
 
-    left_front = np.array([-front_half_w, hip_y, lm["hip_front"][2]])
-    right_front = np.array([front_half_w, hip_y, lm["hip_front"][2]])
-    left_back = np.array([-back_half_w, hip_y, lm["hip_back"][2]])
-    right_back = np.array([back_half_w, hip_y, lm["hip_back"][2]])
+    left_front = np.array([-front_half_w, hip_y, lm["hip_front"][2] + 0.005])
+    right_front = np.array([front_half_w, hip_y, lm["hip_front"][2] + 0.005])
+    left_back = np.array([-back_half_w, lm["hip_back"][1], lm["hip_back"][2] - 0.005])
+    right_back = np.array([back_half_w, lm["hip_back"][1], lm["hip_back"][2] - 0.005])
 
     return left_front, left_back, right_front, right_back
 
 
-def side_tie_straps(width: float = 0.008) -> list[GarmentPatch]:
-    """Side-tie strings connecting front and back panels over the hips."""
+def side_tie_straps(width: float = 0.012) -> list[GarmentPatch]:
+    """Side-tie strings connecting front and back panels around the hips."""
     lm = get_landmarks()
     left_front, left_back, right_front, right_back = _get_panel_side_points(lm)
 
     straps = []
-    # Left side: front panel edge → hip → back panel edge
-    left_hip = lm["hip_left"] * 0.6 + np.array([0, lm["hip_front"][1], 0]) * 0.4
-    left_hip[1] = lm["hip_front"][1]  # keep at hip height
-    straps.append(_strip_between(
-        "bottom_strap_left_tie", left_front, left_back,
-        width, waypoints=[left_hip], n_length=20,
-    ))
-
-    # Right side
-    right_hip = lm["hip_right"] * 0.6 + np.array([0, lm["hip_front"][1], 0]) * 0.4
-    right_hip[1] = lm["hip_front"][1]
-    straps.append(_strip_between(
-        "bottom_strap_right_tie", right_front, right_back,
-        width, waypoints=[right_hip], n_length=20,
-    ))
+    for side, sf, sb in [("left", left_front, left_back), ("right", right_front, right_back)]:
+        waypoints = _hip_arc_waypoints(lm, side, n_points=4)
+        straps.append(_strip_between(
+            f"bottom_strap_{side}_tie", sf, sb,
+            width, waypoints=waypoints, n_length=24,
+        ))
     return straps
 
 
 def waistband(width: float = 0.02) -> list[GarmentPatch]:
-    """Full waistband encircling the hips, connecting front and back."""
+    """Full waistband encircling the hips."""
     lm = get_landmarks()
-    hip_y = lm["hip_front"][1] + 0.01
+    hip_y = lm["hip_front"][1] + 0.005
 
-    # Build a path: front center → right hip → back center → left hip → front center
-    n_points = 32
+    n_points = 36
     angles = np.linspace(0, 2 * np.pi, n_points, endpoint=True)
 
-    # Elliptical path around body at hip height
-    rx = abs(lm["hip_left"][0]) * 0.55  # X radius
-    rz_front = lm["hip_front"][2] + 0.01  # front Z
-    rz_back = abs(lm["hip_back"][2]) + 0.01  # back Z
+    rx = abs(lm["hip_left"][0]) * 0.5
+    rz_front = lm["hip_front"][2] + 0.015
+    rz_back = abs(lm["hip_back"][2]) + 0.015
 
     path = []
     for a in angles:
@@ -188,31 +198,27 @@ def waistband(width: float = 0.02) -> list[GarmentPatch]:
     return [patch]
 
 
-def chain_straps(width: float = 0.004) -> list[GarmentPatch]:
+def chain_straps(width: float = 0.006) -> list[GarmentPatch]:
     """Thin chain-like side straps connecting front and back."""
     return side_tie_straps(width=width)
 
 
-def multi_strap_sides(width: float = 0.005) -> list[GarmentPatch]:
+def multi_strap_sides(width: float = 0.008) -> list[GarmentPatch]:
     """Multiple thin straps on each side (3 per side)."""
     lm = get_landmarks()
     left_front, left_back, right_front, right_back = _get_panel_side_points(lm)
 
     straps = []
-    for side_name, s_front, s_back, hip_lm in [
-        ("left", left_front, left_back, "hip_left"),
-        ("right", right_front, right_back, "hip_right"),
-    ]:
-        for i, offset_y in enumerate([-0.01, 0.0, 0.01]):
-            hip = lm[hip_lm] * 0.6 + np.array([0, lm["hip_front"][1], 0]) * 0.4
-            hip[1] = lm["hip_front"][1] + offset_y
-            sf = s_front.copy()
-            sb = s_back.copy()
-            sf[1] += offset_y
-            sb[1] += offset_y
+    for side, sf, sb in [("left", left_front, left_back), ("right", right_front, right_back)]:
+        for i, offset_y in enumerate([-0.012, 0.0, 0.012]):
+            sf2 = sf.copy(); sf2[1] += offset_y
+            sb2 = sb.copy(); sb2[1] += offset_y
+            waypoints = _hip_arc_waypoints(lm, side, n_points=4)
+            for wp in waypoints:
+                wp[1] += offset_y
             straps.append(_strip_between(
-                f"bottom_strap_{side_name}_{i}",
-                sf, sb, width, waypoints=[hip], n_length=20,
+                f"bottom_strap_{side}_{i}",
+                sf2, sb2, width, waypoints=waypoints, n_length=24,
             ))
     return straps
 
