@@ -26,7 +26,7 @@ def _breast_surface(x_sign: float, u: float, v: float, depth: float = 1.0) -> np
     underbust = lm[f"{side}_underbust"]
 
     # Breast center and radii from real landmarks — scaled up for proper coverage
-    cx = apex[0]
+    cx = apex[0] + x_sign * 0.01  # push cups outward for clear separation
     cy = (apex[1] + underbust[1]) / 2 + 0.01  # center between apex and underbust
     cz_base = (inner[2] + outer[2]) / 2  # base Z (on ribcage)
 
@@ -35,7 +35,7 @@ def _breast_surface(x_sign: float, u: float, v: float, depth: float = 1.0) -> np
     r_forward = apex[2] - cz_base + 0.005  # projection depth
 
     theta = u * np.pi * 0.7  # latitude angle (wider sweep)
-    phi = (v - 0.5) * np.pi * 0.9  # longitude angle (wider sweep)
+    phi = (v - 0.5) * np.pi * 0.85  # longitude angle — reduced to avoid inner overlap
 
     r_scale = 1.0 + depth * 0.3
     x = cx + r_lateral * r_scale * np.sin(theta) * np.sin(phi) * x_sign
