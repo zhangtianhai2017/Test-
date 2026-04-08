@@ -652,21 +652,24 @@ def _make_bottom_template(
     theta = np.linspace(0, 2 * np.pi, n, endpoint=False)
 
     # ── Width profile by template ──────────────────────────────
-    # θ=0 → front, θ=π/2 → left side, θ=π → back, θ=3π/2 → right side
-    strap_w = 0.015  # narrow side straps
+    # θ=0 → front center (lowest dip), θ=π/2 → left side (highest),
+    # θ=π → back center (lowest dip), θ=3π/2 → right side (highest)
+    #
+    # KEY INSIGHT: at θ=0 and θ=π, the strip tangent is horizontal,
+    # so "width" extends VERTICALLY. The front/back panel "width" is
+    # really the VERTICAL HEIGHT of the coverage triangle.
+    # Need ~18cm vertical to cover pubic area (Y=0.78 to Y=0.96).
+    strap_w = 0.015
 
     if style == "classic":
-        front_w = 0.14   # 14cm front panel
-        back_w = 0.12    # 12cm back panel
-        crotch_w = 0.06  # 6cm crotch bridge
+        front_w = 0.18   # 18cm vertical height at front center
+        back_w = 0.16    # 16cm vertical at back center
     elif style == "brazilian":
-        front_w = 0.12
-        back_w = 0.07    # smaller back
-        crotch_w = 0.05
+        front_w = 0.16
+        back_w = 0.10    # smaller back
     else:  # highcut
-        front_w = 0.13
-        back_w = 0.11
-        crotch_w = 0.05
+        front_w = 0.17
+        back_w = 0.14
 
     widths = np.full(n, strap_w)
 
@@ -674,28 +677,21 @@ def _make_bottom_template(
         t = theta[i]
         # Front panel: θ near 0 (or 2π)
         front_dist = min(abs(t), abs(t - 2 * np.pi))
-        if front_dist < 0.8:  # ~45° sector
-            blend = 1.0 - front_dist / 0.8
-            blend = blend ** 0.7  # smooth falloff
+        if front_dist < 1.0:  # ~57° sector each side
+            blend = 1.0 - front_dist / 1.0
+            blend = blend ** 0.6  # smooth falloff
             w = strap_w + (front_w - strap_w) * blend
-            # Taper toward crotch: narrower at the dip bottom
-            y_here = pts[i][1]
-            crotch_factor = max(0, (y_here - crotch_y) / (hip_y - crotch_y))
-            w = crotch_w + (w - crotch_w) * crotch_factor
             widths[i] = max(widths[i], w)
 
         # Back panel: θ near π
         back_dist = abs(t - np.pi)
-        if back_dist < 0.8:
-            blend = 1.0 - back_dist / 0.8
-            blend = blend ** 0.7
+        if back_dist < 1.0:
+            blend = 1.0 - back_dist / 1.0
+            blend = blend ** 0.6
             w = strap_w + (back_w - strap_w) * blend
-            y_here = pts[i][1]
-            crotch_factor = max(0, (y_here - crotch_y) / (hip_y - crotch_y))
-            w = crotch_w + (w - crotch_w) * crotch_factor
             widths[i] = max(widths[i], w)
 
-    widths = np.clip(widths, strap_w * 0.5, 0.20)
+    widths = np.clip(widths, strap_w * 0.5, 0.22)
 
     # Generate mesh
     patch = generate_strip_mesh(pts, widths, body, cfg.n_width, cfg.garment_offset)
