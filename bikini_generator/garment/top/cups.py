@@ -171,10 +171,10 @@ def cone_cup(side: str = "left", coverage: float = 0.7, sharpness: float = 0.6,
 
     def func(u, v):
         v_adj = 0.5 + (v - 0.5) * coverage
-        pos = _breast_surface(x_sign, u, v_adj)
-        # Add conical projection toward apex
-        apex_factor = (1 - u) * (1 - abs(v - 0.5) * 2)
-        pos[2] += sharpness * 0.03 * apex_factor
+        pos = _breast_surface(x_sign, u, v_adj, depth=0.8)
+        # Add mild conical projection toward apex (keep close to body)
+        apex_factor = max(0, (1 - u) * (1 - abs(v - 0.5) * 2))
+        pos[2] += sharpness * 0.015 * apex_factor
         return pos
 
     patch = GarmentPatch.from_parametric(

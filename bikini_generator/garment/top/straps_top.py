@@ -78,7 +78,7 @@ def _spline_strip(
     return patch
 
 
-def over_shoulder_straps(width: float = 0.012) -> list[GarmentPatch]:
+def over_shoulder_straps(width: float = 0.018) -> list[GarmentPatch]:
     """Classic over-the-shoulder straps (left and right)."""
     lm = get_landmarks()
     straps = []
@@ -96,23 +96,30 @@ def over_shoulder_straps(width: float = 0.012) -> list[GarmentPatch]:
     return straps
 
 
-def halter_strap(width: float = 0.01) -> list[GarmentPatch]:
-    """Halter neck strap — both cups connect to neck."""
+def halter_strap(width: float = 0.015) -> list[GarmentPatch]:
+    """Halter neck strap — cups connect around back of neck at shoulder height."""
     lm = get_landmarks()
-    neck = lm["neck_front"]
+    # Halter goes up to shoulder height, then wraps behind the neck
+    shoulder_y = (lm["left_shoulder"][1] + lm["right_shoulder"][1]) / 2
+    neck_back_z = lm["neck_back"][2]
     straps = []
     for side in ["left", "right"]:
+        sign = -1 if side == "left" else 1
         apex = lm[f"{side}_breast_apex"] + np.array([0, 0.03, 0])
-        outer = lm[f"{side}_breast_outer"] + np.array([0, 0.04, 0])
+        shoulder = lm[f"{side}_shoulder"]
+        # Route: cup → shoulder area → behind neck (at shoulder height)
+        neck_wrap = np.array([sign * 0.03, shoulder_y + 0.02, neck_back_z + 0.02])
+        neck_center = np.array([0, shoulder_y + 0.02, neck_back_z])
         straps.append(_spline_strip(
             f"strap_{side}_halter",
-            [outer, apex, neck],
+            [apex, shoulder, neck_wrap, neck_center],
             width=width,
+            n_length=20,
         ))
     return straps
 
 
-def cross_back_straps(width: float = 0.01) -> list[GarmentPatch]:
+def cross_back_straps(width: float = 0.015) -> list[GarmentPatch]:
     """Cross-back straps: left cup → right back, right cup → left back."""
     lm = get_landmarks()
     straps = []
@@ -131,8 +138,8 @@ def cross_back_straps(width: float = 0.01) -> list[GarmentPatch]:
     return straps
 
 
-def multi_strap_web(width: float = 0.006) -> list[GarmentPatch]:
-    """Multi-strap web: 3-4 thin straps per side creating a web pattern."""
+def multi_strap_web(width: float = 0.01) -> list[GarmentPatch]:
+    """Multi-strap web: 3 thin straps per side creating a web pattern."""
     lm = get_landmarks()
     straps = []
     for side in ["left", "right"]:
@@ -140,12 +147,15 @@ def multi_strap_web(width: float = 0.006) -> list[GarmentPatch]:
         apex = lm[f"{side}_breast_apex"] + np.array([0, 0.03, 0])
         outer = lm[f"{side}_breast_outer"] + np.array([0, 0.02, 0])
         shoulder = lm[f"{side}_shoulder"]
-        neck = lm["neck_front"] + np.array([sign * 0.02, 0, 0])
         back = lm["spine_upper"] + np.array([sign * 0.04, 0, 0])
 
-        straps.append(_spline_strip(f"strap_{side}_web_a", [apex, neck], width))
+        # Web_a: cup apex → shoulder (inner path)
+        mid_a = (apex + shoulder) / 2 + np.array([0, 0.015, 0.01])
+        straps.append(_spline_strip(f"strap_{side}_web_a", [apex, mid_a, shoulder], width))
+        # Web_b: cup outer → shoulder (outer path)
         straps.append(_spline_strip(f"strap_{side}_web_b", [outer, shoulder], width))
-        straps.append(_spline_strip(f"strap_{side}_web_c", [apex, shoulder], width))
+        # Web_c: cup apex → shoulder → back
+        straps.append(_spline_strip(f"strap_{side}_web_c", [apex, shoulder, back], width))
     return straps
 
 

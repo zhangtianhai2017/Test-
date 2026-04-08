@@ -44,19 +44,19 @@ def _make_strip(
     return patch
 
 
-def string_connector(width: float = 0.005) -> GarmentPatch:
+def string_connector(width: float = 0.008) -> GarmentPatch:
     """Thin string between cups."""
     lm = get_landmarks()
-    start = lm["right_breast_inner"]
-    end = lm["left_breast_inner"]
+    start = lm["right_breast_inner"] + np.array([0.01, 0, 0.005])
+    end = lm["left_breast_inner"] + np.array([-0.01, 0, 0.005])
     return _make_strip("connector_string", start, end, width, n_length=8, n_width=3)
 
 
-def band_connector(width: float = 0.03) -> GarmentPatch:
+def band_connector(width: float = 0.035) -> GarmentPatch:
     """Wide band between cups."""
     lm = get_landmarks()
-    start = lm["right_breast_inner"]
-    end = lm["left_breast_inner"]
+    start = lm["right_breast_inner"] + np.array([0.01, 0, 0.005])
+    end = lm["left_breast_inner"] + np.array([-0.01, 0, 0.005])
     return _make_strip("connector_band", start, end, width, n_length=10, n_width=6)
 
 

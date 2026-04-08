@@ -1,0 +1,17 @@
+# Material for bikini_ecaf7afc
+newmtl bikini_ecaf7afc_material
+Ka 0.2 0.2 0.2
+Kd 0.8 0.8 0.8
+Ks 0.3 0.3 0.3
+Ns 50.0
+d 1.0
+illum 2
+map_Kd bikini_ecaf7afc.png
+
+newmtl metal_material
+Ka 0.3 0.3 0.3
+Kd 0.7 0.6 0.3
+Ks 0.9 0.9 0.9
+Ns 200.0
+d 1.0
+illum 2

@@ -126,7 +126,7 @@ def _get_panel_side_points(lm):
     return left_front, left_back, right_front, right_back
 
 
-def side_tie_straps(width: float = 0.012) -> list[GarmentPatch]:
+def side_tie_straps(width: float = 0.018) -> list[GarmentPatch]:
     """Side-tie strings connecting front and back panels around the hips."""
     lm = get_landmarks()
     left_front, left_back, right_front, right_back = _get_panel_side_points(lm)
@@ -198,12 +198,12 @@ def waistband(width: float = 0.02) -> list[GarmentPatch]:
     return [patch]
 
 
-def chain_straps(width: float = 0.006) -> list[GarmentPatch]:
+def chain_straps(width: float = 0.01) -> list[GarmentPatch]:
     """Thin chain-like side straps connecting front and back."""
     return side_tie_straps(width=width)
 
 
-def multi_strap_sides(width: float = 0.008) -> list[GarmentPatch]:
+def multi_strap_sides(width: float = 0.012) -> list[GarmentPatch]:
     """Multiple thin straps on each side (3 per side)."""
     lm = get_landmarks()
     left_front, left_back, right_front, right_back = _get_panel_side_points(lm)
