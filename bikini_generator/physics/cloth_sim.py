@@ -317,17 +317,19 @@ class ClothSimulator:
                 self.pos[i][2] = pz * scale
 
     def simulate(self) -> np.ndarray:
-        """Run the full PBD simulation and return final vertex positions."""
+        """Run the full PBD simulation and return final vertex positions.
+
+        No anchors, no attraction — pure physics:
+        - Gravity pulls down
+        - Distance constraints (with elastic tension) resist stretching
+        - Body collision prevents penetration
+        - Surface friction resists sliding
+        """
         for step in range(self.num_steps):
             self._predict_positions(self.dt, self.damping, self.gravity)
 
             for _ in range(self.num_constraint_iters):
                 self._solve_distance_constraints(self.stretch_compliance)
-                self._attract_to_body(
-                    0.3, self.collision_margin,
-                    self.y_min, self.y_max,
-                    self.lut_ny, self.lut_ntheta,
-                )
                 self._collide_body_surface(
                     self.friction, self.collision_margin,
                     self.y_min, self.y_max,

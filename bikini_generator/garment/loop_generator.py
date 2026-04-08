@@ -39,23 +39,23 @@ def _get_coverage_zones() -> list[CoverageZone]:
         CoverageZone(
             name="left_breast",
             center=lm["left_breast_apex"],
-            radius_y=0.06,
-            radius_xz=0.08,
-            min_strip_width=0.10,
+            radius_y=0.08,
+            radius_xz=0.10,
+            min_strip_width=0.12,
         ),
         CoverageZone(
             name="right_breast",
             center=lm["right_breast_apex"],
-            radius_y=0.06,
-            radius_xz=0.08,
-            min_strip_width=0.10,
+            radius_y=0.08,
+            radius_xz=0.10,
+            min_strip_width=0.12,
         ),
         CoverageZone(
             name="crotch",
-            center=lm["crotch_center"] + np.array([0, 0.04, 0]),
-            radius_y=0.08,
-            radius_xz=0.07,
-            min_strip_width=0.09,
+            center=lm["crotch_center"] + np.array([0, 0.06, 0]),
+            radius_y=0.12,
+            radius_xz=0.09,
+            min_strip_width=0.10,
         ),
     ]
 
@@ -372,8 +372,8 @@ def compute_strip_widths(
             modulation = amp * np.sin(freq * theta + phase)
             widths *= (1.0 + modulation)
 
-    # Ensure minimum width
-    widths = np.clip(widths, base_width * 0.5, 0.15)
+    # Ensure minimum width (max 20cm to allow full breast/crotch coverage)
+    widths = np.clip(widths, base_width * 0.5, 0.20)
 
     return widths
 
@@ -635,9 +635,9 @@ def generate_loop_bikini(
 
     patches = []
 
-    # ── Base coverage patches (always present) ──────────────────
-    base_patches = _generate_base_coverage(body, cfg.garment_offset)
-    patches.extend(base_patches)
+    # No independent base patches — coverage comes from loops
+    # widening at privacy zones (breast/crotch). Every piece of
+    # fabric is part of a structurally supported loop.
 
     # ── Helper: make a loop patch with width harmonics ──────────
     def make_patch(loop, name):
