@@ -79,12 +79,15 @@ class ClothSimulator:
         self.old_pos.from_numpy(pos_np)
         self.initial_pos.from_numpy(pos_np)
 
-        # Edges
+        # Edges — rest lengths scaled by 0.95 to create elastic tension
+        # (fabric wants to compress → presses against body like elastic bands)
+        elastic_scale = 0.95
         if self.n_edges > 0:
             edge_np = np.array(all_edges, dtype=np.int32)
             self.edge_indices.from_numpy(edge_np)
             rest_lens = np.array([
-                np.linalg.norm(pos_np[a] - pos_np[b]) for a, b in all_edges
+                np.linalg.norm(pos_np[a] - pos_np[b]) * elastic_scale
+                for a, b in all_edges
             ], dtype=np.float32)
             self.edge_rest_len.from_numpy(rest_lens)
 
@@ -257,7 +260,6 @@ class ClothSimulator:
             # 2. Solve constraints (multiple iterations for convergence)
             for _ in range(self.num_constraint_iters):
                 self._solve_distance_constraints(self.stretch_compliance)
-                self._shape_retention(0.4)  # elastic garment tension
                 self._collide_body(self.friction, self.collision_margin)
                 self._apply_anchors()
 

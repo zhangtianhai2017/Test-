@@ -35,8 +35,8 @@ class PhysicsConfig:
     """Cloth simulation parameters."""
     gravity: float = -9.81
     dt: float = 0.001  # timestep per step
-    num_steps: int = 150  # simulation steps (settle time ~0.15s)
-    num_substeps: int = 10  # PBD constraint iterations per step
+    num_steps: int = 200  # simulation steps (settle time ~0.2s)
+    num_substeps: int = 15  # PBD constraint iterations per step
     cloth_mass_per_vertex: float = 0.001  # kg
     stretch_stiffness: float = 10000.0  # very stiff — tight-fitting garment
     shear_stiffness: float = 500.0

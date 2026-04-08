@@ -83,64 +83,70 @@ def generate_full_body() -> tuple[np.ndarray, np.ndarray]:
 
 
 def get_body_collision_primitives() -> list[dict]:
-    """Return simplified collision shapes for physics simulation.
+    """Return collision shapes for physics simulation.
 
-    Derived from the real mesh dimensions. Each primitive is a dict
-    with 'type', 'center', and shape-specific params.
+    Non-overlapping ellipsoids at key body regions. Each covers a Y
+    band with generous radii to prevent cloth penetration.
     """
     return [
         # Upper torso (ribcage to shoulders)
         {
             "type": "ellipsoid",
             "center": [0.0, 1.34, -0.005],
-            "radii": [0.14, 0.08, 0.10],
+            "radii": [0.14, 0.10, 0.10],
         },
-        # Lower torso (waist to bust)
+        # Mid torso (bust to underbust)
         {
             "type": "ellipsoid",
-            "center": [0.0, 1.16, 0.0],
-            "radii": [0.13, 0.08, 0.09],
+            "center": [0.0, 1.20, 0.0],
+            "radii": [0.14, 0.10, 0.10],
         },
-        # Waist region
+        # Lower torso (underbust to waist)
         {
             "type": "ellipsoid",
-            "center": [0.0, 1.03, 0.0],
-            "radii": [0.13, 0.04, 0.09],
+            "center": [0.0, 1.08, 0.0],
+            "radii": [0.14, 0.06, 0.10],
         },
-        # Hip region
+        # Waist to hip
         {
             "type": "ellipsoid",
-            "center": [0.0, 0.97, 0.02],
-            "radii": [0.16, 0.05, 0.10],
+            "center": [0.0, 0.98, 0.01],
+            "radii": [0.17, 0.06, 0.11],
+        },
+        # Lower hip / upper thigh
+        {
+            "type": "ellipsoid",
+            "center": [0.0, 0.88, 0.0],
+            "radii": [0.14, 0.06, 0.10],
+        },
+        # Crotch region
+        {
+            "type": "ellipsoid",
+            "center": [0.0, 0.80, -0.01],
+            "radii": [0.07, 0.05, 0.07],
         },
         # Left breast
         {
             "type": "sphere",
             "center": [-0.073, 1.298, 0.105],
-            "radius": 0.050,
+            "radius": 0.055,
         },
         # Right breast
         {
             "type": "sphere",
             "center": [0.072, 1.297, 0.105],
-            "radius": 0.050,
+            "radius": 0.055,
         },
         # Left buttock
         {
             "type": "sphere",
             "center": [-0.062, 0.926, -0.130],
-            "radius": 0.065,
+            "radius": 0.070,
         },
         # Right buttock
         {
             "type": "sphere",
             "center": [0.061, 0.929, -0.130],
-            "radius": 0.065,
-        },
-        # Crotch bridge
-        {
-            "type": "ellipsoid",
-            "center": [0.0, 0.81, -0.01],
-            "radii": [0.06, 0.04, 0.06],
+            "radius": 0.070,
         },
     ]

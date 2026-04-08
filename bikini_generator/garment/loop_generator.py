@@ -467,26 +467,18 @@ def generate_strip_mesh(
     faces = np.array(faces, dtype=np.int32)
 
     # ── Anchor assignment ───────────────────────────────────────
-    # Anchor vertices where the strip is narrow (strap regions) and
-    # at the sides of the body (tight contact). This simulates the
-    # friction/pressure that keeps a loop on the body.
-    # We anchor ~25% of vertices: every 4th ring, center vertex.
+    # Model elastic band behavior: a loop stays on the body because
+    # tension presses it against the surface everywhere. We anchor
+    # the center vertex at regular intervals around the loop.
+    # Between anchors, fabric drapes naturally under gravity.
     anchor_ids = []
     anchor_positions = []
-    theta = np.linspace(0, 2 * np.pi, n_length, endpoint=False)
-    base_width = widths.min()
     mid_j = n_width // 2  # center width vertex
 
-    for i in range(n_length):
-        is_narrow = widths[i] < base_width * 1.5  # strap region
-        is_side = (abs(np.sin(theta[i])) > 0.7)   # at body sides (θ ≈ π/2, 3π/2)
-
-        # Anchor every 4th ring at narrow/side regions
-        if (is_narrow or is_side) and i % 4 == 0:
-            for j in range(n_width):
-                vid = i * n_width + j
-                anchor_ids.append(vid)
-                anchor_positions.append(verts[vid].copy())
+    for i in range(0, n_length, 4):  # every 4th ring, center vertex
+        vid = i * n_width + mid_j
+        anchor_ids.append(vid)
+        anchor_positions.append(verts[vid].copy())
 
     patch = GarmentPatch(
         name="loop_strip",
@@ -558,14 +550,18 @@ def _generate_base_coverage(body: BodySurface, garment_offset: float = 0.005) ->
             patch.faces = patch.faces[:, [0, 2, 1]]
             patch.compute_normals()
 
-        # Anchor edges of cup (held by surrounding loops/body contact)
-        edge_ids = []
+        # Only anchor the top edge (row==0 = strap attachment) and
+        # side edges (col==0, col==nv-1 = where straps connect).
+        # The cup body is free to drape naturally under gravity.
+        anchor_ids = []
         for idx in range(nu * nv):
             row, col = divmod(idx, nv)
-            if row == 0 or row == nu - 1 or col == 0 or col == nv - 1:
-                edge_ids.append(idx)
-        patch.anchor_vertex_ids = edge_ids
-        patch.anchor_body_positions = [patch.vertices[i].copy() for i in edge_ids]
+            if row == 0:  # top edge (shoulder strap)
+                anchor_ids.append(idx)
+            elif row <= 2 and (col == 0 or col == nv - 1):  # upper side strap points
+                anchor_ids.append(idx)
+        patch.anchor_vertex_ids = anchor_ids
+        patch.anchor_body_positions = [patch.vertices[i].copy() for i in anchor_ids]
         patches.append(patch)
 
     # ── Bottom panel: front V-shape + crotch strip + back panel ──
@@ -624,14 +620,20 @@ def _generate_base_coverage(body: BodySurface, garment_offset: float = 0.005) ->
         "base_bottom", bottom_func,
         (0.0, 1.0), (0.0, 1.0), nu, nv,
     )
-    # Anchor top edge (held by hip strap) and bottom edges (body contact)
-    edge_ids = []
+    # Anchor the top edge (waistband), crotch bridge row (between legs),
+    # and back top edge. The fabric between anchors drapes under gravity.
+    anchor_ids = []
+    crotch_row = int(nu * 0.5)  # u≈0.5 is the crotch bridge
     for idx in range(nu * nv):
         row, col = divmod(idx, nv)
-        if row == 0 or row == nu - 1 or col == 0 or col == nv - 1:
-            edge_ids.append(idx)
-    patch.anchor_vertex_ids = edge_ids
-    patch.anchor_body_positions = [patch.vertices[i].copy() for i in edge_ids]
+        if row == 0:  # top edge (front waistband)
+            anchor_ids.append(idx)
+        elif row == nu - 1:  # back top edge
+            anchor_ids.append(idx)
+        elif row == crotch_row:  # crotch bridge (sits between legs)
+            anchor_ids.append(idx)
+    patch.anchor_vertex_ids = anchor_ids
+    patch.anchor_body_positions = [patch.vertices[i].copy() for i in anchor_ids]
     patches.append(patch)
 
     return patches
