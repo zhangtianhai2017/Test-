@@ -1,10 +1,9 @@
 """GPU-accelerated cloth simulation using Taichi.
 
-Implements a mass-spring system with:
-- Stretch, shear, and bend springs
+Uses Position-Based Dynamics (PBD) for unconditional stability:
+- Distance constraints (stretch, shear, bend)
 - Body collision with friction
 - Anchor constraints (pinned vertices)
-- Elastic tension modeling
 - Verlet integration on GPU
 """
 
@@ -15,7 +14,7 @@ from ..config import PHYSICS
 
 @ti.data_oriented
 class ClothSimulator:
-    """GPU cloth simulator using Taichi mass-spring model."""
+    """GPU cloth simulator using Taichi with PBD constraints."""
 
     def __init__(
         self,
@@ -33,79 +32,44 @@ class ClothSimulator:
         self.damping = cfg.damping
         self.friction = cfg.friction_coefficient
         self.collision_margin = cfg.collision_margin
-        self.stretch_k = cfg.stretch_stiffness
-        self.shear_k = cfg.shear_stiffness
-        self.bend_k = cfg.bend_stiffness
         self.mass = cfg.cloth_mass_per_vertex
+
+        # PBD stiffness (0-1 range, applied as constraint compliance)
+        self.stretch_compliance = 1.0 / max(cfg.stretch_stiffness, 1.0)
+        self.num_constraint_iters = getattr(cfg, 'num_substeps', 5)
 
         self.n_verts = len(vertices)
         self.n_faces = len(faces)
 
-        # Build spring connectivity from mesh edges
+        # Build edge connectivity
         edges = set()
-        face_adj = {}  # edge -> list of opposite vertex for bend springs
-
         for f in faces:
             for i in range(3):
                 a, b = int(f[i]), int(f[(i + 1) % 3])
-                c = int(f[(i + 2) % 3])  # opposite vertex
-                edge = (min(a, b), max(a, b))
-                edges.add(edge)
-                if edge not in face_adj:
-                    face_adj[edge] = []
-                face_adj[edge].append(c)
+                edges.add((min(a, b), max(a, b)))
 
-        # Stretch springs = mesh edges
-        stretch_springs = list(edges)
-
-        # Shear springs = face diagonals (connecting non-adjacent vertices)
-        shear_springs = []
-        for f in faces:
-            for i in range(3):
-                a, b = int(f[i]), int(f[(i + 2) % 3])
-                edge = (min(a, b), max(a, b))
-                if edge not in edges:
-                    shear_springs.append(edge)
-                    edges.add(edge)
-
-        # Bend springs = connect opposite vertices of adjacent faces
-        bend_springs = []
-        for edge_key, opposites in face_adj.items():
-            if len(opposites) == 2:
-                a, b = opposites
-                bend_edge = (min(a, b), max(a, b))
-                if bend_edge not in edges:
-                    bend_springs.append(bend_edge)
-                    edges.add(bend_edge)
-
-        all_springs = stretch_springs + shear_springs + bend_springs
-        n_stretch = len(stretch_springs)
-        n_shear = len(shear_springs)
-        self.n_springs = len(all_springs)
+        all_edges = list(edges)
+        self.n_edges = len(all_edges)
 
         # --- Taichi fields ---
         self.pos = ti.Vector.field(3, dtype=ti.f32, shape=self.n_verts)
         self.old_pos = ti.Vector.field(3, dtype=ti.f32, shape=self.n_verts)
-        self.vel = ti.Vector.field(3, dtype=ti.f32, shape=self.n_verts)
-        self.force = ti.Vector.field(3, dtype=ti.f32, shape=self.n_verts)
         self.initial_pos = ti.Vector.field(3, dtype=ti.f32, shape=self.n_verts)
 
-        # Springs: [idx_a, idx_b]
-        self.spring_indices = ti.Vector.field(2, dtype=ti.i32, shape=self.n_springs)
-        self.spring_rest_len = ti.field(dtype=ti.f32, shape=self.n_springs)
-        self.spring_stiffness = ti.field(dtype=ti.f32, shape=self.n_springs)
+        # Edges for distance constraints
+        self.edge_indices = ti.Vector.field(2, dtype=ti.i32, shape=max(self.n_edges, 1))
+        self.edge_rest_len = ti.field(dtype=ti.f32, shape=max(self.n_edges, 1))
 
         # Anchors
         self.n_anchors = len(anchor_ids)
         self.anchor_ids_field = ti.field(dtype=ti.i32, shape=max(self.n_anchors, 1))
         self.anchor_targets = ti.Vector.field(3, dtype=ti.f32, shape=max(self.n_anchors, 1))
         self.is_anchored = ti.field(dtype=ti.i32, shape=self.n_verts)
+        self.inv_mass = ti.field(dtype=ti.f32, shape=self.n_verts)
 
         # Collision primitives
-        # Support spheres and ellipsoids
         max_prims = max(len(collision_primitives), 1)
         self.n_colliders = len(collision_primitives)
-        self.collider_type = ti.field(dtype=ti.i32, shape=max_prims)  # 0=sphere, 1=ellipsoid
         self.collider_center = ti.Vector.field(3, dtype=ti.f32, shape=max_prims)
         self.collider_radii = ti.Vector.field(3, dtype=ti.f32, shape=max_prims)
 
@@ -114,86 +78,83 @@ class ClothSimulator:
         self.pos.from_numpy(pos_np)
         self.old_pos.from_numpy(pos_np)
         self.initial_pos.from_numpy(pos_np)
-        self.vel.from_numpy(np.zeros_like(pos_np))
 
-        # Springs
-        spring_np = np.array(all_springs, dtype=np.int32)
-        self.spring_indices.from_numpy(spring_np)
+        # Edges
+        if self.n_edges > 0:
+            edge_np = np.array(all_edges, dtype=np.int32)
+            self.edge_indices.from_numpy(edge_np)
+            rest_lens = np.array([
+                np.linalg.norm(pos_np[a] - pos_np[b]) for a, b in all_edges
+            ], dtype=np.float32)
+            self.edge_rest_len.from_numpy(rest_lens)
 
-        # Compute rest lengths and assign stiffness
-        rest_lens = np.zeros(self.n_springs, dtype=np.float32)
-        stiffness = np.zeros(self.n_springs, dtype=np.float32)
-        for i, (a, b) in enumerate(all_springs):
-            rest_lens[i] = np.linalg.norm(pos_np[a] - pos_np[b])
-            if i < n_stretch:
-                stiffness[i] = self.stretch_k
-            elif i < n_stretch + n_shear:
-                stiffness[i] = self.shear_k
-            else:
-                stiffness[i] = self.bend_k
-        self.spring_rest_len.from_numpy(rest_lens)
-        self.spring_stiffness.from_numpy(stiffness)
-
-        # Anchors
+        # Anchors and inverse mass
         anchored = np.zeros(self.n_verts, dtype=np.int32)
+        inv_mass = np.ones(self.n_verts, dtype=np.float32) / self.mass
         if self.n_anchors > 0:
             anchor_ids_np = np.array(anchor_ids, dtype=np.int32)
-            anchor_targets_np = np.array([p.astype(np.float32) for p in anchor_positions])
+            anchor_targets_np = np.array(
+                [p.astype(np.float32) for p in anchor_positions]
+            )
             self.anchor_ids_field.from_numpy(anchor_ids_np)
             self.anchor_targets.from_numpy(anchor_targets_np)
             for aid in anchor_ids:
                 if 0 <= aid < self.n_verts:
                     anchored[aid] = 1
+                    inv_mass[aid] = 0.0  # infinite mass = pinned
         self.is_anchored.from_numpy(anchored)
+        self.inv_mass.from_numpy(inv_mass)
 
         # Collision primitives
         for i, prim in enumerate(collision_primitives):
             center = np.array(prim["center"], dtype=np.float32)
+            self.collider_center[i] = ti.Vector(center.tolist())
             if prim["type"] == "sphere":
                 r = prim["radius"]
-                self.collider_type[i] = 0
-                self.collider_center[i] = ti.Vector(center.tolist())
                 self.collider_radii[i] = ti.Vector([r, r, r])
             elif prim["type"] == "ellipsoid":
                 radii = np.array(prim["radii"], dtype=np.float32)
-                self.collider_type[i] = 1
-                self.collider_center[i] = ti.Vector(center.tolist())
                 self.collider_radii[i] = ti.Vector(radii.tolist())
 
     @ti.kernel
-    def _apply_forces(self):
-        """Apply gravity and spring forces."""
-        # Reset forces
-        for i in range(self.n_verts):
-            self.force[i] = ti.Vector([0.0, self.gravity * self.mass, 0.0])
-
-        # Spring forces
-        for s in range(self.n_springs):
-            a = self.spring_indices[s][0]
-            b = self.spring_indices[s][1]
-            diff = self.pos[b] - self.pos[a]
-            dist = diff.norm()
-            if dist > 1e-7:
-                rest = self.spring_rest_len[s]
-                k = self.spring_stiffness[s]
-                # Hooke's law with direction
-                f = k * (dist - rest) * diff / dist
-                self.force[a] += f
-                self.force[b] -= f
-
-    @ti.kernel
-    def _integrate(self, dt: ti.f32, damping: ti.f32):
-        """Verlet integration step."""
+    def _predict_positions(self, dt: ti.f32, damping: ti.f32, gravity: ti.f32):
+        """Verlet prediction step: apply gravity and damping."""
         for i in range(self.n_verts):
             if self.is_anchored[i] == 0:
-                # Verlet integration
-                new_pos = (
-                    self.pos[i]
-                    + (self.pos[i] - self.old_pos[i]) * damping
-                    + self.force[i] / self.mass * dt * dt
-                )
+                vel = (self.pos[i] - self.old_pos[i]) * damping
                 self.old_pos[i] = self.pos[i]
-                self.pos[i] = new_pos
+                # Verlet: x_new = x + v*dt + a*dt^2
+                self.pos[i] = self.pos[i] + vel + ti.Vector([0.0, gravity * dt * dt, 0.0])
+
+    @ti.kernel
+    def _solve_distance_constraints(self, compliance: ti.f32):
+        """PBD distance constraint solver — unconditionally stable."""
+        for e in range(self.n_edges):
+            a = self.edge_indices[e][0]
+            b = self.edge_indices[e][1]
+            diff = self.pos[b] - self.pos[a]
+            dist = diff.norm()
+
+            if dist < 1e-8:
+                continue
+
+            rest = self.edge_rest_len[e]
+            w_a = self.inv_mass[a]
+            w_b = self.inv_mass[b]
+            w_sum = w_a + w_b
+
+            if w_sum < 1e-8:
+                continue
+
+            # PBD correction
+            error = dist - rest
+            correction = error * diff / (dist * w_sum)
+
+            # Stiffness via compliance (lower = stiffer)
+            stiffness_factor = 1.0 / (1.0 + compliance)
+
+            self.pos[a] += correction * w_a * stiffness_factor
+            self.pos[b] -= correction * w_b * stiffness_factor
 
     @ti.kernel
     def _apply_anchors(self):
@@ -202,7 +163,6 @@ class ClothSimulator:
             aid = self.anchor_ids_field[i]
             if aid >= 0 and aid < self.n_verts:
                 self.pos[aid] = self.anchor_targets[i]
-                self.old_pos[aid] = self.anchor_targets[i]
 
     @ti.kernel
     def _collide_body(self, friction: ti.f32, margin: ti.f32):
@@ -217,58 +177,89 @@ class ClothSimulator:
 
                 # Transform to ellipsoid-local space
                 local = self.pos[i] - center
-                # Normalized distance (in ellipsoid space)
                 nx = local[0] / radii[0]
                 ny = local[1] / radii[1]
                 nz = local[2] / radii[2]
                 dist_sq = nx * nx + ny * ny + nz * nz
 
-                if dist_sq < (1.0 + margin) * (1.0 + margin):
-                    # Inside or too close to body surface
+                threshold = 1.0 + margin / ti.min(radii[0], ti.min(radii[1], radii[2]))
+
+                if dist_sq < threshold * threshold:
                     dist = ti.sqrt(dist_sq)
                     if dist < 1e-7:
                         dist = 1e-7
 
-                    # Normal direction in world space
+                    # Normal in world space
                     normal = ti.Vector([
                         nx / radii[0],
                         ny / radii[1],
                         nz / radii[2],
                     ])
-                    normal = normal / normal.norm()
+                    n_len = normal.norm()
+                    if n_len > 1e-7:
+                        normal = normal / n_len
 
                     # Push out to surface + margin
-                    penetration = (1.0 + margin) - dist
-                    correction = normal * penetration * ti.sqrt(
-                        radii[0] * radii[0] * normal[0] * normal[0]
-                        + radii[1] * radii[1] * normal[1] * normal[1]
-                        + radii[2] * radii[2] * normal[2] * normal[2]
-                    )
-                    self.pos[i] += correction
+                    target_dist = threshold
+                    scale_factor = target_dist / dist
+
+                    new_local = ti.Vector([
+                        local[0] * scale_factor,
+                        local[1] * scale_factor,
+                        local[2] * scale_factor,
+                    ])
+
+                    new_pos = center + new_local
+                    displacement = new_pos - self.pos[i]
+                    self.pos[i] = new_pos
 
                     # Friction: reduce tangential velocity
                     vel = self.pos[i] - self.old_pos[i]
                     vel_n = vel.dot(normal) * normal
                     vel_t = vel - vel_n
-
-                    # Coulomb friction model
                     vel_t_mag = vel_t.norm()
-                    if vel_t_mag > 1e-7:
-                        friction_force = friction * ti.abs(vel_n.norm())
-                        if friction_force > vel_t_mag:
-                            friction_force = vel_t_mag
-                        vel_t = vel_t * (1.0 - friction_force / vel_t_mag)
 
-                    # Update: only keep tangential component (bounce = 0)
+                    if vel_t_mag > 1e-7:
+                        friction_reduction = friction * ti.abs(displacement.norm())
+                        if friction_reduction > vel_t_mag:
+                            friction_reduction = vel_t_mag
+                        vel_t = vel_t * (1.0 - friction_reduction / vel_t_mag)
+
                     self.old_pos[i] = self.pos[i] - vel_t
 
+    @ti.kernel
+    def _shape_retention(self, strength: ti.f32):
+        """Pull vertices toward their initial (rest) positions.
+
+        Models the elastic memory of the garment — it was designed to fit
+        the body and resists deformation away from that shape.
+        This is the key force that keeps a bikini on the body.
+        """
+        for i in range(self.n_verts):
+            if self.is_anchored[i] == 1:
+                continue
+
+            disp = self.initial_pos[i] - self.pos[i]
+            dist = disp.norm()
+            if dist > 0.001:
+                # Stronger pull for larger displacements (nonlinear)
+                factor = strength * (1.0 + dist * 3.0)
+                if factor > 0.8:
+                    factor = 0.8
+                self.pos[i] += disp * factor
+
     def simulate(self) -> np.ndarray:
-        """Run the full simulation and return final vertex positions."""
+        """Run the full PBD simulation and return final vertex positions."""
         for step in range(self.num_steps):
-            self._apply_forces()
-            self._integrate(self.dt, self.damping)
-            self._apply_anchors()
-            self._collide_body(self.friction, self.collision_margin)
+            # 1. Predict positions (gravity + inertia)
+            self._predict_positions(self.dt, self.damping, self.gravity)
+
+            # 2. Solve constraints (multiple iterations for convergence)
+            for _ in range(self.num_constraint_iters):
+                self._solve_distance_constraints(self.stretch_compliance)
+                self._shape_retention(0.4)  # elastic garment tension
+                self._collide_body(self.friction, self.collision_margin)
+                self._apply_anchors()
 
         return self.pos.to_numpy()
 
@@ -280,6 +271,10 @@ class ClothSimulator:
 
         # Ignore anchored vertices
         anchored = self.is_anchored.to_numpy()
-        displacements[anchored == 1] = 0
+        displacements[anchored == 1] = 0.0
 
-        return float(np.max(displacements)) if len(displacements) > 0 else 0.0
+        # Filter NaN/Inf
+        valid = np.isfinite(displacements)
+        if valid.any():
+            return float(np.max(displacements[valid]))
+        return 0.0

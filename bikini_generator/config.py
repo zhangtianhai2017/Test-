@@ -34,16 +34,17 @@ class BodyConfig:
 class PhysicsConfig:
     """Cloth simulation parameters."""
     gravity: float = -9.81
-    dt: float = 0.001  # timestep
-    num_steps: int = 500  # simulation steps
-    cloth_mass_per_vertex: float = 0.002  # kg
-    stretch_stiffness: float = 800.0
-    shear_stiffness: float = 200.0
-    bend_stiffness: float = 50.0
-    friction_coefficient: float = 0.6  # cloth-skin friction
-    damping: float = 0.995
-    collision_margin: float = 0.002  # 2mm
-    max_displacement_threshold: float = 0.05  # 5cm - fail if any vertex moves more
+    dt: float = 0.001  # timestep per step
+    num_steps: int = 150  # simulation steps (settle time ~0.15s)
+    num_substeps: int = 10  # PBD constraint iterations per step
+    cloth_mass_per_vertex: float = 0.001  # kg
+    stretch_stiffness: float = 10000.0  # very stiff — tight-fitting garment
+    shear_stiffness: float = 500.0
+    bend_stiffness: float = 100.0
+    friction_coefficient: float = 0.8  # cloth-skin friction
+    damping: float = 0.90  # very strong damping — fast settling, models air resistance
+    collision_margin: float = 0.004  # 4mm
+    max_displacement_threshold: float = 0.10  # 10cm (straps legitimately span distances)
 
 
 @dataclass

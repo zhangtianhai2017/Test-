@@ -11,6 +11,8 @@ from ..garment.assembly import GarmentAssembly
 from ..body.mannequin import get_body_collision_primitives
 from ..config import PHYSICS
 
+_taichi_initialized = False
+
 
 @dataclass
 class ValidationResult:
@@ -53,14 +55,17 @@ def validate_garment(
     collision_prims = get_body_collision_primitives()
 
     # Lazy import Taichi and cloth sim (heavy deps)
+    global _taichi_initialized
     import taichi as ti
     from .cloth_sim import ClothSimulator
 
-    # Initialize Taichi (idempotent)
-    try:
-        ti.init(arch=ti.gpu, default_fp=ti.f32)
-    except Exception:
-        ti.init(arch=ti.cpu, default_fp=ti.f32)
+    # Initialize Taichi once per process
+    if not _taichi_initialized:
+        try:
+            ti.init(arch=ti.gpu, default_fp=ti.f32)
+        except Exception:
+            ti.init(arch=ti.cpu, default_fp=ti.f32)
+        _taichi_initialized = True
 
     # Run simulation
     sim = ClothSimulator(
