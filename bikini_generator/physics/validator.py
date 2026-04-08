@@ -5,9 +5,7 @@ If validation fails, suggests parameter adjustments for retry.
 """
 
 import numpy as np
-import taichi as ti
 from dataclasses import dataclass
-from .cloth_sim import ClothSimulator
 from .coverage_check import check_coverage, all_covered
 from ..garment.assembly import GarmentAssembly
 from ..body.mannequin import get_body_collision_primitives
@@ -53,6 +51,10 @@ def validate_garment(
 
     # Get body collision primitives
     collision_prims = get_body_collision_primitives()
+
+    # Lazy import Taichi and cloth sim (heavy deps)
+    import taichi as ti
+    from .cloth_sim import ClothSimulator
 
     # Initialize Taichi (idempotent)
     try:
