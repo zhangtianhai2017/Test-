@@ -10,12 +10,11 @@ build/
 venv/
 env/
 web/generated/
-*.obj
-*.mtl
 *.stl
 .env
 *.png
 !web/static/**/*.png
 !bikini_output.png
+!output/**/*.png
 .pytest_cache/
 .mypy_cache/
