@@ -1,8 +1,8 @@
 """Generate debug image marking privacy zone positions on the body.
 
 Privacy zones are drawn as 3D curves on the body surface.
-The bikini bottom is one continuous piece: front panel + crotch strip + back panel,
-all flush against skin.
+The bikini bottom is one continuous piece: front panel + crotch strip + back panel.
+Fabric is clipped to the body silhouette so it never shows over background.
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -19,7 +19,7 @@ from bikini_generator.garment.loop_generator import BodySurface
 
 
 def render_body(ax, body_verts, body_faces, azimuth=0, title=""):
-    """Render body with painter's algorithm. Returns rotate function."""
+    """Render body with painter's algorithm. Returns (rotate_fn, silhouette)."""
     cos_a, sin_a = np.cos(azimuth), np.sin(azimuth)
 
     def rotate(v):
@@ -62,7 +62,49 @@ def render_body(ax, body_verts, body_faces, azimuth=0, title=""):
     pc = PolyCollection(body_xy[order], facecolors=body_colors[order],
                         edgecolors='none', zorder=1)
     ax.add_collection(pc)
-    return rotate
+
+    # Build body silhouette: for each Y bin, find min/max X of front-facing verts
+    front_mask = rv[:, 2] > -0.01
+    front_verts = rv[front_mask]
+    silhouette = build_silhouette(front_verts[:, 0], front_verts[:, 1],
+                                  y_min=0.55, y_max=1.60, n_bins=500)
+
+    return rotate, silhouette
+
+
+def build_silhouette(xs, ys, y_min, y_max, n_bins=500):
+    """Build body silhouette as (y_bin -> (min_x, max_x)).
+
+    Returns a function: is_inside(x, y) -> bool
+    """
+    bin_edges = np.linspace(y_min, y_max, n_bins + 1)
+    bin_min_x = np.full(n_bins, np.inf)
+    bin_max_x = np.full(n_bins, -np.inf)
+
+    bin_idx = np.clip(((ys - y_min) / (y_max - y_min) * n_bins).astype(int),
+                      0, n_bins - 1)
+    for i in range(len(xs)):
+        bi = bin_idx[i]
+        if xs[i] < bin_min_x[bi]:
+            bin_min_x[bi] = xs[i]
+        if xs[i] > bin_max_x[bi]:
+            bin_max_x[bi] = xs[i]
+
+    # Expand bins slightly for margin
+    margin = 0.003
+    valid = bin_min_x < np.inf
+    bin_min_x[valid] -= margin
+    bin_max_x[valid] += margin
+
+    def is_inside(x, y):
+        bi = int((y - y_min) / (y_max - y_min) * n_bins)
+        if bi < 0 or bi >= n_bins:
+            return False
+        if bin_min_x[bi] == np.inf:
+            return False
+        return bin_min_x[bi] <= x <= bin_max_x[bi]
+
+    return is_inside
 
 
 def sample_surface_points(body_surface, yt_points, offset=0.002):
@@ -105,143 +147,155 @@ def cubic_bezier(p0, p1, p2, p3, n=20):
 
 
 def make_bikini_bottom(lm, body_surface):
-    """Create one continuous bikini bottom: front panel + crotch strip + back panel.
+    """Create one continuous bikini bottom: front + crotch strip + back.
 
-    The outline is a single closed loop in (Y, theta) space, projected
-    onto the body surface. The crotch strip wraps between the legs from
-    front to back, flush against skin.
+    Front panel covers the pubic area on the FRONT of the body.
+    Its bottom edge is at crotch_front level (~Y=0.84), NOT at crotch_center.
+    Only the narrow crotch strip goes down between the legs.
 
     Outline traversal (clockwise from front top-left):
-    1. Front top edge (left to right)
-    2. Right leg scoop (down to front crotch)
-    3. Right edge of crotch strip (front to back, between legs)
-    4. Back right leg scoop (up from crotch to back top)
-    5. Back top edge (right to left, viewed from back)
-    6. Back left leg scoop (down to back crotch)
-    7. Left edge of crotch strip (back to front, between legs)
-    8. Front left leg scoop (up to front top-left)
+    1. Front top edge
+    2. Right leg scoop (down to front panel bottom)
+    3. Right crotch strip edge (front panel bottom → crotch_center → back panel bottom)
+    4. Back right leg scoop (up)
+    5. Back top edge
+    6. Back left leg scoop (down)
+    7. Left crotch strip edge (back → crotch_center → front)
+    8. Front left leg scoop (up)
     """
-    hip_side_y = (lm["hip_left"][1] + lm["hip_right"][1]) / 2  # 0.976
-    crotch_y = lm["crotch_center"][1]  # 0.781
+    hip_side_y = (lm["hip_left"][1] + lm["hip_right"][1]) / 2
+    crotch_front_y = lm["crotch_front"][1]  # 0.846 — where front meets crotch
+    crotch_back_y = lm["crotch_back"][1]    # 0.849
+    crotch_center_y = lm["crotch_center"][1]  # 0.781 — lowest point between legs
 
-    # Slightly smaller overall: top at hip - 3cm
     top_y = hip_side_y - 0.03  # 0.946
+    # Front panel bottom: at crotch fold, not between legs
+    front_bottom_y = crotch_front_y - 0.01  # 0.836
+    back_bottom_y = crotch_back_y - 0.01    # 0.839
 
-    # Front panel half-width at top: 5.5cm (smaller)
     hw_front = 0.055
-    # Back panel half-width at top: 5cm
     hw_back = 0.050
-    # Crotch strip half-width: 1.5cm
     hw_crotch = 0.015
 
-    def theta_for_hw(hw, y, theta_center):
-        """Convert physical half-width (m) to angular half-width."""
-        r = body_surface.get_surface_radius(y, theta_center)
+    def theta_hw(hw, y, tc):
+        r = body_surface.get_surface_radius(y, tc)
         return hw / max(r, 0.01)
 
-    # Angular half-widths at key locations
-    thf = theta_for_hw(hw_front, top_y, 0.0)         # front top
-    thb = theta_for_hw(hw_back, top_y, np.pi)         # back top
-    thc_f = theta_for_hw(hw_crotch, crotch_y, 0.0)    # crotch front
-    thc_b = theta_for_hw(hw_crotch, crotch_y, np.pi)  # crotch back
+    thf = theta_hw(hw_front, top_y, 0.0)
+    thb = theta_hw(hw_back, top_y, np.pi)
+    # Crotch strip width at front/back panel bottoms (on body surface)
+    thc_f = theta_hw(hw_crotch, front_bottom_y, 0.0)
+    thc_b = theta_hw(hw_crotch, back_bottom_y, np.pi)
+    # Crotch strip width at the lowest point (between legs)
+    thc_mid = theta_hw(hw_crotch, crotch_center_y, np.pi / 2)
 
     outline = []
 
-    # --- 1. FRONT TOP EDGE (left to right) ---
-    n_top = 15
-    for i in range(n_top + 1):
-        frac = i / n_top
-        theta = thf * (1 - 2 * frac)  # +thf to -thf
-        bow = 0.004 * np.sin(np.pi * frac)
+    # 1. Front top edge
+    for i in range(16):
+        f = i / 15
+        theta = thf * (1 - 2 * f)
+        bow = 0.004 * np.sin(np.pi * f)
         outline.append((top_y + bow, theta))
 
-    # --- 2. RIGHT LEG SCOOP (top-right to front crotch-right) ---
-    scoop_frac = 0.35
-    scoop_y = top_y - (top_y - crotch_y) * scoop_frac
-    scoop_depth = thf * 0.55
-    p0 = (top_y, -thf)
-    p3 = (crotch_y, -thc_f)
-    p1 = (scoop_y, -thf + scoop_depth)
-    p2 = (crotch_y + 0.03, -thc_f * 1.5)
-    outline.extend(cubic_bezier(p0, p1, p2, p3, n=25)[1:])
+    # 2. Right leg scoop (top-right → front panel bottom-right)
+    sy = top_y - (top_y - front_bottom_y) * 0.4
+    sd = thf * 0.55
+    outline.extend(cubic_bezier(
+        (top_y, -thf), (sy, -thf + sd),
+        (front_bottom_y + 0.02, -thc_f * 1.5), (front_bottom_y, -thc_f),
+        n=25)[1:])
 
-    # --- 3. RIGHT CROTCH STRIP EDGE (front to back, between legs) ---
-    # theta_center sweeps from 0 (front) to pi (back)
-    # right edge = theta_center - offset
-    n_crotch = 25
+    # 3. Right crotch strip edge (front bottom → dip to crotch_center → back bottom)
+    # The strip dips from front_bottom_y down to crotch_center_y and back up to back_bottom_y
+    n_crotch = 30
     for i in range(n_crotch + 1):
-        frac = i / n_crotch
-        theta_center = np.pi * frac  # 0 → pi
-        offset = theta_for_hw(hw_crotch, crotch_y, theta_center)
-        theta = theta_center - offset  # right edge
-        # Slight Y dip at midpoint (between legs, lowest point)
-        y_dip = -0.008 * np.sin(np.pi * frac)
-        outline.append((crotch_y + y_dip, theta))
+        f = i / n_crotch
+        # theta goes from 0 (front) to pi (back)
+        tc = np.pi * f
+        # Y: smooth dip from front_bottom_y → crotch_center_y → back_bottom_y
+        # Use a sine curve to dip at the midpoint
+        y_start = front_bottom_y
+        y_end = back_bottom_y
+        y_baseline = y_start + (y_end - y_start) * f
+        dip_depth = y_baseline - crotch_center_y
+        dip = -dip_depth * np.sin(np.pi * f)
+        y_here = y_baseline + dip
+        off = theta_hw(hw_crotch, max(y_here, crotch_center_y), tc)
+        outline.append((y_here, tc - off))
 
-    # --- 4. BACK RIGHT LEG SCOOP (crotch up to back top-right) ---
-    # From (crotch_y, pi - thc_b) up to (top_y, pi - thb)
-    scoop_y_b = top_y - (top_y - crotch_y) * scoop_frac
-    scoop_depth_b = thb * 0.55
-    p0 = (crotch_y, np.pi - thc_b)
-    p3 = (top_y, np.pi - thb)
-    p1 = (crotch_y + 0.03, np.pi - thc_b * 1.5)
-    p2 = (scoop_y_b, np.pi - thb + scoop_depth_b)
-    outline.extend(cubic_bezier(p0, p1, p2, p3, n=25)[1:])
+    # 4. Back right leg scoop (back bottom → back top-right)
+    sy_b = top_y - (top_y - back_bottom_y) * 0.4
+    sd_b = thb * 0.55
+    outline.extend(cubic_bezier(
+        (back_bottom_y, np.pi - thc_b), (back_bottom_y + 0.02, np.pi - thc_b * 1.5),
+        (sy_b, np.pi - thb + sd_b), (top_y, np.pi - thb),
+        n=25)[1:])
 
-    # --- 5. BACK TOP EDGE (right to left, at theta ~ pi) ---
-    for i in range(n_top + 1):
-        frac = i / n_top
-        theta = np.pi - thb + 2 * thb * frac  # pi-thb to pi+thb
-        bow = 0.004 * np.sin(np.pi * frac)
+    # 5. Back top edge
+    for i in range(16):
+        f = i / 15
+        theta = np.pi - thb + 2 * thb * f
+        bow = 0.004 * np.sin(np.pi * f)
         outline.append((top_y + bow, theta))
 
-    # --- 6. BACK LEFT LEG SCOOP (back top-left down to crotch) ---
-    p0 = (top_y, np.pi + thb)
-    p3 = (crotch_y, np.pi + thc_b)
-    p1 = (scoop_y_b, np.pi + thb - scoop_depth_b)
-    p2 = (crotch_y + 0.03, np.pi + thc_b * 1.5)
-    outline.extend(cubic_bezier(p0, p1, p2, p3, n=25)[1:])
+    # 6. Back left leg scoop (down)
+    outline.extend(cubic_bezier(
+        (top_y, np.pi + thb), (sy_b, np.pi + thb - sd_b),
+        (back_bottom_y + 0.02, np.pi + thc_b * 1.5), (back_bottom_y, np.pi + thc_b),
+        n=25)[1:])
 
-    # --- 7. LEFT CROTCH STRIP EDGE (back to front, between legs) ---
-    # theta_center sweeps from pi (back) to 0 (front)
-    # left edge = theta_center + offset
+    # 7. Left crotch strip edge (back → crotch_center → front)
     for i in range(n_crotch + 1):
-        frac = i / n_crotch
-        theta_center = np.pi * (1 - frac)  # pi → 0
-        offset = theta_for_hw(hw_crotch, crotch_y, theta_center)
-        theta = theta_center + offset  # left edge
-        y_dip = -0.008 * np.sin(np.pi * frac)
-        outline.append((crotch_y + y_dip, theta))
+        f = i / n_crotch
+        tc = np.pi * (1 - f)
+        y_start = back_bottom_y
+        y_end = front_bottom_y
+        y_baseline = y_start + (y_end - y_start) * f
+        dip_depth = y_baseline - crotch_center_y
+        dip = -dip_depth * np.sin(np.pi * f)
+        y_here = y_baseline + dip
+        off = theta_hw(hw_crotch, max(y_here, crotch_center_y), tc)
+        outline.append((y_here, tc + off))
 
-    # --- 8. FRONT LEFT LEG SCOOP (crotch up to front top-left) ---
-    p0 = (crotch_y, thc_f)
-    p3 = (top_y, thf)
-    p1 = (crotch_y + 0.03, thc_f * 1.5)
-    p2 = (scoop_y, thf - scoop_depth)
-    outline.extend(cubic_bezier(p0, p1, p2, p3, n=25)[1:])
+    # 8. Front left leg scoop (up)
+    outline.extend(cubic_bezier(
+        (front_bottom_y, thc_f), (front_bottom_y + 0.02, thc_f * 1.5),
+        (sy, thf - sd), (top_y, thf),
+        n=25)[1:])
 
     return outline
 
 
-def draw_surface_zone(ax, rotate_fn, pts3d, color, label, label_offset_y=0.02,
-                      fill=False):
-    """Draw a 3D surface curve projected to 2D view."""
+def draw_surface_zone_clipped(ax, rotate_fn, silhouette, pts3d, color, label,
+                              label_offset_y=0.02):
+    """Draw 3D surface curve clipped to body silhouette.
+
+    Only segments where BOTH endpoints project inside the body silhouette
+    are drawn. This prevents fabric from appearing over background.
+    """
     rpts = rotate_fn(pts3d)
 
     # Close the loop
+    n = len(rpts)
     xs = np.append(rpts[:, 0], rpts[0, 0])
     ys = np.append(rpts[:, 1], rpts[0, 1])
-    z_vals = np.append(rpts[:, 2], rpts[0, 2])
+    zs = np.append(rpts[:, 2], rpts[0, 2])
 
-    # Draw segments where vertices face the camera
-    visible = z_vals > -0.02
-    i = 0
+    # Check each point: must face camera AND be inside body silhouette
+    inside = np.zeros(n + 1, dtype=bool)
+    for i in range(n + 1):
+        if zs[i] > -0.02 and silhouette(xs[i], ys[i]):
+            inside[i] = True
+
+    # Draw visible+inside segments
     drawn_any = False
-    while i < len(xs) - 1:
-        if visible[i] and visible[i + 1]:
+    i = 0
+    while i < n:
+        if inside[i] and inside[i + 1]:
             seg_x = [xs[i]]
             seg_y = [ys[i]]
-            while i < len(xs) - 1 and visible[i] and visible[i + 1]:
+            while i < n and inside[i] and inside[i + 1]:
                 seg_x.append(xs[i + 1])
                 seg_y.append(ys[i + 1])
                 i += 1
@@ -254,21 +308,18 @@ def draw_surface_zone(ax, rotate_fn, pts3d, color, label, label_offset_y=0.02,
     if not drawn_any:
         return
 
-    # Optional fill
-    if fill:
-        visible_mask = rpts[:, 2] > -0.02
-        if visible_mask.sum() > 2:
-            vis_pts = rpts[visible_mask]
-            ax.fill(vis_pts[:, 0], vis_pts[:, 1], color=color,
-                    alpha=0.15, zorder=45)
+    # Fill only inside-silhouette points
+    inside_pts = rpts[[silhouette(rpts[j, 0], rpts[j, 1]) and rpts[j, 2] > -0.02
+                        for j in range(n)]]
+    if len(inside_pts) > 2:
+        ax.fill(inside_pts[:, 0], inside_pts[:, 1], color=color,
+                alpha=0.2, zorder=45)
 
-    # Label at top of visible area
-    visible_mask = rpts[:, 2] > -0.02
-    if visible_mask.sum() > 0:
-        vis_pts = rpts[visible_mask]
-        center_x = vis_pts[:, 0].mean()
-        top_y_val = vis_pts[:, 1].max()
-        ax.annotate(label, (center_x, top_y_val + label_offset_y),
+    # Label
+    if len(inside_pts) > 0:
+        cx = inside_pts[:, 0].mean()
+        ty = inside_pts[:, 1].max()
+        ax.annotate(label, (cx, ty + label_offset_y),
                     color=color, fontsize=7, ha='center',
                     fontweight='bold', zorder=51,
                     bbox=dict(boxstyle='round,pad=0.2',
@@ -290,7 +341,7 @@ def main():
         (axes[2], np.pi, "Back View"),
     ]
 
-    # Breast zones (elliptical)
+    # Breast zones
     breast_zones = [
         {
             "name": "LEFT BREAST",
@@ -321,7 +372,7 @@ def main():
         )
         breast_curves.append(pts)
 
-    # One continuous bikini bottom (front + crotch strip + back)
+    # One continuous bikini bottom
     bottom_yt = make_bikini_bottom(lm, body_surface)
     bottom_3d = sample_surface_points(body_surface, bottom_yt)
 
@@ -352,23 +403,22 @@ def main():
     }
 
     for ax, azimuth, title in views:
-        rotate = render_body(ax, body_verts, body_faces, azimuth, title)
+        rotate, silhouette = render_body(ax, body_verts, body_faces, azimuth, title)
 
-        # Draw breast zones
+        # Draw breast zones (clipped to body)
         for zone, pts3d in zip(breast_zones, breast_curves):
-            draw_surface_zone(ax, rotate, pts3d, zone["color"], zone["name"],
-                              fill=True)
+            draw_surface_zone_clipped(ax, rotate, silhouette, pts3d,
+                                      zone["color"], zone["name"])
 
-        # Draw bikini bottom (one continuous piece)
-        draw_surface_zone(ax, rotate, bottom_3d, '#ff4444',
-                          'BIKINI BOTTOM', fill=True)
+        # Draw bikini bottom (clipped to body silhouette)
+        draw_surface_zone_clipped(ax, rotate, silhouette, bottom_3d,
+                                  '#ff4444', 'BIKINI BOTTOM')
 
         # Draw landmarks
         for lm_name, (color, marker) in key_landmarks.items():
             pt3d = np.array([lm[lm_name]])
             rpt = rotate(pt3d)[0]
-
-            if rpt[2] > -0.03:
+            if rpt[2] > -0.03 and silhouette(rpt[0], rpt[1]):
                 ax.scatter(rpt[0], rpt[1], c=color, marker=marker,
                            s=40, zorder=30, edgecolors='white',
                            linewidths=0.5, alpha=0.9)
