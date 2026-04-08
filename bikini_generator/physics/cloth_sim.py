@@ -1,10 +1,10 @@
-"""GPU-accelerated cloth simulation using Taichi.
+"""Cloth simulation using Position-Based Dynamics (PBD).
 
-Uses Position-Based Dynamics (PBD) for unconditional stability:
-- Distance constraints (stretch, shear, bend)
-- Body collision with friction
-- Anchor constraints (pinned vertices)
-- Verlet integration on GPU
+Key physics:
+- NO anchor points — garment stays on purely through collision + friction + tension
+- Body collision uses a pre-computed continuous surface model (no gaps)
+- Elastic tension via shortened rest lengths (fabric presses against body)
+- Coulomb friction model prevents sliding along body surface
 """
 
 import taichi as ti
@@ -12,17 +12,43 @@ import numpy as np
 from ..config import PHYSICS
 
 
+def _build_body_surface_lut(n_y=128, n_theta=128):
+    """Pre-compute body surface radius lookup table.
+
+    Uses the BodySurface ellipsoidal model from loop_generator to get
+    a continuous, gap-free body surface representation.
+
+    Returns: (lut, y_min, y_max) where lut is (n_y, n_theta) float32 array
+    """
+    from ..garment.loop_generator import BodySurface
+    body = BodySurface()
+
+    # Y range covering the garment region
+    y_min = 0.75
+    y_max = 1.50
+
+    lut = np.zeros((n_y, n_theta), dtype=np.float32)
+    y_values = np.linspace(y_min, y_max, n_y)
+    theta_values = np.linspace(0, 2 * np.pi, n_theta, endpoint=False)
+
+    for iy, y in enumerate(y_values):
+        for it, theta in enumerate(theta_values):
+            lut[iy, it] = body.get_surface_radius(y, theta)
+
+    return lut, y_min, y_max
+
+
 @ti.data_oriented
 class ClothSimulator:
-    """GPU cloth simulator using Taichi with PBD constraints."""
+    """Cloth simulator with mesh-based collision — no anchor points needed."""
 
     def __init__(
         self,
         vertices: np.ndarray,
         faces: np.ndarray,
-        anchor_ids: list[int],
-        anchor_positions: list[np.ndarray],
-        collision_primitives: list[dict],
+        anchor_ids: list[int] = None,
+        anchor_positions: list[np.ndarray] = None,
+        collision_primitives: list[dict] = None,
         config: object | None = None,
     ):
         cfg = config or PHYSICS
@@ -34,7 +60,6 @@ class ClothSimulator:
         self.collision_margin = cfg.collision_margin
         self.mass = cfg.cloth_mass_per_vertex
 
-        # PBD stiffness (0-1 range, applied as constraint compliance)
         self.stretch_compliance = 1.0 / max(cfg.stretch_stiffness, 1.0)
         self.num_constraint_iters = getattr(cfg, 'num_substeps', 5)
 
@@ -47,31 +72,26 @@ class ClothSimulator:
             for i in range(3):
                 a, b = int(f[i]), int(f[(i + 1) % 3])
                 edges.add((min(a, b), max(a, b)))
-
         all_edges = list(edges)
         self.n_edges = len(all_edges)
+
+        # --- Build body surface LUT for gap-free collision ---
+        self.lut_ny = 128
+        self.lut_ntheta = 128
+        lut, self.y_min, self.y_max = _build_body_surface_lut(
+            self.lut_ny, self.lut_ntheta
+        )
+        self.body_lut = ti.field(dtype=ti.f32, shape=(self.lut_ny, self.lut_ntheta))
+        self.body_lut.from_numpy(lut)
 
         # --- Taichi fields ---
         self.pos = ti.Vector.field(3, dtype=ti.f32, shape=self.n_verts)
         self.old_pos = ti.Vector.field(3, dtype=ti.f32, shape=self.n_verts)
         self.initial_pos = ti.Vector.field(3, dtype=ti.f32, shape=self.n_verts)
 
-        # Edges for distance constraints
         self.edge_indices = ti.Vector.field(2, dtype=ti.i32, shape=max(self.n_edges, 1))
         self.edge_rest_len = ti.field(dtype=ti.f32, shape=max(self.n_edges, 1))
-
-        # Anchors
-        self.n_anchors = len(anchor_ids)
-        self.anchor_ids_field = ti.field(dtype=ti.i32, shape=max(self.n_anchors, 1))
-        self.anchor_targets = ti.Vector.field(3, dtype=ti.f32, shape=max(self.n_anchors, 1))
-        self.is_anchored = ti.field(dtype=ti.i32, shape=self.n_verts)
         self.inv_mass = ti.field(dtype=ti.f32, shape=self.n_verts)
-
-        # Collision primitives
-        max_prims = max(len(collision_primitives), 1)
-        self.n_colliders = len(collision_primitives)
-        self.collider_center = ti.Vector.field(3, dtype=ti.f32, shape=max_prims)
-        self.collider_radii = ti.Vector.field(3, dtype=ti.f32, shape=max_prims)
 
         # --- Initialize ---
         pos_np = vertices.astype(np.float32)
@@ -79,9 +99,10 @@ class ClothSimulator:
         self.old_pos.from_numpy(pos_np)
         self.initial_pos.from_numpy(pos_np)
 
-        # Edges — rest lengths scaled by 0.95 to create elastic tension
-        # (fabric wants to compress → presses against body like elastic bands)
-        elastic_scale = 0.95
+        # Edges — rest lengths scaled by 0.88 for strong elastic tension
+        # The garment wants to be 12% shorter than its initial span,
+        # creating strong inward pressure that keeps it pressed against body
+        elastic_scale = 0.88
         if self.n_edges > 0:
             edge_np = np.array(all_edges, dtype=np.int32)
             self.edge_indices.from_numpy(edge_np)
@@ -91,47 +112,26 @@ class ClothSimulator:
             ], dtype=np.float32)
             self.edge_rest_len.from_numpy(rest_lens)
 
-        # Anchors and inverse mass
-        anchored = np.zeros(self.n_verts, dtype=np.int32)
+        # All vertices have equal mass (no anchors)
         inv_mass = np.ones(self.n_verts, dtype=np.float32) / self.mass
-        if self.n_anchors > 0:
-            anchor_ids_np = np.array(anchor_ids, dtype=np.int32)
-            anchor_targets_np = np.array(
-                [p.astype(np.float32) for p in anchor_positions]
-            )
-            self.anchor_ids_field.from_numpy(anchor_ids_np)
-            self.anchor_targets.from_numpy(anchor_targets_np)
-            for aid in anchor_ids:
-                if 0 <= aid < self.n_verts:
-                    anchored[aid] = 1
-                    inv_mass[aid] = 0.0  # infinite mass = pinned
-        self.is_anchored.from_numpy(anchored)
         self.inv_mass.from_numpy(inv_mass)
 
-        # Collision primitives
-        for i, prim in enumerate(collision_primitives):
-            center = np.array(prim["center"], dtype=np.float32)
-            self.collider_center[i] = ti.Vector(center.tolist())
-            if prim["type"] == "sphere":
-                r = prim["radius"]
-                self.collider_radii[i] = ti.Vector([r, r, r])
-            elif prim["type"] == "ellipsoid":
-                radii = np.array(prim["radii"], dtype=np.float32)
-                self.collider_radii[i] = ti.Vector(radii.tolist())
+        # Keep legacy anchor fields for API compatibility but don't use them
+        self.n_anchors = 0
+        self.is_anchored = ti.field(dtype=ti.i32, shape=self.n_verts)
+        self.is_anchored.from_numpy(np.zeros(self.n_verts, dtype=np.int32))
 
     @ti.kernel
     def _predict_positions(self, dt: ti.f32, damping: ti.f32, gravity: ti.f32):
-        """Verlet prediction step: apply gravity and damping."""
+        """Verlet integration: apply gravity and velocity damping."""
         for i in range(self.n_verts):
-            if self.is_anchored[i] == 0:
-                vel = (self.pos[i] - self.old_pos[i]) * damping
-                self.old_pos[i] = self.pos[i]
-                # Verlet: x_new = x + v*dt + a*dt^2
-                self.pos[i] = self.pos[i] + vel + ti.Vector([0.0, gravity * dt * dt, 0.0])
+            vel = (self.pos[i] - self.old_pos[i]) * damping
+            self.old_pos[i] = self.pos[i]
+            self.pos[i] = self.pos[i] + vel + ti.Vector([0.0, gravity * dt * dt, 0.0])
 
     @ti.kernel
     def _solve_distance_constraints(self, compliance: ti.f32):
-        """PBD distance constraint solver — unconditionally stable."""
+        """PBD distance constraint solver."""
         for e in range(self.n_edges):
             a = self.edge_indices[e][0]
             b = self.edge_indices[e][1]
@@ -149,119 +149,190 @@ class ClothSimulator:
             if w_sum < 1e-8:
                 continue
 
-            # PBD correction
             error = dist - rest
             correction = error * diff / (dist * w_sum)
-
-            # Stiffness via compliance (lower = stiffer)
             stiffness_factor = 1.0 / (1.0 + compliance)
 
             self.pos[a] += correction * w_a * stiffness_factor
             self.pos[b] -= correction * w_b * stiffness_factor
 
     @ti.kernel
-    def _apply_anchors(self):
-        """Pin anchored vertices to their target positions."""
-        for i in range(self.n_anchors):
-            aid = self.anchor_ids_field[i]
-            if aid >= 0 and aid < self.n_verts:
-                self.pos[aid] = self.anchor_targets[i]
+    def _collide_body_surface(self, friction: ti.f32, margin: ti.f32,
+                               y_min: ti.f32, y_max: ti.f32,
+                               lut_ny: ti.i32, lut_ntheta: ti.i32):
+        """Collision with continuous body surface using LUT.
 
-    @ti.kernel
-    def _collide_body(self, friction: ti.f32, margin: ti.f32):
-        """Handle collision with body primitives including friction."""
-        for i in range(self.n_verts):
-            if self.is_anchored[i] == 1:
-                continue
-
-            for c in range(self.n_colliders):
-                center = self.collider_center[c]
-                radii = self.collider_radii[c]
-
-                # Transform to ellipsoid-local space
-                local = self.pos[i] - center
-                nx = local[0] / radii[0]
-                ny = local[1] / radii[1]
-                nz = local[2] / radii[2]
-                dist_sq = nx * nx + ny * ny + nz * nz
-
-                threshold = 1.0 + margin / ti.min(radii[0], ti.min(radii[1], radii[2]))
-
-                if dist_sq < threshold * threshold:
-                    dist = ti.sqrt(dist_sq)
-                    if dist < 1e-7:
-                        dist = 1e-7
-
-                    # Normal in world space
-                    normal = ti.Vector([
-                        nx / radii[0],
-                        ny / radii[1],
-                        nz / radii[2],
-                    ])
-                    n_len = normal.norm()
-                    if n_len > 1e-7:
-                        normal = normal / n_len
-
-                    # Push out to surface + margin
-                    target_dist = threshold
-                    scale_factor = target_dist / dist
-
-                    new_local = ti.Vector([
-                        local[0] * scale_factor,
-                        local[1] * scale_factor,
-                        local[2] * scale_factor,
-                    ])
-
-                    new_pos = center + new_local
-                    displacement = new_pos - self.pos[i]
-                    self.pos[i] = new_pos
-
-                    # Friction: reduce tangential velocity
-                    vel = self.pos[i] - self.old_pos[i]
-                    vel_n = vel.dot(normal) * normal
-                    vel_t = vel - vel_n
-                    vel_t_mag = vel_t.norm()
-
-                    if vel_t_mag > 1e-7:
-                        friction_reduction = friction * ti.abs(displacement.norm())
-                        if friction_reduction > vel_t_mag:
-                            friction_reduction = vel_t_mag
-                        vel_t = vel_t * (1.0 - friction_reduction / vel_t_mag)
-
-                    self.old_pos[i] = self.pos[i] - vel_t
-
-    @ti.kernel
-    def _shape_retention(self, strength: ti.f32):
-        """Pull vertices toward their initial (rest) positions.
-
-        Models the elastic memory of the garment — it was designed to fit
-        the body and resists deformation away from that shape.
-        This is the key force that keeps a bikini on the body.
+        For each vertex:
+        1. Convert position to cylindrical coords (y, theta)
+        2. Look up body surface radius from pre-computed table
+        3. If vertex is inside body + margin, push outward
+        4. Apply Coulomb friction to tangential velocity
         """
         for i in range(self.n_verts):
-            if self.is_anchored[i] == 1:
+            px = self.pos[i][0]
+            py = self.pos[i][1]
+            pz = self.pos[i][2]
+
+            # Skip vertices outside the torso Y range
+            if py < y_min - 0.05 or py > y_max + 0.05:
                 continue
 
-            disp = self.initial_pos[i] - self.pos[i]
-            dist = disp.norm()
-            if dist > 0.001:
-                # Stronger pull for larger displacements (nonlinear)
-                factor = strength * (1.0 + dist * 3.0)
-                if factor > 0.8:
-                    factor = 0.8
-                self.pos[i] += disp * factor
+            # Cylindrical coords from body center axis (0, y, 0)
+            # theta: 0=+Z(front), pi/2=-X(left), pi=-Z(back)
+            theta = ti.atan2(-px, pz)  # atan2(-x, z) to match convention
+            if theta < 0:
+                theta += 2.0 * 3.14159265358979
+
+            radial_dist = ti.sqrt(px * px + pz * pz)
+
+            # Clamp Y for LUT lookup
+            y_clamped = ti.max(y_min, ti.min(y_max, py))
+
+            # Bilinear interpolation in LUT
+            y_frac = (y_clamped - y_min) / (y_max - y_min) * (lut_ny - 1)
+            t_frac = theta / (2.0 * 3.14159265358979) * lut_ntheta
+
+            iy0 = ti.cast(ti.floor(y_frac), ti.i32)
+            it0 = ti.cast(ti.floor(t_frac), ti.i32)
+            iy1 = ti.min(iy0 + 1, lut_ny - 1)
+            it1 = (it0 + 1) % lut_ntheta
+            iy0 = ti.max(0, ti.min(iy0, lut_ny - 1))
+            it0 = it0 % lut_ntheta
+
+            fy = y_frac - ti.floor(y_frac)
+            ft = t_frac - ti.floor(t_frac)
+
+            # Bilinear interpolation
+            r00 = self.body_lut[iy0, it0]
+            r01 = self.body_lut[iy0, it1]
+            r10 = self.body_lut[iy1, it0]
+            r11 = self.body_lut[iy1, it1]
+
+            body_radius = (r00 * (1 - fy) * (1 - ft) +
+                           r01 * (1 - fy) * ft +
+                           r10 * fy * (1 - ft) +
+                           r11 * fy * ft)
+
+            min_radius = body_radius + margin
+
+            # Friction band: apply friction when within 3x margin of body
+            friction_band = margin * 3.0
+            max_radius = body_radius + friction_band
+
+            if radial_dist > 1e-6 and radial_dist < max_radius:
+                # --- Collision: push out if penetrating ---
+                if radial_dist < min_radius:
+                    scale = min_radius / radial_dist
+                    px = px * scale
+                    pz = pz * scale
+                    radial_dist = min_radius
+                    self.pos[i] = ti.Vector([px, py, pz])
+
+                # --- Surface friction (applies in entire friction band) ---
+                # Strength: 100% at surface, fading to 0% at edge of band
+                dist_from_surface = radial_dist - min_radius
+                band_width = max_radius - min_radius
+                proximity = 1.0 - dist_from_surface / band_width  # 1=touching, 0=far
+                proximity = ti.max(0.0, proximity)
+
+                vel = self.pos[i] - self.old_pos[i]
+
+                # Normal direction (radial outward)
+                normal = ti.Vector([px, 0.0, pz])
+                n_len = normal.norm()
+                if n_len > 1e-7:
+                    normal = normal / n_len
+
+                # Decompose velocity
+                vel_n = vel.dot(normal) * normal
+                vel_t = vel - vel_n
+                vel_t_mag = vel_t.norm()
+
+                # Friction damps tangential velocity proportional to proximity
+                if vel_t_mag > 1e-7:
+                    # retain=0 at surface (fully stuck), retain=1 at band edge (free)
+                    retain = ti.max(0.0, 1.0 - friction * proximity)
+                    vel_t = vel_t * retain
+
+                self.old_pos[i] = self.pos[i] - vel_t
+
+    @ti.kernel
+    def _attract_to_body(self, strength: ti.f32, margin: ti.f32,
+                          y_min: ti.f32, y_max: ti.f32,
+                          lut_ny: ti.i32, lut_ntheta: ti.i32):
+        """Pull vertices toward body surface — models elastic inward pressure.
+
+        Vertices far from the body get pulled back. This prevents loops
+        from drifting away. Combined with collision (prevents going inside),
+        creates a stable equilibrium at body_surface + margin.
+        """
+        for i in range(self.n_verts):
+            px = self.pos[i][0]
+            py = self.pos[i][1]
+            pz = self.pos[i][2]
+
+            if py < y_min - 0.05 or py > y_max + 0.05:
+                continue
+
+            theta = ti.atan2(-px, pz)
+            if theta < 0:
+                theta += 2.0 * 3.14159265358979
+
+            radial_dist = ti.sqrt(px * px + pz * pz)
+            if radial_dist < 1e-6:
+                continue
+
+            y_clamped = ti.max(y_min, ti.min(y_max, py))
+            y_frac = (y_clamped - y_min) / (y_max - y_min) * (lut_ny - 1)
+            t_frac = theta / (2.0 * 3.14159265358979) * lut_ntheta
+
+            iy0 = ti.cast(ti.floor(y_frac), ti.i32)
+            it0 = ti.cast(ti.floor(t_frac), ti.i32)
+            iy1 = ti.min(iy0 + 1, lut_ny - 1)
+            it1 = (it0 + 1) % lut_ntheta
+            iy0 = ti.max(0, ti.min(iy0, lut_ny - 1))
+            it0 = it0 % lut_ntheta
+
+            fy = y_frac - ti.floor(y_frac)
+            ft = t_frac - ti.floor(t_frac)
+
+            body_radius = (self.body_lut[iy0, it0] * (1 - fy) * (1 - ft) +
+                           self.body_lut[iy0, it1] * (1 - fy) * ft +
+                           self.body_lut[iy1, it0] * fy * (1 - ft) +
+                           self.body_lut[iy1, it1] * fy * ft)
+
+            target_r = body_radius + margin
+            gap = radial_dist - target_r
+
+            # Only attract if vertex is ABOVE the surface (gap > 0)
+            # Attraction grows linearly with distance
+            if gap > 0.001:  # more than 1mm away
+                # Pull toward target radius
+                pull = gap * strength
+                new_r = radial_dist - pull
+                if new_r < target_r:
+                    new_r = target_r
+                scale = new_r / radial_dist
+                self.pos[i][0] = px * scale
+                self.pos[i][2] = pz * scale
 
     def simulate(self) -> np.ndarray:
         """Run the full PBD simulation and return final vertex positions."""
         for step in range(self.num_steps):
-            # 1. Predict positions (gravity + inertia)
             self._predict_positions(self.dt, self.damping, self.gravity)
 
-            # 2. Solve constraints (multiple iterations for convergence)
             for _ in range(self.num_constraint_iters):
                 self._solve_distance_constraints(self.stretch_compliance)
-                self._collide_body(self.friction, self.collision_margin)
-                self._apply_anchors()
+                self._attract_to_body(
+                    0.3, self.collision_margin,
+                    self.y_min, self.y_max,
+                    self.lut_ny, self.lut_ntheta,
+                )
+                self._collide_body_surface(
+                    self.friction, self.collision_margin,
+                    self.y_min, self.y_max,
+                    self.lut_ny, self.lut_ntheta,
+                )
 
         return self.pos.to_numpy()
 
@@ -270,12 +341,6 @@ class ClothSimulator:
         final = self.pos.to_numpy()
         initial = self.initial_pos.to_numpy()
         displacements = np.linalg.norm(final - initial, axis=1)
-
-        # Ignore anchored vertices
-        anchored = self.is_anchored.to_numpy()
-        displacements[anchored == 1] = 0.0
-
-        # Filter NaN/Inf
         valid = np.isfinite(displacements)
         if valid.any():
             return float(np.max(displacements[valid]))

@@ -101,7 +101,6 @@ def run_physics(patches, body_verts, body_faces):
     import taichi as ti
     from bikini_generator.physics.cloth_sim import ClothSimulator
     from bikini_generator.garment.assembly import GarmentAssembly
-    from bikini_generator.body.mannequin import get_body_collision_primitives
     from bikini_generator.config import PHYSICS
 
     try:
@@ -114,26 +113,16 @@ def run_physics(patches, body_verts, body_faces):
         assembly.add_patch(p)
 
     vertices, faces, uvs = assembly.merge_to_single_mesh()
-    anchor_ids, anchor_positions = assembly.get_all_anchors()
-    collision_prims = get_body_collision_primitives()
 
     print(f"  Total vertices: {len(vertices)}")
-    print(f"  Total anchors: {len(anchor_ids)} ({100*len(anchor_ids)/max(len(vertices),1):.1f}%)")
+    print(f"  Anchors: NONE (pure collision + friction + tension)")
 
-    # Print per-patch anchor info
-    offset = 0
     for p in patches:
-        n = p.vertex_count()
-        na = len(p.anchor_vertex_ids) if p.anchor_vertex_ids else 0
-        print(f"    {p.name}: {n} verts, {na} anchors ({100*na/max(n,1):.1f}%)")
-        offset += n
+        print(f"    {p.name}: {p.vertex_count()} verts")
 
     sim = ClothSimulator(
         vertices=vertices,
         faces=faces,
-        anchor_ids=anchor_ids,
-        anchor_positions=anchor_positions,
-        collision_primitives=collision_prims,
         config=PHYSICS,
     )
 
@@ -143,15 +132,12 @@ def run_physics(patches, body_verts, body_faces):
 
     # Check Y drops
     initial = sim.initial_pos.to_numpy()
-    anchored = sim.is_anchored.to_numpy()
     y_drops = initial[:, 1] - final_pos[:, 1]
-    y_drops[anchored == 1] = 0.0
     max_y_drop = float(np.max(y_drops)) if len(y_drops) > 0 else 0
     print(f"  Max Y drop: {max_y_drop*100:.2f} cm")
 
     # Count extreme displacements
     disps = np.linalg.norm(final_pos - initial, axis=1)
-    disps[anchored == 1] = 0
     n_extreme = np.sum(disps > 0.10)
     print(f"  Vertices displaced > 10cm: {n_extreme}")
 
@@ -191,7 +177,7 @@ def main():
 
     fig, axes = plt.subplots(len(seeds), 4, figsize=(16, 4 * len(seeds)))
     fig.patch.set_facecolor('#0a0a1a')
-    fig.suptitle('Physics Simulation: Before vs After\n(NO shape_retention, sparse anchors, soft fabric)',
+    fig.suptitle('Physics Simulation: Before vs After\n(NO anchors, body surface collision + friction + elastic tension)',
                  color='white', fontsize=14, y=0.98)
 
     for row, seed in enumerate(seeds):

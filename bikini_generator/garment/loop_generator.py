@@ -466,19 +466,9 @@ def generate_strip_mesh(
 
     faces = np.array(faces, dtype=np.int32)
 
-    # ── Anchor assignment ───────────────────────────────────────
-    # Model elastic band behavior: a loop stays on the body because
-    # tension presses it against the surface everywhere. We anchor
-    # the center vertex at regular intervals around the loop.
-    # Between anchors, fabric drapes naturally under gravity.
+    # No anchor points — physics uses body surface collision + friction
     anchor_ids = []
     anchor_positions = []
-    mid_j = n_width // 2  # center width vertex
-
-    for i in range(0, n_length, 4):  # every 4th ring, center vertex
-        vid = i * n_width + mid_j
-        anchor_ids.append(vid)
-        anchor_positions.append(verts[vid].copy())
 
     patch = GarmentPatch(
         name="loop_strip",
@@ -499,7 +489,7 @@ class LoopBikiniConfig:
     """Configuration for loop-based bikini generation."""
     n_loops: int = 6               # total loops (2 mandatory + extras)
     base_width: float = 0.015      # strap width (meters)
-    garment_offset: float = 0.005  # distance above body
+    garment_offset: float = 0.004  # matches collision_margin — starts at collision surface
     n_samples: int = 128           # points per loop curve
     n_width: int = 6               # vertices across strip
 
@@ -550,18 +540,9 @@ def _generate_base_coverage(body: BodySurface, garment_offset: float = 0.005) ->
             patch.faces = patch.faces[:, [0, 2, 1]]
             patch.compute_normals()
 
-        # Only anchor the top edge (row==0 = strap attachment) and
-        # side edges (col==0, col==nv-1 = where straps connect).
-        # The cup body is free to drape naturally under gravity.
-        anchor_ids = []
-        for idx in range(nu * nv):
-            row, col = divmod(idx, nv)
-            if row == 0:  # top edge (shoulder strap)
-                anchor_ids.append(idx)
-            elif row <= 2 and (col == 0 or col == nv - 1):  # upper side strap points
-                anchor_ids.append(idx)
-        patch.anchor_vertex_ids = anchor_ids
-        patch.anchor_body_positions = [patch.vertices[i].copy() for i in anchor_ids]
+        # No anchor points — relies on body collision + friction
+        patch.anchor_vertex_ids = []
+        patch.anchor_body_positions = []
         patches.append(patch)
 
     # ── Bottom panel: front V-shape + crotch strip + back panel ──
@@ -620,20 +601,9 @@ def _generate_base_coverage(body: BodySurface, garment_offset: float = 0.005) ->
         "base_bottom", bottom_func,
         (0.0, 1.0), (0.0, 1.0), nu, nv,
     )
-    # Anchor the top edge (waistband), crotch bridge row (between legs),
-    # and back top edge. The fabric between anchors drapes under gravity.
-    anchor_ids = []
-    crotch_row = int(nu * 0.5)  # u≈0.5 is the crotch bridge
-    for idx in range(nu * nv):
-        row, col = divmod(idx, nv)
-        if row == 0:  # top edge (front waistband)
-            anchor_ids.append(idx)
-        elif row == nu - 1:  # back top edge
-            anchor_ids.append(idx)
-        elif row == crotch_row:  # crotch bridge (sits between legs)
-            anchor_ids.append(idx)
-    patch.anchor_vertex_ids = anchor_ids
-    patch.anchor_body_positions = [patch.vertices[i].copy() for i in anchor_ids]
+    # No anchor points — relies on body collision + friction
+    patch.anchor_vertex_ids = []
+    patch.anchor_body_positions = []
     patches.append(patch)
 
     return patches
@@ -696,9 +666,7 @@ def generate_loop_bikini(
             (rng.uniform(0.005, 0.015), 1, rng.uniform(0, 2 * np.pi)),
             (rng.uniform(0.002, 0.008), 2, rng.uniform(0, 2 * np.pi)),
         ],
-        harmonics_r=[
-            (rng.uniform(0.002, 0.006), 1, rng.uniform(0, 2 * np.pi)),
-        ],
+        harmonics_r=[],  # no radial offset — stay on body surface
         harmonics_w=rand_width_harmonics(),
     )
     patches.append(make_patch(breast_loop, "loop_breast"))
@@ -715,9 +683,7 @@ def generate_loop_bikini(
             (dip_amp, 2, -np.pi / 2 + rng.uniform(-0.1, 0.1)),
             (rng.uniform(0.005, 0.015), 1, rng.uniform(0, 2 * np.pi)),
         ],
-        harmonics_r=[
-            (rng.uniform(0.002, 0.006), 1, rng.uniform(0, 2 * np.pi)),
-        ],
+        harmonics_r=[],  # no radial offset — stay on body surface
         harmonics_w=rand_width_harmonics(),
     )
     patches.append(make_patch(crotch_loop, "loop_crotch"))
@@ -735,11 +701,50 @@ def generate_loop_bikini(
                 (rng.uniform(0.005, 0.03), 1, rng.uniform(0, 2 * np.pi)),
                 (rng.uniform(0.003, 0.015), 2, rng.uniform(0, 2 * np.pi)),
             ],
-            harmonics_r=[
-                (rng.uniform(0.002, 0.008), 1, rng.uniform(0, 2 * np.pi)),
-            ],
+            harmonics_r=[],  # no radial offset — stay on body surface
             harmonics_w=rand_width_harmonics(),
         )
         patches.append(make_patch(loop, f"loop_extra_{i}"))
 
+    # ── Project ALL vertices onto body surface ───────────────────
+    # Ensures every garment vertex starts touching the body.
+    _project_all_to_body(patches, body, cfg.garment_offset)
+
     return patches
+
+
+def _project_all_to_body(patches: list, body: 'BodySurface', offset: float):
+    """Project every garment vertex onto the body surface + offset.
+
+    For each vertex, compute its cylindrical coords (y, theta),
+    look up the body radius, and place it at body_radius + offset.
+    This guarantees the garment starts flush against the body.
+    """
+    for patch in patches:
+        for i in range(len(patch.vertices)):
+            v = patch.vertices[i]
+            y = v[1]
+
+            # Skip vertices outside torso range
+            if y < 0.75 or y > 1.50:
+                continue
+
+            # Cylindrical coords
+            x, z = v[0], v[2]
+            theta = np.arctan2(-x, z)
+            if theta < 0:
+                theta += 2 * np.pi
+
+            radial_dist = np.sqrt(x**2 + z**2)
+            if radial_dist < 1e-6:
+                continue
+
+            body_r = body.get_surface_radius(y, theta)
+            target_r = body_r + offset
+
+            # Scale to target radius
+            scale = target_r / radial_dist
+            patch.vertices[i][0] = x * scale
+            patch.vertices[i][2] = z * scale
+
+        patch.compute_normals()

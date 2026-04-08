@@ -41,8 +41,8 @@ class PhysicsConfig:
     stretch_stiffness: float = 10000.0  # very stiff — tight-fitting garment
     shear_stiffness: float = 500.0
     bend_stiffness: float = 100.0
-    friction_coefficient: float = 0.8  # cloth-skin friction
-    damping: float = 0.90  # very strong damping — fast settling, models air resistance
+    friction_coefficient: float = 1.5  # cloth-skin friction (high — elastic fabric grips skin)
+    damping: float = 0.85  # strong damping — fast settling
     collision_margin: float = 0.004  # 4mm
     max_displacement_threshold: float = 0.10  # 10cm (straps legitimately span distances)
 
