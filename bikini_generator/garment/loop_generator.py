@@ -33,7 +33,11 @@ class CoverageZone:
 
 
 def _get_coverage_zones() -> list[CoverageZone]:
-    """Define the mandatory coverage zones on the body."""
+    """Define the mandatory coverage zones on the body.
+
+    Only breasts — crotch coverage is handled by fixed bottom templates,
+    not by loop widening.
+    """
     lm = get_landmarks()
     return [
         CoverageZone(
@@ -49,13 +53,6 @@ def _get_coverage_zones() -> list[CoverageZone]:
             radius_y=0.08,
             radius_xz=0.10,
             min_strip_width=0.12,
-        ),
-        CoverageZone(
-            name="crotch",
-            center=lm["crotch_center"] + np.array([0, 0.06, 0]),
-            radius_y=0.14,
-            radius_xz=0.10,
-            min_strip_width=0.18,  # 18cm wide — covers full pubic triangle
         ),
     ]
 
@@ -609,6 +606,103 @@ def _generate_base_coverage(body: BodySurface, garment_offset: float = 0.005) ->
     return patches
 
 
+# ── Classic bottom templates ───────────────────────────────────────
+
+BOTTOM_STYLES = ["classic", "brazilian", "highcut"]
+
+
+def _make_bottom_template(
+    body: BodySurface,
+    lm: dict,
+    cfg: 'LoopBikiniConfig',
+    rng: np.random.Generator,
+) -> GarmentPatch:
+    """Create a fixed-shape bikini bottom from classic templates.
+
+    The bottom is a closed loop: front panel → right side strap →
+    back panel → left side strap → back to front.
+    This is a structurally sound loop (self-supporting, no anchors needed).
+
+    Three styles:
+    - classic: standard coverage front and back
+    - brazilian: smaller back panel (less coverage)
+    - highcut: higher on the hips, narrower sides
+    """
+    style = rng.choice(BOTTOM_STYLES)
+
+    hip_y = (lm["hip_left"][1] + lm["hip_right"][1]) / 2
+    crotch_y = lm["crotch_center"][1]
+    y_mid = (hip_y + crotch_y) / 2 + 0.02
+    dip_amp = y_mid - crotch_y  # reaches crotch_center at front/back
+
+    # Fixed loop curve — dips at front (θ=0) and back (θ=π)
+    # No random variation on the main shape
+    bottom_loop = LoopCurve(
+        y_center=y_mid,
+        harmonics_y=[
+            (dip_amp, 2, -np.pi / 2),  # -cos(2θ): dip at front and back
+        ],
+        harmonics_r=[],
+        harmonics_w=None,  # width controlled by template, not harmonics
+    )
+
+    # Sample the loop centerline
+    pts = sample_loop_curve(bottom_loop, body, cfg.n_samples, cfg.garment_offset)
+    n = len(pts)
+    theta = np.linspace(0, 2 * np.pi, n, endpoint=False)
+
+    # ── Width profile by template ──────────────────────────────
+    # θ=0 → front, θ=π/2 → left side, θ=π → back, θ=3π/2 → right side
+    strap_w = 0.015  # narrow side straps
+
+    if style == "classic":
+        front_w = 0.14   # 14cm front panel
+        back_w = 0.12    # 12cm back panel
+        crotch_w = 0.06  # 6cm crotch bridge
+    elif style == "brazilian":
+        front_w = 0.12
+        back_w = 0.07    # smaller back
+        crotch_w = 0.05
+    else:  # highcut
+        front_w = 0.13
+        back_w = 0.11
+        crotch_w = 0.05
+
+    widths = np.full(n, strap_w)
+
+    for i in range(n):
+        t = theta[i]
+        # Front panel: θ near 0 (or 2π)
+        front_dist = min(abs(t), abs(t - 2 * np.pi))
+        if front_dist < 0.8:  # ~45° sector
+            blend = 1.0 - front_dist / 0.8
+            blend = blend ** 0.7  # smooth falloff
+            w = strap_w + (front_w - strap_w) * blend
+            # Taper toward crotch: narrower at the dip bottom
+            y_here = pts[i][1]
+            crotch_factor = max(0, (y_here - crotch_y) / (hip_y - crotch_y))
+            w = crotch_w + (w - crotch_w) * crotch_factor
+            widths[i] = max(widths[i], w)
+
+        # Back panel: θ near π
+        back_dist = abs(t - np.pi)
+        if back_dist < 0.8:
+            blend = 1.0 - back_dist / 0.8
+            blend = blend ** 0.7
+            w = strap_w + (back_w - strap_w) * blend
+            y_here = pts[i][1]
+            crotch_factor = max(0, (y_here - crotch_y) / (hip_y - crotch_y))
+            w = crotch_w + (w - crotch_w) * crotch_factor
+            widths[i] = max(widths[i], w)
+
+    widths = np.clip(widths, strap_w * 0.5, 0.20)
+
+    # Generate mesh
+    patch = generate_strip_mesh(pts, widths, body, cfg.n_width, cfg.garment_offset)
+    patch.name = f"bottom_{style}"
+    return patch
+
+
 def generate_loop_bikini(
     seed: int | None = None,
     config: LoopBikiniConfig | None = None,
@@ -671,23 +765,9 @@ def generate_loop_bikini(
     )
     patches.append(make_patch(breast_loop, "loop_breast"))
 
-    # ── Crotch loop (dips at front and back) ────────────────────
-    hip_y = (lm["hip_left"][1] + lm["hip_right"][1]) / 2
-    crotch_y = lm["crotch_center"][1]
-    y_mid = (hip_y + crotch_y) / 2 + 0.02
-    # Dip must reach crotch_center Y — full depth for coverage
-    dip_amp = y_mid - crotch_y
-
-    crotch_loop = LoopCurve(
-        y_center=y_mid,
-        harmonics_y=[
-            (dip_amp, 2, -np.pi / 2 + rng.uniform(-0.05, 0.05)),
-            (rng.uniform(0.003, 0.010), 1, rng.uniform(0, 2 * np.pi)),
-        ],
-        harmonics_r=[],  # no radial offset — stay on body surface
-        harmonics_w=rand_width_harmonics(),
-    )
-    patches.append(make_patch(crotch_loop, "loop_crotch"))
+    # ── Bottom (fixed template — not randomly generated) ─────────
+    bottom_patch = _make_bottom_template(body, lm, cfg, rng)
+    patches.append(bottom_patch)
 
     # ── Extra decorative loops ──────────────────────────────────
     n_extra = max(0, cfg.n_loops - 2)
