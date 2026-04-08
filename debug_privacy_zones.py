@@ -112,7 +112,10 @@ def make_bikini_front_panel(lm):
     """Create bikini front panel shape in (Y, theta) body surface coords.
 
     Shape: inverted triangle / shield with concave leg scoops.
-    The fabric sits flush on skin surface (no gap).
+    The fabric sits flush on skin surface.
+
+    Real bikini bottom: top edge at hip level (~navel area),
+    bottom at crotch. Total height ~18-20cm.
 
     Coordinate system:
       Y = height (meters), theta = angle around body
@@ -120,86 +123,80 @@ def make_bikini_front_panel(lm):
 
     Returns: list of (y, theta) tuples forming a closed curve.
     """
-    # Key Y heights from landmarks
-    pubic_top_y = lm["pubic_top"][1]      # 0.865
-    crotch_front_y = lm["crotch_front"][1]  # 0.846
+    # Key Y heights
+    hip_y = lm["hip_front"][1]              # 0.996
+    hip_side_y = (lm["hip_left"][1] + lm["hip_right"][1]) / 2  # 0.976
     crotch_center_y = lm["crotch_center"][1]  # 0.781
 
-    # Top of panel: ~1cm above pubic_top (bikini line)
-    top_y = pubic_top_y + 0.01  # 0.875
+    # Top of panel: at hip level (low-rise bikini sits ~2cm below hip bone)
+    top_y = hip_side_y - 0.02  # ~0.956
 
-    # Bottom of panel: at crotch_center (between legs, no gap)
+    # Bottom: at crotch center (flush, no gap)
     bottom_y = crotch_center_y  # 0.781
 
-    # Width at top: ~7cm each side = 14cm total (classic bikini)
-    # On the body surface at this height, 1cm ~ some angle in theta
-    # Body radius at front ~0.09m, so 7cm = 0.07m, angle ~ 0.07/0.09 ~ 0.78 rad
-    # But this is too wide. For a small bikini: ~5cm each side
-    body_r_top = 0.09  # approximate front body radius at pubic height
-    half_width_top = 0.05  # 5cm each side
-    theta_half_top = half_width_top / body_r_top  # ~0.56 rad (~32 degrees)
+    # Width at top (hip level): ~7cm each side = 14cm total
+    body_r_top = 0.10  # body radius at hip height
+    half_width_top = 0.07  # 7cm each side
+    theta_half_top = half_width_top / body_r_top  # ~0.7 rad (~40 degrees)
 
     # Width at bottom (crotch): ~1.5cm each side = 3cm total
     body_r_bottom = 0.06
     half_width_bottom = 0.015
     theta_half_bottom = half_width_bottom / body_r_bottom  # ~0.25 rad
 
-    # Build the outline clockwise from top-left:
-    # Top edge: slight upward bow at center
-    top_bow = 0.005  # 5mm upward bow at center
+    # Build outline clockwise from top-left
+    top_bow = 0.005
     n_top = 15
     outline = []
 
     # 1. Top edge: left to right with slight upward bow
     for i in range(n_top + 1):
-        frac = i / n_top  # 0 to 1, left to right
-        theta = theta_half_top * (1 - 2 * frac)  # +half to -half
-        bow = top_bow * np.sin(np.pi * frac)  # parabolic bow
-        y = top_y + bow
-        outline.append((y, theta))
+        frac = i / n_top
+        theta = theta_half_top * (1 - 2 * frac)
+        bow = top_bow * np.sin(np.pi * frac)
+        outline.append((top_y + bow, theta))
 
     # 2. Right side: concave leg scoop from top-right down to bottom-right
-    #    Bezier: top-right -> scoop inward -> bottom-right
-    p0 = (top_y, -theta_half_top)           # top-right corner
-    p3 = (bottom_y, -theta_half_bottom)      # bottom-right (crotch)
-    # Control points create concave scoop (pulled inward toward center)
-    mid_y = (top_y + bottom_y) / 2
-    scoop_depth = theta_half_top * 0.6  # how deep the leg scoop cuts in
-    p1 = (top_y - 0.02, -theta_half_top + scoop_depth)  # pull inward near top
-    p2 = (mid_y, -theta_half_bottom)  # narrow already at midpoint
-    outline.extend(cubic_bezier(p0, p1, p2, p3, n=20)[1:])  # skip first (duplicate)
+    #    The scoop is deepest around upper-thigh / pubic area
+    p0 = (top_y, -theta_half_top)
+    p3 = (bottom_y, -theta_half_bottom)
+    # Leg scoop: the side curves inward aggressively
+    scoop_y = top_y - (top_y - bottom_y) * 0.35  # scoop deepest at ~35% down
+    scoop_depth = theta_half_top * 0.55
+    p1 = (scoop_y, -theta_half_top + scoop_depth)  # pull inward
+    p2 = (bottom_y + 0.03, -theta_half_bottom * 1.5)  # approach crotch width
+    outline.extend(cubic_bezier(p0, p1, p2, p3, n=25)[1:])
 
-    # 3. Bottom edge: right to left across crotch (flush, no gap)
+    # 3. Bottom edge: across crotch (flush)
     n_bottom = 5
     for i in range(n_bottom + 1):
         frac = i / n_bottom
         theta = -theta_half_bottom + 2 * theta_half_bottom * frac
         outline.append((bottom_y, theta))
 
-    # 4. Left side: concave leg scoop from bottom-left up to top-left (mirror)
-    p0 = (bottom_y, theta_half_bottom)      # bottom-left
-    p3 = (top_y, theta_half_top)            # top-left corner
-    p1 = (mid_y, theta_half_bottom)
-    p2 = (top_y - 0.02, theta_half_top - scoop_depth)
-    outline.extend(cubic_bezier(p0, p1, p2, p3, n=20)[1:])
+    # 4. Left side: mirror of right
+    p0 = (bottom_y, theta_half_bottom)
+    p3 = (top_y, theta_half_top)
+    p1 = (bottom_y + 0.03, theta_half_bottom * 1.5)
+    p2 = (scoop_y, theta_half_top - scoop_depth)
+    outline.extend(cubic_bezier(p0, p1, p2, p3, n=25)[1:])
 
     return outline
 
 
 def make_bikini_back_panel(lm):
-    """Create bikini back panel shape (thong/minimal back piece).
+    """Create bikini back panel shape.
 
-    Similar inverted triangle but centered at theta=pi (back).
+    Similar inverted triangle at theta=pi (back), from hip level to crotch.
     """
-    buttock_y = (lm["buttock_crease_left"][1] + lm["buttock_crease_right"][1]) / 2
-    crotch_back_y = lm["crotch_back"][1]  # 0.849
-    crotch_center_y = lm["crotch_center"][1]  # 0.781
+    hip_side_y = (lm["hip_left"][1] + lm["hip_right"][1]) / 2
+    crotch_center_y = lm["crotch_center"][1]
 
-    top_y = crotch_back_y + 0.01  # 0.859
+    top_y = hip_side_y - 0.02  # same height as front
     bottom_y = crotch_center_y
 
-    body_r_top = 0.10
-    half_width_top = 0.045
+    body_r_top = 0.12
+    half_width_top = 0.065  # slightly narrower than front
     theta_half_top = half_width_top / body_r_top
 
     body_r_bottom = 0.06
@@ -210,7 +207,7 @@ def make_bikini_back_panel(lm):
     n_top = 15
     outline = []
 
-    # Top edge (at back: theta around pi)
+    # Top edge at back
     for i in range(n_top + 1):
         frac = i / n_top
         theta = np.pi + theta_half_top * (1 - 2 * frac)
@@ -220,11 +217,11 @@ def make_bikini_back_panel(lm):
     # Right side scoop
     p0 = (top_y, np.pi - theta_half_top)
     p3 = (bottom_y, np.pi - theta_half_bottom)
-    mid_y = (top_y + bottom_y) / 2
-    scoop_depth = theta_half_top * 0.5
-    p1 = (top_y - 0.02, np.pi - theta_half_top + scoop_depth)
-    p2 = (mid_y, np.pi - theta_half_bottom)
-    outline.extend(cubic_bezier(p0, p1, p2, p3, n=20)[1:])
+    scoop_y = top_y - (top_y - bottom_y) * 0.35
+    scoop_depth = theta_half_top * 0.55
+    p1 = (scoop_y, np.pi - theta_half_top + scoop_depth)
+    p2 = (bottom_y + 0.03, np.pi - theta_half_bottom * 1.5)
+    outline.extend(cubic_bezier(p0, p1, p2, p3, n=25)[1:])
 
     # Bottom edge
     for i in range(6):
@@ -235,9 +232,9 @@ def make_bikini_back_panel(lm):
     # Left side scoop (mirror)
     p0 = (bottom_y, np.pi + theta_half_bottom)
     p3 = (top_y, np.pi + theta_half_top)
-    p1 = (mid_y, np.pi + theta_half_bottom)
-    p2 = (top_y - 0.02, np.pi + theta_half_top - scoop_depth)
-    outline.extend(cubic_bezier(p0, p1, p2, p3, n=20)[1:])
+    p1 = (bottom_y + 0.03, np.pi + theta_half_bottom * 1.5)
+    p2 = (scoop_y, np.pi + theta_half_top - scoop_depth)
+    outline.extend(cubic_bezier(p0, p1, p2, p3, n=25)[1:])
 
     return outline
 
