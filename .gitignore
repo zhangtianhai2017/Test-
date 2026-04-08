@@ -15,6 +15,7 @@ web/generated/
 *.png
 !web/static/**/*.png
 !bikini_output.png
+!privacy_zones_debug.png
 !output/**/*.png
 .pytest_cache/
 .mypy_cache/
