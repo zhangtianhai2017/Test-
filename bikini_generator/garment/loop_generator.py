@@ -53,9 +53,9 @@ def _get_coverage_zones() -> list[CoverageZone]:
         CoverageZone(
             name="crotch",
             center=lm["crotch_center"] + np.array([0, 0.06, 0]),
-            radius_y=0.12,
-            radius_xz=0.09,
-            min_strip_width=0.10,
+            radius_y=0.14,
+            radius_xz=0.10,
+            min_strip_width=0.18,  # 18cm wide — covers full pubic triangle
         ),
     ]
 
@@ -372,8 +372,8 @@ def compute_strip_widths(
             modulation = amp * np.sin(freq * theta + phase)
             widths *= (1.0 + modulation)
 
-    # Ensure minimum width (max 20cm to allow full breast/crotch coverage)
-    widths = np.clip(widths, base_width * 0.5, 0.20)
+    # Ensure minimum width (max 25cm to allow full breast/crotch coverage)
+    widths = np.clip(widths, base_width * 0.5, 0.25)
 
     return widths
 
@@ -491,7 +491,7 @@ class LoopBikiniConfig:
     base_width: float = 0.015      # strap width (meters)
     garment_offset: float = 0.004  # matches collision_margin — starts at collision surface
     n_samples: int = 128           # points per loop curve
-    n_width: int = 6               # vertices across strip
+    n_width: int = 10              # vertices across strip (enough for coverage panels)
 
 
 def _generate_base_coverage(body: BodySurface, garment_offset: float = 0.005) -> list[GarmentPatch]:
@@ -675,13 +675,14 @@ def generate_loop_bikini(
     hip_y = (lm["hip_left"][1] + lm["hip_right"][1]) / 2
     crotch_y = lm["crotch_center"][1]
     y_mid = (hip_y + crotch_y) / 2 + 0.02
-    dip_amp = (hip_y - crotch_y) / 2 - 0.01
+    # Dip must reach crotch_center Y — full depth for coverage
+    dip_amp = y_mid - crotch_y
 
     crotch_loop = LoopCurve(
         y_center=y_mid,
         harmonics_y=[
-            (dip_amp, 2, -np.pi / 2 + rng.uniform(-0.1, 0.1)),
-            (rng.uniform(0.005, 0.015), 1, rng.uniform(0, 2 * np.pi)),
+            (dip_amp, 2, -np.pi / 2 + rng.uniform(-0.05, 0.05)),
+            (rng.uniform(0.003, 0.010), 1, rng.uniform(0, 2 * np.pi)),
         ],
         harmonics_r=[],  # no radial offset — stay on body surface
         harmonics_w=rand_width_harmonics(),
