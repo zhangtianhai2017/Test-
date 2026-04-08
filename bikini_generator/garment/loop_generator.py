@@ -401,22 +401,13 @@ def generate_strip_mesh(
     widths: np.ndarray,
     body: BodySurface,
     n_width: int = 6,
-    garment_offset: float = 0.008,
+    garment_offset: float = 0.005,
 ) -> GarmentPatch:
     """Generate a closed strip mesh from loop points and varying widths.
 
-    The strip follows the loop curve, with width varying based on
-    coverage zone proximity. Both edges are projected onto the body surface.
-
-    Args:
-        loop_points: (N, 3) closed loop centerline
-        widths: (N,) width at each point
-        body: body surface for projection
-        n_width: number of vertices across the strip width
-        garment_offset: distance above body surface
-
-    Returns:
-        GarmentPatch with closed topology
+    Anchors are placed where the strip wraps tightly around the body
+    (narrow width regions and side-body contact points). This lets
+    physics simulation keep the strip on while allowing natural drape.
     """
     n_length = len(loop_points)
     verts = []
@@ -446,24 +437,22 @@ def generate_strip_mesh(
         side = np.cross(tangent, outward)
         side_norm = np.linalg.norm(side)
         if side_norm < 1e-6:
-            # Fallback: use up direction
             side = np.cross(tangent, np.array([0, 1, 0]))
             side_norm = np.linalg.norm(side)
         if side_norm > 1e-6:
             side = side / side_norm
 
-        # Generate width vertices (pure math, no mesh projection = no jitter)
+        # Generate width vertices
         for j in range(n_width):
-            t = (j / (n_width - 1)) - 0.5  # -0.5 to 0.5
+            t = (j / (n_width - 1)) - 0.5
             final_pt = pt + side * t * w
-
             verts.append(final_pt)
             uvs.append([i / n_length, j / (n_width - 1)])
 
     verts = np.array(verts, dtype=np.float64)
     uvs = np.array(uvs, dtype=np.float64)
 
-    # Generate faces — closed loop (last row connects to first row)
+    # Generate faces — closed loop
     faces = []
     for i in range(n_length):
         i_next = (i + 1) % n_length
@@ -477,11 +466,35 @@ def generate_strip_mesh(
 
     faces = np.array(faces, dtype=np.int32)
 
+    # ── Anchor assignment ───────────────────────────────────────
+    # Anchor vertices where the strip is narrow (strap regions) and
+    # at the sides of the body (tight contact). This simulates the
+    # friction/pressure that keeps a loop on the body.
+    # We anchor ~25% of vertices: every 4th ring, center vertex.
+    anchor_ids = []
+    anchor_positions = []
+    theta = np.linspace(0, 2 * np.pi, n_length, endpoint=False)
+    base_width = widths.min()
+    mid_j = n_width // 2  # center width vertex
+
+    for i in range(n_length):
+        is_narrow = widths[i] < base_width * 1.5  # strap region
+        is_side = (abs(np.sin(theta[i])) > 0.7)   # at body sides (θ ≈ π/2, 3π/2)
+
+        # Anchor every 4th ring at narrow/side regions
+        if (is_narrow or is_side) and i % 4 == 0:
+            for j in range(n_width):
+                vid = i * n_width + j
+                anchor_ids.append(vid)
+                anchor_positions.append(verts[vid].copy())
+
     patch = GarmentPatch(
         name="loop_strip",
         vertices=verts,
         faces=faces,
         uvs=uvs,
+        anchor_vertex_ids=anchor_ids,
+        anchor_body_positions=anchor_positions,
     )
     patch.compute_normals()
     return patch
@@ -544,6 +557,15 @@ def _generate_base_coverage(body: BodySurface, garment_offset: float = 0.005) ->
         if side == "left":
             patch.faces = patch.faces[:, [0, 2, 1]]
             patch.compute_normals()
+
+        # Anchor edges of cup (held by surrounding loops/body contact)
+        edge_ids = []
+        for idx in range(nu * nv):
+            row, col = divmod(idx, nv)
+            if row == 0 or row == nu - 1 or col == 0 or col == nv - 1:
+                edge_ids.append(idx)
+        patch.anchor_vertex_ids = edge_ids
+        patch.anchor_body_positions = [patch.vertices[i].copy() for i in edge_ids]
         patches.append(patch)
 
     # ── Bottom panel: front V-shape + crotch strip + back panel ──
@@ -602,6 +624,14 @@ def _generate_base_coverage(body: BodySurface, garment_offset: float = 0.005) ->
         "base_bottom", bottom_func,
         (0.0, 1.0), (0.0, 1.0), nu, nv,
     )
+    # Anchor top edge (held by hip strap) and bottom edges (body contact)
+    edge_ids = []
+    for idx in range(nu * nv):
+        row, col = divmod(idx, nv)
+        if row == 0 or row == nu - 1 or col == 0 or col == nv - 1:
+            edge_ids.append(idx)
+    patch.anchor_vertex_ids = edge_ids
+    patch.anchor_body_positions = [patch.vertices[i].copy() for i in edge_ids]
     patches.append(patch)
 
     return patches
