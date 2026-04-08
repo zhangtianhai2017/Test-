@@ -1,6 +1,8 @@
 """Generate debug image marking privacy zone positions on the body.
 
-Privacy zones are drawn as 3D curves on the body surface, not flat 2D ellipses.
+Privacy zones are drawn as 3D curves on the body surface.
+The front pubic panel uses a realistic bikini shape (inverted triangle
+with concave leg scoops), not an ellipse.
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -63,52 +65,194 @@ def render_body(ax, body_verts, body_faces, azimuth=0, title=""):
     return rotate
 
 
-def sample_surface_ellipse(body_surface, center_y, center_theta,
-                           radius_y, radius_theta, n_pts=80, offset=0.002):
-    """Sample a closed curve on the body surface around a center point.
+def sample_surface_points(body_surface, yt_points, offset=0.002):
+    """Convert (Y, theta) points to 3D body surface positions.
 
-    The ellipse is defined in (Y, theta) parameter space, then each point
-    is placed on the body surface at the correct 3D radius.
-
-    Returns: (n_pts, 3) array of 3D points on the body surface.
+    yt_points: list of (y, theta) tuples
+    Returns: (N, 3) array of 3D points on body surface.
     """
-    pts = np.zeros((n_pts, 3))
-    for i in range(n_pts):
-        t = 2 * np.pi * i / n_pts
-        # Parametric ellipse in (Y, theta) space
-        dy = radius_y * np.sin(t)
-        dtheta = radius_theta * np.cos(t)
-
-        y = center_y + dy
-        theta = center_theta + dtheta
-
-        # Get body surface radius at this (y, theta)
+    pts = np.zeros((len(yt_points), 3))
+    for i, (y, theta) in enumerate(yt_points):
         r = body_surface.get_surface_radius(y, theta) + offset
-
-        # Convert cylindrical to cartesian
-        # theta: 0=+Z (front), pi/2=-X (left), pi=-Z (back)
         x = -np.sin(theta) * r
         z = np.cos(theta) * r
-
         pts[i] = [x, y, z]
     return pts
 
 
-def draw_surface_zone(ax, rotate_fn, pts3d, color, label, label_offset_y=0.02):
+def sample_surface_ellipse(body_surface, center_y, center_theta,
+                           radius_y, radius_theta, n_pts=80, offset=0.002):
+    """Sample elliptical curve on body surface (for breast zones)."""
+    yt = []
+    for i in range(n_pts):
+        t = 2 * np.pi * i / n_pts
+        dy = radius_y * np.sin(t)
+        dtheta = radius_theta * np.cos(t)
+        yt.append((center_y + dy, center_theta + dtheta))
+    return sample_surface_points(body_surface, yt, offset)
+
+
+def cubic_bezier(p0, p1, p2, p3, n=20):
+    """Sample cubic bezier curve, returns list of (y, theta) points."""
+    pts = []
+    for i in range(n + 1):
+        t = i / n
+        t2 = t * t
+        t3 = t2 * t
+        mt = 1 - t
+        mt2 = mt * mt
+        mt3 = mt2 * mt
+        y = mt3 * p0[0] + 3 * mt2 * t * p1[0] + 3 * mt * t2 * p2[0] + t3 * p3[0]
+        th = mt3 * p0[1] + 3 * mt2 * t * p1[1] + 3 * mt * t2 * p2[1] + t3 * p3[1]
+        pts.append((y, th))
+    return pts
+
+
+def make_bikini_front_panel(lm):
+    """Create bikini front panel shape in (Y, theta) body surface coords.
+
+    Shape: inverted triangle / shield with concave leg scoops.
+    The fabric sits flush on skin surface (no gap).
+
+    Coordinate system:
+      Y = height (meters), theta = angle around body
+      theta=0 is front center (+Z), positive theta goes left
+
+    Returns: list of (y, theta) tuples forming a closed curve.
+    """
+    # Key Y heights from landmarks
+    pubic_top_y = lm["pubic_top"][1]      # 0.865
+    crotch_front_y = lm["crotch_front"][1]  # 0.846
+    crotch_center_y = lm["crotch_center"][1]  # 0.781
+
+    # Top of panel: ~1cm above pubic_top (bikini line)
+    top_y = pubic_top_y + 0.01  # 0.875
+
+    # Bottom of panel: at crotch_center (between legs, no gap)
+    bottom_y = crotch_center_y  # 0.781
+
+    # Width at top: ~7cm each side = 14cm total (classic bikini)
+    # On the body surface at this height, 1cm ~ some angle in theta
+    # Body radius at front ~0.09m, so 7cm = 0.07m, angle ~ 0.07/0.09 ~ 0.78 rad
+    # But this is too wide. For a small bikini: ~5cm each side
+    body_r_top = 0.09  # approximate front body radius at pubic height
+    half_width_top = 0.05  # 5cm each side
+    theta_half_top = half_width_top / body_r_top  # ~0.56 rad (~32 degrees)
+
+    # Width at bottom (crotch): ~1.5cm each side = 3cm total
+    body_r_bottom = 0.06
+    half_width_bottom = 0.015
+    theta_half_bottom = half_width_bottom / body_r_bottom  # ~0.25 rad
+
+    # Build the outline clockwise from top-left:
+    # Top edge: slight upward bow at center
+    top_bow = 0.005  # 5mm upward bow at center
+    n_top = 15
+    outline = []
+
+    # 1. Top edge: left to right with slight upward bow
+    for i in range(n_top + 1):
+        frac = i / n_top  # 0 to 1, left to right
+        theta = theta_half_top * (1 - 2 * frac)  # +half to -half
+        bow = top_bow * np.sin(np.pi * frac)  # parabolic bow
+        y = top_y + bow
+        outline.append((y, theta))
+
+    # 2. Right side: concave leg scoop from top-right down to bottom-right
+    #    Bezier: top-right -> scoop inward -> bottom-right
+    p0 = (top_y, -theta_half_top)           # top-right corner
+    p3 = (bottom_y, -theta_half_bottom)      # bottom-right (crotch)
+    # Control points create concave scoop (pulled inward toward center)
+    mid_y = (top_y + bottom_y) / 2
+    scoop_depth = theta_half_top * 0.6  # how deep the leg scoop cuts in
+    p1 = (top_y - 0.02, -theta_half_top + scoop_depth)  # pull inward near top
+    p2 = (mid_y, -theta_half_bottom)  # narrow already at midpoint
+    outline.extend(cubic_bezier(p0, p1, p2, p3, n=20)[1:])  # skip first (duplicate)
+
+    # 3. Bottom edge: right to left across crotch (flush, no gap)
+    n_bottom = 5
+    for i in range(n_bottom + 1):
+        frac = i / n_bottom
+        theta = -theta_half_bottom + 2 * theta_half_bottom * frac
+        outline.append((bottom_y, theta))
+
+    # 4. Left side: concave leg scoop from bottom-left up to top-left (mirror)
+    p0 = (bottom_y, theta_half_bottom)      # bottom-left
+    p3 = (top_y, theta_half_top)            # top-left corner
+    p1 = (mid_y, theta_half_bottom)
+    p2 = (top_y - 0.02, theta_half_top - scoop_depth)
+    outline.extend(cubic_bezier(p0, p1, p2, p3, n=20)[1:])
+
+    return outline
+
+
+def make_bikini_back_panel(lm):
+    """Create bikini back panel shape (thong/minimal back piece).
+
+    Similar inverted triangle but centered at theta=pi (back).
+    """
+    buttock_y = (lm["buttock_crease_left"][1] + lm["buttock_crease_right"][1]) / 2
+    crotch_back_y = lm["crotch_back"][1]  # 0.849
+    crotch_center_y = lm["crotch_center"][1]  # 0.781
+
+    top_y = crotch_back_y + 0.01  # 0.859
+    bottom_y = crotch_center_y
+
+    body_r_top = 0.10
+    half_width_top = 0.045
+    theta_half_top = half_width_top / body_r_top
+
+    body_r_bottom = 0.06
+    half_width_bottom = 0.015
+    theta_half_bottom = half_width_bottom / body_r_bottom
+
+    top_bow = 0.005
+    n_top = 15
+    outline = []
+
+    # Top edge (at back: theta around pi)
+    for i in range(n_top + 1):
+        frac = i / n_top
+        theta = np.pi + theta_half_top * (1 - 2 * frac)
+        bow = top_bow * np.sin(np.pi * frac)
+        outline.append((top_y + bow, theta))
+
+    # Right side scoop
+    p0 = (top_y, np.pi - theta_half_top)
+    p3 = (bottom_y, np.pi - theta_half_bottom)
+    mid_y = (top_y + bottom_y) / 2
+    scoop_depth = theta_half_top * 0.5
+    p1 = (top_y - 0.02, np.pi - theta_half_top + scoop_depth)
+    p2 = (mid_y, np.pi - theta_half_bottom)
+    outline.extend(cubic_bezier(p0, p1, p2, p3, n=20)[1:])
+
+    # Bottom edge
+    for i in range(6):
+        frac = i / 5
+        theta = np.pi - theta_half_bottom + 2 * theta_half_bottom * frac
+        outline.append((bottom_y, theta))
+
+    # Left side scoop (mirror)
+    p0 = (bottom_y, np.pi + theta_half_bottom)
+    p3 = (top_y, np.pi + theta_half_top)
+    p1 = (mid_y, np.pi + theta_half_bottom)
+    p2 = (top_y - 0.02, np.pi + theta_half_top - scoop_depth)
+    outline.extend(cubic_bezier(p0, p1, p2, p3, n=20)[1:])
+
+    return outline
+
+
+def draw_surface_zone(ax, rotate_fn, pts3d, color, label, label_offset_y=0.02,
+                      fill=False):
     """Draw a 3D surface curve projected to 2D view."""
     rpts = rotate_fn(pts3d)
 
-    # Use the average z to determine visibility
     avg_z = rpts[:, 2].mean()
     if avg_z < -0.05:
-        return  # behind body in this view
+        return
 
-    # Close the loop
     xs = np.append(rpts[:, 0], rpts[0, 0])
     ys = np.append(rpts[:, 1], rpts[0, 1])
-
-    # Only draw segments that face the camera (z > threshold)
-    # Split into visible segments
     z_vals = np.append(rpts[:, 2], rpts[0, 2])
     visible = z_vals > -0.02
 
@@ -116,7 +260,6 @@ def draw_surface_zone(ax, rotate_fn, pts3d, color, label, label_offset_y=0.02):
     i = 0
     while i < len(xs) - 1:
         if visible[i] and visible[i + 1]:
-            # Find contiguous visible segment
             seg_x = [xs[i]]
             seg_y = [ys[i]]
             while i < len(xs) - 1 and visible[i] and visible[i + 1]:
@@ -128,7 +271,15 @@ def draw_surface_zone(ax, rotate_fn, pts3d, color, label, label_offset_y=0.02):
         else:
             i += 1
 
-    # Label at top of zone
+    # Optional fill
+    if fill:
+        visible_mask = rpts[:, 2] > -0.02
+        if visible_mask.sum() > 2:
+            vis_pts = rpts[visible_mask]
+            ax.fill(vis_pts[:, 0], vis_pts[:, 1], color=color,
+                    alpha=0.15, zorder=45)
+
+    # Label
     center_2d = rpts[:, :2].mean(axis=0)
     top_y = rpts[:, 1].max()
     ax.annotate(label, (center_2d[0], top_y + label_offset_y),
@@ -153,21 +304,15 @@ def main():
         (axes[2], np.pi, "Back View"),
     ]
 
-    # Privacy zone definitions:
-    # center_y, center_theta, radius_y, radius_theta
-    # theta: 0=front(+Z), pi=back(-Z)
-    #
-    # The actual pubic privacy center is around pubic_top/crotch_front,
-    # NOT at crotch_center (which is the very bottom between legs).
-    pubic_center_y = (lm["pubic_top"][1] + lm["crotch_front"][1]) / 2  # ~0.855
-    privacy_zones = [
+    # Breast zones (still elliptical — they're round)
+    breast_zones = [
         {
             "name": "LEFT BREAST",
-            "center_y": lm["left_breast_apex"][1],  # 1.298
+            "center_y": lm["left_breast_apex"][1],
             "center_theta": np.arctan2(-lm["left_breast_apex"][0],
                                         lm["left_breast_apex"][2]),
             "radius_y": 0.04,
-            "radius_theta": 0.5,  # ~30 degrees
+            "radius_theta": 0.5,
             "color": "red",
         },
         {
@@ -179,33 +324,22 @@ def main():
             "radius_theta": 0.5,
             "color": "red",
         },
-        {
-            "name": "PUBIC AREA",
-            "center_y": pubic_center_y,
-            "center_theta": 0.0,  # front center
-            "radius_y": 0.04,  # ~4cm up/down from center
-            "radius_theta": 0.35,  # ~20 degrees left/right
-            "color": "#ff4444",
-        },
-        {
-            "name": "BUTTOCK CREASE",
-            "center_y": (lm["buttock_crease_left"][1] + lm["buttock_crease_right"][1]) / 2,
-            "center_theta": np.pi,  # back center
-            "radius_y": 0.04,
-            "radius_theta": 0.5,
-            "color": "#ff6666",
-        },
     ]
 
-    # Pre-sample all zone curves in 3D
-    zone_curves = []
-    for zone in privacy_zones:
+    breast_curves = []
+    for zone in breast_zones:
         pts = sample_surface_ellipse(
             body_surface,
             zone["center_y"], zone["center_theta"],
             zone["radius_y"], zone["radius_theta"],
         )
-        zone_curves.append(pts)
+        breast_curves.append(pts)
+
+    # Bikini bottom panels — realistic shape on body surface
+    front_panel_yt = make_bikini_front_panel(lm)
+    back_panel_yt = make_bikini_back_panel(lm)
+    front_panel_3d = sample_surface_points(body_surface, front_panel_yt)
+    back_panel_3d = sample_surface_points(body_surface, back_panel_yt)
 
     key_landmarks = {
         "neck_front": ('cyan', 'v'),
@@ -236,9 +370,16 @@ def main():
     for ax, azimuth, title in views:
         rotate = render_body(ax, body_verts, body_faces, azimuth, title)
 
-        # Draw privacy zones as 3D curves on body surface
-        for zone, pts3d in zip(privacy_zones, zone_curves):
-            draw_surface_zone(ax, rotate, pts3d, zone["color"], zone["name"])
+        # Draw breast zones (elliptical)
+        for zone, pts3d in zip(breast_zones, breast_curves):
+            draw_surface_zone(ax, rotate, pts3d, zone["color"], zone["name"],
+                              fill=True)
+
+        # Draw bikini bottom panels (realistic shape)
+        draw_surface_zone(ax, rotate, front_panel_3d, '#ff4444',
+                          'FRONT PANEL', fill=True)
+        draw_surface_zone(ax, rotate, back_panel_3d, '#ff6666',
+                          'BACK PANEL', fill=True)
 
         # Draw landmarks
         for lm_name, (color, marker) in key_landmarks.items():
