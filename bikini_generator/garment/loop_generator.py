@@ -546,36 +546,60 @@ def _generate_base_coverage(body: BodySurface, garment_offset: float = 0.005) ->
             patch.compute_normals()
         patches.append(patch)
 
-    # ── Crotch patch ────────────────────────────────────────────
-    crotch_c = lm["crotch_center"]
+    # ── Bottom panel: front V-shape + crotch strip + back panel ──
+    # Front panel: wide at top (hip level), narrows to crotch
+    # Back panel: from crotch up to buttocks
+    hip_front = lm["hip_front"]
     pubic = lm["pubic_top"]
-    crotch_f = lm["crotch_front"]
+    crotch_c = lm["crotch_center"]
     crotch_b = lm["crotch_back"]
+    buttock_l = lm["left_buttock_apex"]
+    buttock_r = lm["right_buttock_apex"]
 
-    nu, nv = 12, 10
+    nu, nv = 20, 12
 
-    def crotch_func(u, v):
-        # u: front-to-back (0=front, 1=back)
-        # v: left-to-right (-0.5 to 0.5)
-        front = crotch_f + np.array([0, 0.02, garment_offset])
-        back = crotch_b + np.array([0, 0.02, -garment_offset])
-        center = crotch_c + np.array([0, 0, 0])
-        # Path from front → crotch center → back
-        if u < 0.5:
-            t = u * 2
-            pt = front * (1 - t) + center * t
+    # Front panel top (wide): Y≈0.96, Z≈0.08 (body surface front)
+    front_top_y = hip_front[1] - 0.03   # ~0.966
+    front_top_z = hip_front[2]           # ~0.086
+    front_half_w = 0.06                  # half-width at top (~12cm total)
+
+    # Crotch narrowest point
+    crotch_half_w = 0.025                # half-width at crotch (~5cm)
+
+    # Back panel top: Y≈0.92, Z≈-0.13
+    back_top_y = (buttock_l[1] + buttock_r[1]) / 2  # ~0.927
+    back_top_z = (buttock_l[2] + buttock_r[2]) / 2   # ~-0.14
+    back_half_w = 0.055                  # half-width at back top
+
+    def bottom_func(u, v):
+        # u: 0=front top → 0.4=crotch center → 1.0=back top
+        # v: 0=left edge → 1=right edge
+
+        if u < 0.4:
+            # Front panel: hip → crotch
+            t = u / 0.4
+            y = front_top_y * (1 - t) + crotch_c[1] * t
+            z = front_top_z * (1 - t) + crotch_c[2] * t
+            half_w = front_half_w * (1 - t) + crotch_half_w * t
+        elif u < 0.6:
+            # Crotch bridge: narrow strip between legs
+            t = (u - 0.4) / 0.2
+            y = crotch_c[1]
+            z = crotch_c[2] * (1 - t) + crotch_b[2] * 0.3 * t
+            half_w = crotch_half_w
         else:
-            t = (u - 0.5) * 2
-            pt = center * (1 - t) + back * t
-        # Width narrows at center
-        width = 0.04 * (1.0 - 0.5 * np.exp(-((u - 0.5) / 0.3) ** 2))
-        lateral = (v - 0.5) * width
-        pt[0] += lateral
-        pt[2] += garment_offset
-        return pt
+            # Back panel: crotch → buttocks
+            t = (u - 0.6) / 0.4
+            y = crotch_c[1] * (1 - t) + back_top_y * t
+            z_start = crotch_c[2] + (crotch_b[2] - crotch_c[2]) * 0.3
+            z = z_start * (1 - t) + back_top_z * t
+            half_w = crotch_half_w * (1 - t) + back_half_w * t
+
+        x = (v - 0.5) * 2 * half_w
+        return np.array([x, y, z + garment_offset * np.sign(z + 0.01)])
 
     patch = GarmentPatch.from_parametric(
-        "base_crotch", crotch_func,
+        "base_bottom", bottom_func,
         (0.0, 1.0), (0.0, 1.0), nu, nv,
     )
     patches.append(patch)
