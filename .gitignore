@@ -16,5 +16,6 @@ web/generated/
 .env
 *.png
 !web/static/**/*.png
+!bikini_output.png
 .pytest_cache/
 .mypy_cache/
