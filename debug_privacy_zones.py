@@ -450,10 +450,14 @@ def main():
         np.arctan2(-lm["right_breast_apex"][0], lm["right_breast_apex"][2]),
         0.04, 0.5)
 
-    # Shrinkwrap all fabric meshes onto actual body mesh surface
+    # Shrinkwrap panels and breast zones onto actual body mesh surface.
+    # NOTE: crotch strip is NOT shrinkwrapped — its perineum wrap vertices
+    # are intentionally inside the body (between the legs) at ~1cm radius.
+    # Shrinkwrapping would push them onto the outer body surface, creating
+    # a visible artifact (upright triangle below the front panel).
     print("Shrinkwrapping fabric to body mesh...")
     fabric_offset = 0.003
-    for mesh in [front_mesh, back_mesh, crotch_mesh, left_breast, right_breast]:
+    for mesh in [front_mesh, back_mesh, left_breast, right_breast]:
         if mesh is not None:
             shrinkwrap_to_body(mesh, body_trimesh, offset=fabric_offset)
 
