@@ -24,6 +24,75 @@ from bikini_generator.garment.loop_generator import BodySurface
 
 
 # ---------------------------------------------------------------------------
+# Mesh thickness: extrude thin surface into solid shell
+# ---------------------------------------------------------------------------
+
+def thicken_mesh(mesh, thickness=0.002):
+    """Extrude a surface mesh into a solid shell with given thickness.
+
+    Creates outer surface offset along vertex normals, connects edges
+    with side quads, producing a watertight solid. This prevents z-fighting
+    with the body mesh that occurs with infinitely thin surfaces.
+    """
+    from collections import Counter
+
+    verts = mesh.vertices.copy()
+    faces = mesh.faces.copy()
+    n = len(verts)
+
+    # Compute vertex normals from face normals
+    normals = np.zeros_like(verts)
+    for f in faces:
+        v0, v1, v2 = verts[f[0]], verts[f[1]], verts[f[2]]
+        fn = np.cross(v1 - v0, v2 - v0)
+        normals[f[0]] += fn
+        normals[f[1]] += fn
+        normals[f[2]] += fn
+    lengths = np.linalg.norm(normals, axis=1, keepdims=True)
+    normals /= np.maximum(lengths, 1e-8)
+
+    # Ensure normals point outward (away from body center axis)
+    radial = verts.copy()
+    radial[:, 1] = 0
+    dots = np.sum(normals * radial, axis=1)
+    normals[dots < 0] *= -1
+
+    # Outer surface = original + normal * thickness
+    outer_verts = verts + normals * thickness
+    all_verts = np.vstack([verts, outer_verts])
+
+    # Inner faces (original winding) + outer faces (reversed, offset by n)
+    outer_faces = faces[:, ::-1] + n
+    all_faces_list = [faces, outer_faces]
+
+    # Side faces: connect boundary edges (edges in only 1 face)
+    edge_count = Counter()
+    for f in faces:
+        for i in range(3):
+            e = tuple(sorted([f[i], f[(i + 1) % 3]]))
+            edge_count[e] += 1
+
+    side_faces = []
+    for (a, b), c in edge_count.items():
+        if c == 1:
+            side_faces.append([a, b, a + n])
+            side_faces.append([b, b + n, a + n])
+
+    if side_faces:
+        all_faces_list.append(np.array(side_faces, dtype=np.int32))
+
+    all_faces = np.vstack(all_faces_list)
+    thick = trimesh.Trimesh(vertices=all_verts, faces=all_faces, process=False)
+
+    # Copy vertex colors to both inner and outer surfaces
+    if hasattr(mesh.visual, 'vertex_colors') and mesh.visual.vertex_colors is not None:
+        colors = mesh.visual.vertex_colors[:n]
+        thick.visual.vertex_colors = np.tile(
+            colors[0], (len(all_verts), 1))  # uniform color
+    return thick
+
+
+# ---------------------------------------------------------------------------
 # Body mesh LUT builder (uses actual mesh, not BodySurface ellipsoidal model)
 # ---------------------------------------------------------------------------
 
@@ -280,8 +349,15 @@ def make_back_panel_outline(lm, body_surface):
 
 
 def create_panel_mesh(body_surface, outline_yt, n_grid=40, offset=0.003):
-    """Create a triangulated mesh for a panel on the body surface."""
+    """Create a triangulated mesh for a panel on the body surface.
+
+    Uses contains_points (batch) with radius tolerance to avoid
+    boundary misses that create clean breaks in the mesh.
+    """
     outline_arr = np.array(outline_yt)
+    # Ensure path is explicitly closed
+    if not np.allclose(outline_arr[0], outline_arr[-1]):
+        outline_arr = np.vstack([outline_arr, outline_arr[0:1]])
     path = MplPath(outline_arr)
 
     y_min, y_max = outline_arr[:, 0].min(), outline_arr[:, 0].max()
@@ -290,25 +366,35 @@ def create_panel_mesh(body_surface, outline_yt, n_grid=40, offset=0.003):
     y_vals = np.linspace(y_min - 0.005, y_max + 0.005, n_grid)
     th_vals = np.linspace(th_min - 0.05, th_max + 0.05, n_grid * 2)
 
+    # Batch contains_points with radius tolerance to avoid boundary gaps
+    grid_points = np.array([(y, th) for y in y_vals for th in th_vals])
+    # Radius tolerance: half the grid spacing to include boundary points
+    tol = max((y_vals[1] - y_vals[0]), (th_vals[1] - th_vals[0])) * 0.6
+    inside = path.contains_points(grid_points, radius=tol)
+
     vertices = []
     grid_idx = {}
+    n_th = len(th_vals)
 
-    for iy, y in enumerate(y_vals):
-        for it, th in enumerate(th_vals):
-            if path.contains_point((y, th)):
-                idx = len(vertices)
-                grid_idx[(iy, it)] = idx
-                r = body_surface.get_surface_radius(y, th) + offset
-                x = -np.sin(th) * r
-                z = np.cos(th) * r
-                vertices.append([x, y, z])
+    for idx_flat, is_in in enumerate(inside):
+        if is_in:
+            iy = idx_flat // n_th
+            it = idx_flat % n_th
+            y = y_vals[iy]
+            th = th_vals[it]
+            vidx = len(vertices)
+            grid_idx[(iy, it)] = vidx
+            r = body_surface.get_surface_radius(y, th) + offset
+            x = -np.sin(th) * r
+            z = np.cos(th) * r
+            vertices.append([x, y, z])
 
     if len(vertices) < 3:
         return None
 
     faces = []
     for iy in range(n_grid - 1):
-        for it in range(len(th_vals) - 1):
+        for it in range(n_th - 1):
             i00 = grid_idx.get((iy, it))
             i10 = grid_idx.get((iy + 1, it))
             i01 = grid_idx.get((iy, it + 1))
@@ -323,7 +409,7 @@ def create_panel_mesh(body_surface, outline_yt, n_grid=40, offset=0.003):
 
     mesh = trimesh.Trimesh(vertices=np.array(vertices),
                            faces=np.array(faces), process=False)
-    color = [255, 80, 80, 180]
+    color = [255, 80, 80, 255]  # Fully opaque
     mesh.visual.vertex_colors = np.tile(color, (len(vertices), 1))
     return mesh
 
@@ -391,7 +477,7 @@ def create_crotch_strip_mesh(lm, body_surface, hw=0.015, offset=0.003,
 
     mesh = trimesh.Trimesh(vertices=vertices, faces=np.array(faces),
                            process=False)
-    color = [255, 80, 80, 180]
+    color = [255, 80, 80, 255]
     mesh.visual.vertex_colors = np.tile(color, (len(vertices), 1))
     return mesh
 
@@ -435,7 +521,7 @@ def create_breast_zone_mesh(body_surface, center_y, center_theta,
 
     mesh = trimesh.Trimesh(vertices=np.array(vertices),
                            faces=np.array(faces), process=False)
-    color = [255, 80, 80, 180]
+    color = [255, 80, 80, 255]
     mesh.visual.vertex_colors = np.tile(color, (len(vertices), 1))
     return mesh
 
@@ -536,6 +622,17 @@ def main():
     print("Running cloth physics simulation...")
     physics_meshes = [front_mesh, back_mesh, left_breast, right_breast]
     settle_fabric_on_body(physics_meshes, body_verts, num_steps=300)
+
+    # --- Add 2mm thickness to all fabric meshes ---
+    print("Extruding 2mm thickness on all fabric meshes...")
+    all_fabric = [front_mesh, back_mesh, crotch_mesh, left_breast, right_breast]
+    thick_meshes = []
+    for m in all_fabric:
+        if m is not None:
+            thick_meshes.append(thicken_mesh(m, thickness=0.002))
+        else:
+            thick_meshes.append(None)
+    front_mesh, back_mesh, crotch_mesh, left_breast, right_breast = thick_meshes
 
     # --- Build pyrender scene ---
     print("Creating landmark markers...")
