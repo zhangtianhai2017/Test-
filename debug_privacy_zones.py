@@ -22,25 +22,35 @@ from bikini_generator.body.landmarks import get_landmarks
 from bikini_generator.garment.loop_generator import BodySurface
 
 
-def shrinkwrap_to_body(fabric_mesh, body_trimesh, offset=0.003):
+def shrinkwrap_to_body(fabric_mesh, body_trimesh, offset=0.004):
     """Project every fabric vertex onto the nearest body surface point + offset.
 
     Uses trimesh proximity query for accurate 3D projection.
-    This ensures fabric is flush against the actual body mesh,
-    not the simplified ellipsoidal BodySurface model.
+    Offset is applied along the body mesh FACE NORMAL at the nearest point,
+    which correctly handles non-radial surfaces like breasts and pubic area.
     """
     verts = fabric_mesh.vertices.copy()
     # Find closest point on body surface for each fabric vertex
     closest_pts, distances, face_ids = body_trimesh.nearest.on_surface(verts)
-    # Compute outward normal direction for each vertex (radial from Y-axis)
-    # This is more robust than face normals which can be noisy
-    radial = verts.copy()
-    radial[:, 1] = 0  # zero out Y, keep XZ for radial direction
+    # Get face normals from the body mesh for accurate outward direction
+    face_normals = body_trimesh.face_normals[face_ids]
+    # Ensure normals point outward (away from body center axis)
+    # Check by dot product with radial direction from Y-axis
+    radial = closest_pts.copy()
+    radial[:, 1] = 0
     radial_len = np.linalg.norm(radial, axis=1, keepdims=True)
     radial_len = np.maximum(radial_len, 1e-6)
     radial_dir = radial / radial_len
-    # Place vertex at closest body surface point + offset along radial outward
-    fabric_mesh.vertices = closest_pts + radial_dir * offset
+    dots = np.sum(face_normals * radial_dir, axis=1)
+    # Flip normals that point inward
+    flip_mask = dots < 0
+    face_normals[flip_mask] *= -1
+    # Normalize face normals (should already be unit but be safe)
+    fn_len = np.linalg.norm(face_normals, axis=1, keepdims=True)
+    fn_len = np.maximum(fn_len, 1e-6)
+    face_normals = face_normals / fn_len
+    # Place vertex at closest body surface point + offset along face normal
+    fabric_mesh.vertices = closest_pts + face_normals * offset
     return fabric_mesh
 
 
