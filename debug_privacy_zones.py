@@ -1,10 +1,16 @@
 """Generate debug image marking privacy zones using proper 3D rendering.
 
-Approach: extract body mesh faces at privacy zones, extrude outward 2mm.
-Fabric = body skin surface + offset along vertex normals.
-Guarantees perfect body conformity — fabric literally IS the skin, pushed out.
+Approach: parametric mesh + body surface projection.
+- Creates clean fabric meshes with smooth parametric boundaries
+- Projects all vertices onto body surface using trimesh closest-point query
+- Offsets along surface normals for 2mm solid shell thickness
+- Bikini bottom = one continuous mesh (front + crotch + back)
+- Breast zones = elliptical disc meshes
 
-Uses pyrender (OpenGL) with OSMesa for offscreen rendering.
+Advantages over body-face-selection approach:
+- Smooth edges (defined by parametric curves, not body mesh topology)
+- No gaps between segments (continuous grid connectivity)
+- Resolution independent of body mesh density
 """
 import os
 os.environ['PYOPENGL_PLATFORM'] = 'osmesa'
@@ -23,152 +29,66 @@ from bikini_generator.body.landmarks import get_landmarks
 
 
 # ---------------------------------------------------------------------------
-# Extract body surface faces within a zone and extrude outward
+# Helpers: projection and solid shell
 # ---------------------------------------------------------------------------
 
-def vertex_cylindrical(verts):
-    """Convert vertices to cylindrical coords: (Y, theta).
-    theta: 0=front(+Z), pi/2=left(-X), pi=back(-Z).
-    """
-    y = verts[:, 1]
-    theta = np.arctan2(-verts[:, 0], verts[:, 2])
-    theta[theta < 0] += 2 * np.pi
-    return y, theta
+def project_and_offset(verts_3d, body_trimesh, thickness=0.002):
+    """Project points onto body surface and offset outward along normals."""
+    closest, dist, fids = body_trimesh.nearest.on_surface(verts_3d)
+    normals = body_trimesh.face_normals[fids].copy()
 
+    # Ensure normals point outward from body
+    radial = closest.copy()
+    radial[:, 1] = 0  # XZ plane radial direction
+    radial_len = np.linalg.norm(radial, axis=1)
 
-def select_faces_in_zone(verts, faces, zone_path):
-    """Select body mesh faces whose centroid falls inside a (Y, theta) zone.
+    # For vertices near body center axis (crotch/perineum), use direction
+    # from body center-of-mass instead of radial
+    near_axis = radial_len < 0.03
+    body_com = np.array([0.0, 1.0, 0.0])
+    com_dir = closest - body_com
 
-    zone_path: MplPath in (Y, theta) space defining the zone boundary.
-    Handles theta wrapping at the 0/2pi boundary (front of body).
-    Returns face indices.
-    """
-    y, theta = vertex_cylindrical(verts)
+    ref = radial.copy()
+    ref[near_axis] = com_dir[near_axis]
+    ref_len = np.linalg.norm(ref, axis=1, keepdims=True)
+    ref /= np.maximum(ref_len, 1e-8)
 
-    # Check if zone crosses the theta=0/2pi boundary
-    zone_verts = zone_path.vertices
-    has_negative_theta = np.any(zone_verts[:, 1] < 0)
-    has_large_theta = np.any(zone_verts[:, 1] > 2 * np.pi - 0.1)
-
-    # Face centroids in (Y, theta)
-    fy = (y[faces[:, 0]] + y[faces[:, 1]] + y[faces[:, 2]]) / 3
-
-    # For theta, handle wrapping carefully
-    th0 = theta[faces[:, 0]].copy()
-    th1 = theta[faces[:, 1]].copy()
-    th2 = theta[faces[:, 2]].copy()
-
-    if has_negative_theta:
-        # Front zone: shift theta > pi to negative range
-        th0[th0 > np.pi] -= 2 * np.pi
-        th1[th1 > np.pi] -= 2 * np.pi
-        th2[th2 > np.pi] -= 2 * np.pi
-
-    fth = (th0 + th1 + th2) / 3
-
-    points = np.column_stack([fy, fth])
-    inside = zone_path.contains_points(points, radius=0.002)
-    return np.where(inside)[0]
-
-
-def extract_and_extrude(verts, faces, face_indices, thickness=0.002,
-                        color=(255, 80, 80), smooth_iters=15):
-    """Extract faces from body mesh, smooth boundary, and extrude outward.
-
-    Steps:
-    1. Extract faces at the zone boundary
-    2. Laplacian-smooth boundary vertices for clean curved edges
-    3. Extrude outward along vertex normals by thickness
-    4. Cap with side faces for solid shell
-
-    color: RGB tuple for this fabric piece.
-    smooth_iters: iterations of boundary Laplacian smoothing.
-    """
-    from collections import Counter, defaultdict
-
-    if len(face_indices) == 0:
-        return None
-
-    # Collect unique vertices used by selected faces
-    selected_faces = faces[face_indices]
-    unique_vids = np.unique(selected_faces)
-    vid_map = {old: new for new, old in enumerate(unique_vids)}
-
-    new_faces = np.array([[vid_map[v] for v in f] for f in selected_faces])
-    new_verts = verts[unique_vids].copy()
-    n = len(new_verts)
-
-    # --- Identify boundary vertices and smooth them ---
-    edge_count = Counter()
-    edge_neighbors = defaultdict(set)
-    for f in new_faces:
-        for i in range(3):
-            a, b = f[i], f[(i + 1) % 3]
-            e = (min(a, b), max(a, b))
-            edge_count[e] += 1
-            edge_neighbors[a].add(b)
-            edge_neighbors[b].add(a)
-
-    # Boundary vertices: on edges that appear in exactly 1 face
-    boundary_vids = set()
-    for (a, b), c in edge_count.items():
-        if c == 1:
-            boundary_vids.add(a)
-            boundary_vids.add(b)
-
-    # Laplacian smooth boundary vertices (keeps interior fixed)
-    # Each boundary vertex moves toward the average of its boundary neighbors
-    boundary_list = list(boundary_vids)
-    for _ in range(smooth_iters):
-        new_pos = new_verts.copy()
-        for vid in boundary_list:
-            neighbors = [nb for nb in edge_neighbors[vid]
-                         if nb in boundary_vids]
-            if len(neighbors) >= 2:
-                avg = np.mean(new_verts[neighbors], axis=0)
-                # Blend: 50% toward average, 50% stay
-                new_pos[vid] = 0.5 * new_verts[vid] + 0.5 * avg
-        new_verts = new_pos
-
-    # --- Compute vertex normals ---
-    normals = np.zeros_like(new_verts)
-    for f in new_faces:
-        v0, v1, v2 = new_verts[f[0]], new_verts[f[1]], new_verts[f[2]]
-        fn = np.cross(v1 - v0, v2 - v0)
-        normals[f[0]] += fn
-        normals[f[1]] += fn
-        normals[f[2]] += fn
-    lengths = np.linalg.norm(normals, axis=1, keepdims=True)
-    normals /= np.maximum(lengths, 1e-8)
-
-    # Ensure normals point outward
-    radial = new_verts.copy()
-    radial[:, 1] = 0
-    dots = np.sum(normals * radial, axis=1)
+    dots = np.sum(normals * ref, axis=1)
     normals[dots < 0] *= -1
 
-    # --- Extrude ---
-    outer_verts = new_verts + normals * thickness
-    all_verts = np.vstack([new_verts, outer_verts])
+    outer = closest + normals * thickness
+    return outer, closest, normals
 
-    inner_faces = new_faces[:, ::-1]
-    outer_faces = new_faces + n
-    all_faces_list = [inner_faces, outer_faces]
 
-    # Side faces from boundary edges
-    side_faces = []
-    for (a, b), c in edge_count.items():
+def make_solid_shell(outer, inner, faces, color):
+    """Build extruded solid: inner surface + outer surface + side walls."""
+    from collections import Counter
+
+    n = len(outer)
+    all_verts = np.vstack([inner, outer])
+    inner_faces = faces[:, ::-1]  # reversed winding
+    outer_faces = faces + n
+
+    # Find boundary edges (appear in exactly 1 triangle)
+    ec = Counter()
+    for f in faces:
+        for i in range(3):
+            a, b = int(f[i]), int(f[(i + 1) % 3])
+            ec[(min(a, b), max(a, b))] += 1
+
+    sides = []
+    for (a, b), c in ec.items():
         if c == 1:
-            side_faces.append([a, b, b + n])
-            side_faces.append([a, b + n, a + n])
+            sides.append([a, b, b + n])
+            sides.append([a, b + n, a + n])
 
-    if side_faces:
-        all_faces_list.append(np.array(side_faces, dtype=np.int32))
+    parts = [inner_faces, outer_faces]
+    if sides:
+        parts.append(np.array(sides, dtype=np.int32))
+    all_faces = np.vstack(parts)
 
-    all_faces = np.vstack(all_faces_list)
     mesh = trimesh.Trimesh(vertices=all_verts, faces=all_faces, process=False)
-    rgba = list(color) + [255]
-    mesh.visual.vertex_colors = np.tile(rgba, (len(all_verts), 1))
+    mesh.visual.vertex_colors = np.tile(list(color) + [255], (len(all_verts), 1))
     return mesh
 
 
@@ -177,32 +97,23 @@ def extract_and_extrude(verts, faces, face_indices, thickness=0.002,
 # ---------------------------------------------------------------------------
 
 def make_front_panel_zone(lm):
-    """Front panel: inverted triangle zone in (Y, theta) space."""
+    """Front panel: inverted triangle with bezier leg scoops in (Y, theta)."""
     hip_side_y = (lm["hip_left"][1] + lm["hip_right"][1]) / 2
     pubic_top_y = lm["pubic_top"][1]
-
     top_y = hip_side_y - 0.03
     bottom_y = pubic_top_y + 0.015
-    hw_top = 0.065      # half-width at top in meters
-    hw_bottom = 0.018   # half-width at bottom
-
-    # Convert to theta using approximate body radius
-    r_top = 0.10   # front body radius at hip level
-    r_bot = 0.085  # front body radius at pubic level
+    hw_top, hw_bottom = 0.065, 0.018
+    r_top, r_bot = 0.10, 0.085
     thf = hw_top / r_top
     thc = hw_bottom / r_bot
 
-    # Inverted triangle with concave leg scoops
     outline = []
-
-    # Top edge (slight bow)
     for i in range(20):
         f = i / 19
         theta = thf * (1 - 2 * f)
         bow = 0.004 * np.sin(np.pi * f)
         outline.append((top_y + bow, theta))
 
-    # Right leg scoop (bezier)
     sy = top_y - (top_y - bottom_y) * 0.4
     sd = thf * 0.55
     n_bez = 30
@@ -215,12 +126,10 @@ def make_front_panel_zone(lm):
         th = mt**3*p0[1] + 3*mt**2*t*p1[1] + 3*mt*t**2*p2[1] + t**3*p3[1]
         outline.append((y, th))
 
-    # Bottom edge
     for i in range(6):
         f = i / 5
         outline.append((bottom_y, -thc + 2 * thc * f))
 
-    # Left leg scoop (bezier)
     for i in range(1, n_bez + 1):
         t = i / n_bez
         mt = 1 - t
@@ -237,22 +146,17 @@ def make_front_panel_zone(lm):
 
 
 def make_back_panel_zone(lm):
-    """Back panel: inverted triangle zone on the back."""
+    """Back panel: inverted triangle on the back in (Y, theta)."""
     hip_side_y = (lm["hip_left"][1] + lm["hip_right"][1]) / 2
     pubic_top_y = lm["pubic_top"][1]
-
     top_y = hip_side_y - 0.03
     bottom_y = pubic_top_y + 0.015
-    hw_top = 0.060
-    hw_bottom = 0.018
-
-    r_top = 0.10
-    r_bot = 0.085
+    hw_top, hw_bottom = 0.060, 0.018
+    r_top, r_bot = 0.10, 0.085
     thb = hw_top / r_top
     thc = hw_bottom / r_bot
 
     outline = []
-
     for i in range(20):
         f = i / 19
         theta = np.pi + thb * (1 - 2 * f)
@@ -290,56 +194,159 @@ def make_back_panel_zone(lm):
     return MplPath(outline_arr)
 
 
-def select_crotch_strip_faces(verts, faces, lm, hw=0.018):
-    """Select body mesh faces for the crotch strip by 3D position.
+def scan_hw_at_y(path, y, center_theta, r_body):
+    """Find half-width in meters at given Y by scanning the outline path."""
+    verts = path.vertices
+    th_lo, th_hi = verts[:, 1].min() - 0.05, verts[:, 1].max() + 0.05
+    test = np.linspace(th_lo, th_hi, 500)
+    pts = np.column_stack([np.full(500, y), test])
+    inside = path.contains_points(pts)
+    if not inside.any():
+        return 0.005  # fallback minimum
+    th_in = test[inside]
+    max_angle = max(abs(th_in.min() - center_theta), abs(th_in.max() - center_theta))
+    return r_body * np.sin(min(max_angle, np.pi / 2))
 
-    The crotch strip goes BETWEEN the legs (sagittal plane, |X| < hw),
-    from front panel bottom to back panel bottom.
-    Can't use cylindrical theta — theta sweep goes around the side, not between legs.
 
-    Selection: |X| < hw AND Y < panel_bottom AND Y > crotch_bottom
+# ---------------------------------------------------------------------------
+# Parametric fabric generators
+# ---------------------------------------------------------------------------
+
+def create_bottom_mesh(lm, body_trimesh, thickness=0.002, color=(255, 80, 100)):
+    """Create entire bikini bottom as one continuous parametric mesh.
+
+    All rows share the same column count (n_cols), connected as a single grid:
+    1. Front panel: rows at different Y, width from outline (leg scoops)
+    2. Crotch strip: arc from front-bottom through perineum to back-bottom
+    3. Back panel: rows at different Y, width from outline
+
+    Each vertex is then projected onto the body surface for perfect conformity.
     """
     pubic_top_y = lm["pubic_top"][1]
     crotch_y = lm["crotch_center"][1]
+    hip_y = (lm["hip_left"][1] + lm["hip_right"][1]) / 2
 
-    panel_bottom = pubic_top_y + 0.015  # 0.88
-    y_bottom = crotch_y - 0.02          # ~0.76
+    top_y = hip_y - 0.03
+    bot_y = pubic_top_y + 0.015
+    crotch_bot_y = crotch_y - 0.02
+    hw_crotch = 0.018
+    r_body = 0.11  # approximate body radius (corrected by projection)
 
-    # Face centroids in 3D
-    cx = (verts[faces[:, 0], 0] + verts[faces[:, 1], 0] + verts[faces[:, 2], 0]) / 3
-    cy = (verts[faces[:, 0], 1] + verts[faces[:, 1], 1] + verts[faces[:, 2], 1]) / 3
+    n_cols = 24
+    n_front = 20
+    n_crotch = 25
+    n_back = 20
 
-    # Select faces: narrow X band, below panels, above bottom
-    mask = (np.abs(cx) < hw) & (cy < panel_bottom) & (cy > y_bottom)
-    return np.where(mask)[0]
+    front_path = make_front_panel_zone(lm)
+    back_path = make_back_panel_zone(lm)
+
+    all_verts = []
+
+    # ---- Front panel rows: top_y → bot_y ----
+    front_ys = np.linspace(top_y, bot_y, n_front)
+    for y in front_ys:
+        hw = scan_hw_at_y(front_path, y, 0.0, r_body)
+        xs = np.linspace(-hw, hw, n_cols)
+        for x in xs:
+            z = np.sqrt(max(r_body**2 - x**2, 0.001))
+            all_verts.append([x, y, z])
+
+    # ---- Crotch strip rows: arc from front-bottom to back-bottom ----
+    # Interior rows only (endpoints are adjacent to panel rows)
+    front_hw = scan_hw_at_y(front_path, bot_y, 0.0, r_body)
+    back_hw = scan_hw_at_y(back_path, bot_y, np.pi, r_body)
+
+    phis = np.linspace(0, np.pi, n_crotch + 2)[1:-1]  # skip endpoints
+    for phi in phis:
+        # Y: U-shape (high at front/back, low in middle)
+        y = crotch_bot_y + (bot_y - crotch_bot_y) * np.cos(phi)**2
+        # Z: front(+) through 0 to back(-)
+        z_center = r_body * np.cos(phi)
+        # Width: smooth transition panel_hw ↔ crotch_hw
+        t = np.sin(phi)  # 0 at endpoints, 1 in middle
+        endpoint_hw = front_hw if phi < np.pi / 2 else back_hw
+        hw = endpoint_hw * (1 - t) + hw_crotch * t
+
+        xs = np.linspace(-hw, hw, n_cols)
+        for x in xs:
+            all_verts.append([x, y, z_center])
+
+    # ---- Back panel rows: bot_y → top_y ----
+    back_ys = np.linspace(bot_y, top_y, n_back)
+    for y in back_ys:
+        hw = scan_hw_at_y(back_path, y, np.pi, r_body)
+        xs = np.linspace(-hw, hw, n_cols)
+        for x in xs:
+            z = -np.sqrt(max(r_body**2 - x**2, 0.001))
+            all_verts.append([x, y, z])
+
+    all_verts = np.array(all_verts, dtype=np.float64)
+    total_rows = n_front + n_crotch + n_back
+
+    # Build faces: uniform grid connectivity
+    faces = []
+    for ri in range(total_rows - 1):
+        for ci in range(n_cols - 1):
+            a = ri * n_cols + ci
+            b = a + 1
+            c = (ri + 1) * n_cols + ci
+            d = c + 1
+            faces.append([a, c, b])
+            faces.append([b, c, d])
+    faces = np.array(faces, dtype=np.int32)
+
+    # Project onto body surface and offset
+    print(f"    Projecting {len(all_verts)} vertices onto body surface...")
+    outer, inner, normals = project_and_offset(all_verts, body_trimesh, thickness)
+    return make_solid_shell(outer, inner, faces, color)
 
 
-def make_breast_zone(lm, side='left'):
-    """Elliptical breast zone around the apex."""
-    if side == 'left':
-        apex = lm["left_breast_apex"]
-    else:
-        apex = lm["right_breast_apex"]
+def create_breast_mesh(lm, body_trimesh, side='left', thickness=0.002,
+                       color=(255, 160, 40)):
+    """Create elliptical breast zone as parametric disc, projected onto body."""
+    apex = lm[f"{side}_breast_apex"]
+    cy = apex[1]
+    cth = np.arctan2(-apex[0], apex[2])
+    if cth < 0:
+        cth += 2 * np.pi
 
-    center_y = apex[1]
-    center_theta = np.arctan2(-apex[0], apex[2])
-    if center_theta < 0:
-        center_theta += 2 * np.pi
+    ry = 0.04    # Y radius (meters)
+    rth = 0.5    # theta radius (radians)
+    r_body = 0.11
+    n_rings = 12
+    n_radial = 24
 
-    radius_y = 0.04
-    radius_theta = 0.5
+    # Center vertex
+    verts_3d = [[-r_body * np.sin(cth), cy, r_body * np.cos(cth)]]
 
-    # Ellipse in (Y, theta) space
-    n = 60
-    outline = []
-    for i in range(n):
-        t = 2 * np.pi * i / n
-        y = center_y + radius_y * np.sin(t)
-        theta = center_theta + radius_theta * np.cos(t)
-        outline.append((y, theta))
-    outline.append(outline[0])  # close
+    # Concentric rings
+    for ring in range(1, n_rings + 1):
+        frac = ring / n_rings
+        for j in range(n_radial):
+            angle = 2 * np.pi * j / n_radial
+            y = cy + ry * frac * np.sin(angle)
+            th = cth + rth * frac * np.cos(angle)
+            verts_3d.append([-r_body * np.sin(th), y, r_body * np.cos(th)])
 
-    return MplPath(np.array(outline))
+    verts_3d = np.array(verts_3d, dtype=np.float64)
+
+    # Faces: center fan + ring-to-ring quads
+    faces = []
+    for j in range(n_radial):
+        faces.append([0, 1 + j, 1 + (j + 1) % n_radial])
+
+    for ring in range(1, n_rings):
+        ib = 1 + (ring - 1) * n_radial
+        ob = 1 + ring * n_radial
+        for j in range(n_radial):
+            jn = (j + 1) % n_radial
+            faces.append([ib + j, ob + j, ib + jn])
+            faces.append([ib + jn, ob + j, ob + jn])
+
+    faces = np.array(faces, dtype=np.int32)
+
+    outer, inner, normals = project_and_offset(verts_3d, body_trimesh, thickness)
+    return make_solid_shell(outer, inner, faces, color)
 
 
 # ---------------------------------------------------------------------------
@@ -347,11 +354,10 @@ def make_breast_zone(lm, side='left'):
 # ---------------------------------------------------------------------------
 
 def create_body_mesh():
-    """Load body mesh and create trimesh object."""
+    """Load body mesh and create trimesh with skin color."""
     verts, faces = generate_full_body()
-    skin_color = [220, 185, 160, 255]
     mesh = trimesh.Trimesh(vertices=verts, faces=faces, process=False)
-    mesh.visual.vertex_colors = np.tile(skin_color, (len(verts), 1))
+    mesh.visual.vertex_colors = np.tile([220, 185, 160, 255], (len(verts), 1))
     return mesh
 
 
@@ -419,49 +425,25 @@ def render_view(scene, camera_node, cam_pose, renderer):
 def main():
     print("Loading body mesh...")
     body_verts, body_faces = generate_full_body()
+    body_trimesh = trimesh.Trimesh(vertices=body_verts, faces=body_faces,
+                                    process=False)
     body_mesh = create_body_mesh()
     lm = get_landmarks()
 
-    # --- Define privacy zones ---
-    print("Defining privacy zones...")
     fabric_meshes = []
 
-    # --- Bikini bottom: merge front + crotch + back into ONE continuous piece ---
-    # This prevents gaps/tears between the three sections.
-    # Real bikini bottoms are a single piece of fabric.
-    print("  Building bikini bottom (merged front + crotch + back)...")
-    front_zone = make_front_panel_zone(lm)
-    back_zone = make_back_panel_zone(lm)
+    # --- Bikini bottom: one continuous parametric mesh ---
+    print("Creating bikini bottom (parametric + projection)...")
+    bottom = create_bottom_mesh(lm, body_trimesh)
+    fabric_meshes.append(bottom)
+    print(f"  Bottom: {len(bottom.vertices)} verts, {len(bottom.faces)} faces")
 
-    front_ids = select_faces_in_zone(body_verts, body_faces, front_zone)
-    back_ids = select_faces_in_zone(body_verts, body_faces, back_zone)
-    crotch_ids = select_crotch_strip_faces(body_verts, body_faces, lm)
-
-    # Merge all face indices (deduplicate)
-    bottom_ids = np.unique(np.concatenate([front_ids, back_ids, crotch_ids]))
-    print(f"    front={len(front_ids)}, back={len(back_ids)}, "
-          f"crotch={len(crotch_ids)} → merged={len(bottom_ids)}")
-
-    bottom_mesh = extract_and_extrude(body_verts, body_faces, bottom_ids,
-                                       thickness=0.002,
-                                       color=(255, 80, 100))  # Red-pink
-    if bottom_mesh is not None:
-        fabric_meshes.append(bottom_mesh)
-    else:
-        print("    WARNING - no faces found for bottom!")
-
-    # --- Breast zones ---
+    # --- Breast zones: elliptical discs ---
     for side in ['left', 'right']:
-        zone = make_breast_zone(lm, side)
-        face_ids = select_faces_in_zone(body_verts, body_faces, zone)
-        mesh = extract_and_extrude(body_verts, body_faces, face_ids,
-                                    thickness=0.002,
-                                    color=(255, 160, 40))  # Orange
-        if mesh is not None:
-            print(f"  {side}_breast: {len(face_ids)} faces extracted")
-            fabric_meshes.append(mesh)
-        else:
-            print(f"  {side}_breast: WARNING - no faces found!")
+        print(f"Creating {side} breast zone...")
+        breast = create_breast_mesh(lm, body_trimesh, side)
+        fabric_meshes.append(breast)
+        print(f"  {side}: {len(breast.vertices)} verts, {len(breast.faces)} faces")
 
     # --- Export 3D files ---
     print("Exporting 3D files...")
@@ -473,7 +455,6 @@ def main():
     combined.export(obj_path, file_type='obj')
     print(f"  OBJ: {obj_path}")
 
-    # GLB (binary glTF) — best color support, works in most 3D viewers
     glb_path = os.path.join(base, "privacy_zones_debug.glb")
     combined.export(glb_path, file_type='glb')
     print(f"  GLB: {glb_path}")
@@ -484,12 +465,9 @@ def main():
 
     scene = pyrender.Scene(bg_color=[10, 10, 30, 255],
                            ambient_light=[0.3, 0.3, 0.3])
-
     scene.add(pyrender.Mesh.from_trimesh(body_mesh, smooth=True))
-
     for fm in fabric_meshes:
         scene.add(pyrender.Mesh.from_trimesh(fm, smooth=False))
-
     for m in markers:
         scene.add(pyrender.Mesh.from_trimesh(m, smooth=False))
 
@@ -499,12 +477,11 @@ def main():
     light = pyrender.DirectionalLight(color=[1.0, 1.0, 1.0], intensity=4.0)
     scene.add(light, pose=make_camera_pose(azimuth=0.3, elevation=0.3,
                                             distance=2.0))
-    fill_light = pyrender.DirectionalLight(color=[0.7, 0.7, 0.8],
-                                            intensity=2.0)
+    fill_light = pyrender.DirectionalLight(color=[0.7, 0.7, 0.8], intensity=2.0)
     scene.add(fill_light, pose=make_camera_pose(azimuth=np.pi + 0.5,
                                                  elevation=0.2, distance=2.0))
 
-    # --- Render 4 views (high resolution) ---
+    # --- Render 4 views ---
     W, H = 800, 1280
     renderer = pyrender.OffscreenRenderer(W, H)
 
@@ -517,15 +494,14 @@ def main():
 
     images = []
     for azimuth, title in views:
-        cam_pose = make_camera_pose(azimuth=azimuth, distance=1.8,
-                                     target_y=1.05)
+        cam_pose = make_camera_pose(azimuth=azimuth, distance=1.8, target_y=1.05)
         img = render_view(scene, cam_node, cam_pose, renderer)
         images.append((img, title))
         print(f"  Rendered {title}")
 
     renderer.delete()
 
-    # --- Combine views ---
+    # --- Combine views into one image ---
     from PIL import ImageDraw, ImageFont
     n_views = len(views)
     gap = 10
@@ -545,7 +521,7 @@ def main():
         font_small = ImageFont.load_default()
 
     draw.text((combined_w // 2 - 200, 5),
-              "Privacy Zones: Body Surface Extrusion (2mm)",
+              "Privacy Zones: Parametric Mesh + Projection (2mm)",
               fill=(255, 255, 255), font=font_big)
 
     for i, (img, title) in enumerate(images):
@@ -555,8 +531,7 @@ def main():
         draw.text((x_offset + W // 2 - 30, 34), title,
                   fill=(255, 255, 255), font=font_small)
 
-    out_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                            "privacy_zones_debug.png")
+    out_path = os.path.join(base, "privacy_zones_debug.png")
     combined_img.save(out_path)
     print(f"Saved to {out_path}")
 
