@@ -199,14 +199,17 @@ def create_panel_mesh(body_surface, outline_yt, n_grid=40, offset=0.003):
     return mesh
 
 
-def create_crotch_strip_mesh(lm, body_surface, hw=0.015, offset=0.003, n_along=30, n_across=6):
-    """Create crotch strip mesh in the SAGITTAL PLANE (X=0).
+def create_crotch_strip_mesh(lm, body_surface, hw=0.015, offset=0.003,
+                             n_along=40, n_across=6):
+    """Create crotch strip mesh that follows the body surface from front to back.
 
-    The strip goes straight from front panel bottom to back panel bottom,
-    dipping through the perineum (crotch_center). NOT sweeping around the body.
+    Three segments, ALL on the body surface:
+    1. Front descent: theta=0 (front surface), Y drops from front_bottom to crotch_center
+    2. Perineum wrap: at Y=crotch_center, semicircle from theta=0 to theta=pi
+       using the small perineum radius (~3cm), staying on the body surface
+    3. Back ascent: theta=pi (back surface), Y rises from crotch_center to back_bottom
 
-    Path: front(+Z) → down → perineum(Z≈0) → down/back → back(-Z)
-    Width: ±hw in X direction.
+    Width: ±hw in X direction (perpendicular to strip direction).
     """
     crotch_front_y = lm["crotch_front"][1]
     crotch_back_y = lm["crotch_back"][1]
@@ -215,40 +218,51 @@ def create_crotch_strip_mesh(lm, body_surface, hw=0.015, offset=0.003, n_along=3
     front_bottom_y = crotch_front_y - 0.01  # 0.836
     back_bottom_y = crotch_back_y - 0.01    # 0.839
 
-    # Get Z positions at front and back panel bottoms
-    z_front = body_surface.get_surface_radius(front_bottom_y, 0.0) + offset   # +Z (front)
-    z_back = -(body_surface.get_surface_radius(back_bottom_y, np.pi) + offset)  # -Z (back)
+    # Build center line in 3 segments
+    center_line = []
 
-    # Center line of crotch strip in sagittal plane (X=0):
-    # Bezier curve from front bottom → perineum → back bottom
-    p_front = np.array([0, front_bottom_y, z_front])
-    p_back = np.array([0, back_bottom_y, z_back])
-    p_perineum = np.array([0, crotch_center_y, 0])  # lowest point, Z=0
+    # Segment 1: front descent, theta=0, Y from front_bottom to crotch_center
+    n_descent = n_along // 3
+    for i in range(n_descent + 1):
+        f = i / n_descent
+        y = front_bottom_y + (crotch_center_y - front_bottom_y) * f
+        r = body_surface.get_surface_radius(y, 0.0) + offset
+        center_line.append([0, y, r])  # X=0, Z=+r (front surface)
 
-    # Control points for smooth curve through perineum
-    ctrl1 = np.array([0, front_bottom_y - 0.03, z_front * 0.5])
-    ctrl2 = np.array([0, back_bottom_y - 0.03, z_back * 0.5])
+    # Segment 2: perineum wrap, theta sweeps 0→pi at Y=crotch_center
+    # Tight swimwear: use SMALL radius (1.5cm) - fabric pulls tight against perineum
+    r_peri = 0.015 + offset  # tight against body, not loose drape
+    n_wrap = n_along // 3
+    for i in range(1, n_wrap + 1):  # skip first (duplicate)
+        f = i / n_wrap
+        theta = np.pi * f
+        x = -np.sin(theta) * r_peri
+        z = np.cos(theta) * r_peri
+        center_line.append([x, crotch_center_y, z])
 
-    # Two-segment bezier: front→perineum, perineum→back
-    pts_front_half = cubic_bezier_3d(p_front, ctrl1, p_perineum, p_perineum, n=n_along // 2)
-    pts_back_half = cubic_bezier_3d(p_perineum, p_perineum, ctrl2, p_back, n=n_along // 2)
+    # Segment 3: back ascent, theta=pi, Y from crotch_center to back_bottom
+    n_ascent = n_along // 3
+    for i in range(1, n_ascent + 1):  # skip first (duplicate)
+        f = i / n_ascent
+        y = crotch_center_y + (back_bottom_y - crotch_center_y) * f
+        r = body_surface.get_surface_radius(y, np.pi) + offset
+        center_line.append([0, y, -r])  # X=0, Z=-r (back surface)
 
-    # Combine (remove duplicate perineum point)
-    center_line = np.vstack([pts_front_half, pts_back_half[1:]])
+    center_line = np.array(center_line)
 
-    # Build strip mesh: for each center point, create vertices at ±hw in X
+    # Build strip mesh: at each center point, add width perpendicular to strip direction
     n_pts = len(center_line)
     vertices = []
     for i in range(n_pts):
         cx, cy, cz = center_line[i]
         for j in range(n_across + 1):
             f = j / n_across
-            x = cx + hw * (2 * f - 1)  # from -hw to +hw
+            x = cx + hw * (2 * f - 1)  # ±hw in X
             vertices.append([x, cy, cz])
 
     vertices = np.array(vertices)
 
-    # Triangulate: grid of n_pts × (n_across+1)
+    # Triangulate
     faces = []
     w = n_across + 1
     for i in range(n_pts - 1):
@@ -266,14 +280,51 @@ def create_crotch_strip_mesh(lm, body_surface, hw=0.015, offset=0.003, n_along=3
     return mesh
 
 
+def _project_to_mesh(body_verts, point, direction=None):
+    """Project a point onto the actual body mesh surface.
+
+    Finds the nearest mesh vertex and returns its radial distance.
+    More accurate than BodySurface ellipsoidal model, especially at breasts.
+    """
+    # Find nearest vertex
+    dists = np.linalg.norm(body_verts - point, axis=1)
+    nearest = body_verts[np.argmin(dists)]
+    return np.sqrt(nearest[0]**2 + nearest[2]**2)
+
+
 def create_breast_zone_mesh(body_surface, center_y, center_theta,
-                            radius_y, radius_theta, offset=0.008, n=30):
+                            radius_y, radius_theta, offset=0.004, n=30,
+                            body_verts=None):
     """Create elliptical breast zone mesh on body surface.
 
-    Uses larger offset (8mm) to prevent clipping into body.
+    Uses actual mesh vertices for projection (not BodySurface model)
+    to prevent clipping at the breast area where the model is inaccurate.
     """
     vertices = []
-    r = body_surface.get_surface_radius(center_y, center_theta) + offset
+
+    def get_radius(y, theta):
+        """Get body radius using actual mesh if available."""
+        if body_verts is not None:
+            # Approximate target point
+            r_est = body_surface.get_surface_radius(y, theta)
+            target = np.array([-np.sin(theta) * r_est, y, np.cos(theta) * r_est])
+            # Find nearest mesh vertex in a cone around this direction
+            direction = np.array([-np.sin(theta), 0, np.cos(theta)])
+            # Filter vertices near this Y and direction
+            y_mask = np.abs(body_verts[:, 1] - y) < 0.02
+            if y_mask.sum() > 0:
+                candidates = body_verts[y_mask]
+                # Project onto radial direction
+                radii = candidates[:, 0] * (-np.sin(theta)) + candidates[:, 2] * np.cos(theta)
+                # Use the maximum radius in this direction (outermost surface)
+                lateral = np.abs(candidates[:, 0] * np.cos(theta) + candidates[:, 2] * np.sin(theta))
+                close_mask = lateral < 0.03  # within 3cm of this theta line
+                if close_mask.sum() > 0:
+                    return np.max(radii[close_mask])
+            return r_est
+        return body_surface.get_surface_radius(y, theta)
+
+    r = get_radius(center_y, center_theta) + offset
     cx = -np.sin(center_theta) * r
     cz = np.cos(center_theta) * r
     vertices.append([cx, center_y, cz])
@@ -282,7 +333,7 @@ def create_breast_zone_mesh(body_surface, center_y, center_theta,
         t = 2 * np.pi * i / n
         y = center_y + radius_y * np.sin(t)
         theta = center_theta + radius_theta * np.cos(t)
-        r = body_surface.get_surface_radius(y, theta) + offset
+        r = get_radius(y, theta) + offset
         x = -np.sin(theta) * r
         z = np.cos(theta) * r
         vertices.append([x, y, z])
@@ -372,15 +423,16 @@ def main():
     print("Creating crotch strip mesh (sagittal plane)...")
     crotch_mesh = create_crotch_strip_mesh(lm, body_surface)
 
-    print("Creating breast zone meshes...")
+    print("Creating breast zone meshes (using actual mesh projection)...")
+    body_verts, _ = generate_full_body()
     left_breast = create_breast_zone_mesh(
         body_surface, lm["left_breast_apex"][1],
         np.arctan2(-lm["left_breast_apex"][0], lm["left_breast_apex"][2]),
-        0.04, 0.5)
+        0.04, 0.5, body_verts=body_verts)
     right_breast = create_breast_zone_mesh(
         body_surface, lm["right_breast_apex"][1],
         np.arctan2(-lm["right_breast_apex"][0], lm["right_breast_apex"][2]),
-        0.04, 0.5)
+        0.04, 0.5, body_verts=body_verts)
 
     print("Creating landmark markers...")
     markers = create_landmark_markers(lm)
