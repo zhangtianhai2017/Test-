@@ -422,48 +422,46 @@ def main():
     body_mesh = create_body_mesh()
     lm = get_landmarks()
 
-    # --- Define privacy zones with distinct colors ---
+    # --- Define privacy zones ---
     print("Defining privacy zones...")
-    # Colors: easily distinguishable in 3D viewer
-    zone_colors = {
-        "front_panel":  (255, 80, 80),    # Red
-        "back_panel":   (80, 160, 255),   # Blue
-        "left_breast":  (255, 160, 40),   # Orange
-        "right_breast": (255, 160, 40),   # Orange
-    }
-    yt_zones = {
-        "front_panel": make_front_panel_zone(lm),
-        "back_panel": make_back_panel_zone(lm),
-        "left_breast": make_breast_zone(lm, 'left'),
-        "right_breast": make_breast_zone(lm, 'right'),
-    }
-
-    # --- Extract body faces in each zone and extrude ---
-    print("Extracting body surface and extruding fabric...")
     fabric_meshes = []
 
-    # Zones defined in (Y, theta) space
-    for name, zone_path in yt_zones.items():
-        face_ids = select_faces_in_zone(body_verts, body_faces, zone_path)
+    # --- Bikini bottom: merge front + crotch + back into ONE continuous piece ---
+    # This prevents gaps/tears between the three sections.
+    # Real bikini bottoms are a single piece of fabric.
+    print("  Building bikini bottom (merged front + crotch + back)...")
+    front_zone = make_front_panel_zone(lm)
+    back_zone = make_back_panel_zone(lm)
+
+    front_ids = select_faces_in_zone(body_verts, body_faces, front_zone)
+    back_ids = select_faces_in_zone(body_verts, body_faces, back_zone)
+    crotch_ids = select_crotch_strip_faces(body_verts, body_faces, lm)
+
+    # Merge all face indices (deduplicate)
+    bottom_ids = np.unique(np.concatenate([front_ids, back_ids, crotch_ids]))
+    print(f"    front={len(front_ids)}, back={len(back_ids)}, "
+          f"crotch={len(crotch_ids)} → merged={len(bottom_ids)}")
+
+    bottom_mesh = extract_and_extrude(body_verts, body_faces, bottom_ids,
+                                       thickness=0.002,
+                                       color=(255, 80, 100))  # Red-pink
+    if bottom_mesh is not None:
+        fabric_meshes.append(bottom_mesh)
+    else:
+        print("    WARNING - no faces found for bottom!")
+
+    # --- Breast zones ---
+    for side in ['left', 'right']:
+        zone = make_breast_zone(lm, side)
+        face_ids = select_faces_in_zone(body_verts, body_faces, zone)
         mesh = extract_and_extrude(body_verts, body_faces, face_ids,
                                     thickness=0.002,
-                                    color=zone_colors[name])
+                                    color=(255, 160, 40))  # Orange
         if mesh is not None:
-            print(f"  {name}: {len(face_ids)} faces extracted")
+            print(f"  {side}_breast: {len(face_ids)} faces extracted")
             fabric_meshes.append(mesh)
         else:
-            print(f"  {name}: WARNING - no faces found!")
-
-    # Crotch strip: selected by 3D position (between legs, not around side)
-    crotch_face_ids = select_crotch_strip_faces(body_verts, body_faces, lm)
-    crotch_mesh = extract_and_extrude(body_verts, body_faces, crotch_face_ids,
-                                       thickness=0.002,
-                                       color=(80, 220, 80))  # Green
-    if crotch_mesh is not None:
-        print(f"  crotch_strip: {len(crotch_face_ids)} faces extracted")
-        fabric_meshes.append(crotch_mesh)
-    else:
-        print("  crotch_strip: WARNING - no faces found!")
+            print(f"  {side}_breast: WARNING - no faces found!")
 
     # --- Export 3D files ---
     print("Exporting 3D files...")
