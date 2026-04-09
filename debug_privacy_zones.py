@@ -634,6 +634,21 @@ def main():
             thick_meshes.append(None)
     front_mesh, back_mesh, crotch_mesh, left_breast, right_breast = thick_meshes
 
+    # --- Export combined OBJ file ---
+    print("Exporting OBJ file...")
+    export_meshes = []
+    # Body mesh (skin color)
+    export_meshes.append(body_mesh)
+    # Fabric meshes (red)
+    for m in [front_mesh, back_mesh, crotch_mesh, left_breast, right_breast]:
+        if m is not None:
+            export_meshes.append(m)
+    combined_mesh = trimesh.util.concatenate(export_meshes)
+    obj_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            "privacy_zones_debug.obj")
+    combined_mesh.export(obj_path, file_type='obj')
+    print(f"Saved OBJ to {obj_path}")
+
     # --- Build pyrender scene ---
     print("Creating landmark markers...")
     markers = create_landmark_markers(lm)
