@@ -658,6 +658,47 @@ def main():
     bottom_mesh.visual.vertex_colors = np.tile(
         [255, 80, 80, 255], (len(bottom_mesh.vertices), 1))
 
+    # --- Shrinkwrap: project onto exact body mesh surface ---
+    # Physics gave correct topology; now pin every vertex to the actual
+    # body surface for a perfectly flush fit.
+    # Skip perineum vertices (radial distance < 3cm from Y-axis) —
+    # they're between the legs where the body surface isn't a simple shell.
+    print("Shrinkwrapping to body mesh (final pass)...")
+    body_trimesh = create_body_mesh()
+    skin_offset = 0.0005  # 0.5mm — barely above skin
+
+    for mesh in [bottom_mesh, left_breast, right_breast]:
+        if mesh is None:
+            continue
+        verts = mesh.vertices.copy()
+        # Radial distance from Y-axis for each vertex
+        radial_dist = np.sqrt(verts[:, 0]**2 + verts[:, 2]**2)
+        # Only shrinkwrap vertices on the outer body surface (r > 3cm)
+        outer_mask = radial_dist > 0.03
+
+        if outer_mask.sum() > 0:
+            outer_verts = verts[outer_mask]
+            closest_pts, _, face_ids = body_trimesh.nearest.on_surface(
+                outer_verts)
+            # Offset along body face normals (outward)
+            face_normals = body_trimesh.face_normals[face_ids]
+            # Ensure normals point outward
+            radial = closest_pts.copy()
+            radial[:, 1] = 0
+            r_len = np.linalg.norm(radial, axis=1, keepdims=True)
+            radial_dir = radial / np.maximum(r_len, 1e-6)
+            dots = np.sum(face_normals * radial_dir, axis=1)
+            face_normals[dots < 0] *= -1
+            fn_len = np.linalg.norm(face_normals, axis=1, keepdims=True)
+            face_normals /= np.maximum(fn_len, 1e-6)
+
+            verts[outer_mask] = closest_pts + face_normals * skin_offset
+        mesh.vertices = verts
+
+    n_outer = sum(1 for v in bottom_mesh.vertices
+                  if np.sqrt(v[0]**2 + v[2]**2) > 0.03)
+    print(f"  Projected {n_outer} outer vertices to body surface + 0.5mm")
+
     # --- Add 2mm thickness (extrude inward toward body) ---
     print("Extruding 2mm thickness...")
     if bottom_mesh is not None:
