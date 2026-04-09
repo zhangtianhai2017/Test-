@@ -1,9 +1,10 @@
 """Generate debug image marking privacy zones using proper 3D rendering.
 
 Uses pyrender (OpenGL) with OSMesa for offscreen rendering.
-Provides correct z-buffering, camera projection, and lighting.
+Uses Taichi PBD cloth simulation to settle fabric onto body surface.
 
 Bikini bottom = front panel + crotch strip (sagittal plane) + back panel.
+Breast zones = two elliptical patches.
 """
 import os
 os.environ['PYOPENGL_PLATFORM'] = 'osmesa'
@@ -22,37 +23,147 @@ from bikini_generator.body.landmarks import get_landmarks
 from bikini_generator.garment.loop_generator import BodySurface
 
 
-def shrinkwrap_to_body(fabric_mesh, body_trimesh, offset=0.004):
-    """Project every fabric vertex onto the nearest body surface point + offset.
+# ---------------------------------------------------------------------------
+# Body mesh LUT builder (uses actual mesh, not BodySurface ellipsoidal model)
+# ---------------------------------------------------------------------------
 
-    Uses trimesh proximity query for accurate 3D projection.
-    Offset is applied along the body mesh FACE NORMAL at the nearest point,
-    which correctly handles non-radial surfaces like breasts and pubic area.
+def build_mesh_body_lut(body_verts, n_y=128, n_theta=128,
+                        y_min=0.75, y_max=1.50):
+    """Build body surface radius LUT from actual mesh vertices.
+
+    For each (Y, theta) cell, records the maximum radial distance of any
+    mesh vertex in that region.  This captures actual breast protrusion,
+    pelvic curvature, etc. that the ellipsoidal BodySurface model misses.
+
+    Cells with no nearby vertices fall back to the BodySurface model.
+    Result is smoothed to fill sparse cells.
     """
-    verts = fabric_mesh.vertices.copy()
-    # Find closest point on body surface for each fabric vertex
-    closest_pts, distances, face_ids = body_trimesh.nearest.on_surface(verts)
-    # Get face normals from the body mesh for accurate outward direction
-    face_normals = body_trimesh.face_normals[face_ids]
-    # Ensure normals point outward (away from body center axis)
-    # Check by dot product with radial direction from Y-axis
-    radial = closest_pts.copy()
-    radial[:, 1] = 0
-    radial_len = np.linalg.norm(radial, axis=1, keepdims=True)
-    radial_len = np.maximum(radial_len, 1e-6)
-    radial_dir = radial / radial_len
-    dots = np.sum(face_normals * radial_dir, axis=1)
-    # Flip normals that point inward
-    flip_mask = dots < 0
-    face_normals[flip_mask] *= -1
-    # Normalize face normals (should already be unit but be safe)
-    fn_len = np.linalg.norm(face_normals, axis=1, keepdims=True)
-    fn_len = np.maximum(fn_len, 1e-6)
-    face_normals = face_normals / fn_len
-    # Place vertex at closest body surface point + offset along face normal
-    fabric_mesh.vertices = closest_pts + face_normals * offset
-    return fabric_mesh
+    lut = np.zeros((n_y, n_theta), dtype=np.float32)
+    count = np.zeros((n_y, n_theta), dtype=np.int32)
 
+    dy = (y_max - y_min) / (n_y - 1)
+    dtheta = 2 * np.pi / n_theta
+
+    for v in body_verts:
+        x, y, z = v
+        if y < y_min - dy or y > y_max + dy:
+            continue
+        r = np.sqrt(x * x + z * z)
+        theta = np.arctan2(-x, z)
+        if theta < 0:
+            theta += 2 * np.pi
+
+        iy = int(round((y - y_min) / dy))
+        it = int(theta / dtheta) % n_theta
+        iy = max(0, min(iy, n_y - 1))
+
+        # Keep maximum radius in each cell
+        if r > lut[iy, it]:
+            lut[iy, it] = r
+        count[iy, it] += 1
+
+    # Fill empty cells with BodySurface fallback, then smooth
+    body = BodySurface()
+    y_values = np.linspace(y_min, y_max, n_y)
+    theta_values = np.linspace(0, 2 * np.pi, n_theta, endpoint=False)
+
+    for iy in range(n_y):
+        for it in range(n_theta):
+            if count[iy, it] == 0:
+                lut[iy, it] = body.get_surface_radius(
+                    y_values[iy], theta_values[it])
+
+    # Light Gaussian blur to smooth out noise from sparse vertex sampling
+    from scipy.ndimage import gaussian_filter
+    # Wrap theta axis (periodic boundary)
+    padded = np.concatenate([lut[:, -3:], lut, lut[:, :3]], axis=1)
+    padded = gaussian_filter(padded, sigma=[1.0, 1.5])
+    lut_smooth = padded[:, 3:-3]
+
+    # Take max of original and smoothed to avoid shrinking breast peaks
+    lut = np.maximum(lut, lut_smooth)
+
+    return lut
+
+
+# ---------------------------------------------------------------------------
+# Cloth physics settling
+# ---------------------------------------------------------------------------
+
+def settle_fabric_on_body(fabric_meshes, body_verts, num_steps=150):
+    """Run PBD cloth simulation to settle fabric meshes onto body surface.
+
+    Uses ClothSimulator with:
+    - Zero gravity (pure settling, not dynamics)
+    - Mesh-based body LUT (accurate breast/pelvis collision)
+    - Elastic tension (rest lengths at 88% → fabric contracts onto body)
+    - Collision + friction (prevents penetration, holds position)
+
+    Returns updated vertex positions for each mesh.
+    """
+    import taichi as ti
+    from bikini_generator.physics.cloth_sim import ClothSimulator
+    from bikini_generator.config import PhysicsConfig
+
+    # Initialize Taichi
+    try:
+        ti.init(arch=ti.gpu, default_fp=ti.f32)
+        print("  Taichi: GPU backend")
+    except Exception:
+        ti.init(arch=ti.cpu, default_fp=ti.f32)
+        print("  Taichi: CPU fallback")
+
+    # Track vertex counts for splitting results back
+    valid_meshes = [m for m in fabric_meshes if m is not None]
+    vertex_counts = [len(m.vertices) for m in valid_meshes]
+
+    # Merge all fabric into single mesh for simulation
+    merged = trimesh.util.concatenate(valid_meshes)
+    all_verts = merged.vertices.astype(np.float32)
+    all_faces = merged.faces.astype(np.int32)
+
+    print(f"  Merged fabric: {len(all_verts)} verts, {len(all_faces)} faces")
+
+    # Custom config: zero gravity settling
+    cfg = PhysicsConfig()
+    cfg.gravity = 0.0           # No gravity — pure elastic settling
+    cfg.num_steps = num_steps   # Enough iterations to converge
+    cfg.num_substeps = 15       # Constraint iterations per step
+    cfg.collision_margin = 0.004  # 4mm offset from body
+    cfg.damping = 0.90          # Strong damping for fast convergence
+    cfg.friction_coefficient = 2.0  # High friction to prevent sliding
+    cfg.stretch_stiffness = 10000.0  # Stiff fabric
+
+    # Create simulator
+    sim = ClothSimulator(all_verts, all_faces, config=cfg)
+
+    # Replace the BodySurface-based LUT with actual-mesh-based LUT
+    # This is critical: the BodySurface model underestimates breast radius
+    # by 6-12mm, causing fabric to clip into the actual body mesh
+    mesh_lut = build_mesh_body_lut(
+        body_verts, sim.lut_ny, sim.lut_ntheta, sim.y_min, sim.y_max)
+    sim.body_lut.from_numpy(mesh_lut)
+    print("  Replaced body LUT with mesh-based version")
+
+    # Run simulation
+    print(f"  Running {num_steps} physics steps...")
+    final_verts = sim.simulate()
+    max_disp = sim.get_max_displacement()
+    print(f"  Max displacement: {max_disp*100:.1f} cm")
+
+    # Split results back to individual meshes
+    offset = 0
+    for i, mesh in enumerate(valid_meshes):
+        n = vertex_counts[i]
+        mesh.vertices = final_verts[offset:offset + n]
+        offset += n
+
+    return valid_meshes
+
+
+# ---------------------------------------------------------------------------
+# Mesh creation (geometric initial placement)
+# ---------------------------------------------------------------------------
 
 def create_body_mesh():
     """Load body mesh and create trimesh object."""
@@ -75,28 +186,13 @@ def cubic_bezier_yt(p0, p1, p2, p3, n=20):
     return pts
 
 
-def cubic_bezier_3d(p0, p1, p2, p3, n=20):
-    """Sample cubic bezier in 3D space. Returns (n+1, 3) array."""
-    pts = []
-    for i in range(n + 1):
-        t = i / n
-        mt = 1 - t
-        pt = mt**3*p0 + 3*mt**2*t*p1 + 3*mt*t**2*p2 + t**3*p3
-        pts.append(pt)
-    return np.array(pts)
-
-
 def make_front_panel_outline(lm, body_surface):
-    """Front panel: inverted triangle on the FRONT of the body.
-
-    Bottom edge raised to pubic area level - tight swimwear pulls up.
-    """
+    """Front panel: inverted triangle on the FRONT of the body."""
     hip_side_y = (lm["hip_left"][1] + lm["hip_right"][1]) / 2
-    pubic_top_y = lm["pubic_top"][1]  # 0.865
+    pubic_top_y = lm["pubic_top"][1]
 
-    top_y = hip_side_y - 0.03   # 0.946
-    # Tight bikini: bottom at pubic area, not at crotch fold
-    bottom_y = pubic_top_y + 0.015  # ~0.88, elastic pulls fabric up
+    top_y = hip_side_y - 0.03
+    bottom_y = pubic_top_y + 0.015
     hw_front = 0.055
     hw_crotch = 0.015
 
@@ -109,14 +205,12 @@ def make_front_panel_outline(lm, body_surface):
 
     outline = []
 
-    # Top edge
     for i in range(16):
         f = i / 15
         theta = thf * (1 - 2 * f)
         bow = 0.004 * np.sin(np.pi * f)
         outline.append((top_y + bow, theta))
 
-    # Right leg scoop
     sy = top_y - (top_y - bottom_y) * 0.4
     sd = thf * 0.55
     outline.extend(cubic_bezier_yt(
@@ -124,12 +218,10 @@ def make_front_panel_outline(lm, body_surface):
         (bottom_y + 0.02, -thc * 1.5), (bottom_y, -thc),
         n=25)[1:])
 
-    # Bottom edge
     for i in range(6):
         f = i / 5
         outline.append((bottom_y, -thc + 2 * thc * f))
 
-    # Left leg scoop
     outline.extend(cubic_bezier_yt(
         (bottom_y, thc), (bottom_y + 0.02, thc * 1.5),
         (sy, thf - sd), (top_y, thf),
@@ -139,16 +231,12 @@ def make_front_panel_outline(lm, body_surface):
 
 
 def make_back_panel_outline(lm, body_surface):
-    """Back panel: inverted triangle on the BACK of the body.
-
-    Bottom edge raised - tight swimwear pulls up.
-    """
+    """Back panel: inverted triangle on the BACK of the body."""
     hip_side_y = (lm["hip_left"][1] + lm["hip_right"][1]) / 2
     pubic_top_y = lm["pubic_top"][1]
 
     top_y = hip_side_y - 0.03
-    # Same height as front bottom - fabric pulled tight
-    bottom_y = pubic_top_y + 0.015  # ~0.88
+    bottom_y = pubic_top_y + 0.015
     hw_back = 0.050
     hw_crotch = 0.015
 
@@ -161,14 +249,12 @@ def make_back_panel_outline(lm, body_surface):
 
     outline = []
 
-    # Top edge
     for i in range(16):
         f = i / 15
         theta = np.pi + thb * (1 - 2 * f)
         bow = 0.004 * np.sin(np.pi * f)
         outline.append((top_y + bow, theta))
 
-    # Right scoop (as seen from back)
     sy = top_y - (top_y - bottom_y) * 0.4
     sd = thb * 0.55
     outline.extend(cubic_bezier_yt(
@@ -176,12 +262,10 @@ def make_back_panel_outline(lm, body_surface):
         (bottom_y + 0.02, np.pi - thc * 1.5), (bottom_y, np.pi - thc),
         n=25)[1:])
 
-    # Bottom edge
     for i in range(6):
         f = i / 5
         outline.append((bottom_y, np.pi - thc + 2 * thc * f))
 
-    # Left scoop
     outline.extend(cubic_bezier_yt(
         (bottom_y, np.pi + thc), (bottom_y + 0.02, np.pi + thc * 1.5),
         (sy, np.pi + thb - sd), (top_y, np.pi + thb),
@@ -241,38 +325,26 @@ def create_panel_mesh(body_surface, outline_yt, n_grid=40, offset=0.003):
 
 def create_crotch_strip_mesh(lm, body_surface, hw=0.015, offset=0.003,
                              n_along=40, n_across=6):
-    """Create crotch strip mesh that follows the body surface from front to back.
+    """Create crotch strip mesh in the sagittal plane.
 
-    Three segments, ALL on the body surface:
-    1. Front descent: theta=0 (front surface), Y drops from front_bottom to crotch_center
-    2. Perineum wrap: at Y=crotch_center, semicircle from theta=0 to theta=pi
-       using the small perineum radius (~3cm), staying on the body surface
-    3. Back ascent: theta=pi (back surface), Y rises from crotch_center to back_bottom
-
-    Width: ±hw in X direction (perpendicular to strip direction).
+    Not included in physics simulation — the cylindrical body model
+    can't represent the concavity between the legs.
     """
-    pubic_top_y = lm["pubic_top"][1]  # 0.865
+    pubic_top_y = lm["pubic_top"][1]
 
-    # Tight swimwear: fabric pulled up to pubic area, barely dips below
-    panel_bottom_y = pubic_top_y + 0.015  # 0.88 (matches panel bottoms)
-    # Strip lowest point: only 1-2cm below panel bottom (elastic pulls tight)
-    strip_lowest_y = panel_bottom_y - 0.015  # ~0.865
+    panel_bottom_y = pubic_top_y + 0.015
+    strip_lowest_y = panel_bottom_y - 0.015
 
-    # Build center line in 3 segments
     center_line = []
 
-    # Segment 1: front descent, theta=0, Y from panel_bottom to strip_lowest
-    # Very short descent - fabric barely dips
     n_descent = n_along // 4
     for i in range(n_descent + 1):
         f = i / n_descent
         y = panel_bottom_y + (strip_lowest_y - panel_bottom_y) * f
         r = body_surface.get_surface_radius(y, 0.0) + offset
-        center_line.append([0, y, r])  # X=0, Z=+r (front surface)
+        center_line.append([0, y, r])
 
-    # Segment 2: wrap from front to back at strip_lowest_y
-    # Very tight: small radius, fabric pressed into body crease by elastic
-    r_wrap = 0.010 + offset  # 1cm - extremely tight against perineum
+    r_wrap = 0.010 + offset
     n_wrap = n_along // 2
     for i in range(1, n_wrap + 1):
         f = i / n_wrap
@@ -281,29 +353,26 @@ def create_crotch_strip_mesh(lm, body_surface, hw=0.015, offset=0.003,
         z = np.cos(theta) * r_wrap
         center_line.append([x, strip_lowest_y, z])
 
-    # Segment 3: back ascent, theta=pi, Y from strip_lowest to panel_bottom
     n_ascent = n_along // 4
     for i in range(1, n_ascent + 1):
         f = i / n_ascent
         y = strip_lowest_y + (panel_bottom_y - strip_lowest_y) * f
         r = body_surface.get_surface_radius(y, np.pi) + offset
-        center_line.append([0, y, -r])  # X=0, Z=-r (back surface)
+        center_line.append([0, y, -r])
 
     center_line = np.array(center_line)
 
-    # Build strip mesh: at each center point, add width perpendicular to strip direction
     n_pts = len(center_line)
     vertices = []
     for i in range(n_pts):
         cx, cy, cz = center_line[i]
         for j in range(n_across + 1):
             f = j / n_across
-            x = cx + hw * (2 * f - 1)  # ±hw in X
+            x = cx + hw * (2 * f - 1)
             vertices.append([x, cy, cz])
 
     vertices = np.array(vertices)
 
-    # Triangulate
     faces = []
     w = n_across + 1
     for i in range(n_pts - 1):
@@ -315,7 +384,8 @@ def create_crotch_strip_mesh(lm, body_surface, hw=0.015, offset=0.003,
             faces.append([i00, i10, i01])
             faces.append([i10, i11, i01])
 
-    mesh = trimesh.Trimesh(vertices=vertices, faces=np.array(faces), process=False)
+    mesh = trimesh.Trimesh(vertices=vertices, faces=np.array(faces),
+                           process=False)
     color = [255, 80, 80, 180]
     mesh.visual.vertex_colors = np.tile(color, (len(vertices), 1))
     return mesh
@@ -323,24 +393,16 @@ def create_crotch_strip_mesh(lm, body_surface, hw=0.015, offset=0.003,
 
 def create_breast_zone_mesh(body_surface, center_y, center_theta,
                             radius_y, radius_theta, offset=0.004, n=40):
-    """Create elliptical breast zone mesh on body surface.
-
-    Initial placement uses BodySurface model; shrinkwrap_to_body() is
-    called afterwards to project onto the actual mesh surface.
-    Uses a finer grid (not just fan triangles) for better shrinkwrap results.
-    """
-    # Build a grid mesh over the ellipse for better surface conformity
+    """Create elliptical breast zone mesh with concentric ring grid."""
     n_rings = 8
     vertices = []
     faces = []
 
-    # Center vertex
     r = body_surface.get_surface_radius(center_y, center_theta) + offset
     cx = -np.sin(center_theta) * r
     cz = np.cos(center_theta) * r
     vertices.append([cx, center_y, cz])
 
-    # Concentric rings from center to edge
     for ring in range(1, n_rings + 1):
         frac = ring / n_rings
         for i in range(n):
@@ -352,11 +414,9 @@ def create_breast_zone_mesh(body_surface, center_y, center_theta,
             z = np.cos(theta) * r
             vertices.append([x, y, z])
 
-    # Triangulate: center fan
     for i in range(n):
         faces.append([0, 1 + i, 1 + (i + 1) % n])
 
-    # Ring-to-ring quads
     for ring in range(1, n_rings):
         base_inner = 1 + (ring - 1) * n
         base_outer = 1 + ring * n
@@ -399,6 +459,10 @@ def create_landmark_markers(lm, radius=0.004):
     return markers
 
 
+# ---------------------------------------------------------------------------
+# Rendering
+# ---------------------------------------------------------------------------
+
 def make_camera_pose(azimuth, elevation=0.0, distance=1.5, target_y=1.0):
     """Create camera pose (look-at matrix)."""
     eye = np.array([
@@ -432,25 +496,27 @@ def render_view(scene, camera_node, cam_pose, renderer):
     return color
 
 
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
 def main():
     print("Loading body mesh...")
     body_mesh = create_body_mesh()
-    body_trimesh = create_body_mesh()  # separate copy for proximity queries
+    body_verts, _ = generate_full_body()
     lm = get_landmarks()
     body_surface = BodySurface()
 
-    print("Creating front panel mesh...")
-    front_outline = make_front_panel_outline(lm, body_surface)
-    front_mesh = create_panel_mesh(body_surface, front_outline, n_grid=50)
-
-    print("Creating back panel mesh...")
-    back_outline = make_back_panel_outline(lm, body_surface)
-    back_mesh = create_panel_mesh(body_surface, back_outline, n_grid=50)
-
-    print("Creating crotch strip mesh (sagittal plane)...")
+    # --- Create initial fabric meshes (geometric placement) ---
+    print("Creating initial fabric meshes (geometric)...")
+    front_mesh = create_panel_mesh(body_surface,
+                                   make_front_panel_outline(lm, body_surface),
+                                   n_grid=50)
+    back_mesh = create_panel_mesh(body_surface,
+                                  make_back_panel_outline(lm, body_surface),
+                                  n_grid=50)
     crotch_mesh = create_crotch_strip_mesh(lm, body_surface)
 
-    print("Creating breast zone meshes...")
     left_breast = create_breast_zone_mesh(
         body_surface, lm["left_breast_apex"][1],
         np.arctan2(-lm["left_breast_apex"][0], lm["left_breast_apex"][2]),
@@ -460,28 +526,21 @@ def main():
         np.arctan2(-lm["right_breast_apex"][0], lm["right_breast_apex"][2]),
         0.04, 0.5)
 
-    # Shrinkwrap panels and breast zones onto actual body mesh surface.
-    # NOTE: crotch strip is NOT shrinkwrapped — its perineum wrap vertices
-    # are intentionally inside the body (between the legs) at ~1cm radius.
-    # Shrinkwrapping would push them onto the outer body surface, creating
-    # a visible artifact (upright triangle below the front panel).
-    print("Shrinkwrapping fabric to body mesh...")
-    fabric_offset = 0.003
-    for mesh in [front_mesh, back_mesh, left_breast, right_breast]:
-        if mesh is not None:
-            shrinkwrap_to_body(mesh, body_trimesh, offset=fabric_offset)
+    # --- Physics: settle fabric onto body surface ---
+    # Crotch strip excluded — cylindrical body model can't handle between-legs
+    print("Running cloth physics simulation...")
+    physics_meshes = [front_mesh, back_mesh, left_breast, right_breast]
+    settle_fabric_on_body(physics_meshes, body_verts, num_steps=150)
 
+    # --- Build pyrender scene ---
     print("Creating landmark markers...")
     markers = create_landmark_markers(lm)
 
-    # Build pyrender scene
     scene = pyrender.Scene(bg_color=[10, 10, 30, 255],
                            ambient_light=[0.3, 0.3, 0.3])
 
-    # Add body
     scene.add(pyrender.Mesh.from_trimesh(body_mesh, smooth=True))
 
-    # Add bikini panels (3 separate pieces)
     for mesh in [front_mesh, back_mesh, crotch_mesh]:
         if mesh is not None:
             scene.add(pyrender.Mesh.from_trimesh(mesh, smooth=False))
@@ -493,17 +552,18 @@ def main():
     for m in markers:
         scene.add(pyrender.Mesh.from_trimesh(m, smooth=False))
 
-    # Camera
     camera = pyrender.OrthographicCamera(xmag=0.35, ymag=0.55)
     cam_node = scene.add(camera, pose=np.eye(4))
 
-    # Lighting
     light = pyrender.DirectionalLight(color=[1.0, 1.0, 1.0], intensity=4.0)
-    scene.add(light, pose=make_camera_pose(azimuth=0.3, elevation=0.3, distance=2.0))
-    fill_light = pyrender.DirectionalLight(color=[0.7, 0.7, 0.8], intensity=2.0)
-    scene.add(fill_light, pose=make_camera_pose(azimuth=np.pi + 0.5, elevation=0.2, distance=2.0))
+    scene.add(light, pose=make_camera_pose(azimuth=0.3, elevation=0.3,
+                                            distance=2.0))
+    fill_light = pyrender.DirectionalLight(color=[0.7, 0.7, 0.8],
+                                            intensity=2.0)
+    scene.add(fill_light, pose=make_camera_pose(azimuth=np.pi + 0.5,
+                                                 elevation=0.2, distance=2.0))
 
-    # Render 4 views: front, right side (90°), left side (270°/close), back
+    # --- Render 4 views ---
     W, H = 500, 800
     renderer = pyrender.OffscreenRenderer(W, H)
 
@@ -516,14 +576,15 @@ def main():
 
     images = []
     for azimuth, title in views:
-        cam_pose = make_camera_pose(azimuth=azimuth, distance=1.8, target_y=1.05)
+        cam_pose = make_camera_pose(azimuth=azimuth, distance=1.8,
+                                     target_y=1.05)
         img = render_view(scene, cam_node, cam_pose, renderer)
         images.append((img, title))
         print(f"  Rendered {title}")
 
     renderer.delete()
 
-    # Combine views into one image
+    # --- Combine views ---
     from PIL import ImageDraw, ImageFont
     n_views = len(views)
     gap = 10
@@ -533,14 +594,16 @@ def main():
     draw = ImageDraw.Draw(combined)
 
     try:
-        font_big = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 22)
-        font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
+        font_big = ImageFont.truetype(
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 22)
+        font_small = ImageFont.truetype(
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
     except IOError:
         font_big = ImageFont.load_default()
         font_small = ImageFont.load_default()
 
-    draw.text((combined_w // 2 - 180, 5),
-              "Privacy Zones: Front + Back Panels + Crotch Strip",
+    draw.text((combined_w // 2 - 200, 5),
+              "Privacy Zones: PBD Cloth Simulation + Mesh Body LUT",
               fill=(255, 255, 255), font=font_big)
 
     for i, (img, title) in enumerate(images):
