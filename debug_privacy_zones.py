@@ -2,6 +2,8 @@
 
 Uses pyrender (OpenGL) with OSMesa for offscreen rendering.
 Provides correct z-buffering, camera projection, and lighting.
+
+Bikini bottom = front panel + crotch strip (sagittal plane) + back panel.
 """
 import os
 os.environ['PYOPENGL_PLATFORM'] = 'osmesa'
@@ -23,42 +25,43 @@ from bikini_generator.garment.loop_generator import BodySurface
 def create_body_mesh():
     """Load body mesh and create trimesh object."""
     verts, faces = generate_full_body()
-    skin_color = [220, 185, 160, 255]  # RGBA skin tone
+    skin_color = [220, 185, 160, 255]
     mesh = trimesh.Trimesh(vertices=verts, faces=faces, process=False)
     mesh.visual.vertex_colors = np.tile(skin_color, (len(verts), 1))
     return mesh
 
 
-def cubic_bezier(p0, p1, p2, p3, n=20):
-    """Sample cubic bezier curve, returns list of (y, theta) points."""
+def cubic_bezier_yt(p0, p1, p2, p3, n=20):
+    """Sample cubic bezier in (y, theta) space."""
     pts = []
     for i in range(n + 1):
         t = i / n
         mt = 1 - t
-        y = (mt**3 * p0[0] + 3 * mt**2 * t * p1[0] +
-             3 * mt * t**2 * p2[0] + t**3 * p3[0])
-        th = (mt**3 * p0[1] + 3 * mt**2 * t * p1[1] +
-              3 * mt * t**2 * p2[1] + t**3 * p3[1])
+        y = mt**3*p0[0] + 3*mt**2*t*p1[0] + 3*mt*t**2*p2[0] + t**3*p3[0]
+        th = mt**3*p0[1] + 3*mt**2*t*p1[1] + 3*mt*t**2*p2[1] + t**3*p3[1]
         pts.append((y, th))
     return pts
 
 
-def make_bikini_bottom_outline(lm, body_surface):
-    """Create bikini bottom outline in (Y, theta) space.
+def cubic_bezier_3d(p0, p1, p2, p3, n=20):
+    """Sample cubic bezier in 3D space. Returns (n+1, 3) array."""
+    pts = []
+    for i in range(n + 1):
+        t = i / n
+        mt = 1 - t
+        pt = mt**3*p0 + 3*mt**2*t*p1 + 3*mt*t**2*p2 + t**3*p3
+        pts.append(pt)
+    return np.array(pts)
 
-    Returns list of (y, theta) tuples forming a closed curve.
-    """
+
+def make_front_panel_outline(lm, body_surface):
+    """Front panel only: inverted triangle on the FRONT of the body (theta near 0)."""
     hip_side_y = (lm["hip_left"][1] + lm["hip_right"][1]) / 2
     crotch_front_y = lm["crotch_front"][1]
-    crotch_back_y = lm["crotch_back"][1]
-    crotch_center_y = lm["crotch_center"][1]
 
-    top_y = hip_side_y - 0.03
-    front_bottom_y = crotch_front_y - 0.01
-    back_bottom_y = crotch_back_y - 0.01
-
+    top_y = hip_side_y - 0.03   # 0.946
+    bottom_y = crotch_front_y - 0.01  # 0.836
     hw_front = 0.055
-    hw_back = 0.050
     hw_crotch = 0.015
 
     def theta_hw(hw, y, tc):
@@ -66,105 +69,100 @@ def make_bikini_bottom_outline(lm, body_surface):
         return hw / max(r, 0.01)
 
     thf = theta_hw(hw_front, top_y, 0.0)
-    thb = theta_hw(hw_back, top_y, np.pi)
-    thc_f = theta_hw(hw_crotch, front_bottom_y, 0.0)
-    thc_b = theta_hw(hw_crotch, back_bottom_y, np.pi)
+    thc = theta_hw(hw_crotch, bottom_y, 0.0)
 
     outline = []
 
-    # 1. Front top edge
+    # Top edge
     for i in range(16):
         f = i / 15
         theta = thf * (1 - 2 * f)
         bow = 0.004 * np.sin(np.pi * f)
         outline.append((top_y + bow, theta))
 
-    # 2. Right leg scoop
-    sy = top_y - (top_y - front_bottom_y) * 0.4
+    # Right leg scoop
+    sy = top_y - (top_y - bottom_y) * 0.4
     sd = thf * 0.55
-    outline.extend(cubic_bezier(
+    outline.extend(cubic_bezier_yt(
         (top_y, -thf), (sy, -thf + sd),
-        (front_bottom_y + 0.02, -thc_f * 1.5), (front_bottom_y, -thc_f),
+        (bottom_y + 0.02, -thc * 1.5), (bottom_y, -thc),
         n=25)[1:])
 
-    # 3. Right crotch strip (front→back, dipping to crotch_center)
-    n_crotch = 30
-    for i in range(n_crotch + 1):
-        f = i / n_crotch
-        tc = np.pi * f
-        y_start = front_bottom_y
-        y_end = back_bottom_y
-        y_baseline = y_start + (y_end - y_start) * f
-        dip_depth = y_baseline - crotch_center_y
-        dip = -dip_depth * np.sin(np.pi * f)
-        y_here = y_baseline + dip
-        off = theta_hw(hw_crotch, max(y_here, crotch_center_y), tc)
-        outline.append((y_here, tc - off))
+    # Bottom edge
+    for i in range(6):
+        f = i / 5
+        outline.append((bottom_y, -thc + 2 * thc * f))
 
-    # 4. Back right leg scoop (up)
-    sy_b = top_y - (top_y - back_bottom_y) * 0.4
-    sd_b = thb * 0.55
-    outline.extend(cubic_bezier(
-        (back_bottom_y, np.pi - thc_b), (back_bottom_y + 0.02, np.pi - thc_b * 1.5),
-        (sy_b, np.pi - thb + sd_b), (top_y, np.pi - thb),
-        n=25)[1:])
-
-    # 5. Back top edge
-    for i in range(16):
-        f = i / 15
-        theta = np.pi - thb + 2 * thb * f
-        bow = 0.004 * np.sin(np.pi * f)
-        outline.append((top_y + bow, theta))
-
-    # 6. Back left leg scoop (down)
-    outline.extend(cubic_bezier(
-        (top_y, np.pi + thb), (sy_b, np.pi + thb - sd_b),
-        (back_bottom_y + 0.02, np.pi + thc_b * 1.5), (back_bottom_y, np.pi + thc_b),
-        n=25)[1:])
-
-    # 7. Left crotch strip (back→front)
-    for i in range(n_crotch + 1):
-        f = i / n_crotch
-        tc = np.pi * (1 - f)
-        y_start = back_bottom_y
-        y_end = front_bottom_y
-        y_baseline = y_start + (y_end - y_start) * f
-        dip_depth = y_baseline - crotch_center_y
-        dip = -dip_depth * np.sin(np.pi * f)
-        y_here = y_baseline + dip
-        off = theta_hw(hw_crotch, max(y_here, crotch_center_y), tc)
-        outline.append((y_here, tc + off))
-
-    # 8. Front left leg scoop (up)
-    outline.extend(cubic_bezier(
-        (front_bottom_y, thc_f), (front_bottom_y + 0.02, thc_f * 1.5),
+    # Left leg scoop
+    outline.extend(cubic_bezier_yt(
+        (bottom_y, thc), (bottom_y + 0.02, thc * 1.5),
         (sy, thf - sd), (top_y, thf),
         n=25)[1:])
 
     return outline
 
 
-def create_panel_mesh(body_surface, outline_yt, n_grid=40, offset=0.003):
-    """Create a triangulated mesh for a panel on the body surface.
+def make_back_panel_outline(lm, body_surface):
+    """Back panel: inverted triangle on the BACK of the body (theta near pi)."""
+    hip_side_y = (lm["hip_left"][1] + lm["hip_right"][1]) / 2
+    crotch_back_y = lm["crotch_back"][1]
 
-    Fills the interior of the outline with a grid, projects onto body surface,
-    and triangulates.
-    """
-    # Convert outline to (Y, theta) path for containment test
+    top_y = hip_side_y - 0.03
+    bottom_y = crotch_back_y - 0.01  # 0.839
+    hw_back = 0.050
+    hw_crotch = 0.015
+
+    def theta_hw(hw, y, tc):
+        r = body_surface.get_surface_radius(y, tc)
+        return hw / max(r, 0.01)
+
+    thb = theta_hw(hw_back, top_y, np.pi)
+    thc = theta_hw(hw_crotch, bottom_y, np.pi)
+
+    outline = []
+
+    # Top edge
+    for i in range(16):
+        f = i / 15
+        theta = np.pi + thb * (1 - 2 * f)
+        bow = 0.004 * np.sin(np.pi * f)
+        outline.append((top_y + bow, theta))
+
+    # Right scoop (as seen from back)
+    sy = top_y - (top_y - bottom_y) * 0.4
+    sd = thb * 0.55
+    outline.extend(cubic_bezier_yt(
+        (top_y, np.pi - thb), (sy, np.pi - thb + sd),
+        (bottom_y + 0.02, np.pi - thc * 1.5), (bottom_y, np.pi - thc),
+        n=25)[1:])
+
+    # Bottom edge
+    for i in range(6):
+        f = i / 5
+        outline.append((bottom_y, np.pi - thc + 2 * thc * f))
+
+    # Left scoop
+    outline.extend(cubic_bezier_yt(
+        (bottom_y, np.pi + thc), (bottom_y + 0.02, np.pi + thc * 1.5),
+        (sy, np.pi + thb - sd), (top_y, np.pi + thb),
+        n=25)[1:])
+
+    return outline
+
+
+def create_panel_mesh(body_surface, outline_yt, n_grid=40, offset=0.003):
+    """Create a triangulated mesh for a panel on the body surface."""
     outline_arr = np.array(outline_yt)
     path = MplPath(outline_arr)
 
-    # Bounding box in (Y, theta) space
     y_min, y_max = outline_arr[:, 0].min(), outline_arr[:, 0].max()
     th_min, th_max = outline_arr[:, 1].min(), outline_arr[:, 1].max()
 
-    # Create grid
     y_vals = np.linspace(y_min - 0.005, y_max + 0.005, n_grid)
     th_vals = np.linspace(th_min - 0.05, th_max + 0.05, n_grid * 2)
 
-    # Find interior grid points
     vertices = []
-    grid_idx = {}  # (iy, it) -> vertex index
+    grid_idx = {}
 
     for iy, y in enumerate(y_vals):
         for it, th in enumerate(th_vals):
@@ -179,7 +177,6 @@ def create_panel_mesh(body_surface, outline_yt, n_grid=40, offset=0.003):
     if len(vertices) < 3:
         return None
 
-    # Create triangles from adjacent grid points
     faces = []
     for iy in range(n_grid - 1):
         for it in range(len(th_vals) - 1):
@@ -195,28 +192,92 @@ def create_panel_mesh(body_surface, outline_yt, n_grid=40, offset=0.003):
     if len(faces) == 0:
         return None
 
-    vertices = np.array(vertices)
-    faces = np.array(faces)
-    mesh = trimesh.Trimesh(vertices=vertices, faces=faces, process=False)
+    mesh = trimesh.Trimesh(vertices=np.array(vertices),
+                           faces=np.array(faces), process=False)
+    color = [255, 80, 80, 180]
+    mesh.visual.vertex_colors = np.tile(color, (len(vertices), 1))
+    return mesh
 
-    # Color: semi-transparent red
+
+def create_crotch_strip_mesh(lm, body_surface, hw=0.015, offset=0.003, n_along=30, n_across=6):
+    """Create crotch strip mesh in the SAGITTAL PLANE (X=0).
+
+    The strip goes straight from front panel bottom to back panel bottom,
+    dipping through the perineum (crotch_center). NOT sweeping around the body.
+
+    Path: front(+Z) → down → perineum(Z≈0) → down/back → back(-Z)
+    Width: ±hw in X direction.
+    """
+    crotch_front_y = lm["crotch_front"][1]
+    crotch_back_y = lm["crotch_back"][1]
+    crotch_center_y = lm["crotch_center"][1]
+
+    front_bottom_y = crotch_front_y - 0.01  # 0.836
+    back_bottom_y = crotch_back_y - 0.01    # 0.839
+
+    # Get Z positions at front and back panel bottoms
+    z_front = body_surface.get_surface_radius(front_bottom_y, 0.0) + offset   # +Z (front)
+    z_back = -(body_surface.get_surface_radius(back_bottom_y, np.pi) + offset)  # -Z (back)
+
+    # Center line of crotch strip in sagittal plane (X=0):
+    # Bezier curve from front bottom → perineum → back bottom
+    p_front = np.array([0, front_bottom_y, z_front])
+    p_back = np.array([0, back_bottom_y, z_back])
+    p_perineum = np.array([0, crotch_center_y, 0])  # lowest point, Z=0
+
+    # Control points for smooth curve through perineum
+    ctrl1 = np.array([0, front_bottom_y - 0.03, z_front * 0.5])
+    ctrl2 = np.array([0, back_bottom_y - 0.03, z_back * 0.5])
+
+    # Two-segment bezier: front→perineum, perineum→back
+    pts_front_half = cubic_bezier_3d(p_front, ctrl1, p_perineum, p_perineum, n=n_along // 2)
+    pts_back_half = cubic_bezier_3d(p_perineum, p_perineum, ctrl2, p_back, n=n_along // 2)
+
+    # Combine (remove duplicate perineum point)
+    center_line = np.vstack([pts_front_half, pts_back_half[1:]])
+
+    # Build strip mesh: for each center point, create vertices at ±hw in X
+    n_pts = len(center_line)
+    vertices = []
+    for i in range(n_pts):
+        cx, cy, cz = center_line[i]
+        for j in range(n_across + 1):
+            f = j / n_across
+            x = cx + hw * (2 * f - 1)  # from -hw to +hw
+            vertices.append([x, cy, cz])
+
+    vertices = np.array(vertices)
+
+    # Triangulate: grid of n_pts × (n_across+1)
+    faces = []
+    w = n_across + 1
+    for i in range(n_pts - 1):
+        for j in range(n_across):
+            i00 = i * w + j
+            i01 = i * w + j + 1
+            i10 = (i + 1) * w + j
+            i11 = (i + 1) * w + j + 1
+            faces.append([i00, i10, i01])
+            faces.append([i10, i11, i01])
+
+    mesh = trimesh.Trimesh(vertices=vertices, faces=np.array(faces), process=False)
     color = [255, 80, 80, 180]
     mesh.visual.vertex_colors = np.tile(color, (len(vertices), 1))
     return mesh
 
 
 def create_breast_zone_mesh(body_surface, center_y, center_theta,
-                            radius_y, radius_theta, offset=0.003, n=30):
-    """Create elliptical breast zone mesh on body surface."""
+                            radius_y, radius_theta, offset=0.008, n=30):
+    """Create elliptical breast zone mesh on body surface.
+
+    Uses larger offset (8mm) to prevent clipping into body.
+    """
     vertices = []
-    # Center point
     r = body_surface.get_surface_radius(center_y, center_theta) + offset
     cx = -np.sin(center_theta) * r
     cz = np.cos(center_theta) * r
-    center_idx = 0
     vertices.append([cx, center_y, cz])
 
-    # Boundary points
     for i in range(n):
         t = 2 * np.pi * i / n
         y = center_y + radius_y * np.sin(t)
@@ -226,12 +287,9 @@ def create_breast_zone_mesh(body_surface, center_y, center_theta,
         z = np.cos(theta) * r
         vertices.append([x, y, z])
 
-    # Fan triangulation from center
     faces = []
     for i in range(n):
-        i1 = 1 + i
-        i2 = 1 + (i + 1) % n
-        faces.append([center_idx, i1, i2])
+        faces.append([0, 1 + i, 1 + (i + 1) % n])
 
     mesh = trimesh.Trimesh(vertices=np.array(vertices),
                            faces=np.array(faces), process=False)
@@ -240,7 +298,7 @@ def create_breast_zone_mesh(body_surface, center_y, center_theta,
     return mesh
 
 
-def create_landmark_markers(lm, body_surface, radius=0.004):
+def create_landmark_markers(lm, radius=0.004):
     """Create small sphere markers at key landmarks."""
     markers = []
     key_points = {
@@ -265,8 +323,7 @@ def create_landmark_markers(lm, body_surface, radius=0.004):
 
 
 def make_camera_pose(azimuth, elevation=0.0, distance=1.5, target_y=1.0):
-    """Create camera pose looking at the body from given angle."""
-    # Camera looks at (0, target_y, 0) from (distance * sin(az), target_y, distance * cos(az))
+    """Create camera pose (look-at matrix)."""
     eye = np.array([
         distance * np.sin(azimuth),
         target_y + distance * np.sin(elevation),
@@ -275,7 +332,6 @@ def make_camera_pose(azimuth, elevation=0.0, distance=1.5, target_y=1.0):
     target = np.array([0, target_y, 0])
     up = np.array([0, 1, 0])
 
-    # Look-at matrix
     forward = target - eye
     forward /= np.linalg.norm(forward)
     right = np.cross(forward, up)
@@ -305,9 +361,16 @@ def main():
     lm = get_landmarks()
     body_surface = BodySurface()
 
-    print("Creating bikini bottom mesh...")
-    bottom_outline = make_bikini_bottom_outline(lm, body_surface)
-    bottom_mesh = create_panel_mesh(body_surface, bottom_outline, n_grid=50)
+    print("Creating front panel mesh...")
+    front_outline = make_front_panel_outline(lm, body_surface)
+    front_mesh = create_panel_mesh(body_surface, front_outline, n_grid=50)
+
+    print("Creating back panel mesh...")
+    back_outline = make_back_panel_outline(lm, body_surface)
+    back_mesh = create_panel_mesh(body_surface, back_outline, n_grid=50)
+
+    print("Creating crotch strip mesh (sagittal plane)...")
+    crotch_mesh = create_crotch_strip_mesh(lm, body_surface)
 
     print("Creating breast zone meshes...")
     left_breast = create_breast_zone_mesh(
@@ -320,20 +383,19 @@ def main():
         0.04, 0.5)
 
     print("Creating landmark markers...")
-    markers = create_landmark_markers(lm, body_surface)
+    markers = create_landmark_markers(lm)
 
     # Build pyrender scene
     scene = pyrender.Scene(bg_color=[10, 10, 30, 255],
                            ambient_light=[0.3, 0.3, 0.3])
 
     # Add body
-    body_pr = pyrender.Mesh.from_trimesh(body_mesh, smooth=True)
-    scene.add(body_pr)
+    scene.add(pyrender.Mesh.from_trimesh(body_mesh, smooth=True))
 
-    # Add bikini panels
-    if bottom_mesh is not None:
-        bottom_pr = pyrender.Mesh.from_trimesh(bottom_mesh, smooth=False)
-        scene.add(bottom_pr)
+    # Add bikini panels (3 separate pieces)
+    for mesh in [front_mesh, back_mesh, crotch_mesh]:
+        if mesh is not None:
+            scene.add(pyrender.Mesh.from_trimesh(mesh, smooth=False))
 
     for bm in [left_breast, right_breast]:
         if bm is not None:
@@ -342,28 +404,25 @@ def main():
     for m in markers:
         scene.add(pyrender.Mesh.from_trimesh(m, smooth=False))
 
-    # Camera setup: orthographic for consistent scale across views
+    # Camera
     camera = pyrender.OrthographicCamera(xmag=0.35, ymag=0.55)
     cam_node = scene.add(camera, pose=np.eye(4))
 
     # Lighting
     light = pyrender.DirectionalLight(color=[1.0, 1.0, 1.0], intensity=4.0)
-    light_pose = make_camera_pose(azimuth=0.3, elevation=0.3, distance=2.0)
-    scene.add(light, pose=light_pose)
-
-    # Add fill light from opposite side
+    scene.add(light, pose=make_camera_pose(azimuth=0.3, elevation=0.3, distance=2.0))
     fill_light = pyrender.DirectionalLight(color=[0.7, 0.7, 0.8], intensity=2.0)
-    fill_pose = make_camera_pose(azimuth=np.pi + 0.5, elevation=0.2, distance=2.0)
-    scene.add(fill_light, pose=fill_pose)
+    scene.add(fill_light, pose=make_camera_pose(azimuth=np.pi + 0.5, elevation=0.2, distance=2.0))
 
-    # Render views
-    W, H = 600, 900
+    # Render 4 views: front, right side (90°), left side (270°/close), back
+    W, H = 500, 800
     renderer = pyrender.OffscreenRenderer(W, H)
 
     views = [
-        (0, "Front View"),
-        (np.pi / 3, "Side View (60\u00b0)"),
-        (np.pi, "Back View"),
+        (0, "Front"),
+        (np.pi / 2, "Right Side (90\u00b0)"),
+        (np.pi, "Back"),
+        (-np.pi / 2, "Left Side (270\u00b0)"),
     ]
 
     images = []
@@ -375,29 +434,31 @@ def main():
 
     renderer.delete()
 
-    # Combine views into one image with titles
+    # Combine views into one image
     from PIL import ImageDraw, ImageFont
-    combined_w = W * 3 + 20
+    n_views = len(views)
+    gap = 10
+    combined_w = W * n_views + gap * (n_views - 1)
     combined_h = H + 60
     combined = Image.new('RGBA', (combined_w, combined_h), (10, 10, 30, 255))
     draw = ImageDraw.Draw(combined)
 
-    # Title
     try:
-        font_big = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 24)
-        font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 16)
+        font_big = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 22)
+        font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
     except IOError:
         font_big = ImageFont.load_default()
         font_small = ImageFont.load_default()
 
-    draw.text((combined_w // 2 - 150, 5), "Privacy Zones & Key Landmarks",
+    draw.text((combined_w // 2 - 180, 5),
+              "Privacy Zones: Front + Back Panels + Crotch Strip",
               fill=(255, 255, 255), font=font_big)
 
     for i, (img, title) in enumerate(images):
         pil_img = Image.fromarray(img)
-        x_offset = i * (W + 10)
+        x_offset = i * (W + gap)
         combined.paste(pil_img, (x_offset, 50))
-        draw.text((x_offset + W // 2 - 40, 32), title,
+        draw.text((x_offset + W // 2 - 30, 34), title,
                   fill=(255, 255, 255), font=font_small)
 
     out_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
