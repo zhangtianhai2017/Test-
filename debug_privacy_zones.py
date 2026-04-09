@@ -30,9 +30,9 @@ from bikini_generator.garment.loop_generator import BodySurface
 def thicken_mesh(mesh, thickness=0.002):
     """Extrude a surface mesh into a solid shell with given thickness.
 
-    Creates outer surface offset along vertex normals, connects edges
-    with side quads, producing a watertight solid. This prevents z-fighting
-    with the body mesh that occurs with infinitely thin surfaces.
+    Extrudes INWARD (toward body), so the original surface stays as the
+    visible outer face. This keeps fabric flush against the body surface
+    at the collision margin position.
     """
     from collections import Counter
 
@@ -57,15 +57,16 @@ def thicken_mesh(mesh, thickness=0.002):
     dots = np.sum(normals * radial, axis=1)
     normals[dots < 0] *= -1
 
-    # Outer surface = original + normal * thickness
-    outer_verts = verts + normals * thickness
-    all_verts = np.vstack([verts, outer_verts])
+    # Outer surface = original vertices (stays at collision margin)
+    # Inner surface = original - normal * thickness (goes toward body)
+    inner_verts = verts - normals * thickness
+    all_verts = np.vstack([verts, inner_verts])
 
-    # Inner faces (original winding) + outer faces (reversed, offset by n)
-    outer_faces = faces[:, ::-1] + n
-    all_faces_list = [faces, outer_faces]
+    # Outer faces (original winding) + inner faces (reversed, offset by n)
+    inner_faces = faces[:, ::-1] + n
+    all_faces_list = [faces, inner_faces]
 
-    # Side faces: connect boundary edges (edges in only 1 face)
+    # Side faces: connect boundary edges
     edge_count = Counter()
     for f in faces:
         for i in range(3):
@@ -198,7 +199,7 @@ def settle_fabric_on_body(fabric_meshes, body_verts, num_steps=300):
     cfg.gravity = 0.0           # No gravity — pure elastic settling
     cfg.num_steps = num_steps   # More iterations for better convergence
     cfg.num_substeps = 25       # More constraint iterations per step
-    cfg.collision_margin = 0.002  # 2mm — tighter against body
+    cfg.collision_margin = 0.001  # 1mm — very tight against body
     cfg.damping = 0.90          # Strong damping for fast convergence
     cfg.friction_coefficient = 2.0  # High friction to prevent sliding
     cfg.stretch_stiffness = 15000.0  # Stiffer fabric for better shape retention
@@ -617,30 +618,59 @@ def main():
         np.arctan2(-lm["right_breast_apex"][0], lm["right_breast_apex"][2]),
         0.04, 0.5)
 
-    # --- Physics: settle fabric onto body surface ---
-    # Crotch strip excluded — cylindrical body model can't handle between-legs
-    print("Running cloth physics simulation...")
+    # --- Physics: settle panels + breasts onto body ---
+    # Crotch strip excluded (cylindrical model can't handle between-legs)
+    print("Running cloth physics simulation (panels + breasts)...")
     physics_meshes = [front_mesh, back_mesh, left_breast, right_breast]
     settle_fabric_on_body(physics_meshes, body_verts, num_steps=300)
 
-    # --- Add 2mm thickness to all fabric meshes ---
-    print("Extruding 2mm thickness on all fabric meshes...")
-    all_fabric = [front_mesh, back_mesh, crotch_mesh, left_breast, right_breast]
-    thick_meshes = []
-    for m in all_fabric:
-        if m is not None:
-            thick_meshes.append(thicken_mesh(m, thickness=0.002))
-        else:
-            thick_meshes.append(None)
-    front_mesh, back_mesh, crotch_mesh, left_breast, right_breast = thick_meshes
+    # --- Snap crotch strip boundaries to post-physics panel edges ---
+    # The crotch strip's first row should connect to front panel bottom,
+    # and last row to back panel bottom. After physics moved the panels,
+    # we snap the crotch endpoints to match.
+    print("Connecting crotch strip to panels...")
+    if crotch_mesh is not None and front_mesh is not None and back_mesh is not None:
+        from scipy.spatial import cKDTree
+        crotch_verts = crotch_mesh.vertices.copy()
+        n_across = 13  # n_across(12) + 1
+        n_crotch_pts = len(crotch_verts) // n_across
+
+        # Front boundary: first row of crotch strip
+        front_tree = cKDTree(front_mesh.vertices)
+        for j in range(n_across):
+            _, idx = front_tree.query(crotch_verts[j])
+            crotch_verts[j] = front_mesh.vertices[idx]
+
+        # Back boundary: last row of crotch strip
+        back_tree = cKDTree(back_mesh.vertices)
+        last_row_start = (n_crotch_pts - 1) * n_across
+        for j in range(n_across):
+            _, idx = back_tree.query(crotch_verts[last_row_start + j])
+            crotch_verts[last_row_start + j] = back_mesh.vertices[idx]
+
+        crotch_mesh.vertices = crotch_verts
+        print(f"  Snapped {n_across} front + {n_across} back boundary verts")
+
+    # --- Concatenate into one bottom mesh ---
+    bottom_parts = [m for m in [front_mesh, back_mesh, crotch_mesh]
+                    if m is not None]
+    bottom_mesh = trimesh.util.concatenate(bottom_parts)
+    bottom_mesh.visual.vertex_colors = np.tile(
+        [255, 80, 80, 255], (len(bottom_mesh.vertices), 1))
+
+    # --- Add 2mm thickness (extrude inward toward body) ---
+    print("Extruding 2mm thickness...")
+    if bottom_mesh is not None:
+        bottom_mesh = thicken_mesh(bottom_mesh, thickness=0.002)
+    if left_breast is not None:
+        left_breast = thicken_mesh(left_breast, thickness=0.002)
+    if right_breast is not None:
+        right_breast = thicken_mesh(right_breast, thickness=0.002)
 
     # --- Export combined OBJ file ---
     print("Exporting OBJ file...")
-    export_meshes = []
-    # Body mesh (skin color)
-    export_meshes.append(body_mesh)
-    # Fabric meshes (red)
-    for m in [front_mesh, back_mesh, crotch_mesh, left_breast, right_breast]:
+    export_meshes = [body_mesh]
+    for m in [bottom_mesh, left_breast, right_breast]:
         if m is not None:
             export_meshes.append(m)
     combined_mesh = trimesh.util.concatenate(export_meshes)
@@ -658,9 +688,8 @@ def main():
 
     scene.add(pyrender.Mesh.from_trimesh(body_mesh, smooth=True))
 
-    for mesh in [front_mesh, back_mesh, crotch_mesh]:
-        if mesh is not None:
-            scene.add(pyrender.Mesh.from_trimesh(mesh, smooth=False))
+    if bottom_mesh is not None:
+        scene.add(pyrender.Mesh.from_trimesh(bottom_mesh, smooth=False))
 
     for bm in [left_breast, right_breast]:
         if bm is not None:
