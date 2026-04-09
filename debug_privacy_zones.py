@@ -71,15 +71,20 @@ def select_faces_in_zone(verts, faces, zone_path):
     return np.where(inside)[0]
 
 
-def extract_and_extrude(verts, faces, face_indices, thickness=0.002):
-    """Extract faces from body mesh and extrude outward.
+def extract_and_extrude(verts, faces, face_indices, thickness=0.002,
+                        color=(255, 80, 80), smooth_iters=15):
+    """Extract faces from body mesh, smooth boundary, and extrude outward.
 
-    Returns a trimesh with:
-    - Outer surface (body surface + thickness along vertex normals)
-    - Inner surface (original body surface)
-    - Side faces connecting the edges
+    Steps:
+    1. Extract faces at the zone boundary
+    2. Laplacian-smooth boundary vertices for clean curved edges
+    3. Extrude outward along vertex normals by thickness
+    4. Cap with side faces for solid shell
+
+    color: RGB tuple for this fabric piece.
+    smooth_iters: iterations of boundary Laplacian smoothing.
     """
-    from collections import Counter
+    from collections import Counter, defaultdict
 
     if len(face_indices) == 0:
         return None
@@ -89,12 +94,43 @@ def extract_and_extrude(verts, faces, face_indices, thickness=0.002):
     unique_vids = np.unique(selected_faces)
     vid_map = {old: new for new, old in enumerate(unique_vids)}
 
-    # Remap faces
     new_faces = np.array([[vid_map[v] for v in f] for f in selected_faces])
     new_verts = verts[unique_vids].copy()
     n = len(new_verts)
 
-    # Compute vertex normals (area-weighted from face normals)
+    # --- Identify boundary vertices and smooth them ---
+    edge_count = Counter()
+    edge_neighbors = defaultdict(set)
+    for f in new_faces:
+        for i in range(3):
+            a, b = f[i], f[(i + 1) % 3]
+            e = (min(a, b), max(a, b))
+            edge_count[e] += 1
+            edge_neighbors[a].add(b)
+            edge_neighbors[b].add(a)
+
+    # Boundary vertices: on edges that appear in exactly 1 face
+    boundary_vids = set()
+    for (a, b), c in edge_count.items():
+        if c == 1:
+            boundary_vids.add(a)
+            boundary_vids.add(b)
+
+    # Laplacian smooth boundary vertices (keeps interior fixed)
+    # Each boundary vertex moves toward the average of its boundary neighbors
+    boundary_list = list(boundary_vids)
+    for _ in range(smooth_iters):
+        new_pos = new_verts.copy()
+        for vid in boundary_list:
+            neighbors = [nb for nb in edge_neighbors[vid]
+                         if nb in boundary_vids]
+            if len(neighbors) >= 2:
+                avg = np.mean(new_verts[neighbors], axis=0)
+                # Blend: 50% toward average, 50% stay
+                new_pos[vid] = 0.5 * new_verts[vid] + 0.5 * avg
+        new_verts = new_pos
+
+    # --- Compute vertex normals ---
     normals = np.zeros_like(new_verts)
     for f in new_faces:
         v0, v1, v2 = new_verts[f[0]], new_verts[f[1]], new_verts[f[2]]
@@ -105,33 +141,24 @@ def extract_and_extrude(verts, faces, face_indices, thickness=0.002):
     lengths = np.linalg.norm(normals, axis=1, keepdims=True)
     normals /= np.maximum(lengths, 1e-8)
 
-    # Ensure normals point outward (away from Y-axis)
+    # Ensure normals point outward
     radial = new_verts.copy()
     radial[:, 1] = 0
     dots = np.sum(normals * radial, axis=1)
     normals[dots < 0] *= -1
 
-    # Outer surface = body surface + normal * thickness
+    # --- Extrude ---
     outer_verts = new_verts + normals * thickness
     all_verts = np.vstack([new_verts, outer_verts])
 
-    # Inner faces (body surface, reversed winding so normals face inward)
-    # Outer faces (extruded surface, original winding so normals face outward)
-    inner_faces = new_faces[:, ::-1]  # reversed → normals face inward
-    outer_faces = new_faces + n       # offset → outer surface
-
+    inner_faces = new_faces[:, ::-1]
+    outer_faces = new_faces + n
     all_faces_list = [inner_faces, outer_faces]
 
-    # Side faces: connect boundary edges
-    edge_count = Counter()
-    for f in new_faces:
-        for i in range(3):
-            e = tuple(sorted([f[i], f[(i + 1) % 3]]))
-            edge_count[e] += 1
-
+    # Side faces from boundary edges
     side_faces = []
     for (a, b), c in edge_count.items():
-        if c == 1:  # boundary edge
+        if c == 1:
             side_faces.append([a, b, b + n])
             side_faces.append([a, b + n, a + n])
 
@@ -140,8 +167,8 @@ def extract_and_extrude(verts, faces, face_indices, thickness=0.002):
 
     all_faces = np.vstack(all_faces_list)
     mesh = trimesh.Trimesh(vertices=all_verts, faces=all_faces, process=False)
-    color = [255, 80, 80, 255]
-    mesh.visual.vertex_colors = np.tile(color, (len(all_verts), 1))
+    rgba = list(color) + [255]
+    mesh.visual.vertex_colors = np.tile(rgba, (len(all_verts), 1))
     return mesh
 
 
@@ -395,8 +422,15 @@ def main():
     body_mesh = create_body_mesh()
     lm = get_landmarks()
 
-    # --- Define privacy zones ---
+    # --- Define privacy zones with distinct colors ---
     print("Defining privacy zones...")
+    # Colors: easily distinguishable in 3D viewer
+    zone_colors = {
+        "front_panel":  (255, 80, 80),    # Red
+        "back_panel":   (80, 160, 255),   # Blue
+        "left_breast":  (255, 160, 40),   # Orange
+        "right_breast": (255, 160, 40),   # Orange
+    }
     yt_zones = {
         "front_panel": make_front_panel_zone(lm),
         "back_panel": make_back_panel_zone(lm),
@@ -412,7 +446,8 @@ def main():
     for name, zone_path in yt_zones.items():
         face_ids = select_faces_in_zone(body_verts, body_faces, zone_path)
         mesh = extract_and_extrude(body_verts, body_faces, face_ids,
-                                    thickness=0.002)
+                                    thickness=0.002,
+                                    color=zone_colors[name])
         if mesh is not None:
             print(f"  {name}: {len(face_ids)} faces extracted")
             fabric_meshes.append(mesh)
@@ -422,21 +457,28 @@ def main():
     # Crotch strip: selected by 3D position (between legs, not around side)
     crotch_face_ids = select_crotch_strip_faces(body_verts, body_faces, lm)
     crotch_mesh = extract_and_extrude(body_verts, body_faces, crotch_face_ids,
-                                       thickness=0.002)
+                                       thickness=0.002,
+                                       color=(80, 220, 80))  # Green
     if crotch_mesh is not None:
         print(f"  crotch_strip: {len(crotch_face_ids)} faces extracted")
         fabric_meshes.append(crotch_mesh)
     else:
         print("  crotch_strip: WARNING - no faces found!")
 
-    # --- Export OBJ ---
-    print("Exporting OBJ file...")
+    # --- Export 3D files ---
+    print("Exporting 3D files...")
     export_parts = [body_mesh] + fabric_meshes
     combined = trimesh.util.concatenate(export_parts)
-    obj_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                            "privacy_zones_debug.obj")
+    base = os.path.dirname(os.path.abspath(__file__))
+
+    obj_path = os.path.join(base, "privacy_zones_debug.obj")
     combined.export(obj_path, file_type='obj')
-    print(f"Saved OBJ to {obj_path}")
+    print(f"  OBJ: {obj_path}")
+
+    # GLB (binary glTF) — best color support, works in most 3D viewers
+    glb_path = os.path.join(base, "privacy_zones_debug.glb")
+    combined.export(glb_path, file_type='glb')
+    print(f"  GLB: {glb_path}")
 
     # --- Build pyrender scene ---
     print("Creating landmark markers...")
