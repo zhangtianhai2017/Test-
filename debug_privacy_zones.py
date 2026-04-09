@@ -22,6 +22,28 @@ from bikini_generator.body.landmarks import get_landmarks
 from bikini_generator.garment.loop_generator import BodySurface
 
 
+def shrinkwrap_to_body(fabric_mesh, body_trimesh, offset=0.003):
+    """Project every fabric vertex onto the nearest body surface point + offset.
+
+    Uses trimesh proximity query for accurate 3D projection.
+    This ensures fabric is flush against the actual body mesh,
+    not the simplified ellipsoidal BodySurface model.
+    """
+    verts = fabric_mesh.vertices.copy()
+    # Find closest point on body surface for each fabric vertex
+    closest_pts, distances, face_ids = body_trimesh.nearest.on_surface(verts)
+    # Compute outward normal direction for each vertex (radial from Y-axis)
+    # This is more robust than face normals which can be noisy
+    radial = verts.copy()
+    radial[:, 1] = 0  # zero out Y, keep XZ for radial direction
+    radial_len = np.linalg.norm(radial, axis=1, keepdims=True)
+    radial_len = np.maximum(radial_len, 1e-6)
+    radial_dir = radial / radial_len
+    # Place vertex at closest body surface point + offset along radial outward
+    fabric_mesh.vertices = closest_pts + radial_dir * offset
+    return fabric_mesh
+
+
 def create_body_mesh():
     """Load body mesh and create trimesh object."""
     verts, faces = generate_full_body()
@@ -289,67 +311,52 @@ def create_crotch_strip_mesh(lm, body_surface, hw=0.015, offset=0.003,
     return mesh
 
 
-def _project_to_mesh(body_verts, point, direction=None):
-    """Project a point onto the actual body mesh surface.
-
-    Finds the nearest mesh vertex and returns its radial distance.
-    More accurate than BodySurface ellipsoidal model, especially at breasts.
-    """
-    # Find nearest vertex
-    dists = np.linalg.norm(body_verts - point, axis=1)
-    nearest = body_verts[np.argmin(dists)]
-    return np.sqrt(nearest[0]**2 + nearest[2]**2)
-
-
 def create_breast_zone_mesh(body_surface, center_y, center_theta,
-                            radius_y, radius_theta, offset=0.004, n=30,
-                            body_verts=None):
+                            radius_y, radius_theta, offset=0.004, n=40):
     """Create elliptical breast zone mesh on body surface.
 
-    Uses actual mesh vertices for projection (not BodySurface model)
-    to prevent clipping at the breast area where the model is inaccurate.
+    Initial placement uses BodySurface model; shrinkwrap_to_body() is
+    called afterwards to project onto the actual mesh surface.
+    Uses a finer grid (not just fan triangles) for better shrinkwrap results.
     """
+    # Build a grid mesh over the ellipse for better surface conformity
+    n_rings = 8
     vertices = []
+    faces = []
 
-    def get_radius(y, theta):
-        """Get body radius using actual mesh if available."""
-        if body_verts is not None:
-            # Approximate target point
-            r_est = body_surface.get_surface_radius(y, theta)
-            target = np.array([-np.sin(theta) * r_est, y, np.cos(theta) * r_est])
-            # Find nearest mesh vertex in a cone around this direction
-            direction = np.array([-np.sin(theta), 0, np.cos(theta)])
-            # Filter vertices near this Y and direction
-            y_mask = np.abs(body_verts[:, 1] - y) < 0.02
-            if y_mask.sum() > 0:
-                candidates = body_verts[y_mask]
-                # Project onto radial direction
-                radii = candidates[:, 0] * (-np.sin(theta)) + candidates[:, 2] * np.cos(theta)
-                # Use the maximum radius in this direction (outermost surface)
-                lateral = np.abs(candidates[:, 0] * np.cos(theta) + candidates[:, 2] * np.sin(theta))
-                close_mask = lateral < 0.03  # within 3cm of this theta line
-                if close_mask.sum() > 0:
-                    return np.max(radii[close_mask])
-            return r_est
-        return body_surface.get_surface_radius(y, theta)
-
-    r = get_radius(center_y, center_theta) + offset
+    # Center vertex
+    r = body_surface.get_surface_radius(center_y, center_theta) + offset
     cx = -np.sin(center_theta) * r
     cz = np.cos(center_theta) * r
     vertices.append([cx, center_y, cz])
 
-    for i in range(n):
-        t = 2 * np.pi * i / n
-        y = center_y + radius_y * np.sin(t)
-        theta = center_theta + radius_theta * np.cos(t)
-        r = get_radius(y, theta) + offset
-        x = -np.sin(theta) * r
-        z = np.cos(theta) * r
-        vertices.append([x, y, z])
+    # Concentric rings from center to edge
+    for ring in range(1, n_rings + 1):
+        frac = ring / n_rings
+        for i in range(n):
+            t = 2 * np.pi * i / n
+            y = center_y + radius_y * frac * np.sin(t)
+            theta = center_theta + radius_theta * frac * np.cos(t)
+            r = body_surface.get_surface_radius(y, theta) + offset
+            x = -np.sin(theta) * r
+            z = np.cos(theta) * r
+            vertices.append([x, y, z])
 
-    faces = []
+    # Triangulate: center fan
     for i in range(n):
         faces.append([0, 1 + i, 1 + (i + 1) % n])
+
+    # Ring-to-ring quads
+    for ring in range(1, n_rings):
+        base_inner = 1 + (ring - 1) * n
+        base_outer = 1 + ring * n
+        for i in range(n):
+            i0 = base_inner + i
+            i1 = base_inner + (i + 1) % n
+            o0 = base_outer + i
+            o1 = base_outer + (i + 1) % n
+            faces.append([i0, o0, i1])
+            faces.append([o0, o1, i1])
 
     mesh = trimesh.Trimesh(vertices=np.array(vertices),
                            faces=np.array(faces), process=False)
@@ -418,6 +425,7 @@ def render_view(scene, camera_node, cam_pose, renderer):
 def main():
     print("Loading body mesh...")
     body_mesh = create_body_mesh()
+    body_trimesh = create_body_mesh()  # separate copy for proximity queries
     lm = get_landmarks()
     body_surface = BodySurface()
 
@@ -432,16 +440,22 @@ def main():
     print("Creating crotch strip mesh (sagittal plane)...")
     crotch_mesh = create_crotch_strip_mesh(lm, body_surface)
 
-    print("Creating breast zone meshes (using actual mesh projection)...")
-    body_verts, _ = generate_full_body()
+    print("Creating breast zone meshes...")
     left_breast = create_breast_zone_mesh(
         body_surface, lm["left_breast_apex"][1],
         np.arctan2(-lm["left_breast_apex"][0], lm["left_breast_apex"][2]),
-        0.04, 0.5, body_verts=body_verts)
+        0.04, 0.5)
     right_breast = create_breast_zone_mesh(
         body_surface, lm["right_breast_apex"][1],
         np.arctan2(-lm["right_breast_apex"][0], lm["right_breast_apex"][2]),
-        0.04, 0.5, body_verts=body_verts)
+        0.04, 0.5)
+
+    # Shrinkwrap all fabric meshes onto actual body mesh surface
+    print("Shrinkwrapping fabric to body mesh...")
+    fabric_offset = 0.003
+    for mesh in [front_mesh, back_mesh, crotch_mesh, left_breast, right_breast]:
+        if mesh is not None:
+            shrinkwrap_to_body(mesh, body_trimesh, offset=fabric_offset)
 
     print("Creating landmark markers...")
     markers = create_landmark_markers(lm)
