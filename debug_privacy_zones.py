@@ -27,7 +27,7 @@ from bikini_generator.garment.loop_generator import BodySurface
 # Body mesh LUT builder (uses actual mesh, not BodySurface ellipsoidal model)
 # ---------------------------------------------------------------------------
 
-def build_mesh_body_lut(body_verts, n_y=128, n_theta=128,
+def build_mesh_body_lut(body_verts, n_y=256, n_theta=256,
                         y_min=0.75, y_max=1.50):
     """Build body surface radius LUT from actual mesh vertices.
 
@@ -90,7 +90,7 @@ def build_mesh_body_lut(body_verts, n_y=128, n_theta=128,
 # Cloth physics settling
 # ---------------------------------------------------------------------------
 
-def settle_fabric_on_body(fabric_meshes, body_verts, num_steps=150):
+def settle_fabric_on_body(fabric_meshes, body_verts, num_steps=300):
     """Run PBD cloth simulation to settle fabric meshes onto body surface.
 
     Uses ClothSimulator with:
@@ -124,26 +124,31 @@ def settle_fabric_on_body(fabric_meshes, body_verts, num_steps=150):
 
     print(f"  Merged fabric: {len(all_verts)} verts, {len(all_faces)} faces")
 
-    # Custom config: zero gravity settling
+    # Custom config: zero gravity settling, high precision
     cfg = PhysicsConfig()
     cfg.gravity = 0.0           # No gravity — pure elastic settling
-    cfg.num_steps = num_steps   # Enough iterations to converge
-    cfg.num_substeps = 15       # Constraint iterations per step
-    cfg.collision_margin = 0.004  # 4mm offset from body
+    cfg.num_steps = num_steps   # More iterations for better convergence
+    cfg.num_substeps = 25       # More constraint iterations per step
+    cfg.collision_margin = 0.002  # 2mm — tighter against body
     cfg.damping = 0.90          # Strong damping for fast convergence
     cfg.friction_coefficient = 2.0  # High friction to prevent sliding
-    cfg.stretch_stiffness = 10000.0  # Stiff fabric
+    cfg.stretch_stiffness = 15000.0  # Stiffer fabric for better shape retention
 
     # Create simulator
     sim = ClothSimulator(all_verts, all_faces, config=cfg)
 
-    # Replace the BodySurface-based LUT with actual-mesh-based LUT
-    # This is critical: the BodySurface model underestimates breast radius
-    # by 6-12mm, causing fabric to clip into the actual body mesh
+    # Replace the BodySurface-based LUT with high-res mesh-based LUT
+    # The BodySurface model underestimates breast radius by 6-12mm
+    import taichi as ti
+    hi_ny, hi_ntheta = 256, 256
     mesh_lut = build_mesh_body_lut(
-        body_verts, sim.lut_ny, sim.lut_ntheta, sim.y_min, sim.y_max)
+        body_verts, hi_ny, hi_ntheta, sim.y_min, sim.y_max)
+    # Reallocate Taichi LUT field at higher resolution
+    sim.body_lut = ti.field(dtype=ti.f32, shape=(hi_ny, hi_ntheta))
     sim.body_lut.from_numpy(mesh_lut)
-    print("  Replaced body LUT with mesh-based version")
+    sim.lut_ny = hi_ny
+    sim.lut_ntheta = hi_ntheta
+    print(f"  Replaced body LUT with {hi_ny}x{hi_ntheta} mesh-based version")
 
     # Run simulation
     print(f"  Running {num_steps} physics steps...")
@@ -324,7 +329,7 @@ def create_panel_mesh(body_surface, outline_yt, n_grid=40, offset=0.003):
 
 
 def create_crotch_strip_mesh(lm, body_surface, hw=0.015, offset=0.003,
-                             n_along=40, n_across=6):
+                             n_along=80, n_across=12):
     """Create crotch strip mesh in the sagittal plane.
 
     Not included in physics simulation — the cylindrical body model
@@ -392,9 +397,9 @@ def create_crotch_strip_mesh(lm, body_surface, hw=0.015, offset=0.003,
 
 
 def create_breast_zone_mesh(body_surface, center_y, center_theta,
-                            radius_y, radius_theta, offset=0.004, n=40):
+                            radius_y, radius_theta, offset=0.004, n=60):
     """Create elliptical breast zone mesh with concentric ring grid."""
-    n_rings = 8
+    n_rings = 12
     vertices = []
     faces = []
 
@@ -511,10 +516,10 @@ def main():
     print("Creating initial fabric meshes (geometric)...")
     front_mesh = create_panel_mesh(body_surface,
                                    make_front_panel_outline(lm, body_surface),
-                                   n_grid=50)
+                                   n_grid=100)
     back_mesh = create_panel_mesh(body_surface,
                                   make_back_panel_outline(lm, body_surface),
-                                  n_grid=50)
+                                  n_grid=100)
     crotch_mesh = create_crotch_strip_mesh(lm, body_surface)
 
     left_breast = create_breast_zone_mesh(
@@ -530,7 +535,7 @@ def main():
     # Crotch strip excluded — cylindrical body model can't handle between-legs
     print("Running cloth physics simulation...")
     physics_meshes = [front_mesh, back_mesh, left_breast, right_breast]
-    settle_fabric_on_body(physics_meshes, body_verts, num_steps=150)
+    settle_fabric_on_body(physics_meshes, body_verts, num_steps=300)
 
     # --- Build pyrender scene ---
     print("Creating landmark markers...")
@@ -563,8 +568,8 @@ def main():
     scene.add(fill_light, pose=make_camera_pose(azimuth=np.pi + 0.5,
                                                  elevation=0.2, distance=2.0))
 
-    # --- Render 4 views ---
-    W, H = 500, 800
+    # --- Render 4 views (high resolution) ---
+    W, H = 800, 1280
     renderer = pyrender.OffscreenRenderer(W, H)
 
     views = [
