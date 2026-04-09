@@ -55,12 +55,16 @@ def cubic_bezier_3d(p0, p1, p2, p3, n=20):
 
 
 def make_front_panel_outline(lm, body_surface):
-    """Front panel only: inverted triangle on the FRONT of the body (theta near 0)."""
+    """Front panel: inverted triangle on the FRONT of the body.
+
+    Bottom edge raised to pubic area level - tight swimwear pulls up.
+    """
     hip_side_y = (lm["hip_left"][1] + lm["hip_right"][1]) / 2
-    crotch_front_y = lm["crotch_front"][1]
+    pubic_top_y = lm["pubic_top"][1]  # 0.865
 
     top_y = hip_side_y - 0.03   # 0.946
-    bottom_y = crotch_front_y - 0.01  # 0.836
+    # Tight bikini: bottom at pubic area, not at crotch fold
+    bottom_y = pubic_top_y + 0.015  # ~0.88, elastic pulls fabric up
     hw_front = 0.055
     hw_crotch = 0.015
 
@@ -103,12 +107,16 @@ def make_front_panel_outline(lm, body_surface):
 
 
 def make_back_panel_outline(lm, body_surface):
-    """Back panel: inverted triangle on the BACK of the body (theta near pi)."""
+    """Back panel: inverted triangle on the BACK of the body.
+
+    Bottom edge raised - tight swimwear pulls up.
+    """
     hip_side_y = (lm["hip_left"][1] + lm["hip_right"][1]) / 2
-    crotch_back_y = lm["crotch_back"][1]
+    pubic_top_y = lm["pubic_top"][1]
 
     top_y = hip_side_y - 0.03
-    bottom_y = crotch_back_y - 0.01  # 0.839
+    # Same height as front bottom - fabric pulled tight
+    bottom_y = pubic_top_y + 0.015  # ~0.88
     hw_back = 0.050
     hw_crotch = 0.015
 
@@ -211,40 +219,41 @@ def create_crotch_strip_mesh(lm, body_surface, hw=0.015, offset=0.003,
 
     Width: ±hw in X direction (perpendicular to strip direction).
     """
-    crotch_front_y = lm["crotch_front"][1]
-    crotch_back_y = lm["crotch_back"][1]
-    crotch_center_y = lm["crotch_center"][1]
+    pubic_top_y = lm["pubic_top"][1]  # 0.865
 
-    front_bottom_y = crotch_front_y - 0.01  # 0.836
-    back_bottom_y = crotch_back_y - 0.01    # 0.839
+    # Tight swimwear: fabric pulled up to pubic area, barely dips below
+    panel_bottom_y = pubic_top_y + 0.015  # 0.88 (matches panel bottoms)
+    # Strip lowest point: only 1-2cm below panel bottom (elastic pulls tight)
+    strip_lowest_y = panel_bottom_y - 0.015  # ~0.865
 
     # Build center line in 3 segments
     center_line = []
 
-    # Segment 1: front descent, theta=0, Y from front_bottom to crotch_center
-    n_descent = n_along // 3
+    # Segment 1: front descent, theta=0, Y from panel_bottom to strip_lowest
+    # Very short descent - fabric barely dips
+    n_descent = n_along // 4
     for i in range(n_descent + 1):
         f = i / n_descent
-        y = front_bottom_y + (crotch_center_y - front_bottom_y) * f
+        y = panel_bottom_y + (strip_lowest_y - panel_bottom_y) * f
         r = body_surface.get_surface_radius(y, 0.0) + offset
         center_line.append([0, y, r])  # X=0, Z=+r (front surface)
 
-    # Segment 2: perineum wrap, theta sweeps 0→pi at Y=crotch_center
-    # Tight swimwear: use SMALL radius (1.5cm) - fabric pulls tight against perineum
-    r_peri = 0.015 + offset  # tight against body, not loose drape
-    n_wrap = n_along // 3
-    for i in range(1, n_wrap + 1):  # skip first (duplicate)
+    # Segment 2: wrap from front to back at strip_lowest_y
+    # Very tight: small radius, fabric pressed into body crease by elastic
+    r_wrap = 0.010 + offset  # 1cm - extremely tight against perineum
+    n_wrap = n_along // 2
+    for i in range(1, n_wrap + 1):
         f = i / n_wrap
         theta = np.pi * f
-        x = -np.sin(theta) * r_peri
-        z = np.cos(theta) * r_peri
-        center_line.append([x, crotch_center_y, z])
+        x = -np.sin(theta) * r_wrap
+        z = np.cos(theta) * r_wrap
+        center_line.append([x, strip_lowest_y, z])
 
-    # Segment 3: back ascent, theta=pi, Y from crotch_center to back_bottom
-    n_ascent = n_along // 3
-    for i in range(1, n_ascent + 1):  # skip first (duplicate)
+    # Segment 3: back ascent, theta=pi, Y from strip_lowest to panel_bottom
+    n_ascent = n_along // 4
+    for i in range(1, n_ascent + 1):
         f = i / n_ascent
-        y = crotch_center_y + (back_bottom_y - crotch_center_y) * f
+        y = strip_lowest_y + (panel_bottom_y - strip_lowest_y) * f
         r = body_surface.get_surface_radius(y, np.pi) + offset
         center_line.append([0, y, -r])  # X=0, Z=-r (back surface)
 
