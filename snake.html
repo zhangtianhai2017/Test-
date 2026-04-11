@@ -275,6 +275,7 @@
   const CELL = canvas.width / COLS; // 20px
 
   let snake, dir, nextDir, food, bonus, score, best, gameLoop, speed, paused, gameOver;
+  let particles = [];
   best = parseInt(localStorage.getItem('snakeBest') || '0');
   bestEl.textContent = best;
 
@@ -371,6 +372,7 @@
     if (head.x === food.x && head.y === food.y) {
       score += food.value;
       ate = true;
+      spawnParticles(head.x * CELL + CELL / 2, head.y * CELL + CELL / 2, food.color, 10);
       placeFood();
       // Speed up slightly
       if (speed > 50) speed = Math.max(50, speed - 3);
@@ -378,6 +380,7 @@
       score += bonus.value;
       ate = true;
       ateBonus = true;
+      spawnParticles(head.x * CELL + CELL / 2, head.y * CELL + CELL / 2, '#ffd93d', 20);
       bonus = null;
     } else {
       snake.pop();
@@ -390,6 +393,7 @@
 
     if (ate) {
       scoreEl.textContent = score;
+      scoreEl.style.color = `hsl(${(Date.now() / 30) % 360}, 90%, 62%)`;
       lengthEl.textContent = snake.length;
       if (score > best) {
         best = score;
@@ -399,8 +403,6 @@
       // Spawn bonus only when eating regular food (not the bonus itself)
       if (!ateBonus && score > 0 && score % 50 === 0 && !bonus) spawnBonus();
     }
-
-    draw();
 
     clearTimeout(gameLoop);
     gameLoop = setTimeout(step, speed);
@@ -427,13 +429,12 @@
       ctx.stroke();
     }
 
-    // Snake
+    // Rainbow snake
+    const hueBase = (Date.now() / 30) % 360;
     snake.forEach((seg, i) => {
-      const ratio = 1 - (i / snake.length) * 0.6;
-      const r = Math.round(78 * ratio);
-      const g = Math.round(204 * ratio);
-      const b = Math.round(163 * ratio);
-      ctx.fillStyle = `rgb(${r},${g},${b})`;
+      const hue = (hueBase + i * (180 / Math.max(snake.length, 1))) % 360;
+      const lightness = i === 0 ? 62 : 52;
+      ctx.fillStyle = `hsl(${hue}, 90%, ${lightness}%)`;
       const pad = i === 0 ? 1 : 2;
       const size = CELL - pad * 2;
       roundRect(ctx, seg.x * CELL + pad, seg.y * CELL + pad, size, size, 4);
@@ -442,6 +443,9 @@
 
     // Head eyes
     drawEyes(snake[0], dir);
+
+    // Particles
+    drawParticles();
 
     // Food
     drawFood(food);
@@ -461,6 +465,38 @@
       ctx.textBaseline = 'middle';
       ctx.fillText('暂停', canvas.width / 2, canvas.height / 2);
     }
+  }
+
+  function spawnParticles(cx, cy, color, count) {
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 / count) * i + Math.random() * 0.5;
+      const speed = 1.5 + Math.random() * 2.5;
+      particles.push({
+        x: cx, y: cy,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 1.0,
+        decay: 0.04 + Math.random() * 0.04,
+        r: 2 + Math.random() * 3,
+        color
+      });
+    }
+  }
+
+  function drawParticles() {
+    particles = particles.filter(p => p.life > 0);
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.12; // gravity
+      p.life -= p.decay;
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
   }
 
   function drawFood(f) {
@@ -560,7 +596,6 @@
   function endGame() {
     gameOver = true;
     clearTimeout(gameLoop);
-    draw();
 
     overlay.innerHTML = `
       <h2>游戏结束</h2>
@@ -598,8 +633,8 @@
       case 'p': case 'P':
         if (!gameOver) {
           paused = !paused;
-          if (!paused) { draw(); gameLoop = setTimeout(step, speed); }
-          else { clearTimeout(gameLoop); draw(); }
+          if (!paused) { gameLoop = setTimeout(step, speed); }
+          else { clearTimeout(gameLoop); }
         }
         break;
     }
@@ -652,9 +687,14 @@
     else { clearTimeout(gameLoop); draw(); }
   });
 
-  // Initial draw
+  // Render loop (independent of game logic for smooth animation)
+  function renderLoop() {
+    draw();
+    requestAnimationFrame(renderLoop);
+  }
+
   initGame();
-  draw();
+  renderLoop();
 </script>
 </body>
 </html>
