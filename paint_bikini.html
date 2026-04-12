@@ -193,8 +193,8 @@ let hoverHit = null;
 let undoStack = [];
 
 const SKIN_COLOR = new THREE.Color(0xf0d5c8);
-const PAINT_COLOR = new THREE.Color(0xff4081);
-const FABRIC_COLOR = 0xff5080;
+const PAINT_HINT = new THREE.Color(0xf5b0b8);  // subtle tint during painting
+const FABRIC_COLOR = 0xe84070;
 const STRAP_COLOR = 0xc2185b;
 
 // ============================================================================
@@ -457,13 +457,13 @@ function paintAtVertex(startIdx, radius, strength, erase) {
       }
     }
   }
-  // Update vertex colors for touched vertices
+  // Update vertex colors — subtle tint as painting hint (fabric mesh is the real visual)
   const cArr = bodyColorAttr.array;
   for (const i of touched) {
-    const c = coverage[i] / 255;
-    cArr[i*3+0] = SKIN_COLOR.r * (1 - c) + PAINT_COLOR.r * c;
-    cArr[i*3+1] = SKIN_COLOR.g * (1 - c) + PAINT_COLOR.g * c;
-    cArr[i*3+2] = SKIN_COLOR.b * (1 - c) + PAINT_COLOR.b * c;
+    const c = Math.min(1, coverage[i] / 200); // subtle, capped
+    cArr[i*3+0] = SKIN_COLOR.r * (1 - c) + PAINT_HINT.r * c;
+    cArr[i*3+1] = SKIN_COLOR.g * (1 - c) + PAINT_HINT.g * c;
+    cArr[i*3+2] = SKIN_COLOR.b * (1 - c) + PAINT_HINT.b * c;
   }
   if (touched.length > 0) bodyColorAttr.needsUpdate = true;
 }
@@ -521,27 +521,48 @@ function clearFabrics() {
 function regenerateFabric() {
   clearFabrics();
 
-  const threshold = 64; // require at least ~25% coverage
+  const threshold = 64;
   const idx = bodyGeo.index.array;
-  const nFacesTotal = idx.length / 3;
-  // Collect all faces whose 3 verts are covered
+  const nVerts = coverage.length;
+
+  // --- Dilate coverage for smooth edges (2 rings, 50% falloff per ring) ---
+  const smoothCov = new Float32Array(nVerts);
+  for (let i = 0; i < nVerts; i++) smoothCov[i] = coverage[i];
+  for (let pass = 0; pass < 2; pass++) {
+    const prev = new Float32Array(smoothCov);
+    for (let i = 0; i < nVerts; i++) {
+      if (prev[i] >= threshold) continue;
+      const nb = neighbors[i];
+      let maxNb = 0;
+      for (let k = 0; k < nb.length; k++) {
+        if (prev[nb[k]] > maxNb) maxNb = prev[nb[k]];
+      }
+      if (maxNb > prev[i]) {
+        smoothCov[i] = Math.max(prev[i], maxNb * 0.5);
+      }
+    }
+  }
+
+  // Include faces where all 3 verts have smoothCov >= low threshold
+  const lowThreshold = 12;
   const coveredFaceList = [];
   for (let f = 0; f < idx.length; f += 3) {
-    if (coverage[idx[f]] >= threshold &&
-        coverage[idx[f+1]] >= threshold &&
-        coverage[idx[f+2]] >= threshold) {
+    if (smoothCov[idx[f]] >= lowThreshold &&
+        smoothCov[idx[f+1]] >= lowThreshold &&
+        smoothCov[idx[f+2]] >= lowThreshold) {
       coveredFaceList.push(f / 3);
     }
   }
   if (coveredFaceList.length === 0) {
     document.getElementById('stat-fabric-tris').textContent = `布料三角形: 0`;
+    resetBodyColors();
     return;
   }
 
-  // Build a fabric mesh with vertices displaced along normals
+  // --- Build fabric mesh with coverage-tapered offset for smooth edges ---
   const posAttr = bodyGeo.attributes.position.array;
   const nrmAttr = bodyGeo.attributes.normal.array;
-  const offset = state.fabricOffset;
+  const baseOffset = state.fabricOffset;
   const vertMap = new Map();
   const newPos = [];
   const newNormals = [];
@@ -552,6 +573,10 @@ function regenerateFabric() {
       if (!vertMap.has(oldI)) {
         const ni = newPos.length / 3;
         vertMap.set(oldI, ni);
+        // Smoothstep taper: edges blend from full offset → flush with body
+        const t = Math.min(1, smoothCov[oldI] / 128);
+        const smooth = t * t * (3 - 2 * t);
+        const offset = baseOffset * smooth;
         newPos.push(
           posAttr[oldI*3+0] + nrmAttr[oldI*3+0] * offset,
           posAttr[oldI*3+1] + nrmAttr[oldI*3+1] * offset,
@@ -567,13 +592,12 @@ function regenerateFabric() {
   fabricGeo.setAttribute('position', new THREE.Float32BufferAttribute(newPos, 3));
   fabricGeo.setAttribute('normal', new THREE.Float32BufferAttribute(newNormals, 3));
   fabricGeo.setIndex(newIndices);
-  // Recompute smoothed normals from the offset positions for nicer shading
   fabricGeo.computeVertexNormals();
 
   const fabricMat = new THREE.MeshStandardMaterial({
     color: FABRIC_COLOR,
-    roughness: 0.5,
-    metalness: 0.08,
+    roughness: 0.75,
+    metalness: 0.0,
     side: THREE.DoubleSide,
   });
   const fabricMesh = new THREE.Mesh(fabricGeo, fabricMat);
@@ -582,6 +606,20 @@ function regenerateFabric() {
   fabricMeshes.push(fabricMesh);
 
   document.getElementById('stat-fabric-tris').textContent = `布料三角形: ${(newIndices.length / 3).toLocaleString()}`;
+
+  // Reset body vertex colors to skin — fabric mesh is now the visual
+  resetBodyColors();
+}
+
+// Reset body vertex colors to skin (paint hint disappears, fabric mesh takes over)
+function resetBodyColors() {
+  const cArr = bodyColorAttr.array;
+  for (let i = 0; i < coverage.length; i++) {
+    cArr[i*3+0] = SKIN_COLOR.r;
+    cArr[i*3+1] = SKIN_COLOR.g;
+    cArr[i*3+2] = SKIN_COLOR.b;
+  }
+  bodyColorAttr.needsUpdate = true;
 }
 
 // ============================================================================
@@ -759,15 +797,7 @@ function undo() {
   if (undoStack.length === 0) { setStatus('无可撤销'); return; }
   const snap = undoStack.pop();
   coverage.set(snap.coverage);
-  // Rebuild vertex colors
-  const cArr = bodyColorAttr.array;
-  for (let i = 0; i < coverage.length; i++) {
-    const c = coverage[i] / 255;
-    cArr[i*3+0] = SKIN_COLOR.r * (1 - c) + PAINT_COLOR.r * c;
-    cArr[i*3+1] = SKIN_COLOR.g * (1 - c) + PAINT_COLOR.g * c;
-    cArr[i*3+2] = SKIN_COLOR.b * (1 - c) + PAINT_COLOR.b * c;
-  }
-  bodyColorAttr.needsUpdate = true;
+  resetBodyColors();
   // Pop any fabric/strap meshes created after this snapshot
   while (fabricMeshes.length > snap.fabricCount) {
     const m = fabricMeshes.pop();
@@ -787,13 +817,7 @@ function undo() {
 function clearAll() {
   pushUndoSnapshot();
   coverage.fill(0);
-  const cArr = bodyColorAttr.array;
-  for (let i = 0; i < coverage.length; i++) {
-    cArr[i*3+0] = SKIN_COLOR.r;
-    cArr[i*3+1] = SKIN_COLOR.g;
-    cArr[i*3+2] = SKIN_COLOR.b;
-  }
-  bodyColorAttr.needsUpdate = true;
+  resetBodyColors();
   clearFabrics();
   clearStraps();
   document.getElementById('stat-fabric-tris').textContent = `布料三角形: 0`;
