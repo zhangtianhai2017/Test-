@@ -628,7 +628,10 @@ class MinHeap {
 
 function geodesicPath(startIdx, endIdx) {
   const n = neighbors.length;
-  const dist = new Float32Array(n).fill(Infinity);
+  // Float64 is required: Float32 rounds `dist[v] = alt` down, so the
+  // double-precision priority `d` later satisfies `d > dist[u]` and the pop
+  // is skipped as stale — cutting off whole regions of the graph.
+  const dist = new Float64Array(n).fill(Infinity);
   const prev = new Int32Array(n).fill(-1);
   dist[startIdx] = 0;
   const heap = new MinHeap();
@@ -668,10 +671,7 @@ function geodesicPath(startIdx, endIdx) {
 
 function createStrap(startIdx, endIdx) {
   const path = geodesicPath(startIdx, endIdx);
-  if (!path || path.length < 2) {
-    setStatus('⚠ 找不到路径');
-    return;
-  }
+  if (!path || path.length < 2) return false;
   const pos = bodyGeo.attributes.position.array;
   const nrm = bodyGeo.attributes.normal.array;
   const pts = path.map(i => new THREE.Vector3(
@@ -684,7 +684,7 @@ function createStrap(startIdx, endIdx) {
   const down = [];
   for (let i = 0; i < pts.length; i += step) down.push(pts[i]);
   if (down[down.length - 1] !== pts[pts.length - 1]) down.push(pts[pts.length - 1]);
-  if (down.length < 2) return;
+  if (down.length < 2) return false;
 
   const curve = new THREE.CatmullRomCurve3(down);
   const tube = new THREE.TubeGeometry(curve, down.length * 4, 0.004, 8, false);
@@ -693,7 +693,7 @@ function createStrap(startIdx, endIdx) {
   scene.add(strapMesh);
   strapMeshes.push(strapMesh);
   document.getElementById('stat-straps').textContent = `绑带数: ${strapMeshes.length}`;
-  setStatus(`绑带已生成 (${path.length} 个路径点)`);
+  return true;
 }
 
 function clearStraps() {
@@ -839,7 +839,8 @@ function onPointerDown(e) {
       setStatus('绑带起点已标记 — 点击终点');
     } else {
       pushUndoSnapshot();
-      createStrap(state.strapStart, vi);
+      const ok1 = createStrap(state.strapStart, vi);
+      let ok2 = null;
       if (state.symmetry) {
         // Mirror both endpoints
         const ps = bodyGeo.attributes.position.array;
@@ -848,8 +849,17 @@ function onPointerDown(e) {
         const mStartIdx = nearestVertexToPoint(mStart);
         const mEndIdx = nearestVertexToPoint(mEnd);
         if (mStartIdx >= 0 && mEndIdx >= 0 && mStartIdx !== state.strapStart) {
-          createStrap(mStartIdx, mEndIdx);
+          ok2 = createStrap(mStartIdx, mEndIdx);
         }
+      }
+      if (!ok1 && ok2 !== true) {
+        setStatus('⚠ 找不到路径');
+      } else if (ok1 && ok2 === false) {
+        setStatus('绑带已生成（镜像侧未找到路径）');
+      } else if (ok1 && ok2 === true) {
+        setStatus('绑带已生成（含镜像）');
+      } else {
+        setStatus('绑带已生成');
       }
       state.strapStart = -1;
       strapStartMarker.visible = false;
