@@ -114,8 +114,8 @@ input[type=checkbox] { accent-color:#ff4081; }
 
     <div class="section">
       <h3>布料厚度</h3>
-      <div class="row"><label>外推距离</label><span class="val" id="val-offset">2.0 mm</span></div>
-      <input type="range" id="rng-offset" min="10" max="100" value="20" step="1">
+      <div class="row"><label>外推距离</label><span class="val" id="val-offset">3.0 mm</span></div>
+      <input type="range" id="rng-offset" min="10" max="100" value="30" step="1">
       <button class="btn" id="btn-regen">重新生成布料</button>
     </div>
 
@@ -171,7 +171,7 @@ const state = {
   tool: 'cover',
   brushRadius: 0.03,     // meters
   brushStrength: 0.8,    // 0..1
-  fabricOffset: 0.002,   // 2mm
+  fabricOffset: 0.003,   // 3mm
   symmetry: true,
   painting: false,
   strapStart: -1,
@@ -194,8 +194,58 @@ let undoStack = [];
 
 const SKIN_COLOR = new THREE.Color(0xf0d5c8);
 const PAINT_HINT = new THREE.Color(0xf5b0b8);  // subtle tint during painting
-const FABRIC_COLOR = 0xe84070;
-const STRAP_COLOR = 0xc2185b;
+const FABRIC_COLOR = 0xc62850;
+const STRAP_COLOR = 0x9a1040;
+
+// Procedural fabric weave texture (created once, reused)
+let fabricTexture = null;
+let fabricBumpMap = null;
+function ensureFabricTexture() {
+  if (fabricTexture) return;
+  const size = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  // Base
+  ctx.fillStyle = '#c62850';
+  ctx.fillRect(0, 0, size, size);
+  // Warp threads (horizontal)
+  for (let y = 0; y < size; y += 4) {
+    const bright = (y % 8 < 4) ? 12 : -8;
+    ctx.fillStyle = `rgb(${198+bright},${40+bright},${80+bright})`;
+    ctx.fillRect(0, y, size, 2);
+  }
+  // Weft threads (vertical, offset every other row for weave)
+  for (let x = 0; x < size; x += 4) {
+    for (let y = 0; y < size; y += 8) {
+      const shift = (x % 8 < 4) ? 0 : 4;
+      ctx.fillStyle = 'rgba(0,0,0,0.06)';
+      ctx.fillRect(x, y + shift, 2, 4);
+      ctx.fillStyle = 'rgba(255,255,255,0.04)';
+      ctx.fillRect(x, y + shift + 4, 2, 4);
+    }
+  }
+  fabricTexture = new THREE.CanvasTexture(canvas);
+  fabricTexture.wrapS = THREE.RepeatWrapping;
+  fabricTexture.wrapT = THREE.RepeatWrapping;
+
+  // Bump map for cloth relief
+  const bCanvas = document.createElement('canvas');
+  bCanvas.width = 64; bCanvas.height = 64;
+  const bCtx = bCanvas.getContext('2d');
+  bCtx.fillStyle = '#808080';
+  bCtx.fillRect(0, 0, 64, 64);
+  for (let y = 0; y < 64; y += 4) {
+    for (let x = 0; x < 64; x += 4) {
+      const v = ((x + y) % 8 < 4) ? 148 : 108;
+      bCtx.fillStyle = `rgb(${v},${v},${v})`;
+      bCtx.fillRect(x, y, 2, 2);
+    }
+  }
+  fabricBumpMap = new THREE.CanvasTexture(bCanvas);
+  fabricBumpMap.wrapS = THREE.RepeatWrapping;
+  fabricBumpMap.wrapT = THREE.RepeatWrapping;
+}
 
 // ============================================================================
 // SCENE SETUP
@@ -520,36 +570,17 @@ function clearFabrics() {
 
 function regenerateFabric() {
   clearFabrics();
+  ensureFabricTexture();
 
   const threshold = 64;
   const idx = bodyGeo.index.array;
-  const nVerts = coverage.length;
 
-  // --- Dilate coverage for smooth edges (2 rings, 50% falloff per ring) ---
-  const smoothCov = new Float32Array(nVerts);
-  for (let i = 0; i < nVerts; i++) smoothCov[i] = coverage[i];
-  for (let pass = 0; pass < 2; pass++) {
-    const prev = new Float32Array(smoothCov);
-    for (let i = 0; i < nVerts; i++) {
-      if (prev[i] >= threshold) continue;
-      const nb = neighbors[i];
-      let maxNb = 0;
-      for (let k = 0; k < nb.length; k++) {
-        if (prev[nb[k]] > maxNb) maxNb = prev[nb[k]];
-      }
-      if (maxNb > prev[i]) {
-        smoothCov[i] = Math.max(prev[i], maxNb * 0.5);
-      }
-    }
-  }
-
-  // Include faces where all 3 verts have smoothCov >= low threshold
-  const lowThreshold = 12;
+  // Collect faces where all 3 vertices are covered — clean, sharp edges
   const coveredFaceList = [];
   for (let f = 0; f < idx.length; f += 3) {
-    if (smoothCov[idx[f]] >= lowThreshold &&
-        smoothCov[idx[f+1]] >= lowThreshold &&
-        smoothCov[idx[f+2]] >= lowThreshold) {
+    if (coverage[idx[f]] >= threshold &&
+        coverage[idx[f+1]] >= threshold &&
+        coverage[idx[f+2]] >= threshold) {
       coveredFaceList.push(f / 3);
     }
   }
@@ -559,30 +590,31 @@ function regenerateFabric() {
     return;
   }
 
-  // --- Build fabric mesh with coverage-tapered offset for smooth edges ---
+  // Build fabric mesh: offset along normals with constant depth
   const posAttr = bodyGeo.attributes.position.array;
   const nrmAttr = bodyGeo.attributes.normal.array;
-  const baseOffset = state.fabricOffset;
+  const offset = state.fabricOffset;
   const vertMap = new Map();
   const newPos = [];
   const newNormals = [];
+  const newUVs = [];
   const newIndices = [];
+  const uvScale = 80; // world→UV scale for texture tiling
+
   for (const fi of coveredFaceList) {
     const a = idx[fi*3], b = idx[fi*3+1], c = idx[fi*3+2];
     for (const oldI of [a, b, c]) {
       if (!vertMap.has(oldI)) {
         const ni = newPos.length / 3;
         vertMap.set(oldI, ni);
-        // Smoothstep taper: edges blend from full offset → flush with body
-        const t = Math.min(1, smoothCov[oldI] / 128);
-        const smooth = t * t * (3 - 2 * t);
-        const offset = baseOffset * smooth;
         newPos.push(
           posAttr[oldI*3+0] + nrmAttr[oldI*3+0] * offset,
           posAttr[oldI*3+1] + nrmAttr[oldI*3+1] * offset,
           posAttr[oldI*3+2] + nrmAttr[oldI*3+2] * offset
         );
         newNormals.push(nrmAttr[oldI*3+0], nrmAttr[oldI*3+1], nrmAttr[oldI*3+2]);
+        // World-space planar UVs for fabric texture
+        newUVs.push(posAttr[oldI*3+0] * uvScale, posAttr[oldI*3+1] * uvScale);
       }
     }
     newIndices.push(vertMap.get(a), vertMap.get(b), vertMap.get(c));
@@ -591,12 +623,16 @@ function regenerateFabric() {
   const fabricGeo = new THREE.BufferGeometry();
   fabricGeo.setAttribute('position', new THREE.Float32BufferAttribute(newPos, 3));
   fabricGeo.setAttribute('normal', new THREE.Float32BufferAttribute(newNormals, 3));
+  fabricGeo.setAttribute('uv', new THREE.Float32BufferAttribute(newUVs, 2));
   fabricGeo.setIndex(newIndices);
   fabricGeo.computeVertexNormals();
 
   const fabricMat = new THREE.MeshStandardMaterial({
-    color: FABRIC_COLOR,
-    roughness: 0.75,
+    color: 0xffffff,
+    map: fabricTexture,
+    bumpMap: fabricBumpMap,
+    bumpScale: 0.0008,
+    roughness: 0.85,
     metalness: 0.0,
     side: THREE.DoubleSide,
   });
