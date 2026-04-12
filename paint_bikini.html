@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paint Bikini - 3D 涂抹式泳装生成器</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; font-family:-apple-system,'Segoe UI',system-ui,'PingFang SC',sans-serif; background:#0a0a12; color:#e0e0e0; overflow:hidden; user-select:none; }
+#app { display:grid; grid-template-columns:64px 1fr 300px; grid-template-rows:48px 1fr; height:100vh; }
+
+/* Header */
+#header { grid-column:1/-1; background:linear-gradient(90deg,#1a1a2e,#16213e); border-bottom:1px solid #2a2a4a; display:flex; align-items:center; padding:0 20px; gap:20px; }
+#header h1 { font-size:1rem; font-weight:600; background:linear-gradient(90deg,#ff4081,#c23bf0); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+#header .status { font-size:0.75rem; color:#888; }
+#header .spacer { flex:1; }
+#header button { background:linear-gradient(135deg,#e94560,#c23bf0); color:#fff; border:none; border-radius:4px; padding:6px 14px; font-size:0.8rem; font-weight:500; cursor:pointer; margin-left:6px; }
+#header button:hover { opacity:0.9; }
+#header button.ghost { background:#2a2a4a; }
+
+/* Left toolbar */
+#toolbar { background:#12121a; border-right:1px solid #2a2a4a; padding:8px 0; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.tool { width:48px; height:48px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; border-radius:6px; color:#888; transition:all 0.15s; position:relative; }
+.tool:hover { background:#1a1a2e; color:#e0e0e0; }
+.tool.active { background:linear-gradient(135deg,#e94560,#c23bf0); color:#fff; }
+.tool svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.tool .lbl { font-size:0.55rem; margin-top:2px; }
+.tool-sep { width:30px; height:1px; background:#2a2a4a; margin:4px 0; }
+
+/* Viewport */
+#viewport { position:relative; background:#0a0a12; overflow:hidden; }
+#canvas { width:100%; height:100%; display:block; }
+#viewport-info { position:absolute; left:12px; bottom:12px; font-size:0.7rem; color:#666; background:rgba(0,0,0,0.5); padding:6px 10px; border-radius:4px; pointer-events:none; }
+#viewport-cursor-info { position:absolute; right:12px; bottom:12px; font-size:0.7rem; color:#aaa; background:rgba(0,0,0,0.5); padding:6px 10px; border-radius:4px; pointer-events:none; }
+#loading { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(10,10,18,0.9); z-index:100; }
+#loading .inner { text-align:center; }
+#loading .spin { width:40px; height:40px; border:3px solid #2a2a4a; border-top-color:#ff4081; border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 12px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+#loading .msg { font-size:0.85rem; color:#aaa; }
+
+/* Right panel */
+#panel { background:#12121a; border-left:1px solid #2a2a4a; padding:16px; overflow-y:auto; }
+.section { margin-bottom:22px; padding-bottom:16px; border-bottom:1px solid #1e1e30; }
+.section:last-child { border-bottom:none; }
+.section h3 { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.12em; color:#888; margin-bottom:10px; font-weight:600; }
+.row { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; font-size:0.8rem; }
+.row label { color:#ccc; }
+.row .val { color:#fff; font-weight:500; font-size:0.75rem; min-width:40px; text-align:right; }
+input[type=range] { width:100%; accent-color:#ff4081; margin:6px 0; }
+input[type=checkbox] { accent-color:#ff4081; }
+.btn { width:100%; padding:8px; background:#2a2a4a; color:#e0e0e0; border:none; border-radius:4px; font-size:0.8rem; cursor:pointer; margin-top:4px; transition:background 0.15s; }
+.btn:hover { background:#3a3a5a; }
+.btn.danger { background:#8a2a3a; }
+.btn.danger:hover { background:#a33a4a; }
+.hint { font-size:0.7rem; color:#666; line-height:1.5; margin-top:8px; }
+.stat { font-size:0.7rem; color:#888; margin-top:4px; }
+.key { display:inline-block; background:#2a2a4a; color:#ccc; padding:1px 5px; border-radius:3px; font-size:0.65rem; font-family:monospace; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="header">
+    <h1>Paint Bikini</h1>
+    <span class="status" id="status">就绪</span>
+    <div class="spacer"></div>
+    <button class="ghost" id="btn-clear">清空</button>
+    <button class="ghost" id="btn-undo">撤销 ⌘Z</button>
+    <button id="btn-export">导出 OBJ</button>
+  </header>
+
+  <aside id="toolbar">
+    <div class="tool active" data-tool="cover" title="覆盖画笔 (1)">
+      <svg viewBox="0 0 24 24"><path d="M12 2C8 2 4 6 4 11s4 9 8 9 8-4 8-9-4-9-8-9z"/><circle cx="12" cy="11" r="3"/></svg>
+      <span class="lbl">覆盖</span>
+    </div>
+    <div class="tool" data-tool="eraser" title="橡皮擦 (2)">
+      <svg viewBox="0 0 24 24"><path d="M3 17l6 6 12-12-6-6L3 17z"/><path d="M9 11l6 6"/></svg>
+      <span class="lbl">橡皮</span>
+    </div>
+    <div class="tool-sep"></div>
+    <div class="tool" data-tool="strap" title="绑带画笔 (3)">
+      <svg viewBox="0 0 24 24"><path d="M4 12c4-8 12-8 16 0"/><circle cx="4" cy="12" r="2"/><circle cx="20" cy="12" r="2"/></svg>
+      <span class="lbl">绑带</span>
+    </div>
+    <div class="tool-sep"></div>
+    <div class="tool" data-tool="orbit" title="只旋转 (4)">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>
+      <span class="lbl">视角</span>
+    </div>
+  </aside>
+
+  <main id="viewport">
+    <canvas id="canvas"></canvas>
+    <div id="loading"><div class="inner"><div class="spin"></div><div class="msg">加载身体模型...</div></div></div>
+    <div id="viewport-info">左键: 画笔 / 右键: 旋转 / 滚轮: 缩放 / 中键: 平移</div>
+    <div id="viewport-cursor-info"></div>
+  </main>
+
+  <aside id="panel">
+    <div class="section">
+      <h3>笔刷大小</h3>
+      <div class="row"><label>半径</label><span class="val" id="val-radius">3.0 cm</span></div>
+      <input type="range" id="rng-radius" min="5" max="80" value="30" step="1">
+      <div class="row"><label>强度</label><span class="val" id="val-strength">0.8</span></div>
+      <input type="range" id="rng-strength" min="10" max="100" value="80" step="5">
+    </div>
+
+    <div class="section">
+      <h3>选项</h3>
+      <div class="row"><label><input type="checkbox" id="chk-symmetry" checked> 左右对称</label></div>
+      <div class="row"><label><input type="checkbox" id="chk-show-body" checked> 显示身体</label></div>
+      <div class="row"><label><input type="checkbox" id="chk-show-fabric" checked> 显示布料</label></div>
+    </div>
+
+    <div class="section">
+      <h3>布料厚度</h3>
+      <div class="row"><label>外推距离</label><span class="val" id="val-offset">2.0 mm</span></div>
+      <input type="range" id="rng-offset" min="10" max="100" value="20" step="1">
+      <button class="btn" id="btn-regen">重新生成布料</button>
+    </div>
+
+    <div class="section">
+      <h3>统计</h3>
+      <div class="stat" id="stat-verts">顶点: -</div>
+      <div class="stat" id="stat-faces">三角形: -</div>
+      <div class="stat" id="stat-covered">已涂: 0</div>
+      <div class="stat" id="stat-fabric-tris">布料三角形: 0</div>
+      <div class="stat" id="stat-straps">绑带数: 0</div>
+    </div>
+
+    <div class="section">
+      <h3>快捷键</h3>
+      <div class="hint">
+        <span class="key">1</span> 覆盖画笔<br>
+        <span class="key">2</span> 橡皮擦<br>
+        <span class="key">3</span> 绑带画笔<br>
+        <span class="key">4</span> 仅旋转<br>
+        <span class="key">[</span> / <span class="key">]</span> 缩小/放大笔刷<br>
+        <span class="key">⌘Z</span> / <span class="key">Ctrl+Z</span> 撤销<br>
+        <span class="key">S</span> 切换对称
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>说明</h3>
+      <div class="hint">
+        本工具在浏览器中运行，纯平台无关。<br>
+        需通过静态服务器打开（例如 <span class="key">python -m http.server</span>）。
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.162.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.162.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+
+// ============================================================================
+// STATE
+// ============================================================================
+const state = {
+  tool: 'cover',
+  brushRadius: 0.03,     // meters
+  brushStrength: 0.8,    // 0..1
+  fabricOffset: 0.002,   // 2mm
+  symmetry: true,
+  painting: false,
+  strapStart: -1,
+  lastStatusClear: 0,
+};
+
+let scene, camera, renderer, controls;
+let bodyMesh = null, bodyGeo = null;
+let coverage = null;           // Uint8Array, per-vertex coverage 0..255
+let neighbors = null;          // array of arrays, vertex adjacency
+let bodyColorAttr = null;
+let fabricMeshes = [];
+let strapMeshes = [];
+let cursorRing = null;
+let strapStartMarker = null;
+let raycaster = new THREE.Raycaster();
+let mouseNDC = new THREE.Vector2();
+let hoverHit = null;
+let undoStack = [];
+
+const SKIN_COLOR = new THREE.Color(0xf0d5c8);
+const PAINT_COLOR = new THREE.Color(0xff4081);
+const FABRIC_COLOR = 0xff5080;
+const STRAP_COLOR = 0xc2185b;
+
+// ============================================================================
+// SCENE SETUP
+// ============================================================================
+function initScene() {
+  const canvas = document.getElementById('canvas');
+  const vp = document.getElementById('viewport');
+
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x15151f);
+
+  camera = new THREE.PerspectiveCamera(35, vp.clientWidth / vp.clientHeight, 0.01, 100);
+  camera.position.set(0, 0.95, 1.8);
+
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setSize(vp.clientWidth, vp.clientHeight, false);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+  // Lighting
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x303050, 0.7));
+  const keyLight = new THREE.DirectionalLight(0xffffff, 1.1);
+  keyLight.position.set(2, 3, 3);
+  scene.add(keyLight);
+  const fillLight = new THREE.DirectionalLight(0x8090ff, 0.4);
+  fillLight.position.set(-2, 1, -2);
+  scene.add(fillLight);
+
+  // Ground shadow plane
+  const ground = new THREE.Mesh(
+    new THREE.CircleGeometry(1.2, 32),
+    new THREE.MeshBasicMaterial({ color: 0x0a0a12, transparent: true, opacity: 0.7 })
+  );
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -0.01;
+  scene.add(ground);
+
+  // Controls
+  controls = new OrbitControls(camera, canvas);
+  controls.target.set(0, 0.9, 0);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.mouseButtons = {
+    LEFT: null, // painted by our handlers
+    MIDDLE: THREE.MOUSE.PAN,
+    RIGHT: THREE.MOUSE.ROTATE,
+  };
+  controls.touches = {
+    ONE: THREE.TOUCH.ROTATE,
+    TWO: THREE.TOUCH.DOLLY_PAN,
+  };
+  controls.update();
+
+  // Cursor ring (visible on body surface)
+  const ringGeo = new THREE.RingGeometry(state.brushRadius * 0.92, state.brushRadius, 48);
+  const ringMat = new THREE.MeshBasicMaterial({
+    color: 0xff4081, side: THREE.DoubleSide, transparent: true, opacity: 0.85, depthTest: false,
+  });
+  cursorRing = new THREE.Mesh(ringGeo, ringMat);
+  cursorRing.visible = false;
+  cursorRing.renderOrder = 999;
+  scene.add(cursorRing);
+
+  // Strap start marker
+  const markerGeo = new THREE.SphereGeometry(0.008, 16, 16);
+  const markerMat = new THREE.MeshBasicMaterial({ color: 0x00e0ff, depthTest: false });
+  strapStartMarker = new THREE.Mesh(markerGeo, markerMat);
+  strapStartMarker.visible = false;
+  strapStartMarker.renderOrder = 999;
+  scene.add(strapStartMarker);
+
+  window.addEventListener('resize', onResize);
+  onResize();
+}
+
+function onResize() {
+  const vp = document.getElementById('viewport');
+  camera.aspect = vp.clientWidth / vp.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(vp.clientWidth, vp.clientHeight, false);
+}
+
+// ============================================================================
+// BODY LOADING + MESH CLEANUP
+// ============================================================================
+async function loadBody() {
+  setStatus('下载身体 OBJ...');
+  const loader = new OBJLoader();
+  const obj = await new Promise((resolve, reject) => {
+    loader.load('assets/base_body.obj', resolve, undefined, reject);
+  });
+
+  // Find first mesh in the loaded group
+  let raw = null;
+  obj.traverse(o => { if (!raw && o.isMesh) raw = o; });
+  if (!raw) throw new Error('No mesh in OBJ');
+
+  setStatus('清洗网格...');
+  // OBJ vertices are in cm. Scale to meters and center at feet.
+  const rawPos = raw.geometry.attributes.position;
+  const scaledPos = new Float32Array(rawPos.count * 3);
+  for (let i = 0; i < rawPos.count; i++) {
+    scaledPos[i * 3 + 0] = rawPos.getX(i) * 0.01;
+    scaledPos[i * 3 + 1] = rawPos.getY(i) * 0.01;
+    scaledPos[i * 3 + 2] = rawPos.getZ(i) * 0.01;
+  }
+
+  // Bounding box for centering
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity, minZ = Infinity, maxZ = -Infinity;
+  for (let i = 0; i < rawPos.count; i++) {
+    const x = scaledPos[i*3], y = scaledPos[i*3+1], z = scaledPos[i*3+2];
+    if (x < minX) minX = x; if (x > maxX) maxX = x;
+    if (y < minY) minY = y; if (y > maxY) maxY = y;
+    if (z < minZ) minZ = z; if (z > maxZ) maxZ = z;
+  }
+  const cx = (minX + maxX) / 2;
+  const cz = (minZ + maxZ) / 2;
+  // Shift so feet at y=0, body centered in x,z
+  for (let i = 0; i < rawPos.count; i++) {
+    scaledPos[i*3+0] -= cx;
+    scaledPos[i*3+1] -= minY;
+    scaledPos[i*3+2] -= cz;
+  }
+
+  // Weld duplicate vertices (OBJ often has duplicates at UV seams)
+  const {positions: weldedPos, indices: weldedIdx} = weldVertices(scaledPos);
+
+  // Build clean geometry
+  bodyGeo = new THREE.BufferGeometry();
+  bodyGeo.setAttribute('position', new THREE.Float32BufferAttribute(weldedPos, 3));
+  bodyGeo.setIndex(weldedIdx);
+  bodyGeo.computeVertexNormals();
+
+  const nVerts = bodyGeo.attributes.position.count;
+  const nFaces = weldedIdx.length / 3;
+
+  setStatus('构建邻接表...');
+  neighbors = buildAdjacency(weldedIdx, nVerts);
+
+  // Init coverage and vertex colors
+  coverage = new Uint8Array(nVerts);
+  const colors = new Float32Array(nVerts * 3);
+  for (let i = 0; i < nVerts; i++) {
+    colors[i*3+0] = SKIN_COLOR.r;
+    colors[i*3+1] = SKIN_COLOR.g;
+    colors[i*3+2] = SKIN_COLOR.b;
+  }
+  bodyColorAttr = new THREE.Float32BufferAttribute(colors, 3);
+  bodyGeo.setAttribute('color', bodyColorAttr);
+
+  // Material
+  const bodyMat = new THREE.MeshStandardMaterial({
+    vertexColors: true,
+    roughness: 0.85,
+    metalness: 0.02,
+  });
+  bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+  scene.add(bodyMesh);
+
+  // Adjust camera target to body center
+  const bodyCenterY = (maxY - minY) * 0.55; // slightly above middle
+  controls.target.set(0, bodyCenterY, 0);
+  camera.position.set(0, bodyCenterY + 0.05, 1.6);
+  controls.update();
+
+  // Update stats
+  document.getElementById('stat-verts').textContent = `顶点: ${nVerts.toLocaleString()}`;
+  document.getElementById('stat-faces').textContent = `三角形: ${nFaces.toLocaleString()}`;
+
+  document.getElementById('loading').style.display = 'none';
+  setStatus('就绪 — 用覆盖画笔在身体上涂抹');
+}
+
+function weldVertices(positions) {
+  // Quantize to 0.1mm and merge duplicates.
+  const Q = 10000;
+  const key2idx = new Map();
+  const newPos = [];
+  const remap = new Int32Array(positions.length / 3);
+  for (let i = 0; i < positions.length / 3; i++) {
+    const x = Math.round(positions[i*3] * Q);
+    const y = Math.round(positions[i*3+1] * Q);
+    const z = Math.round(positions[i*3+2] * Q);
+    const k = x + '|' + y + '|' + z;
+    let idx = key2idx.get(k);
+    if (idx === undefined) {
+      idx = newPos.length / 3;
+      key2idx.set(k, idx);
+      newPos.push(positions[i*3], positions[i*3+1], positions[i*3+2]);
+    }
+    remap[i] = idx;
+  }
+  // Rebuild indices as triangle list
+  const indices = [];
+  for (let i = 0; i < remap.length; i += 3) {
+    const a = remap[i], b = remap[i+1], c = remap[i+2];
+    // Drop degenerate triangles
+    if (a === b || b === c || a === c) continue;
+    indices.push(a, b, c);
+  }
+  return { positions: newPos, indices };
+}
+
+function buildAdjacency(indices, nVerts) {
+  const nbrs = new Array(nVerts);
+  for (let i = 0; i < nVerts; i++) nbrs[i] = new Set();
+  for (let i = 0; i < indices.length; i += 3) {
+    const a = indices[i], b = indices[i+1], c = indices[i+2];
+    nbrs[a].add(b); nbrs[a].add(c);
+    nbrs[b].add(a); nbrs[b].add(c);
+    nbrs[c].add(a); nbrs[c].add(b);
+  }
+  // Convert to typed arrays for faster iteration
+  return nbrs.map(s => new Int32Array(s));
+}
+
+// ============================================================================
+// PAINT — BFS-based radial brush with euclidean falloff
+// ============================================================================
+function paintAtVertex(startIdx, radius, strength, erase) {
+  const pos = bodyGeo.attributes.position.array;
+  const sx = pos[startIdx*3], sy = pos[startIdx*3+1], sz = pos[startIdx*3+2];
+  const visited = new Uint8Array(neighbors.length);
+  visited[startIdx] = 1;
+  const queue = [startIdx];
+  let head = 0;
+  const touched = [];
+  while (head < queue.length) {
+    const i = queue[head++];
+    const dx = pos[i*3] - sx;
+    const dy = pos[i*3+1] - sy;
+    const dz = pos[i*3+2] - sz;
+    const d = Math.sqrt(dx*dx + dy*dy + dz*dz);
+    if (d > radius) continue;
+    // Smooth falloff (cosine)
+    const t = d / radius;
+    const falloff = 0.5 * (1 + Math.cos(t * Math.PI));
+    const add = strength * falloff * 255;
+    const prev = coverage[i];
+    let next;
+    if (erase) next = Math.max(0, prev - add);
+    else next = Math.min(255, prev + add);
+    if (next !== prev) {
+      coverage[i] = next;
+      touched.push(i);
+    }
+    const nb = neighbors[i];
+    for (let k = 0; k < nb.length; k++) {
+      const v = nb[k];
+      if (!visited[v]) {
+        visited[v] = 1;
+        // Only enqueue if there's a chance of being inside the radius
+        const vdx = pos[v*3] - sx;
+        const vdy = pos[v*3+1] - sy;
+        const vdz = pos[v*3+2] - sz;
+        if (vdx*vdx + vdy*vdy + vdz*vdz <= radius * radius * 1.44) {
+          queue.push(v);
+        }
+      }
+    }
+  }
+  // Update vertex colors for touched vertices
+  const cArr = bodyColorAttr.array;
+  for (const i of touched) {
+    const c = coverage[i] / 255;
+    cArr[i*3+0] = SKIN_COLOR.r * (1 - c) + PAINT_COLOR.r * c;
+    cArr[i*3+1] = SKIN_COLOR.g * (1 - c) + PAINT_COLOR.g * c;
+    cArr[i*3+2] = SKIN_COLOR.b * (1 - c) + PAINT_COLOR.b * c;
+  }
+  if (touched.length > 0) bodyColorAttr.needsUpdate = true;
+}
+
+// Find the closest vertex on body to an arbitrary 3D point. Linear scan.
+function nearestVertexToPoint(p) {
+  const pos = bodyGeo.attributes.position.array;
+  const n = neighbors.length;
+  let best = -1, bestD = Infinity;
+  for (let i = 0; i < n; i++) {
+    const dx = pos[i*3] - p.x;
+    const dy = pos[i*3+1] - p.y;
+    const dz = pos[i*3+2] - p.z;
+    const d = dx*dx + dy*dy + dz*dz;
+    if (d < bestD) { bestD = d; best = i; }
+  }
+  return best;
+}
+
+// Use raycast hit face to quickly find the nearest vertex (no linear scan).
+function nearestVertexOnHit(hit) {
+  const face = hit.face;
+  const pos = bodyGeo.attributes.position.array;
+  const p = hit.point;
+  let best = face.a, bestD = Infinity;
+  for (const vi of [face.a, face.b, face.c]) {
+    const dx = pos[vi*3] - p.x;
+    const dy = pos[vi*3+1] - p.y;
+    const dz = pos[vi*3+2] - p.z;
+    const d = dx*dx + dy*dy + dz*dz;
+    if (d < bestD) { bestD = d; best = vi; }
+  }
+  return best;
+}
+
+// Count painted vertices for stats display
+function countCovered() {
+  let n = 0;
+  for (let i = 0; i < coverage.length; i++) if (coverage[i] >= 64) n++;
+  return n;
+}
+
+// ============================================================================
+// FABRIC GENERATION — extract covered faces, offset along normals
+// ============================================================================
+function clearFabrics() {
+  for (const m of fabricMeshes) {
+    scene.remove(m);
+    m.geometry.dispose();
+    m.material.dispose();
+  }
+  fabricMeshes.length = 0;
+}
+
+function regenerateFabric() {
+  clearFabrics();
+
+  const threshold = 64; // require at least ~25% coverage
+  const idx = bodyGeo.index.array;
+  const nFacesTotal = idx.length / 3;
+  // Collect all faces whose 3 verts are covered
+  const coveredFaceList = [];
+  for (let f = 0; f < idx.length; f += 3) {
+    if (coverage[idx[f]] >= threshold &&
+        coverage[idx[f+1]] >= threshold &&
+        coverage[idx[f+2]] >= threshold) {
+      coveredFaceList.push(f / 3);
+    }
+  }
+  if (coveredFaceList.length === 0) {
+    document.getElementById('stat-fabric-tris').textContent = `布料三角形: 0`;
+    return;
+  }
+
+  // Build a fabric mesh with vertices displaced along normals
+  const posAttr = bodyGeo.attributes.position.array;
+  const nrmAttr = bodyGeo.attributes.normal.array;
+  const offset = state.fabricOffset;
+  const vertMap = new Map();
+  const newPos = [];
+  const newNormals = [];
+  const newIndices = [];
+  for (const fi of coveredFaceList) {
+    const a = idx[fi*3], b = idx[fi*3+1], c = idx[fi*3+2];
+    for (const oldI of [a, b, c]) {
+      if (!vertMap.has(oldI)) {
+        const ni = newPos.length / 3;
+        vertMap.set(oldI, ni);
+        newPos.push(
+          posAttr[oldI*3+0] + nrmAttr[oldI*3+0] * offset,
+          posAttr[oldI*3+1] + nrmAttr[oldI*3+1] * offset,
+          posAttr[oldI*3+2] + nrmAttr[oldI*3+2] * offset
+        );
+        newNormals.push(nrmAttr[oldI*3+0], nrmAttr[oldI*3+1], nrmAttr[oldI*3+2]);
+      }
+    }
+    newIndices.push(vertMap.get(a), vertMap.get(b), vertMap.get(c));
+  }
+
+  const fabricGeo = new THREE.BufferGeometry();
+  fabricGeo.setAttribute('position', new THREE.Float32BufferAttribute(newPos, 3));
+  fabricGeo.setAttribute('normal', new THREE.Float32BufferAttribute(newNormals, 3));
+  fabricGeo.setIndex(newIndices);
+  // Recompute smoothed normals from the offset positions for nicer shading
+  fabricGeo.computeVertexNormals();
+
+  const fabricMat = new THREE.MeshStandardMaterial({
+    color: FABRIC_COLOR,
+    roughness: 0.5,
+    metalness: 0.08,
+    side: THREE.DoubleSide,
+  });
+  const fabricMesh = new THREE.Mesh(fabricGeo, fabricMat);
+  fabricMesh.visible = document.getElementById('chk-show-fabric').checked;
+  scene.add(fabricMesh);
+  fabricMeshes.push(fabricMesh);
+
+  document.getElementById('stat-fabric-tris').textContent = `布料三角形: ${(newIndices.length / 3).toLocaleString()}`;
+}
+
+// ============================================================================
+// STRAP — Dijkstra shortest path on vertex graph, then TubeGeometry
+// ============================================================================
+class MinHeap {
+  constructor() { this.h = []; }
+  size() { return this.h.length; }
+  push(k, p) {
+    this.h.push({k, p});
+    this._up(this.h.length - 1);
+  }
+  pop() {
+    if (this.h.length === 0) return null;
+    const top = this.h[0];
+    const last = this.h.pop();
+    if (this.h.length > 0) {
+      this.h[0] = last;
+      this._down(0);
+    }
+    return top;
+  }
+  _up(i) {
+    while (i > 0) {
+      const parent = (i - 1) >> 1;
+      if (this.h[parent].p <= this.h[i].p) break;
+      [this.h[parent], this.h[i]] = [this.h[i], this.h[parent]];
+      i = parent;
+    }
+  }
+  _down(i) {
+    const n = this.h.length;
+    while (true) {
+      const l = 2 * i + 1, r = 2 * i + 2;
+      let smallest = i;
+      if (l < n && this.h[l].p < this.h[smallest].p) smallest = l;
+      if (r < n && this.h[r].p < this.h[smallest].p) smallest = r;
+      if (smallest === i) break;
+      [this.h[i], this.h[smallest]] = [this.h[smallest], this.h[i]];
+      i = smallest;
+    }
+  }
+}
+
+function geodesicPath(startIdx, endIdx) {
+  const n = neighbors.length;
+  const dist = new Float32Array(n).fill(Infinity);
+  const prev = new Int32Array(n).fill(-1);
+  dist[startIdx] = 0;
+  const heap = new MinHeap();
+  heap.push(startIdx, 0);
+  const pos = bodyGeo.attributes.position.array;
+  let found = false;
+  while (heap.size()) {
+    const {k: u, p: d} = heap.pop();
+    if (u === endIdx) { found = true; break; }
+    if (d > dist[u]) continue;
+    const nb = neighbors[u];
+    const ux = pos[u*3], uy = pos[u*3+1], uz = pos[u*3+2];
+    for (let kk = 0; kk < nb.length; kk++) {
+      const v = nb[kk];
+      const dx = pos[v*3] - ux;
+      const dy = pos[v*3+1] - uy;
+      const dz = pos[v*3+2] - uz;
+      const w = Math.sqrt(dx*dx + dy*dy + dz*dz);
+      const alt = d + w;
+      if (alt < dist[v]) {
+        dist[v] = alt;
+        prev[v] = u;
+        heap.push(v, alt);
+      }
+    }
+  }
+  if (!found) return null;
+  const path = [];
+  let u = endIdx;
+  while (u !== -1) {
+    path.push(u);
+    u = prev[u];
+  }
+  path.reverse();
+  return path;
+}
+
+function createStrap(startIdx, endIdx) {
+  const path = geodesicPath(startIdx, endIdx);
+  if (!path || path.length < 2) {
+    setStatus('⚠ 找不到路径');
+    return;
+  }
+  const pos = bodyGeo.attributes.position.array;
+  const nrm = bodyGeo.attributes.normal.array;
+  const pts = path.map(i => new THREE.Vector3(
+    pos[i*3] + nrm[i*3] * 0.003,
+    pos[i*3+1] + nrm[i*3+1] * 0.003,
+    pos[i*3+2] + nrm[i*3+2] * 0.003,
+  ));
+  // Downsample path to avoid jitter
+  const step = Math.max(1, Math.floor(pts.length / 40));
+  const down = [];
+  for (let i = 0; i < pts.length; i += step) down.push(pts[i]);
+  if (down[down.length - 1] !== pts[pts.length - 1]) down.push(pts[pts.length - 1]);
+  if (down.length < 2) return;
+
+  const curve = new THREE.CatmullRomCurve3(down);
+  const tube = new THREE.TubeGeometry(curve, down.length * 4, 0.004, 8, false);
+  const strapMat = new THREE.MeshStandardMaterial({ color: STRAP_COLOR, roughness: 0.45, metalness: 0.1 });
+  const strapMesh = new THREE.Mesh(tube, strapMat);
+  scene.add(strapMesh);
+  strapMeshes.push(strapMesh);
+  document.getElementById('stat-straps').textContent = `绑带数: ${strapMeshes.length}`;
+  setStatus(`绑带已生成 (${path.length} 个路径点)`);
+}
+
+function clearStraps() {
+  for (const m of strapMeshes) {
+    scene.remove(m);
+    m.geometry.dispose();
+    m.material.dispose();
+  }
+  strapMeshes.length = 0;
+  document.getElementById('stat-straps').textContent = `绑带数: 0`;
+}
+
+// ============================================================================
+// MOUSE / EVENT HANDLING
+// ============================================================================
+function updateNDC(e) {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouseNDC.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+  mouseNDC.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+}
+
+function raycastBody() {
+  if (!bodyMesh) return null;
+  raycaster.setFromCamera(mouseNDC, camera);
+  const hits = raycaster.intersectObject(bodyMesh, false);
+  return hits.length > 0 ? hits[0] : null;
+}
+
+function updateCursor() {
+  const hit = raycastBody();
+  hoverHit = hit;
+  if (hit && (state.tool === 'cover' || state.tool === 'eraser' || state.tool === 'strap')) {
+    cursorRing.visible = true;
+    cursorRing.position.copy(hit.point);
+    // Orient ring to face along the body's surface normal
+    const normal = hit.face.normal.clone().transformDirection(bodyMesh.matrixWorld).normalize();
+    const up = new THREE.Vector3(0, 0, 1);
+    const q = new THREE.Quaternion().setFromUnitVectors(up, normal);
+    cursorRing.quaternion.copy(q);
+    // Small lift to avoid z-fighting
+    cursorRing.position.addScaledVector(normal, 0.002);
+    document.getElementById('viewport-cursor-info').textContent =
+      `X=${hit.point.x.toFixed(2)} Y=${hit.point.y.toFixed(2)} Z=${hit.point.z.toFixed(2)}`;
+  } else {
+    cursorRing.visible = false;
+    document.getElementById('viewport-cursor-info').textContent = '';
+  }
+}
+
+function pushUndoSnapshot() {
+  // Snapshot coverage + counts of fabric/strap meshes.
+  // Capped at 20 entries.
+  const snap = {
+    coverage: coverage.slice(),
+    fabricCount: fabricMeshes.length,
+    strapCount: strapMeshes.length,
+  };
+  undoStack.push(snap);
+  if (undoStack.length > 20) undoStack.shift();
+}
+
+function undo() {
+  if (undoStack.length === 0) { setStatus('无可撤销'); return; }
+  const snap = undoStack.pop();
+  coverage.set(snap.coverage);
+  // Rebuild vertex colors
+  const cArr = bodyColorAttr.array;
+  for (let i = 0; i < coverage.length; i++) {
+    const c = coverage[i] / 255;
+    cArr[i*3+0] = SKIN_COLOR.r * (1 - c) + PAINT_COLOR.r * c;
+    cArr[i*3+1] = SKIN_COLOR.g * (1 - c) + PAINT_COLOR.g * c;
+    cArr[i*3+2] = SKIN_COLOR.b * (1 - c) + PAINT_COLOR.b * c;
+  }
+  bodyColorAttr.needsUpdate = true;
+  // Pop any fabric/strap meshes created after this snapshot
+  while (fabricMeshes.length > snap.fabricCount) {
+    const m = fabricMeshes.pop();
+    scene.remove(m); m.geometry.dispose(); m.material.dispose();
+  }
+  while (strapMeshes.length > snap.strapCount) {
+    const m = strapMeshes.pop();
+    scene.remove(m); m.geometry.dispose(); m.material.dispose();
+  }
+  document.getElementById('stat-fabric-tris').textContent = `布料三角形: ${fabricMeshes.reduce((s,m)=>s + (m.geometry.index.count/3), 0).toLocaleString()}`;
+  document.getElementById('stat-straps').textContent = `绑带数: ${strapMeshes.length}`;
+  document.getElementById('stat-covered').textContent = `已涂: ${countCovered()}`;
+  regenerateFabric();
+  setStatus('已撤销');
+}
+
+function clearAll() {
+  pushUndoSnapshot();
+  coverage.fill(0);
+  const cArr = bodyColorAttr.array;
+  for (let i = 0; i < coverage.length; i++) {
+    cArr[i*3+0] = SKIN_COLOR.r;
+    cArr[i*3+1] = SKIN_COLOR.g;
+    cArr[i*3+2] = SKIN_COLOR.b;
+  }
+  bodyColorAttr.needsUpdate = true;
+  clearFabrics();
+  clearStraps();
+  document.getElementById('stat-fabric-tris').textContent = `布料三角形: 0`;
+  document.getElementById('stat-covered').textContent = `已涂: 0`;
+  state.strapStart = -1;
+  strapStartMarker.visible = false;
+  setStatus('已清空');
+}
+
+function applyPaintAt(hit) {
+  // Paint from nearest vertex of the hit face
+  const vi = nearestVertexOnHit(hit);
+  if (vi < 0) return;
+  const erase = state.tool === 'eraser';
+  paintAtVertex(vi, state.brushRadius, state.brushStrength, erase);
+  if (state.symmetry) {
+    // Mirror hit point across YZ (negate X), find nearest body vertex
+    const mirrored = new THREE.Vector3(-hit.point.x, hit.point.y, hit.point.z);
+    const mvi = nearestVertexToPoint(mirrored);
+    if (mvi >= 0 && mvi !== vi) {
+      paintAtVertex(mvi, state.brushRadius, state.brushStrength, erase);
+    }
+  }
+}
+
+function onPointerDown(e) {
+  if (e.button !== 0) return; // only left button
+  updateNDC(e);
+  const hit = raycastBody();
+  if (!hit) return;
+
+  if (state.tool === 'cover' || state.tool === 'eraser') {
+    pushUndoSnapshot();
+    state.painting = true;
+    applyPaintAt(hit);
+    document.getElementById('stat-covered').textContent = `已涂: ${countCovered()}`;
+  } else if (state.tool === 'strap') {
+    const vi = nearestVertexOnHit(hit);
+    if (state.strapStart < 0) {
+      state.strapStart = vi;
+      strapStartMarker.visible = true;
+      strapStartMarker.position.copy(hit.point);
+      setStatus('绑带起点已标记 — 点击终点');
+    } else {
+      pushUndoSnapshot();
+      createStrap(state.strapStart, vi);
+      if (state.symmetry) {
+        // Mirror both endpoints
+        const ps = bodyGeo.attributes.position.array;
+        const mStart = new THREE.Vector3(-ps[state.strapStart*3], ps[state.strapStart*3+1], ps[state.strapStart*3+2]);
+        const mEnd = new THREE.Vector3(-ps[vi*3], ps[vi*3+1], ps[vi*3+2]);
+        const mStartIdx = nearestVertexToPoint(mStart);
+        const mEndIdx = nearestVertexToPoint(mEnd);
+        if (mStartIdx >= 0 && mEndIdx >= 0 && mStartIdx !== state.strapStart) {
+          createStrap(mStartIdx, mEndIdx);
+        }
+      }
+      state.strapStart = -1;
+      strapStartMarker.visible = false;
+    }
+  }
+}
+
+function onPointerMove(e) {
+  updateNDC(e);
+  updateCursor();
+  if (state.painting && (state.tool === 'cover' || state.tool === 'eraser')) {
+    const hit = raycastBody();
+    if (hit) {
+      applyPaintAt(hit);
+      document.getElementById('stat-covered').textContent = `已涂: ${countCovered()}`;
+    }
+  }
+}
+
+function onPointerUp(e) {
+  if (state.painting) {
+    state.painting = false;
+    // Trigger fabric regeneration after release
+    regenerateFabric();
+    setStatus('布料已生成');
+  }
+}
+
+// ============================================================================
+// UI EVENTS — toolbar, sliders, checkboxes, buttons, keyboard
+// ============================================================================
+function setTool(tool) {
+  state.tool = tool;
+  document.querySelectorAll('.tool').forEach(el => {
+    el.classList.toggle('active', el.dataset.tool === tool);
+  });
+  // Reset pending strap when switching tools
+  if (tool !== 'strap') {
+    state.strapStart = -1;
+    strapStartMarker.visible = false;
+  }
+  // Change ring color to reflect tool
+  if (tool === 'eraser') cursorRing.material.color.setHex(0x00c0ff);
+  else if (tool === 'strap') cursorRing.material.color.setHex(0x00e0ff);
+  else cursorRing.material.color.setHex(0xff4081);
+  controls.enableRotate = (tool === 'orbit');
+  controls.enabled = (tool === 'orbit');
+  // Always allow right-click rotate
+  if (tool !== 'orbit') {
+    controls.enabled = true;
+    controls.enableRotate = false;
+    controls.mouseButtons = {
+      LEFT: null, MIDDLE: THREE.MOUSE.PAN, RIGHT: THREE.MOUSE.ROTATE,
+    };
+  } else {
+    controls.mouseButtons = {
+      LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.PAN, RIGHT: THREE.MOUSE.ROTATE,
+    };
+  }
+  setStatus(`工具: ${ {cover:'覆盖画笔', eraser:'橡皮擦', strap:'绑带画笔', orbit:'仅旋转'}[tool] }`);
+}
+
+function setBrushRadius(meters) {
+  state.brushRadius = meters;
+  document.getElementById('val-radius').textContent = `${(meters * 100).toFixed(1)} cm`;
+  document.getElementById('rng-radius').value = Math.round(meters * 1000);
+  // Rebuild ring geometry
+  cursorRing.geometry.dispose();
+  cursorRing.geometry = new THREE.RingGeometry(meters * 0.92, meters, 48);
+}
+
+function setStatus(msg) {
+  document.getElementById('status').textContent = msg;
+  state.lastStatusClear = performance.now();
+}
+
+function initUI() {
+  // Toolbar
+  document.querySelectorAll('.tool').forEach(el => {
+    el.addEventListener('click', () => setTool(el.dataset.tool));
+  });
+
+  // Sliders
+  document.getElementById('rng-radius').addEventListener('input', e => {
+    setBrushRadius(parseFloat(e.target.value) / 1000);
+  });
+  document.getElementById('rng-strength').addEventListener('input', e => {
+    state.brushStrength = parseFloat(e.target.value) / 100;
+    document.getElementById('val-strength').textContent = state.brushStrength.toFixed(2);
+  });
+  document.getElementById('rng-offset').addEventListener('input', e => {
+    state.fabricOffset = parseFloat(e.target.value) / 10000; // 1=0.1mm
+    document.getElementById('val-offset').textContent = `${(state.fabricOffset * 1000).toFixed(1)} mm`;
+  });
+
+  // Checkboxes
+  document.getElementById('chk-symmetry').addEventListener('change', e => {
+    state.symmetry = e.target.checked;
+  });
+  document.getElementById('chk-show-body').addEventListener('change', e => {
+    if (bodyMesh) bodyMesh.visible = e.target.checked;
+  });
+  document.getElementById('chk-show-fabric').addEventListener('change', e => {
+    for (const m of fabricMeshes) m.visible = e.target.checked;
+    for (const m of strapMeshes) m.visible = e.target.checked;
+  });
+
+  // Buttons
+  document.getElementById('btn-clear').addEventListener('click', clearAll);
+  document.getElementById('btn-undo').addEventListener('click', undo);
+  document.getElementById('btn-regen').addEventListener('click', regenerateFabric);
+  document.getElementById('btn-export').addEventListener('click', exportOBJ);
+
+  // Canvas events
+  const canvas = renderer.domElement;
+  canvas.addEventListener('pointerdown', onPointerDown);
+  canvas.addEventListener('pointermove', onPointerMove);
+  canvas.addEventListener('pointerup', onPointerUp);
+  canvas.addEventListener('pointerleave', onPointerUp);
+  canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+  // Keyboard
+  window.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT') return;
+    if (e.key === '1') setTool('cover');
+    else if (e.key === '2') setTool('eraser');
+    else if (e.key === '3') setTool('strap');
+    else if (e.key === '4') setTool('orbit');
+    else if (e.key === '[') setBrushRadius(Math.max(0.005, state.brushRadius - 0.005));
+    else if (e.key === ']') setBrushRadius(Math.min(0.08, state.brushRadius + 0.005));
+    else if (e.key === 's' || e.key === 'S') {
+      const cb = document.getElementById('chk-symmetry');
+      cb.checked = !cb.checked;
+      state.symmetry = cb.checked;
+      setStatus(`对称: ${state.symmetry ? '开' : '关'}`);
+    }
+    else if ((e.metaKey || e.ctrlKey) && (e.key === 'z' || e.key === 'Z')) {
+      e.preventDefault();
+      undo();
+    }
+  });
+}
+
+// ============================================================================
+// EXPORT OBJ
+// ============================================================================
+function exportOBJ() {
+  if (fabricMeshes.length === 0 && strapMeshes.length === 0) {
+    setStatus('没有布料或绑带可导出');
+    return;
+  }
+  let s = `# Paint Bikini Export\n# Generated ${new Date().toISOString()}\n\n`;
+  let vOffset = 1;
+  const all = [
+    ...fabricMeshes.map((m, i) => ({ mesh: m, name: `fabric_${i}` })),
+    ...strapMeshes.map((m, i) => ({ mesh: m, name: `strap_${i}` })),
+  ];
+  for (const { mesh, name } of all) {
+    s += `o ${name}\n`;
+    const geo = mesh.geometry;
+    const pos = geo.attributes.position;
+    for (let v = 0; v < pos.count; v++) {
+      s += `v ${pos.getX(v).toFixed(6)} ${pos.getY(v).toFixed(6)} ${pos.getZ(v).toFixed(6)}\n`;
+    }
+    const idx = geo.index ? geo.index.array : null;
+    if (idx) {
+      for (let f = 0; f < idx.length; f += 3) {
+        s += `f ${idx[f]+vOffset} ${idx[f+1]+vOffset} ${idx[f+2]+vOffset}\n`;
+      }
+    } else {
+      for (let f = 0; f < pos.count; f += 3) {
+        s += `f ${f+vOffset} ${f+1+vOffset} ${f+2+vOffset}\n`;
+      }
+    }
+    vOffset += pos.count;
+    s += '\n';
+  }
+  const blob = new Blob([s], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'paint_bikini.obj';
+  a.click();
+  URL.revokeObjectURL(url);
+  setStatus(`已导出 ${all.length} 个部件`);
+}
+
+// ============================================================================
+// RENDER LOOP + STARTUP
+// ============================================================================
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+async function main() {
+  try {
+    initScene();
+    await loadBody();
+    initUI();
+    setTool('cover');
+    setBrushRadius(0.03);
+    animate();
+  } catch (err) {
+    console.error(err);
+    document.getElementById('loading').innerHTML =
+      `<div class="inner" style="color:#ff6060;max-width:400px;padding:24px">` +
+      `<strong>加载失败</strong><br><br>` +
+      `<code style="font-size:0.75rem">${err.message || err}</code><br><br>` +
+      `本文件需要通过静态服务器打开（不是 file://）。<br>` +
+      `在仓库根目录运行：<br><code>python -m http.server 8000</code><br>` +
+      `然后浏览器访问 <code>http://localhost:8000/paint_bikini.html</code>` +
+      `</div>`;
+  }
+}
+
+main();
+</script>
+</body>
+</html>
+
