@@ -574,50 +574,128 @@ function regenerateFabric() {
 
   const threshold = 64;
   const idx = bodyGeo.index.array;
+  const posAttr = bodyGeo.attributes.position.array;
+  const nrmAttr = bodyGeo.attributes.normal.array;
+  const offset = state.fabricOffset;
+  const uvScale = 80;
 
-  // Collect faces where all 3 vertices are covered — clean, sharp edges
-  const coveredFaceList = [];
+  const vertMap = new Map();   // bodyVertIdx → fabricVertIdx (for fully-covered verts)
+  const edgeCache = new Map(); // "min,max" → fabricVertIdx (for edge-split verts)
+  const newPos = [];
+  const newNormals = [];
+  const newUVs = [];
+  const newIndices = [];
+
+  // Add a fully-covered body vertex to the fabric mesh (with offset)
+  function addVert(bi) {
+    if (vertMap.has(bi)) return vertMap.get(bi);
+    const ni = newPos.length / 3;
+    vertMap.set(bi, ni);
+    newPos.push(
+      posAttr[bi*3]   + nrmAttr[bi*3]   * offset,
+      posAttr[bi*3+1] + nrmAttr[bi*3+1] * offset,
+      posAttr[bi*3+2] + nrmAttr[bi*3+2] * offset
+    );
+    newNormals.push(nrmAttr[bi*3], nrmAttr[bi*3+1], nrmAttr[bi*3+2]);
+    newUVs.push(posAttr[bi*3] * uvScale, posAttr[bi*3+1] * uvScale);
+    return ni;
+  }
+
+  // Add a vertex at the coverage threshold crossing point on edge (inside→outside)
+  function addEdgeSplit(biIn, biOut) {
+    const key = Math.min(biIn, biOut) + ',' + Math.max(biIn, biOut);
+    if (edgeCache.has(key)) return edgeCache.get(key);
+    const cIn = coverage[biIn], cOut = coverage[biOut];
+    const t = (threshold - cIn) / (cOut - cIn); // 0→1 from inside to outside
+    const ni = newPos.length / 3;
+    // Interpolate position and normal on body surface
+    const px = posAttr[biIn*3]*(1-t)   + posAttr[biOut*3]*t;
+    const py = posAttr[biIn*3+1]*(1-t) + posAttr[biOut*3+1]*t;
+    const pz = posAttr[biIn*3+2]*(1-t) + posAttr[biOut*3+2]*t;
+    let nx = nrmAttr[biIn*3]*(1-t)   + nrmAttr[biOut*3]*t;
+    let ny = nrmAttr[biIn*3+1]*(1-t) + nrmAttr[biOut*3+1]*t;
+    let nz = nrmAttr[biIn*3+2]*(1-t) + nrmAttr[biOut*3+2]*t;
+    const len = Math.sqrt(nx*nx + ny*ny + nz*nz) || 1;
+    nx /= len; ny /= len; nz /= len;
+    newPos.push(px + nx * offset, py + ny * offset, pz + nz * offset);
+    newNormals.push(nx, ny, nz);
+    newUVs.push(px * uvScale, py * uvScale);
+    edgeCache.set(key, ni);
+    return ni;
+  }
+
+  // --- Marching triangles: clip each body face by coverage threshold ---
   for (let f = 0; f < idx.length; f += 3) {
-    if (coverage[idx[f]] >= threshold &&
-        coverage[idx[f+1]] >= threshold &&
-        coverage[idx[f+2]] >= threshold) {
-      coveredFaceList.push(f / 3);
+    const a = idx[f], b = idx[f+1], c = idx[f+2];
+    const ca = coverage[a] >= threshold;
+    const cb = coverage[b] >= threshold;
+    const cc = coverage[c] >= threshold;
+    const cnt = (ca?1:0) + (cb?1:0) + (cc?1:0);
+    if (cnt === 0) continue;
+
+    if (cnt === 3) {
+      // Fully covered
+      newIndices.push(addVert(a), addVert(b), addVert(c));
+    } else if (cnt === 2) {
+      // Two inside, one outside — clip to quad (2 tris)
+      let vIn1, vIn2, vOut;
+      if (!ca) { vIn1 = b; vIn2 = c; vOut = a; }
+      else if (!cb) { vIn1 = a; vIn2 = c; vOut = b; }
+      else { vIn1 = a; vIn2 = b; vOut = c; }
+      const fi1 = addVert(vIn1);
+      const fi2 = addVert(vIn2);
+      const fs1 = addEdgeSplit(vIn1, vOut);
+      const fs2 = addEdgeSplit(vIn2, vOut);
+      newIndices.push(fi1, fi2, fs1);
+      newIndices.push(fi2, fs2, fs1);
+    } else {
+      // One inside, two outside — clip to single tri
+      let vIn, vOut1, vOut2;
+      if (ca) { vIn = a; vOut1 = b; vOut2 = c; }
+      else if (cb) { vIn = b; vOut1 = c; vOut2 = a; }
+      else { vIn = c; vOut1 = a; vOut2 = b; }
+      const fi = addVert(vIn);
+      const fs1 = addEdgeSplit(vIn, vOut1);
+      const fs2 = addEdgeSplit(vIn, vOut2);
+      newIndices.push(fi, fs1, fs2);
     }
   }
-  if (coveredFaceList.length === 0) {
+
+  if (newIndices.length === 0) {
     document.getElementById('stat-fabric-tris').textContent = `布料三角形: 0`;
     resetBodyColors();
     return;
   }
 
-  // Build fabric mesh: offset along normals with constant depth
-  const posAttr = bodyGeo.attributes.position.array;
-  const nrmAttr = bodyGeo.attributes.normal.array;
-  const offset = state.fabricOffset;
-  const vertMap = new Map();
-  const newPos = [];
-  const newNormals = [];
-  const newUVs = [];
-  const newIndices = [];
-  const uvScale = 80; // world→UV scale for texture tiling
-
-  for (const fi of coveredFaceList) {
-    const a = idx[fi*3], b = idx[fi*3+1], c = idx[fi*3+2];
-    for (const oldI of [a, b, c]) {
-      if (!vertMap.has(oldI)) {
-        const ni = newPos.length / 3;
-        vertMap.set(oldI, ni);
-        newPos.push(
-          posAttr[oldI*3+0] + nrmAttr[oldI*3+0] * offset,
-          posAttr[oldI*3+1] + nrmAttr[oldI*3+1] * offset,
-          posAttr[oldI*3+2] + nrmAttr[oldI*3+2] * offset
-        );
-        newNormals.push(nrmAttr[oldI*3+0], nrmAttr[oldI*3+1], nrmAttr[oldI*3+2]);
-        // World-space planar UVs for fabric texture
-        newUVs.push(posAttr[oldI*3+0] * uvScale, posAttr[oldI*3+1] * uvScale);
-      }
+  // --- Optional: 2 passes of Laplacian smoothing on boundary for extra polish ---
+  const edgeUse = new Map();
+  for (let i = 0; i < newIndices.length; i += 3) {
+    for (let j = 0; j < 3; j++) {
+      const ea = newIndices[i+j], eb = newIndices[i+(j+1)%3];
+      const ek = Math.min(ea,eb) + ',' + Math.max(ea,eb);
+      edgeUse.set(ek, (edgeUse.get(ek)||0) + 1);
     }
-    newIndices.push(vertMap.get(a), vertMap.get(b), vertMap.get(c));
+  }
+  const bndNb = new Map();
+  for (const [key, cnt] of edgeUse) {
+    if (cnt !== 1) continue;
+    const [ea, eb] = key.split(',').map(Number);
+    if (!bndNb.has(ea)) bndNb.set(ea, []);
+    if (!bndNb.has(eb)) bndNb.set(eb, []);
+    bndNb.get(ea).push(eb);
+    bndNb.get(eb).push(ea);
+  }
+  for (let pass = 0; pass < 2; pass++) {
+    const px = newPos.slice();
+    for (const [vi, nbs] of bndNb) {
+      if (nbs.length < 2) continue;
+      let sx = 0, sy = 0, sz = 0;
+      for (const ni of nbs) { sx += px[ni*3]; sy += px[ni*3+1]; sz += px[ni*3+2]; }
+      sx /= nbs.length; sy /= nbs.length; sz /= nbs.length;
+      newPos[vi*3]   = px[vi*3]   * 0.6 + sx * 0.4;
+      newPos[vi*3+1] = px[vi*3+1] * 0.6 + sy * 0.4;
+      newPos[vi*3+2] = px[vi*3+2] * 0.6 + sz * 0.4;
+    }
   }
 
   const fabricGeo = new THREE.BufferGeometry();
