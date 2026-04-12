@@ -55,6 +55,15 @@ input[type=checkbox] { accent-color:#ff4081; }
 .hint { font-size:0.7rem; color:#666; line-height:1.5; margin-top:8px; }
 .stat { font-size:0.7rem; color:#888; margin-top:4px; }
 .key { display:inline-block; background:#2a2a4a; color:#ccc; padding:1px 5px; border-radius:3px; font-size:0.65rem; font-family:monospace; }
+
+/* Stability overlay */
+#stability-overlay { position:absolute; inset:0; background:rgba(10,10,18,0.85); z-index:50; display:none; align-items:center; justify-content:center; }
+#stability-panel { background:#1a1a2e; border:1px solid #2a2a4a; border-radius:8px; padding:24px; max-width:500px; width:90%; max-height:80vh; overflow-y:auto; }
+#stability-panel h2 { font-size:1rem; margin-bottom:16px; color:#e0e0e0; }
+.stability-island { background:#12121a; border-radius:6px; padding:12px 16px; margin-bottom:10px; border-left:4px solid #888; }
+.stability-island .island-header { font-size:0.85rem; font-weight:600; margin-bottom:6px; color:#e0e0e0; }
+.stability-island .island-detail { font-size:0.75rem; color:#aaa; line-height:1.6; }
+.stability-island .island-verdict { font-size:0.8rem; font-weight:600; margin-top:6px; }
 </style>
 </head>
 <body>
@@ -63,6 +72,7 @@ input[type=checkbox] { accent-color:#ff4081; }
     <h1>Paint Bikini</h1>
     <span class="status" id="status">就绪</span>
     <div class="spacer"></div>
+    <button class="ghost" id="btn-stability">检查稳定性</button>
     <button class="ghost" id="btn-clear">清空</button>
     <button class="ghost" id="btn-undo">撤销 ⌘Z</button>
     <button id="btn-export">导出 OBJ</button>
@@ -94,6 +104,13 @@ input[type=checkbox] { accent-color:#ff4081; }
     <div id="loading"><div class="inner"><div class="spin"></div><div class="msg">加载身体模型...</div></div></div>
     <div id="viewport-info">左键: 画笔 / 右键: 旋转 / 滚轮: 缩放 / 中键: 平移</div>
     <div id="viewport-cursor-info"></div>
+    <div id="stability-overlay">
+      <div id="stability-panel">
+        <h2>布料稳定性分析</h2>
+        <div id="stability-results"></div>
+        <button class="btn" id="stability-close" style="margin-top:16px">关闭</button>
+      </div>
+    </div>
   </main>
 
   <aside id="panel">
@@ -135,6 +152,7 @@ input[type=checkbox] { accent-color:#ff4081; }
         <span class="key">2</span> 橡皮擦<br>
         <span class="key">3</span> 绑带画笔<br>
         <span class="key">4</span> 仅旋转<br>
+        <span class="key">5</span> 检查稳定性<br>
         <span class="key">[</span> / <span class="key">]</span> 缩小/放大笔刷<br>
         <span class="key">⌘Z</span> / <span class="key">Ctrl+Z</span> 撤销<br>
         <span class="key">S</span> 切换对称
@@ -185,6 +203,8 @@ let neighbors = null;          // array of arrays, vertex adjacency
 let bodyColorAttr = null;
 let fabricMeshes = [];
 let strapMeshes = [];
+let strapEndpoints = [];  // [{startIdx, endIdx}, ...] body vertex indices per strap
+let bodyBounds = null;    // {minY, maxY} in world coords after centering
 let cursorRing = null;
 let strapStartMarker = null;
 let raycaster = new THREE.Raycaster();
@@ -369,6 +389,8 @@ async function loadBody() {
     scaledPos[i*3+1] -= minY;
     scaledPos[i*3+2] -= cz;
   }
+
+  bodyBounds = { minY: 0, maxY: maxY - minY };
 
   // Weld duplicate vertices (OBJ often has duplicates at UV seams)
   const {positions: weldedPos, indices: weldedIdx} = weldVertices(scaledPos);
@@ -844,6 +866,7 @@ function createStrap(startIdx, endIdx) {
   const strapMesh = new THREE.Mesh(tube, strapMat);
   scene.add(strapMesh);
   strapMeshes.push(strapMesh);
+  strapEndpoints.push({ startIdx, endIdx });
   document.getElementById('stat-straps').textContent = `绑带数: ${strapMeshes.length}`;
   return true;
 }
@@ -855,6 +878,7 @@ function clearStraps() {
     m.material.dispose();
   }
   strapMeshes.length = 0;
+  strapEndpoints.length = 0;
   document.getElementById('stat-straps').textContent = `绑带数: 0`;
 }
 
@@ -921,6 +945,7 @@ function undo() {
     const m = strapMeshes.pop();
     scene.remove(m); m.geometry.dispose(); m.material.dispose();
   }
+  while (strapEndpoints.length > snap.strapCount) strapEndpoints.pop();
   document.getElementById('stat-fabric-tris').textContent = `布料三角形: ${fabricMeshes.reduce((s,m)=>s + (m.geometry.index.count/3), 0).toLocaleString()}`;
   document.getElementById('stat-straps').textContent = `绑带数: ${strapMeshes.length}`;
   document.getElementById('stat-covered').textContent = `已涂: ${countCovered()}`;
@@ -939,6 +964,187 @@ function clearAll() {
   state.strapStart = -1;
   strapStartMarker.visible = false;
   setStatus('已清空');
+}
+
+// ============================================================================
+// STABILITY ANALYSIS — static check: will the fabric fall under gravity?
+// ============================================================================
+function analyzeStability() {
+  if (!coverage || !bodyGeo) { setStatus('没有布料可分析'); return; }
+
+  const threshold = 64;
+  const pos = bodyGeo.attributes.position.array;
+  const nrm = bodyGeo.attributes.normal.array;
+  const nVerts = coverage.length;
+
+  // --- Step 1: Connected components (islands) of covered vertices ---
+  const visited = new Uint8Array(nVerts);
+  const islandOf = new Int32Array(nVerts).fill(-1);
+  const islands = [];
+
+  for (let seed = 0; seed < nVerts; seed++) {
+    if (coverage[seed] < threshold || visited[seed]) continue;
+    const verts = [];
+    const queue = [seed];
+    visited[seed] = 1;
+    let head = 0;
+    while (head < queue.length) {
+      const v = queue[head++];
+      verts.push(v);
+      islandOf[v] = islands.length;
+      const nb = neighbors[v];
+      for (let k = 0; k < nb.length; k++) {
+        const u = nb[k];
+        if (!visited[u] && coverage[u] >= threshold) {
+          visited[u] = 1;
+          queue.push(u);
+        }
+      }
+    }
+    let minY = Infinity, maxY = -Infinity;
+    let sumX = 0, sumY = 0, sumZ = 0;
+    for (const v of verts) {
+      const y = pos[v*3+1];
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+      sumX += pos[v*3]; sumY += y; sumZ += pos[v*3+2];
+    }
+    islands.push({ verts, minY, maxY,
+      cx: sumX / verts.length, cy: sumY / verts.length, cz: sumZ / verts.length });
+  }
+
+  if (islands.length === 0) { showStabilityPanel([]); setStatus('没有已涂覆区域'); return; }
+
+  const bodyH = bodyBounds ? bodyBounds.maxY : 1.8;
+  const results = [];
+
+  for (let i = 0; i < islands.length; i++) {
+    const isl = islands[i];
+    if (isl.verts.length < 5) continue; // skip noise
+
+    // --- Check A: Strap suspension ---
+    let hasStrap = false, strapLift = 0;
+    for (const ep of strapEndpoints) {
+      const sI = islandOf[ep.startIdx], eI = islandOf[ep.endIdx];
+      const sY = pos[ep.startIdx*3+1], eY = pos[ep.endIdx*3+1];
+      if (sI === i && eI !== i && eY > isl.cy) {
+        hasStrap = true; strapLift = Math.max(strapLift, eY - isl.cy);
+      }
+      if (eI === i && sI !== i && sY > isl.cy) {
+        hasStrap = true; strapLift = Math.max(strapLift, sY - isl.cy);
+      }
+    }
+
+    // --- Check B: Friction wrapping (angular span around body) ---
+    const nBins = Math.max(5, Math.ceil((isl.maxY - isl.minY) / 0.01));
+    const binH = (isl.maxY - isl.minY) / nBins || 0.01;
+    let maxWrap = 0;
+    for (let b = 0; b < nBins; b++) {
+      const yLo = isl.minY + b * binH, yHi = yLo + binH;
+      const angles = [];
+      for (const v of isl.verts) {
+        if (pos[v*3+1] >= yLo && pos[v*3+1] < yHi) {
+          angles.push(Math.atan2(pos[v*3+2], pos[v*3]));
+        }
+      }
+      if (angles.length < 3) continue;
+      angles.sort((a, b) => a - b);
+      let maxGap = angles[0] + 2*Math.PI - angles[angles.length-1];
+      for (let j = 1; j < angles.length; j++) {
+        maxGap = Math.max(maxGap, angles[j] - angles[j-1]);
+      }
+      maxWrap = Math.max(maxWrap, 2*Math.PI - maxGap);
+    }
+    const wrapDeg = maxWrap * 180 / Math.PI;
+
+    // --- Check C: Concave body support (normals pointing up = body cradles fabric) ---
+    let sumNy = 0;
+    for (const v of isl.verts) sumNy += nrm[v*3+1];
+    const avgNy = sumNy / isl.verts.length;
+    const concave = avgNy > 0.3;
+
+    // --- Location name ---
+    const relY = isl.cy / bodyH;
+    let location;
+    if (relY > 0.75) location = '肩部区域';
+    else if (relY > 0.60) location = '胸部区域';
+    else if (relY > 0.45) location = '腰部区域';
+    else if (relY > 0.30) location = '臀部区域';
+    else location = '腿部区域';
+
+    // --- Verdict ---
+    let score, verdict, color;
+    if (hasStrap && strapLift > 0.05) {
+      score = 3; verdict = '稳定 — 绑带悬挂支撑'; color = '#4caf50';
+    } else if (wrapDeg >= 270) {
+      score = 3; verdict = '稳定 — 充分包裹体表'; color = '#4caf50';
+    } else if (hasStrap) {
+      score = 2; verdict = '较稳定 — 有绑带辅助'; color = '#8bc34a';
+    } else if (wrapDeg >= 180) {
+      score = 2; verdict = '较稳定 — 摩擦力支撑'; color = '#ffeb3b';
+    } else if (concave) {
+      score = 2; verdict = '较稳定 — 凹面托住'; color = '#ffeb3b';
+    } else if (wrapDeg >= 90) {
+      score = 1; verdict = '不稳定 — 包裹不足'; color = '#ff9800';
+    } else {
+      score = 0; verdict = '会掉落 — 无有效支撑'; color = '#f44336';
+    }
+
+    results.push({ index: i, location, vertexCount: isl.verts.length,
+      hasStrap, strapLift, wrapDeg, concave, avgNy, score, verdict, color, verts: isl.verts });
+  }
+
+  results.sort((a, b) => a.score - b.score);
+  showStabilityPanel(results);
+
+  // Visual: tint body vertices by stability color, hide fabric to show
+  const cArr = bodyColorAttr.array;
+  for (const r of results) {
+    const c = new THREE.Color(r.color);
+    for (const v of r.verts) {
+      cArr[v*3+0] = c.r * 0.6 + SKIN_COLOR.r * 0.4;
+      cArr[v*3+1] = c.g * 0.6 + SKIN_COLOR.g * 0.4;
+      cArr[v*3+2] = c.b * 0.6 + SKIN_COLOR.b * 0.4;
+    }
+  }
+  bodyColorAttr.needsUpdate = true;
+  for (const m of fabricMeshes) m.visible = false;
+  setStatus(`分析完成: ${results.length} 个布料区域`);
+}
+
+function showStabilityPanel(results) {
+  const container = document.getElementById('stability-results');
+  if (results.length === 0) {
+    container.innerHTML = '<div style="color:#888;font-size:0.85rem">没有检测到布料区域</div>';
+  } else {
+    let html = '';
+    const worst = results[0].score;
+    const summaryColor = worst >= 3 ? '#4caf50' : worst >= 2 ? '#ffeb3b' : worst >= 1 ? '#ff9800' : '#f44336';
+    const summaryText = worst >= 3 ? '✓ 所有布料区域都稳定' :
+      worst >= 2 ? '⚠ 部分区域稳定性一般' :
+      worst >= 1 ? '⚠ 存在不稳定区域' : '✗ 有布料会掉落';
+    html += `<div style="font-size:0.9rem;font-weight:600;color:${summaryColor};margin-bottom:16px">${summaryText}</div>`;
+    for (const r of results) {
+      html += `<div class="stability-island" style="border-left-color:${r.color}">`;
+      html += `<div class="island-header">${r.location} (${r.vertexCount} 顶点)</div>`;
+      html += `<div class="island-detail">`;
+      html += `包裹角度: ${r.wrapDeg.toFixed(0)}°<br>`;
+      html += `绑带支撑: ${r.hasStrap ? '有 (提升 ' + (r.strapLift*100).toFixed(1) + 'cm)' : '无'}<br>`;
+      html += `凹面支撑: ${r.concave ? '有' : '无'} (法线Y=${r.avgNy.toFixed(2)})`;
+      html += `</div>`;
+      html += `<div class="island-verdict" style="color:${r.color}">${r.verdict}</div>`;
+      html += `</div>`;
+    }
+    container.innerHTML = html;
+  }
+  document.getElementById('stability-overlay').style.display = 'flex';
+}
+
+function dismissStability() {
+  document.getElementById('stability-overlay').style.display = 'none';
+  resetBodyColors();
+  const showFabric = document.getElementById('chk-show-fabric').checked;
+  for (const m of fabricMeshes) m.visible = showFabric;
 }
 
 function applyPaintAt(hit) {
@@ -1110,6 +1316,8 @@ function initUI() {
   document.getElementById('btn-undo').addEventListener('click', undo);
   document.getElementById('btn-regen').addEventListener('click', regenerateFabric);
   document.getElementById('btn-export').addEventListener('click', exportOBJ);
+  document.getElementById('btn-stability').addEventListener('click', analyzeStability);
+  document.getElementById('stability-close').addEventListener('click', dismissStability);
 
   // Canvas events
   const canvas = renderer.domElement;
@@ -1126,6 +1334,7 @@ function initUI() {
     else if (e.key === '2') setTool('eraser');
     else if (e.key === '3') setTool('strap');
     else if (e.key === '4') setTool('orbit');
+    else if (e.key === '5') analyzeStability();
     else if (e.key === '[') setBrushRadius(Math.max(0.005, state.brushRadius - 0.005));
     else if (e.key === ']') setBrushRadius(Math.min(0.08, state.brushRadius + 0.005));
     else if (e.key === 's' || e.key === 'S') {
