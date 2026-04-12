@@ -56,10 +56,12 @@ input[type=checkbox] { accent-color:#ff4081; }
 .stat { font-size:0.7rem; color:#888; margin-top:4px; }
 .key { display:inline-block; background:#2a2a4a; color:#ccc; padding:1px 5px; border-radius:3px; font-size:0.65rem; font-family:monospace; }
 
-/* Stability overlay */
-#stability-overlay { position:absolute; inset:0; background:rgba(10,10,18,0.85); z-index:50; display:none; align-items:center; justify-content:center; }
-#stability-panel { background:#1a1a2e; border:1px solid #2a2a4a; border-radius:8px; padding:24px; max-width:500px; width:90%; max-height:80vh; overflow-y:auto; }
-#stability-panel h2 { font-size:1rem; margin-bottom:16px; color:#e0e0e0; }
+/* Analysis overlay (stability / privacy) */
+#analysis-overlay { position:absolute; inset:0; background:rgba(10,10,18,0.85); z-index:50; display:none; align-items:center; justify-content:center; }
+#analysis-panel { background:#1a1a2e; border:1px solid #2a2a4a; border-radius:8px; padding:24px; max-width:500px; width:90%; max-height:80vh; overflow-y:auto; }
+#analysis-panel h2 { font-size:1rem; margin-bottom:16px; color:#e0e0e0; }
+.progress-bar { height:8px; border-radius:4px; background:#2a2a4a; margin:6px 0; overflow:hidden; }
+.progress-bar .fill { height:100%; border-radius:4px; transition: width 0.3s; }
 .stability-island { background:#12121a; border-radius:6px; padding:12px 16px; margin-bottom:10px; border-left:4px solid #888; }
 .stability-island .island-header { font-size:0.85rem; font-weight:600; margin-bottom:6px; color:#e0e0e0; }
 .stability-island .island-detail { font-size:0.75rem; color:#aaa; line-height:1.6; }
@@ -73,6 +75,7 @@ input[type=checkbox] { accent-color:#ff4081; }
     <span class="status" id="status">就绪</span>
     <div class="spacer"></div>
     <button class="ghost" id="btn-stability">检查稳定性</button>
+    <button class="ghost" id="btn-privacy">隐私检查</button>
     <button class="ghost" id="btn-clear">清空</button>
     <button class="ghost" id="btn-undo">撤销 ⌘Z</button>
     <button id="btn-export">导出 OBJ</button>
@@ -104,11 +107,11 @@ input[type=checkbox] { accent-color:#ff4081; }
     <div id="loading"><div class="inner"><div class="spin"></div><div class="msg">加载身体模型...</div></div></div>
     <div id="viewport-info">左键: 画笔 / 右键: 旋转 / 滚轮: 缩放 / 中键: 平移</div>
     <div id="viewport-cursor-info"></div>
-    <div id="stability-overlay">
-      <div id="stability-panel">
-        <h2>布料稳定性分析</h2>
-        <div id="stability-results"></div>
-        <button class="btn" id="stability-close" style="margin-top:16px">关闭</button>
+    <div id="analysis-overlay">
+      <div id="analysis-panel">
+        <h2 id="analysis-title">分析</h2>
+        <div id="analysis-results"></div>
+        <button class="btn" id="analysis-close" style="margin-top:16px">关闭</button>
       </div>
     </div>
   </main>
@@ -153,6 +156,7 @@ input[type=checkbox] { accent-color:#ff4081; }
         <span class="key">3</span> 绑带画笔<br>
         <span class="key">4</span> 仅旋转<br>
         <span class="key">5</span> 检查稳定性<br>
+        <span class="key">6</span> 隐私检查<br>
         <span class="key">[</span> / <span class="key">]</span> 缩小/放大笔刷<br>
         <span class="key">⌘Z</span> / <span class="key">Ctrl+Z</span> 撤销<br>
         <span class="key">S</span> 切换对称
@@ -1113,7 +1117,8 @@ function analyzeStability() {
 }
 
 function showStabilityPanel(results) {
-  const container = document.getElementById('stability-results');
+  document.getElementById('analysis-title').textContent = '布料稳定性分析';
+  const container = document.getElementById('analysis-results');
   if (results.length === 0) {
     container.innerHTML = '<div style="color:#888;font-size:0.85rem">没有检测到布料区域</div>';
   } else {
@@ -1137,14 +1142,106 @@ function showStabilityPanel(results) {
     }
     container.innerHTML = html;
   }
-  document.getElementById('stability-overlay').style.display = 'flex';
+  document.getElementById('analysis-overlay').style.display = 'flex';
 }
 
-function dismissStability() {
-  document.getElementById('stability-overlay').style.display = 'none';
+function dismissAnalysis() {
+  document.getElementById('analysis-overlay').style.display = 'none';
   resetBodyColors();
   const showFabric = document.getElementById('chk-show-fabric').checked;
   for (const m of fabricMeshes) m.visible = showFabric;
+}
+
+// ============================================================================
+// PRIVACY COVERAGE CHECK — are intimate areas adequately covered?
+// ============================================================================
+function checkPrivacyCoverage() {
+  if (!coverage || !bodyGeo || !bodyBounds) { setStatus('没有身体可检查'); return; }
+
+  const threshold = 64;
+  const pos = bodyGeo.attributes.position.array;
+  const nrm = bodyGeo.attributes.normal.array;
+  const nVerts = coverage.length;
+  const bodyH = bodyBounds.maxY;
+
+  // Define privacy zones by body-relative coordinates + normal direction
+  const zones = [
+    { name: '左胸',     relYMin: 0.69, relYMax: 0.79, xMin: -0.15, xMax: -0.015, nzMin: 0.0 },
+    { name: '右胸',     relYMin: 0.69, relYMax: 0.79, xMin:  0.015, xMax:  0.15, nzMin: 0.0 },
+    { name: '下体(前)', relYMin: 0.45, relYMax: 0.56, xMin: -0.10, xMax: 0.10, nzMin: -0.3 },
+    { name: '臀部',     relYMin: 0.47, relYMax: 0.60, xMin: -0.12, xMax: 0.12, nzMax: -0.1 },
+  ];
+
+  const results = [];
+  const allZoneVerts = [];
+
+  for (const zone of zones) {
+    const verts = [];
+    let coveredCount = 0;
+    for (let i = 0; i < nVerts; i++) {
+      const x = pos[i*3], y = pos[i*3+1], nz = nrm[i*3+2];
+      const relY = y / bodyH;
+      if (relY < zone.relYMin || relY > zone.relYMax) continue;
+      if (x < zone.xMin || x > zone.xMax) continue;
+      if (zone.nzMin !== undefined && nz < zone.nzMin) continue;
+      if (zone.nzMax !== undefined && nz > zone.nzMax) continue;
+      verts.push(i);
+      if (coverage[i] >= threshold) coveredCount++;
+    }
+    const ratio = verts.length > 0 ? coveredCount / verts.length : 0;
+    const pct = Math.round(ratio * 100);
+
+    let verdict, color;
+    if (pct >= 80) { verdict = '覆盖充分'; color = '#4caf50'; }
+    else if (pct >= 50) { verdict = '部分覆盖'; color = '#ffeb3b'; }
+    else if (pct >= 20) { verdict = '覆盖不足'; color = '#ff9800'; }
+    else { verdict = '暴露'; color = '#f44336'; }
+
+    results.push({ name: zone.name, totalVerts: verts.length, coveredCount, pct, verdict, color, verts });
+    allZoneVerts.push(...verts.map(v => ({ v, covered: coverage[v] >= threshold })));
+  }
+
+  // Overall score
+  const allOk = results.every(r => r.pct >= 80);
+  const anyExposed = results.some(r => r.pct < 20);
+
+  // Show panel
+  document.getElementById('analysis-title').textContent = '隐私部位覆盖检查';
+  const container = document.getElementById('analysis-results');
+  let html = '';
+
+  // Summary
+  const summaryColor = allOk ? '#4caf50' : anyExposed ? '#f44336' : '#ffeb3b';
+  const summaryText = allOk ? '✓ 所有隐私部位覆盖充分' :
+    anyExposed ? '✗ 有隐私部位暴露' : '⚠ 部分区域覆盖不足';
+  html += `<div style="font-size:0.9rem;font-weight:600;color:${summaryColor};margin-bottom:16px">${summaryText}</div>`;
+
+  for (const r of results) {
+    html += `<div class="stability-island" style="border-left-color:${r.color}">`;
+    html += `<div class="island-header">${r.name}</div>`;
+    html += `<div class="island-detail">`;
+    html += `区域顶点: ${r.totalVerts} &nbsp;|&nbsp; 已覆盖: ${r.coveredCount}`;
+    html += `<div class="progress-bar"><div class="fill" style="width:${r.pct}%;background:${r.color}"></div></div>`;
+    html += `</div>`;
+    html += `<div class="island-verdict" style="color:${r.color}">${r.verdict} (${r.pct}%)</div>`;
+    html += `</div>`;
+  }
+  container.innerHTML = html;
+  document.getElementById('analysis-overlay').style.display = 'flex';
+
+  // Visual: tint zone vertices on body (green=covered, red=exposed)
+  const cArr = bodyColorAttr.array;
+  resetBodyColors();
+  for (const { v, covered } of allZoneVerts) {
+    if (covered) {
+      cArr[v*3+0] = 0.3; cArr[v*3+1] = 0.75; cArr[v*3+2] = 0.3;
+    } else {
+      cArr[v*3+0] = 0.95; cArr[v*3+1] = 0.15; cArr[v*3+2] = 0.15;
+    }
+  }
+  bodyColorAttr.needsUpdate = true;
+  for (const m of fabricMeshes) m.visible = false;
+  setStatus('隐私覆盖检查完成');
 }
 
 function applyPaintAt(hit) {
@@ -1317,7 +1414,8 @@ function initUI() {
   document.getElementById('btn-regen').addEventListener('click', regenerateFabric);
   document.getElementById('btn-export').addEventListener('click', exportOBJ);
   document.getElementById('btn-stability').addEventListener('click', analyzeStability);
-  document.getElementById('stability-close').addEventListener('click', dismissStability);
+  document.getElementById('btn-privacy').addEventListener('click', checkPrivacyCoverage);
+  document.getElementById('analysis-close').addEventListener('click', dismissAnalysis);
 
   // Canvas events
   const canvas = renderer.domElement;
@@ -1335,6 +1433,7 @@ function initUI() {
     else if (e.key === '3') setTool('strap');
     else if (e.key === '4') setTool('orbit');
     else if (e.key === '5') analyzeStability();
+    else if (e.key === '6') checkPrivacyCoverage();
     else if (e.key === '[') setBrushRadius(Math.max(0.005, state.brushRadius - 0.005));
     else if (e.key === ']') setBrushRadius(Math.min(0.08, state.brushRadius + 0.005));
     else if (e.key === 's' || e.key === 'S') {
