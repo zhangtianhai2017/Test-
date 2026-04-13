@@ -2215,6 +2215,19 @@ window.__test = {
     return {fabrics:fabricMeshes.length, straps:strapMeshes.length, bindings:edgeBindingMeshes.length, seams:seamLineMeshes.length};
   },
   vertexCount() { return bodyGeo ? bodyGeo.attributes.position.count : 0; },
+  getLibrary() { return SWIMWEAR_LIBRARY; },
+  applyTemplate(templateIndex) {
+    const template = SWIMWEAR_LIBRARY[templateIndex];
+    const cov = computeTemplateCoverage(template);
+    coverage.set(cov);
+    regenerateFabric();
+    generateEdgeBinding();
+    generateSeamLines();
+    if (template.straps && template.straps.length > 0) {
+      addTemplateStraps(template, 1, template, 0);
+    }
+    document.getElementById('stat-covered').textContent = `已涂: ${countCovered()}`;
+  },
 };
 
 
