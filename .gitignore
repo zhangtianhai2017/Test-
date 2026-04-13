@@ -18,6 +18,7 @@ web/generated/
 !privacy_zones_debug.png
 !privacy_zones_debug.obj
 !output/**/*.png
+!test-results/**/*.png
 .pytest_cache/
 .mypy_cache/
 node_modules/
