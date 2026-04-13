@@ -1306,8 +1306,109 @@ function checkPrivacyCoverage() {
 }
 
 // ============================================================================
-// AUTO-GENERATE SWIMWEAR — transform rough paint into realistic garment
+// AUTO-GENERATE SWIMWEAR — library-based template matching + morphing
 // ============================================================================
+
+// --- Swimwear template library: 6 common styles ---
+// Each template defines coverage zones using body-relative coordinates.
+// Zone shape: 'rect' = hard box, 'ellipse' = soft elliptical falloff.
+// Coordinates derived from actual body mesh probing.
+const SWIMWEAR_LIBRARY = [
+  {
+    name: '三角比基尼',
+    features: { hasTop: 1, hasBottom: 1, hasMiddle: 0, topWidth: 0.35, bottomHeight: 0.3 },
+    zones: [
+      // Left cup — small triangle
+      { relYMin:0.68, relYMax:0.78, xMin:-0.13, xMax:-0.02, nzMin:0.0, shape:'ellipse', cx:-0.075, cy:0.73 },
+      // Right cup
+      { relYMin:0.68, relYMax:0.78, xMin:0.02, xMax:0.13, nzMin:0.0, shape:'ellipse', cx:0.075, cy:0.73 },
+      // Front bottom — narrow V
+      { relYMin:0.46, relYMax:0.55, xMin:-0.08, xMax:0.08, nzMin:-0.2, shape:'ellipse', cx:0, cy:0.50 },
+      // Back bottom — narrow
+      { relYMin:0.48, relYMax:0.56, xMin:-0.07, xMax:0.07, nzMax:0.1, shape:'ellipse', cx:0, cy:0.52 },
+    ],
+    straps: [
+      { type:'shoulder', fromRelY:0.76, fromX:-0.07, toRelY:0.87, toX:-0.08 },
+      { type:'shoulder', fromRelY:0.76, fromX:0.07, toRelY:0.87, toX:0.08 },
+    ],
+  },
+  {
+    name: '抹胸比基尼',
+    features: { hasTop: 1, hasBottom: 1, hasMiddle: 0, topWidth: 0.70, bottomHeight: 0.3 },
+    zones: [
+      // Bandeau top — wide horizontal band, full wrap
+      { relYMin:0.67, relYMax:0.77, xMin:-0.14, xMax:0.14, shape:'rect' },
+      // Hipster bottom — moderate coverage
+      { relYMin:0.45, relYMax:0.56, xMin:-0.10, xMax:0.10, nzMin:-0.3, shape:'rect' },
+      { relYMin:0.47, relYMax:0.57, xMin:-0.09, xMax:0.09, nzMax:0.1, shape:'rect' },
+    ],
+    straps: [], // strapless
+  },
+  {
+    name: '挂脖比基尼',
+    features: { hasTop: 1, hasBottom: 1, hasMiddle: 0, topWidth: 0.50, bottomHeight: 0.3 },
+    zones: [
+      // Left cup — wider than triangle
+      { relYMin:0.67, relYMax:0.79, xMin:-0.14, xMax:-0.01, nzMin:0.0, shape:'ellipse', cx:-0.075, cy:0.73 },
+      // Right cup
+      { relYMin:0.67, relYMax:0.79, xMin:0.01, xMax:0.14, nzMin:0.0, shape:'ellipse', cx:0.075, cy:0.73 },
+      // Front bottom
+      { relYMin:0.46, relYMax:0.56, xMin:-0.09, xMax:0.09, nzMin:-0.2, shape:'ellipse', cx:0, cy:0.51 },
+      // Back bottom
+      { relYMin:0.48, relYMax:0.57, xMin:-0.08, xMax:0.08, nzMax:0.1, shape:'ellipse', cx:0, cy:0.52 },
+    ],
+    straps: [
+      // Halter: both cups to neck center
+      { type:'halter', fromRelY:0.77, fromX:-0.05, toRelY:0.90, toX:-0.01 },
+      { type:'halter', fromRelY:0.77, fromX:0.05, toRelY:0.90, toX:0.01 },
+    ],
+  },
+  {
+    name: '运动比基尼',
+    features: { hasTop: 1, hasBottom: 1, hasMiddle: 0, topWidth: 0.75, bottomHeight: 0.5 },
+    zones: [
+      // Sports bra — wide, high coverage, front+back
+      { relYMin:0.66, relYMax:0.79, xMin:-0.14, xMax:0.14, shape:'rect' },
+      // Boy shorts — wide, more leg coverage
+      { relYMin:0.43, relYMax:0.57, xMin:-0.13, xMax:0.13, shape:'rect' },
+    ],
+    straps: [
+      { type:'shoulder', fromRelY:0.77, fromX:-0.08, toRelY:0.87, toX:-0.09 },
+      { type:'shoulder', fromRelY:0.77, fromX:0.08, toRelY:0.87, toX:0.09 },
+    ],
+  },
+  {
+    name: '高腰比基尼',
+    features: { hasTop: 1, hasBottom: 1, hasMiddle: 0.4, topWidth: 0.45, bottomHeight: 0.85 },
+    zones: [
+      // Standard cups
+      { relYMin:0.67, relYMax:0.78, xMin:-0.14, xMax:-0.01, nzMin:0.0, shape:'ellipse', cx:-0.075, cy:0.73 },
+      { relYMin:0.67, relYMax:0.78, xMin:0.01, xMax:0.14, nzMin:0.0, shape:'ellipse', cx:0.075, cy:0.73 },
+      // High-waist bottom — extends well above navel
+      { relYMin:0.44, relYMax:0.63, xMin:-0.14, xMax:0.14, shape:'rect' },
+    ],
+    straps: [
+      { type:'shoulder', fromRelY:0.76, fromX:-0.07, toRelY:0.87, toX:-0.08 },
+      { type:'shoulder', fromRelY:0.76, fromX:0.07, toRelY:0.87, toX:0.08 },
+    ],
+  },
+  {
+    name: '连体泳衣',
+    features: { hasTop: 1, hasBottom: 1, hasMiddle: 1, topWidth: 0.60, bottomHeight: 1.0 },
+    zones: [
+      // Full torso front
+      { relYMin:0.45, relYMax:0.79, xMin:-0.14, xMax:0.14, nzMin:-0.15, shape:'rect' },
+      // Full torso back
+      { relYMin:0.47, relYMax:0.78, xMin:-0.12, xMax:0.12, nzMax:0.05, shape:'rect' },
+    ],
+    straps: [
+      { type:'shoulder', fromRelY:0.77, fromX:-0.07, toRelY:0.87, toX:-0.08 },
+      { type:'shoulder', fromRelY:0.77, fromX:0.07, toRelY:0.87, toX:0.08 },
+    ],
+  },
+];
+
+// --- Main auto-generate pipeline ---
 function autoGenerateSwimwear() {
   if (!coverage || !bodyGeo || !bodyBounds) { setStatus('没有涂抹区域'); return; }
   if (countCovered() < 10) { setStatus('请先涂抹一些区域'); return; }
@@ -1315,32 +1416,163 @@ function autoGenerateSwimwear() {
   pushUndoSnapshot();
   setStatus('自动生成泳衣...');
 
-  // Step 1: Morphological cleanup — smooth edges, fill gaps
+  // Step 1: Extract features from user's paint
+  const userFeatures = extractPaintFeatures();
+  console.log('User features:', JSON.stringify(userFeatures));
+
+  // Step 2: Match to library — find 2 closest templates
+  const matches = matchToLibrary(userFeatures);
+  console.log(`Match: #1 "${matches[0].name}" (d=${matches[0].dist.toFixed(3)}), #2 "${matches[1].name}" (d=${matches[1].dist.toFixed(3)})`);
+  setStatus(`匹配: ${matches[0].name} + ${matches[1].name}`);
+
+  // Step 3: Generate template coverages
+  const tCov1 = computeTemplateCoverage(matches[0].template);
+  const tCov2 = computeTemplateCoverage(matches[1].template);
+
+  // Step 4: Three-way blend (template1 + template2 + user paint)
+  const nVerts = coverage.length;
+  const d1 = matches[0].dist || 0.001;
+  const d2 = matches[1].dist || 0.001;
+  // Inverse-distance weighting: closer template gets more weight
+  const w1 = (1/d1) / (1/d1 + 1/d2);
+  const w2 = 1 - w1;
+  for (let i = 0; i < nVerts; i++) {
+    const templateVal = w1 * tCov1[i] + w2 * tCov2[i];
+    // 70% template guidance + 30% user intent
+    coverage[i] = Math.min(255, Math.round(0.7 * templateVal + 0.3 * coverage[i]));
+  }
+
+  // Step 5: Morphological cleanup for smooth edges
   cleanupCoverage();
 
-  // Step 2: Regenerate fabric mesh with cleaned coverage
+  // Step 6: Regenerate fabric + construction details
   regenerateFabric();
-
-  // Step 3: Edge binding (fold-over elastic) along all fabric boundaries
   generateEdgeBinding();
-
-  // Step 4: Seam lines for garment construction realism
   generateSeamLines();
 
-  // Step 5: Auto-add straps if top coverage exists without straps
-  autoAddStraps();
+  // Step 7: Add straps from matched template(s)
+  if (strapMeshes.length === 0) {
+    addTemplateStraps(matches[0].template, w1, matches[1].template, w2);
+  }
 
   document.getElementById('stat-covered').textContent = `已涂: ${countCovered()}`;
-  setStatus('泳衣生成完成');
+  setStatus(`泳衣生成完成 — ${matches[0].name}${w2 > 0.25 ? ' + ' + matches[1].name : ''}`);
 }
 
-// --- Morphological cleanup: dilate→smooth→erode to clean raw brush strokes ---
+// --- Feature extraction from user's paint coverage ---
+function extractPaintFeatures() {
+  const threshold = 64;
+  const pos = bodyGeo.attributes.position.array;
+  const bodyH = bodyBounds.maxY;
+
+  let topCount = 0, bottomCount = 0, middleCount = 0;
+  let topMinX = Infinity, topMaxX = -Infinity;
+  let bottomMaxRelY = 0;
+
+  for (let i = 0; i < coverage.length; i++) {
+    if (coverage[i] < threshold) continue;
+    const relY = pos[i*3+1] / bodyH;
+    const x = pos[i*3];
+
+    // Top zone (chest): relY 0.64~0.82
+    if (relY > 0.64 && relY < 0.82) {
+      topCount++;
+      if (x < topMinX) topMinX = x;
+      if (x > topMaxX) topMaxX = x;
+    }
+    // Bottom zone (hip): relY 0.42~0.60
+    if (relY > 0.42 && relY < 0.60) {
+      bottomCount++;
+      if (relY > bottomMaxRelY) bottomMaxRelY = relY;
+    }
+    // Middle zone (waist): relY 0.58~0.66 — key for one-piece detection
+    if (relY > 0.58 && relY < 0.66) {
+      middleCount++;
+    }
+  }
+
+  // Binary intent detection: any meaningful paint = 1, none = 0
+  const hasTop = topCount > 15 ? 1 : 0;
+  const hasBottom = bottomCount > 15 ? 1 : 0;
+  const hasMiddle = middleCount > 10 ? 1 : 0;
+
+  // Top width: X-extent of covered vertices / body width at chest (~0.28m)
+  const topWidth = topCount > 15 ? Math.min(1, (topMaxX - topMinX) / 0.28) : 0;
+
+  // Bottom height: how high bottom extends (0=low bikini, 1=high-waist)
+  const bottomHeight = bottomCount > 15 ? Math.max(0, Math.min(1, (bottomMaxRelY - 0.44) / (0.63 - 0.44))) : 0;
+
+  return { hasTop, hasBottom, hasMiddle, topWidth, bottomHeight };
+}
+
+// --- Match user features to library templates ---
+function matchToLibrary(userF) {
+  const scored = SWIMWEAR_LIBRARY.map(t => {
+    const f = t.features;
+    const dist = Math.sqrt(
+      (userF.hasTop - f.hasTop) ** 2 +
+      (userF.hasBottom - f.hasBottom) ** 2 +
+      (userF.hasMiddle - f.hasMiddle) ** 2 * 2 +   // weight middle more (one-piece vs bikini)
+      (userF.topWidth - f.topWidth) ** 2 +
+      (userF.bottomHeight - f.bottomHeight) ** 2
+    );
+    return { template: t, name: t.name, dist };
+  });
+  scored.sort((a, b) => a.dist - b.dist);
+  return [scored[0], scored[1]];
+}
+
+// --- Compute per-vertex coverage array from a template ---
+function computeTemplateCoverage(template) {
+  const pos = bodyGeo.attributes.position.array;
+  const nrm = bodyGeo.attributes.normal.array;
+  const bodyH = bodyBounds.maxY;
+  const nVerts = coverage.length;
+  const cov = new Uint8Array(nVerts);
+
+  for (const zone of template.zones) {
+    for (let i = 0; i < nVerts; i++) {
+      const x = pos[i*3], y = pos[i*3+1], nz = nrm[i*3+2];
+      const relY = y / bodyH;
+
+      // Bounding box check
+      if (relY < zone.relYMin || relY > zone.relYMax) continue;
+      if (x < zone.xMin || x > zone.xMax) continue;
+      if (zone.nzMin !== undefined && nz < zone.nzMin) continue;
+      if (zone.nzMax !== undefined && nz > zone.nzMax) continue;
+
+      if (zone.shape === 'ellipse' && zone.cx !== undefined) {
+        // Elliptical falloff from zone center
+        const cxW = zone.cx * bodyH; // cx is in normalized x but we compare to raw x
+        const cyW = zone.cy * bodyH; // cy is relY
+        const rx = (zone.xMax - zone.xMin) / 2;
+        const ry = (zone.relYMax - zone.relYMin) / 2 * bodyH;
+        const dx = (x - zone.cx) / rx;
+        const dy = (y - zone.cy * bodyH) / ry;
+        const d2 = dx*dx + dy*dy;
+        if (d2 > 1.0) continue; // outside ellipse
+        // Smooth cosine falloff
+        const falloff = 0.5 * (1 + Math.cos(Math.sqrt(d2) * Math.PI));
+        cov[i] = Math.max(cov[i], Math.round(200 * falloff));
+      } else {
+        // Rectangular — full coverage inside box, soft at edges
+        const edgeX = Math.min(x - zone.xMin, zone.xMax - x) / 0.01;
+        const edgeY = Math.min(relY - zone.relYMin, zone.relYMax - relY) / 0.01;
+        const edge = Math.min(1, Math.min(edgeX, edgeY));
+        cov[i] = Math.max(cov[i], Math.round(200 * Math.min(1, edge)));
+      }
+    }
+  }
+  return cov;
+}
+
+// --- Morphological cleanup: smooth edges after blending ---
 function cleanupCoverage() {
   const threshold = 64;
   const nVerts = coverage.length;
 
-  // Pass 1: Dilate — fill small holes (3 passes)
-  for (let pass = 0; pass < 3; pass++) {
+  // Dilate — fill small holes (2 passes)
+  for (let pass = 0; pass < 2; pass++) {
     const next = coverage.slice();
     for (let i = 0; i < nVerts; i++) {
       if (coverage[i] >= threshold) continue;
@@ -1356,8 +1588,8 @@ function cleanupCoverage() {
     coverage.set(next);
   }
 
-  // Pass 2: Smooth — Gaussian-like averaging (2 passes)
-  for (let pass = 0; pass < 2; pass++) {
+  // Smooth — Gaussian-like averaging (3 passes for cleaner edges)
+  for (let pass = 0; pass < 3; pass++) {
     const next = coverage.slice();
     for (let i = 0; i < nVerts; i++) {
       const nb = neighbors[i];
@@ -1372,7 +1604,7 @@ function cleanupCoverage() {
     coverage.set(next);
   }
 
-  // Pass 3: Erode — remove thin protrusions (1 pass)
+  // Erode — remove thin protrusions (1 pass)
   {
     const next = coverage.slice();
     for (let i = 0; i < nVerts; i++) {
@@ -1385,22 +1617,6 @@ function cleanupCoverage() {
       if (covCount < Math.ceil(nb.length * 0.3)) {
         next[i] = 0;
       }
-    }
-    coverage.set(next);
-  }
-
-  // Pass 4: Final smooth for clean boundary (1 pass)
-  {
-    const next = coverage.slice();
-    for (let i = 0; i < nVerts; i++) {
-      const nb = neighbors[i];
-      let sum = coverage[i] * 2;
-      let weight = 2;
-      for (let k = 0; k < nb.length; k++) {
-        sum += coverage[nb[k]];
-        weight++;
-      }
-      next[i] = Math.round(sum / weight);
     }
     coverage.set(next);
   }
@@ -1671,51 +1887,38 @@ function addSeamLine(startIdx, endIdx) {
   seamLineMeshes.push(mesh);
 }
 
-// --- Auto-add straps if top coverage lacks support ---
-function autoAddStraps() {
-  if (strapMeshes.length > 0) return; // user already added straps
+// --- Add straps from template definitions ---
+function addTemplateStraps(t1, w1, t2, w2) {
+  // Use straps from the dominant template (higher weight)
+  const template = w1 >= w2 ? t1 : t2;
+  if (!template.straps || template.straps.length === 0) return;
 
-  const threshold = 64;
   const pos = bodyGeo.attributes.position.array;
+  const nrm = bodyGeo.attributes.normal.array;
   const bodyH = bodyBounds.maxY;
 
-  // Check for top coverage (breast area)
-  let topLeftApex = -1, topRightApex = -1;
-  let leftMaxY = 0, rightMaxY = 0;
-  let hasTop = false;
+  // Find nearest body vertex to a (relY, x) coordinate
+  function findVertex(relY, targetX) {
+    const targetY = relY * bodyH;
+    let best = -1, bestD = Infinity;
+    for (let i = 0; i < coverage.length; i++) {
+      const nz = nrm[i*3+2];
+      if (nz < -0.1) continue; // skip back-facing for front straps
+      const dy = pos[i*3+1] - targetY;
+      const dx = pos[i*3] - targetX;
+      const d = dx*dx + dy*dy*0.5; // weight Y less to be more tolerant
+      if (d < bestD) { bestD = d; best = i; }
+    }
+    return best;
+  }
 
-  for (let i = 0; i < coverage.length; i++) {
-    if (coverage[i] < threshold) continue;
-    const relY = pos[i*3+1] / bodyH;
-    if (relY > 0.64 && relY < 0.82) {
-      hasTop = true;
-      if (pos[i*3] < -0.015 && pos[i*3+1] > leftMaxY) {
-        leftMaxY = pos[i*3+1]; topLeftApex = i;
-      }
-      if (pos[i*3] > 0.015 && pos[i*3+1] > rightMaxY) {
-        rightMaxY = pos[i*3+1]; topRightApex = i;
-      }
+  for (const s of template.straps) {
+    const fromV = findVertex(s.fromRelY, s.fromX);
+    const toV = findVertex(s.toRelY, s.toX);
+    if (fromV >= 0 && toV >= 0) {
+      createStrap(fromV, toV);
     }
   }
-
-  if (!hasTop || topLeftApex < 0 || topRightApex < 0) return;
-
-  // Find shoulder vertices (high on body, lateral position)
-  const shoulderRelY = 0.87;
-  let leftShoulder = -1, rightShoulder = -1;
-  let lsBest = Infinity, rsBest = Infinity;
-  for (let i = 0; i < coverage.length; i++) {
-    const relY = pos[i*3+1] / bodyH;
-    const x = pos[i*3];
-    const nz = bodyGeo.attributes.normal.array[i*3+2];
-    if (nz < 0) continue; // only front-facing
-    const dist = Math.abs(relY - shoulderRelY);
-    if (x < -0.04 && x > -0.14 && dist < lsBest) { lsBest = dist; leftShoulder = i; }
-    if (x > 0.04 && x < 0.14 && dist < rsBest) { rsBest = dist; rightShoulder = i; }
-  }
-
-  if (leftShoulder >= 0) createStrap(topLeftApex, leftShoulder);
-  if (rightShoulder >= 0) createStrap(topRightApex, rightShoulder);
 }
 
 function applyPaintAt(hit) {
