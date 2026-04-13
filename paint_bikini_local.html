@@ -1,0 +1,2043 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paint Bikini - 3D 涂抹式泳装生成器</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; font-family:-apple-system,'Segoe UI',system-ui,'PingFang SC',sans-serif; background:#0a0a12; color:#e0e0e0; overflow:hidden; user-select:none; }
+#app { display:grid; grid-template-columns:64px 1fr 300px; grid-template-rows:48px 1fr; height:100vh; }
+
+/* Header */
+#header { grid-column:1/-1; background:linear-gradient(90deg,#1a1a2e,#16213e); border-bottom:1px solid #2a2a4a; display:flex; align-items:center; padding:0 20px; gap:20px; }
+#header h1 { font-size:1rem; font-weight:600; background:linear-gradient(90deg,#ff4081,#c23bf0); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+#header .status { font-size:0.75rem; color:#888; }
+#header .spacer { flex:1; }
+#header button { background:linear-gradient(135deg,#e94560,#c23bf0); color:#fff; border:none; border-radius:4px; padding:6px 14px; font-size:0.8rem; font-weight:500; cursor:pointer; margin-left:6px; }
+#header button:hover { opacity:0.9; }
+#header button.ghost { background:#2a2a4a; }
+
+/* Left toolbar */
+#toolbar { background:#12121a; border-right:1px solid #2a2a4a; padding:8px 0; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.tool { width:48px; height:48px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; border-radius:6px; color:#888; transition:all 0.15s; position:relative; }
+.tool:hover { background:#1a1a2e; color:#e0e0e0; }
+.tool.active { background:linear-gradient(135deg,#e94560,#c23bf0); color:#fff; }
+.tool svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.tool .lbl { font-size:0.55rem; margin-top:2px; }
+.tool-sep { width:30px; height:1px; background:#2a2a4a; margin:4px 0; }
+
+/* Viewport */
+#viewport { position:relative; background:#0a0a12; overflow:hidden; }
+#canvas { width:100%; height:100%; display:block; }
+#viewport-info { position:absolute; left:12px; bottom:12px; font-size:0.7rem; color:#666; background:rgba(0,0,0,0.5); padding:6px 10px; border-radius:4px; pointer-events:none; }
+#viewport-cursor-info { position:absolute; right:12px; bottom:12px; font-size:0.7rem; color:#aaa; background:rgba(0,0,0,0.5); padding:6px 10px; border-radius:4px; pointer-events:none; }
+#loading { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(10,10,18,0.9); z-index:100; }
+#loading .inner { text-align:center; }
+#loading .spin { width:40px; height:40px; border:3px solid #2a2a4a; border-top-color:#ff4081; border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 12px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+#loading .msg { font-size:0.85rem; color:#aaa; }
+
+/* Right panel */
+#panel { background:#12121a; border-left:1px solid #2a2a4a; padding:16px; overflow-y:auto; }
+.section { margin-bottom:22px; padding-bottom:16px; border-bottom:1px solid #1e1e30; }
+.section:last-child { border-bottom:none; }
+.section h3 { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.12em; color:#888; margin-bottom:10px; font-weight:600; }
+.row { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; font-size:0.8rem; }
+.row label { color:#ccc; }
+.row .val { color:#fff; font-weight:500; font-size:0.75rem; min-width:40px; text-align:right; }
+input[type=range] { width:100%; accent-color:#ff4081; margin:6px 0; }
+input[type=checkbox] { accent-color:#ff4081; }
+.btn { width:100%; padding:8px; background:#2a2a4a; color:#e0e0e0; border:none; border-radius:4px; font-size:0.8rem; cursor:pointer; margin-top:4px; transition:background 0.15s; }
+.btn:hover { background:#3a3a5a; }
+.btn.danger { background:#8a2a3a; }
+.btn.danger:hover { background:#a33a4a; }
+.hint { font-size:0.7rem; color:#666; line-height:1.5; margin-top:8px; }
+.stat { font-size:0.7rem; color:#888; margin-top:4px; }
+.key { display:inline-block; background:#2a2a4a; color:#ccc; padding:1px 5px; border-radius:3px; font-size:0.65rem; font-family:monospace; }
+
+/* Analysis overlay (stability / privacy) */
+#analysis-overlay { position:absolute; inset:0; background:rgba(10,10,18,0.85); z-index:50; display:none; align-items:center; justify-content:center; }
+#analysis-panel { background:#1a1a2e; border:1px solid #2a2a4a; border-radius:8px; padding:24px; max-width:500px; width:90%; max-height:80vh; overflow-y:auto; }
+#analysis-panel h2 { font-size:1rem; margin-bottom:16px; color:#e0e0e0; }
+.progress-bar { height:8px; border-radius:4px; background:#2a2a4a; margin:6px 0; overflow:hidden; }
+.progress-bar .fill { height:100%; border-radius:4px; transition: width 0.3s; }
+.stability-island { background:#12121a; border-radius:6px; padding:12px 16px; margin-bottom:10px; border-left:4px solid #888; }
+.stability-island .island-header { font-size:0.85rem; font-weight:600; margin-bottom:6px; color:#e0e0e0; }
+.stability-island .island-detail { font-size:0.75rem; color:#aaa; line-height:1.6; }
+.stability-island .island-verdict { font-size:0.8rem; font-weight:600; margin-top:6px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="header">
+    <h1>Paint Bikini</h1>
+    <span class="status" id="status">就绪</span>
+    <div class="spacer"></div>
+    <button class="ghost" id="btn-stability">检查稳定性</button>
+    <button class="ghost" id="btn-privacy">隐私检查</button>
+    <button id="btn-auto">自动生成泳衣</button>
+    <button class="ghost" id="btn-clear">清空</button>
+    <button class="ghost" id="btn-undo">撤销 ⌘Z</button>
+    <button id="btn-export">导出 OBJ</button>
+  </header>
+
+  <aside id="toolbar">
+    <div class="tool active" data-tool="cover" title="覆盖画笔 (1)">
+      <svg viewBox="0 0 24 24"><path d="M12 2C8 2 4 6 4 11s4 9 8 9 8-4 8-9-4-9-8-9z"/><circle cx="12" cy="11" r="3"/></svg>
+      <span class="lbl">覆盖</span>
+    </div>
+    <div class="tool" data-tool="eraser" title="橡皮擦 (2)">
+      <svg viewBox="0 0 24 24"><path d="M3 17l6 6 12-12-6-6L3 17z"/><path d="M9 11l6 6"/></svg>
+      <span class="lbl">橡皮</span>
+    </div>
+    <div class="tool-sep"></div>
+    <div class="tool" data-tool="strap" title="绑带画笔 (3)">
+      <svg viewBox="0 0 24 24"><path d="M4 12c4-8 12-8 16 0"/><circle cx="4" cy="12" r="2"/><circle cx="20" cy="12" r="2"/></svg>
+      <span class="lbl">绑带</span>
+    </div>
+    <div class="tool-sep"></div>
+    <div class="tool" data-tool="orbit" title="只旋转 (4)">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>
+      <span class="lbl">视角</span>
+    </div>
+  </aside>
+
+  <main id="viewport">
+    <canvas id="canvas"></canvas>
+    <div id="loading"><div class="inner"><div class="spin"></div><div class="msg">加载身体模型...</div></div></div>
+    <div id="viewport-info">左键: 画笔 / 右键: 旋转 / 滚轮: 缩放 / 中键: 平移</div>
+    <div id="viewport-cursor-info"></div>
+    <div id="analysis-overlay">
+      <div id="analysis-panel">
+        <h2 id="analysis-title">分析</h2>
+        <div id="analysis-results"></div>
+        <button class="btn" id="analysis-close" style="margin-top:16px">关闭</button>
+      </div>
+    </div>
+  </main>
+
+  <aside id="panel">
+    <div class="section">
+      <h3>笔刷大小</h3>
+      <div class="row"><label>半径</label><span class="val" id="val-radius">3.0 cm</span></div>
+      <input type="range" id="rng-radius" min="5" max="80" value="30" step="1">
+      <div class="row"><label>强度</label><span class="val" id="val-strength">0.8</span></div>
+      <input type="range" id="rng-strength" min="10" max="100" value="80" step="5">
+    </div>
+
+    <div class="section">
+      <h3>选项</h3>
+      <div class="row"><label><input type="checkbox" id="chk-symmetry" checked> 左右对称</label></div>
+      <div class="row"><label><input type="checkbox" id="chk-show-body" checked> 显示身体</label></div>
+      <div class="row"><label><input type="checkbox" id="chk-show-fabric" checked> 显示布料</label></div>
+    </div>
+
+    <div class="section">
+      <h3>布料厚度</h3>
+      <div class="row"><label>外推距离</label><span class="val" id="val-offset">3.0 mm</span></div>
+      <input type="range" id="rng-offset" min="10" max="100" value="30" step="1">
+      <button class="btn" id="btn-regen">重新生成布料</button>
+    </div>
+
+    <div class="section">
+      <h3>统计</h3>
+      <div class="stat" id="stat-verts">顶点: -</div>
+      <div class="stat" id="stat-faces">三角形: -</div>
+      <div class="stat" id="stat-covered">已涂: 0</div>
+      <div class="stat" id="stat-fabric-tris">布料三角形: 0</div>
+      <div class="stat" id="stat-straps">绑带数: 0</div>
+    </div>
+
+    <div class="section">
+      <h3>快捷键</h3>
+      <div class="hint">
+        <span class="key">1</span> 覆盖画笔<br>
+        <span class="key">2</span> 橡皮擦<br>
+        <span class="key">3</span> 绑带画笔<br>
+        <span class="key">4</span> 仅旋转<br>
+        <span class="key">5</span> 检查稳定性<br>
+        <span class="key">6</span> 隐私检查<br>
+        <span class="key">7</span> 自动生成泳衣<br>
+        <span class="key">[</span> / <span class="key">]</span> 缩小/放大笔刷<br>
+        <span class="key">⌘Z</span> / <span class="key">Ctrl+Z</span> 撤销<br>
+        <span class="key">S</span> 切换对称
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>说明</h3>
+      <div class="hint">
+        本工具在浏览器中运行，纯平台无关。<br>
+        需通过静态服务器打开（例如 <span class="key">python -m http.server</span>）。
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/build/three.module.js",
+    "three/addons/": "./vendor/three/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+
+// ============================================================================
+// STATE
+// ============================================================================
+const state = {
+  tool: 'cover',
+  brushRadius: 0.03,     // meters
+  brushStrength: 0.8,    // 0..1
+  fabricOffset: 0.003,   // 3mm
+  symmetry: true,
+  painting: false,
+  strapStart: -1,
+  lastStatusClear: 0,
+};
+
+let scene, camera, renderer, controls;
+let bodyMesh = null, bodyGeo = null;
+let coverage = null;           // Uint8Array, per-vertex coverage 0..255
+let neighbors = null;          // array of arrays, vertex adjacency
+let bodyColorAttr = null;
+let fabricMeshes = [];
+let strapMeshes = [];
+let strapEndpoints = [];  // [{startIdx, endIdx}, ...] body vertex indices per strap
+let edgeBindingMeshes = [];  // fold-over elastic binding along fabric edges
+let seamLineMeshes = [];     // construction seam lines on fabric surface
+let bodyBounds = null;    // {minY, maxY} in world coords after centering
+let cursorRing = null;
+let strapStartMarker = null;
+let raycaster = new THREE.Raycaster();
+let mouseNDC = new THREE.Vector2();
+let hoverHit = null;
+let undoStack = [];
+
+const SKIN_COLOR = new THREE.Color(0xf0d5c8);
+const PAINT_HINT = new THREE.Color(0xf5b0b8);  // subtle tint during painting
+const FABRIC_COLOR = 0xc62850;
+const STRAP_COLOR = 0x9a1040;
+
+// Procedural fabric weave texture (created once, reused)
+// Simulates lycra/spandex swimwear: fine jersey knit with subtle sheen
+let fabricTexture = null;
+let fabricBumpMap = null;
+function ensureFabricTexture() {
+  if (fabricTexture) return;
+  const size = 512;
+  const canvas = document.createElement('canvas');
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+
+  // Base swim fabric color
+  ctx.fillStyle = '#c62850';
+  ctx.fillRect(0, 0, size, size);
+
+  // Fine jersey knit — horizontal courses (rows of knit loops)
+  for (let y = 0; y < size; y++) {
+    const phase = y % 4;
+    if (phase === 0) {
+      ctx.fillStyle = 'rgba(255,255,255,0.04)';
+      ctx.fillRect(0, y, size, 1);
+    } else if (phase === 2) {
+      ctx.fillStyle = 'rgba(0,0,0,0.035)';
+      ctx.fillRect(0, y, size, 1);
+    }
+  }
+
+  // Vertical wales (knit columns) — very subtle
+  for (let x = 0; x < size; x += 3) {
+    ctx.fillStyle = (x % 6 < 3) ? 'rgba(0,0,0,0.018)' : 'rgba(255,255,255,0.012)';
+    ctx.fillRect(x, 0, 1, size);
+  }
+
+  // Micro diagonal texture (characteristic of warp-knit tricot)
+  ctx.save();
+  ctx.globalAlpha = 0.018;
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 0.5;
+  for (let i = -size; i < size * 2; i += 8) {
+    ctx.beginPath();
+    ctx.moveTo(i, 0);
+    ctx.lineTo(i + size * 0.25, size);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 0.012;
+  ctx.strokeStyle = '#fff';
+  for (let i = -size; i < size * 2; i += 8) {
+    ctx.beginPath();
+    ctx.moveTo(i + 4, 0);
+    ctx.lineTo(i + 4 + size * 0.25, size);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // Subtle noise for fabric grain
+  const imgData = ctx.getImageData(0, 0, size, size);
+  for (let i = 0; i < imgData.data.length; i += 4) {
+    const noise = (Math.random() - 0.5) * 4;
+    imgData.data[i] = Math.max(0, Math.min(255, imgData.data[i] + noise));
+    imgData.data[i+1] = Math.max(0, Math.min(255, imgData.data[i+1] + noise));
+    imgData.data[i+2] = Math.max(0, Math.min(255, imgData.data[i+2] + noise));
+  }
+  ctx.putImageData(imgData, 0, 0);
+
+  fabricTexture = new THREE.CanvasTexture(canvas);
+  fabricTexture.wrapS = THREE.RepeatWrapping;
+  fabricTexture.wrapT = THREE.RepeatWrapping;
+
+  // Bump map — fine horizontal ribbing characteristic of jersey knit
+  const bSize = 128;
+  const bCanvas = document.createElement('canvas');
+  bCanvas.width = bSize; bCanvas.height = bSize;
+  const bCtx = bCanvas.getContext('2d');
+  bCtx.fillStyle = '#808080';
+  bCtx.fillRect(0, 0, bSize, bSize);
+  for (let y = 0; y < bSize; y++) {
+    const v = 128 + Math.sin(y * Math.PI / 1.5) * 12;
+    bCtx.fillStyle = `rgb(${v|0},${v|0},${v|0})`;
+    bCtx.fillRect(0, y, bSize, 1);
+  }
+  // Subtle vertical wale structure
+  for (let x = 0; x < bSize; x += 3) {
+    const v = (x % 6 < 3) ? 136 : 120;
+    bCtx.globalAlpha = 0.25;
+    bCtx.fillStyle = `rgb(${v},${v},${v})`;
+    bCtx.fillRect(x, 0, 1, bSize);
+    bCtx.globalAlpha = 1;
+  }
+  fabricBumpMap = new THREE.CanvasTexture(bCanvas);
+  fabricBumpMap.wrapS = THREE.RepeatWrapping;
+  fabricBumpMap.wrapT = THREE.RepeatWrapping;
+}
+
+// ============================================================================
+// SCENE SETUP
+// ============================================================================
+function initScene() {
+  const canvas = document.getElementById('canvas');
+  const vp = document.getElementById('viewport');
+
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x15151f);
+
+  camera = new THREE.PerspectiveCamera(35, vp.clientWidth / vp.clientHeight, 0.01, 100);
+  camera.position.set(0, 0.95, 1.8);
+
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setSize(vp.clientWidth, vp.clientHeight, false);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+  // Lighting
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x303050, 0.7));
+  const keyLight = new THREE.DirectionalLight(0xffffff, 1.1);
+  keyLight.position.set(2, 3, 3);
+  scene.add(keyLight);
+  const fillLight = new THREE.DirectionalLight(0x8090ff, 0.4);
+  fillLight.position.set(-2, 1, -2);
+  scene.add(fillLight);
+
+  // Ground shadow plane
+  const ground = new THREE.Mesh(
+    new THREE.CircleGeometry(1.2, 32),
+    new THREE.MeshBasicMaterial({ color: 0x0a0a12, transparent: true, opacity: 0.7 })
+  );
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -0.01;
+  scene.add(ground);
+
+  // Controls
+  controls = new OrbitControls(camera, canvas);
+  controls.target.set(0, 0.9, 0);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.mouseButtons = {
+    LEFT: null, // painted by our handlers
+    MIDDLE: THREE.MOUSE.PAN,
+    RIGHT: THREE.MOUSE.ROTATE,
+  };
+  controls.touches = {
+    ONE: THREE.TOUCH.ROTATE,
+    TWO: THREE.TOUCH.DOLLY_PAN,
+  };
+  controls.update();
+
+  // Cursor ring (visible on body surface)
+  const ringGeo = new THREE.RingGeometry(state.brushRadius * 0.92, state.brushRadius, 48);
+  const ringMat = new THREE.MeshBasicMaterial({
+    color: 0xff4081, side: THREE.DoubleSide, transparent: true, opacity: 0.85, depthTest: false,
+  });
+  cursorRing = new THREE.Mesh(ringGeo, ringMat);
+  cursorRing.visible = false;
+  cursorRing.renderOrder = 999;
+  scene.add(cursorRing);
+
+  // Strap start marker
+  const markerGeo = new THREE.SphereGeometry(0.008, 16, 16);
+  const markerMat = new THREE.MeshBasicMaterial({ color: 0x00e0ff, depthTest: false });
+  strapStartMarker = new THREE.Mesh(markerGeo, markerMat);
+  strapStartMarker.visible = false;
+  strapStartMarker.renderOrder = 999;
+  scene.add(strapStartMarker);
+
+  window.addEventListener('resize', onResize);
+  onResize();
+}
+
+function onResize() {
+  const vp = document.getElementById('viewport');
+  camera.aspect = vp.clientWidth / vp.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(vp.clientWidth, vp.clientHeight, false);
+}
+
+// ============================================================================
+// BODY LOADING + MESH CLEANUP
+// ============================================================================
+async function loadBody() {
+  setStatus('下载身体 OBJ...');
+  const loader = new OBJLoader();
+  const obj = await new Promise((resolve, reject) => {
+    loader.load('assets/base_body.obj', resolve, undefined, reject);
+  });
+
+  // Find first mesh in the loaded group
+  let raw = null;
+  obj.traverse(o => { if (!raw && o.isMesh) raw = o; });
+  if (!raw) throw new Error('No mesh in OBJ');
+
+  setStatus('清洗网格...');
+  // OBJ vertices are in cm. Scale to meters and center at feet.
+  const rawPos = raw.geometry.attributes.position;
+  const scaledPos = new Float32Array(rawPos.count * 3);
+  for (let i = 0; i < rawPos.count; i++) {
+    scaledPos[i * 3 + 0] = rawPos.getX(i) * 0.01;
+    scaledPos[i * 3 + 1] = rawPos.getY(i) * 0.01;
+    scaledPos[i * 3 + 2] = rawPos.getZ(i) * 0.01;
+  }
+
+  // Bounding box for centering
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity, minZ = Infinity, maxZ = -Infinity;
+  for (let i = 0; i < rawPos.count; i++) {
+    const x = scaledPos[i*3], y = scaledPos[i*3+1], z = scaledPos[i*3+2];
+    if (x < minX) minX = x; if (x > maxX) maxX = x;
+    if (y < minY) minY = y; if (y > maxY) maxY = y;
+    if (z < minZ) minZ = z; if (z > maxZ) maxZ = z;
+  }
+  const cx = (minX + maxX) / 2;
+  const cz = (minZ + maxZ) / 2;
+  // Shift so feet at y=0, body centered in x,z
+  for (let i = 0; i < rawPos.count; i++) {
+    scaledPos[i*3+0] -= cx;
+    scaledPos[i*3+1] -= minY;
+    scaledPos[i*3+2] -= cz;
+  }
+
+  bodyBounds = { minY: 0, maxY: maxY - minY };
+
+  // Weld duplicate vertices (OBJ often has duplicates at UV seams)
+  const {positions: weldedPos, indices: weldedIdx} = weldVertices(scaledPos);
+
+  // Build clean geometry
+  bodyGeo = new THREE.BufferGeometry();
+  bodyGeo.setAttribute('position', new THREE.Float32BufferAttribute(weldedPos, 3));
+  bodyGeo.setIndex(weldedIdx);
+  bodyGeo.computeVertexNormals();
+
+  const nVerts = bodyGeo.attributes.position.count;
+  const nFaces = weldedIdx.length / 3;
+
+  setStatus('构建邻接表...');
+  neighbors = buildAdjacency(weldedIdx, nVerts);
+
+  // Init coverage and vertex colors
+  coverage = new Uint8Array(nVerts);
+  const colors = new Float32Array(nVerts * 3);
+  for (let i = 0; i < nVerts; i++) {
+    colors[i*3+0] = SKIN_COLOR.r;
+    colors[i*3+1] = SKIN_COLOR.g;
+    colors[i*3+2] = SKIN_COLOR.b;
+  }
+  bodyColorAttr = new THREE.Float32BufferAttribute(colors, 3);
+  bodyGeo.setAttribute('color', bodyColorAttr);
+
+  // Material
+  const bodyMat = new THREE.MeshStandardMaterial({
+    vertexColors: true,
+    roughness: 0.85,
+    metalness: 0.02,
+  });
+  bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+  scene.add(bodyMesh);
+
+  // Adjust camera target to body center
+  const bodyCenterY = (maxY - minY) * 0.55; // slightly above middle
+  controls.target.set(0, bodyCenterY, 0);
+  camera.position.set(0, bodyCenterY + 0.05, 1.6);
+  controls.update();
+
+  // Update stats
+  document.getElementById('stat-verts').textContent = `顶点: ${nVerts.toLocaleString()}`;
+  document.getElementById('stat-faces').textContent = `三角形: ${nFaces.toLocaleString()}`;
+
+  document.getElementById('loading').style.display = 'none';
+  setStatus('就绪 — 用覆盖画笔在身体上涂抹');
+}
+
+function weldVertices(positions) {
+  // Quantize to 0.1mm and merge duplicates.
+  const Q = 10000;
+  const key2idx = new Map();
+  const newPos = [];
+  const remap = new Int32Array(positions.length / 3);
+  for (let i = 0; i < positions.length / 3; i++) {
+    const x = Math.round(positions[i*3] * Q);
+    const y = Math.round(positions[i*3+1] * Q);
+    const z = Math.round(positions[i*3+2] * Q);
+    const k = x + '|' + y + '|' + z;
+    let idx = key2idx.get(k);
+    if (idx === undefined) {
+      idx = newPos.length / 3;
+      key2idx.set(k, idx);
+      newPos.push(positions[i*3], positions[i*3+1], positions[i*3+2]);
+    }
+    remap[i] = idx;
+  }
+  // Rebuild indices as triangle list
+  const indices = [];
+  for (let i = 0; i < remap.length; i += 3) {
+    const a = remap[i], b = remap[i+1], c = remap[i+2];
+    // Drop degenerate triangles
+    if (a === b || b === c || a === c) continue;
+    indices.push(a, b, c);
+  }
+  return { positions: newPos, indices };
+}
+
+function buildAdjacency(indices, nVerts) {
+  const nbrs = new Array(nVerts);
+  for (let i = 0; i < nVerts; i++) nbrs[i] = new Set();
+  for (let i = 0; i < indices.length; i += 3) {
+    const a = indices[i], b = indices[i+1], c = indices[i+2];
+    nbrs[a].add(b); nbrs[a].add(c);
+    nbrs[b].add(a); nbrs[b].add(c);
+    nbrs[c].add(a); nbrs[c].add(b);
+  }
+  // Convert to typed arrays for faster iteration
+  return nbrs.map(s => new Int32Array(s));
+}
+
+// ============================================================================
+// PAINT — BFS-based radial brush with euclidean falloff
+// ============================================================================
+function paintAtVertex(startIdx, radius, strength, erase) {
+  const pos = bodyGeo.attributes.position.array;
+  const sx = pos[startIdx*3], sy = pos[startIdx*3+1], sz = pos[startIdx*3+2];
+  const visited = new Uint8Array(neighbors.length);
+  visited[startIdx] = 1;
+  const queue = [startIdx];
+  let head = 0;
+  const touched = [];
+  while (head < queue.length) {
+    const i = queue[head++];
+    const dx = pos[i*3] - sx;
+    const dy = pos[i*3+1] - sy;
+    const dz = pos[i*3+2] - sz;
+    const d = Math.sqrt(dx*dx + dy*dy + dz*dz);
+    if (d > radius) continue;
+    // Smooth falloff (cosine)
+    const t = d / radius;
+    const falloff = 0.5 * (1 + Math.cos(t * Math.PI));
+    const add = strength * falloff * 255;
+    const prev = coverage[i];
+    let next;
+    if (erase) next = Math.max(0, prev - add);
+    else next = Math.min(255, prev + add);
+    if (next !== prev) {
+      coverage[i] = next;
+      touched.push(i);
+    }
+    const nb = neighbors[i];
+    for (let k = 0; k < nb.length; k++) {
+      const v = nb[k];
+      if (!visited[v]) {
+        visited[v] = 1;
+        // Only enqueue if there's a chance of being inside the radius
+        const vdx = pos[v*3] - sx;
+        const vdy = pos[v*3+1] - sy;
+        const vdz = pos[v*3+2] - sz;
+        if (vdx*vdx + vdy*vdy + vdz*vdz <= radius * radius * 1.44) {
+          queue.push(v);
+        }
+      }
+    }
+  }
+  // Update vertex colors — subtle tint as painting hint (fabric mesh is the real visual)
+  const cArr = bodyColorAttr.array;
+  for (const i of touched) {
+    const c = Math.min(1, coverage[i] / 200); // subtle, capped
+    cArr[i*3+0] = SKIN_COLOR.r * (1 - c) + PAINT_HINT.r * c;
+    cArr[i*3+1] = SKIN_COLOR.g * (1 - c) + PAINT_HINT.g * c;
+    cArr[i*3+2] = SKIN_COLOR.b * (1 - c) + PAINT_HINT.b * c;
+  }
+  if (touched.length > 0) bodyColorAttr.needsUpdate = true;
+}
+
+// Find the closest vertex on body to an arbitrary 3D point. Linear scan.
+function nearestVertexToPoint(p) {
+  const pos = bodyGeo.attributes.position.array;
+  const n = neighbors.length;
+  let best = -1, bestD = Infinity;
+  for (let i = 0; i < n; i++) {
+    const dx = pos[i*3] - p.x;
+    const dy = pos[i*3+1] - p.y;
+    const dz = pos[i*3+2] - p.z;
+    const d = dx*dx + dy*dy + dz*dz;
+    if (d < bestD) { bestD = d; best = i; }
+  }
+  return best;
+}
+
+// Use raycast hit face to quickly find the nearest vertex (no linear scan).
+function nearestVertexOnHit(hit) {
+  const face = hit.face;
+  const pos = bodyGeo.attributes.position.array;
+  const p = hit.point;
+  let best = face.a, bestD = Infinity;
+  for (const vi of [face.a, face.b, face.c]) {
+    const dx = pos[vi*3] - p.x;
+    const dy = pos[vi*3+1] - p.y;
+    const dz = pos[vi*3+2] - p.z;
+    const d = dx*dx + dy*dy + dz*dz;
+    if (d < bestD) { bestD = d; best = vi; }
+  }
+  return best;
+}
+
+// Count painted vertices for stats display
+function countCovered() {
+  let n = 0;
+  for (let i = 0; i < coverage.length; i++) if (coverage[i] >= 64) n++;
+  return n;
+}
+
+// ============================================================================
+// FABRIC GENERATION — extract covered faces, offset along normals
+// ============================================================================
+function clearFabrics() {
+  for (const m of fabricMeshes) {
+    scene.remove(m);
+    m.geometry.dispose();
+    m.material.dispose();
+  }
+  fabricMeshes.length = 0;
+  clearEdgeBindings();
+  clearSeamLines();
+}
+
+function regenerateFabric() {
+  clearFabrics();
+  ensureFabricTexture();
+
+  const threshold = 64;
+  const idx = bodyGeo.index.array;
+  const posAttr = bodyGeo.attributes.position.array;
+  const nrmAttr = bodyGeo.attributes.normal.array;
+  const offset = state.fabricOffset;
+  const uvScale = 80;
+
+  const vertMap = new Map();   // bodyVertIdx → fabricVertIdx (for fully-covered verts)
+  const edgeCache = new Map(); // "min,max" → fabricVertIdx (for edge-split verts)
+  const newPos = [];
+  const newNormals = [];
+  const newUVs = [];
+  const newIndices = [];
+
+  // Add a fully-covered body vertex to the fabric mesh (with offset)
+  function addVert(bi) {
+    if (vertMap.has(bi)) return vertMap.get(bi);
+    const ni = newPos.length / 3;
+    vertMap.set(bi, ni);
+    newPos.push(
+      posAttr[bi*3]   + nrmAttr[bi*3]   * offset,
+      posAttr[bi*3+1] + nrmAttr[bi*3+1] * offset,
+      posAttr[bi*3+2] + nrmAttr[bi*3+2] * offset
+    );
+    newNormals.push(nrmAttr[bi*3], nrmAttr[bi*3+1], nrmAttr[bi*3+2]);
+    newUVs.push(posAttr[bi*3] * uvScale, posAttr[bi*3+1] * uvScale);
+    return ni;
+  }
+
+  // Add a vertex at the coverage threshold crossing point on edge (inside→outside)
+  function addEdgeSplit(biIn, biOut) {
+    const key = Math.min(biIn, biOut) + ',' + Math.max(biIn, biOut);
+    if (edgeCache.has(key)) return edgeCache.get(key);
+    const cIn = coverage[biIn], cOut = coverage[biOut];
+    const t = (threshold - cIn) / (cOut - cIn); // 0→1 from inside to outside
+    const ni = newPos.length / 3;
+    // Interpolate position and normal on body surface
+    const px = posAttr[biIn*3]*(1-t)   + posAttr[biOut*3]*t;
+    const py = posAttr[biIn*3+1]*(1-t) + posAttr[biOut*3+1]*t;
+    const pz = posAttr[biIn*3+2]*(1-t) + posAttr[biOut*3+2]*t;
+    let nx = nrmAttr[biIn*3]*(1-t)   + nrmAttr[biOut*3]*t;
+    let ny = nrmAttr[biIn*3+1]*(1-t) + nrmAttr[biOut*3+1]*t;
+    let nz = nrmAttr[biIn*3+2]*(1-t) + nrmAttr[biOut*3+2]*t;
+    const len = Math.sqrt(nx*nx + ny*ny + nz*nz) || 1;
+    nx /= len; ny /= len; nz /= len;
+    newPos.push(px + nx * offset, py + ny * offset, pz + nz * offset);
+    newNormals.push(nx, ny, nz);
+    newUVs.push(px * uvScale, py * uvScale);
+    edgeCache.set(key, ni);
+    return ni;
+  }
+
+  // --- Marching triangles: clip each body face by coverage threshold ---
+  for (let f = 0; f < idx.length; f += 3) {
+    const a = idx[f], b = idx[f+1], c = idx[f+2];
+    const ca = coverage[a] >= threshold;
+    const cb = coverage[b] >= threshold;
+    const cc = coverage[c] >= threshold;
+    const cnt = (ca?1:0) + (cb?1:0) + (cc?1:0);
+    if (cnt === 0) continue;
+
+    if (cnt === 3) {
+      // Fully covered
+      newIndices.push(addVert(a), addVert(b), addVert(c));
+    } else if (cnt === 2) {
+      // Two inside, one outside — clip to quad (2 tris)
+      let vIn1, vIn2, vOut;
+      if (!ca) { vIn1 = b; vIn2 = c; vOut = a; }
+      else if (!cb) { vIn1 = a; vIn2 = c; vOut = b; }
+      else { vIn1 = a; vIn2 = b; vOut = c; }
+      const fi1 = addVert(vIn1);
+      const fi2 = addVert(vIn2);
+      const fs1 = addEdgeSplit(vIn1, vOut);
+      const fs2 = addEdgeSplit(vIn2, vOut);
+      newIndices.push(fi1, fi2, fs1);
+      newIndices.push(fi2, fs2, fs1);
+    } else {
+      // One inside, two outside — clip to single tri
+      let vIn, vOut1, vOut2;
+      if (ca) { vIn = a; vOut1 = b; vOut2 = c; }
+      else if (cb) { vIn = b; vOut1 = c; vOut2 = a; }
+      else { vIn = c; vOut1 = a; vOut2 = b; }
+      const fi = addVert(vIn);
+      const fs1 = addEdgeSplit(vIn, vOut1);
+      const fs2 = addEdgeSplit(vIn, vOut2);
+      newIndices.push(fi, fs1, fs2);
+    }
+  }
+
+  if (newIndices.length === 0) {
+    document.getElementById('stat-fabric-tris').textContent = `布料三角形: 0`;
+    resetBodyColors();
+    return;
+  }
+
+  // --- Optional: 2 passes of Laplacian smoothing on boundary for extra polish ---
+  const edgeUse = new Map();
+  for (let i = 0; i < newIndices.length; i += 3) {
+    for (let j = 0; j < 3; j++) {
+      const ea = newIndices[i+j], eb = newIndices[i+(j+1)%3];
+      const ek = Math.min(ea,eb) + ',' + Math.max(ea,eb);
+      edgeUse.set(ek, (edgeUse.get(ek)||0) + 1);
+    }
+  }
+  const bndNb = new Map();
+  for (const [key, cnt] of edgeUse) {
+    if (cnt !== 1) continue;
+    const [ea, eb] = key.split(',').map(Number);
+    if (!bndNb.has(ea)) bndNb.set(ea, []);
+    if (!bndNb.has(eb)) bndNb.set(eb, []);
+    bndNb.get(ea).push(eb);
+    bndNb.get(eb).push(ea);
+  }
+  for (let pass = 0; pass < 2; pass++) {
+    const px = newPos.slice();
+    for (const [vi, nbs] of bndNb) {
+      if (nbs.length < 2) continue;
+      let sx = 0, sy = 0, sz = 0;
+      for (const ni of nbs) { sx += px[ni*3]; sy += px[ni*3+1]; sz += px[ni*3+2]; }
+      sx /= nbs.length; sy /= nbs.length; sz /= nbs.length;
+      newPos[vi*3]   = px[vi*3]   * 0.6 + sx * 0.4;
+      newPos[vi*3+1] = px[vi*3+1] * 0.6 + sy * 0.4;
+      newPos[vi*3+2] = px[vi*3+2] * 0.6 + sz * 0.4;
+    }
+  }
+
+  const fabricGeo = new THREE.BufferGeometry();
+  fabricGeo.setAttribute('position', new THREE.Float32BufferAttribute(newPos, 3));
+  fabricGeo.setAttribute('normal', new THREE.Float32BufferAttribute(newNormals, 3));
+  fabricGeo.setAttribute('uv', new THREE.Float32BufferAttribute(newUVs, 2));
+  fabricGeo.setIndex(newIndices);
+  fabricGeo.computeVertexNormals();
+
+  const fabricMat = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    map: fabricTexture,
+    bumpMap: fabricBumpMap,
+    bumpScale: 0.0006,
+    roughness: 0.55,     // lycra/spandex has subtle sheen
+    metalness: 0.02,
+    side: THREE.DoubleSide,
+  });
+  const fabricMesh = new THREE.Mesh(fabricGeo, fabricMat);
+  fabricMesh.visible = document.getElementById('chk-show-fabric').checked;
+  scene.add(fabricMesh);
+  fabricMeshes.push(fabricMesh);
+
+  document.getElementById('stat-fabric-tris').textContent = `布料三角形: ${(newIndices.length / 3).toLocaleString()}`;
+
+  // Reset body vertex colors to skin — fabric mesh is now the visual
+  resetBodyColors();
+}
+
+// Reset body vertex colors to skin (paint hint disappears, fabric mesh takes over)
+function resetBodyColors() {
+  const cArr = bodyColorAttr.array;
+  for (let i = 0; i < coverage.length; i++) {
+    cArr[i*3+0] = SKIN_COLOR.r;
+    cArr[i*3+1] = SKIN_COLOR.g;
+    cArr[i*3+2] = SKIN_COLOR.b;
+  }
+  bodyColorAttr.needsUpdate = true;
+}
+
+// ============================================================================
+// STRAP — Dijkstra shortest path on vertex graph, then TubeGeometry
+// ============================================================================
+class MinHeap {
+  constructor() { this.h = []; }
+  size() { return this.h.length; }
+  push(k, p) {
+    this.h.push({k, p});
+    this._up(this.h.length - 1);
+  }
+  pop() {
+    if (this.h.length === 0) return null;
+    const top = this.h[0];
+    const last = this.h.pop();
+    if (this.h.length > 0) {
+      this.h[0] = last;
+      this._down(0);
+    }
+    return top;
+  }
+  _up(i) {
+    while (i > 0) {
+      const parent = (i - 1) >> 1;
+      if (this.h[parent].p <= this.h[i].p) break;
+      [this.h[parent], this.h[i]] = [this.h[i], this.h[parent]];
+      i = parent;
+    }
+  }
+  _down(i) {
+    const n = this.h.length;
+    while (true) {
+      const l = 2 * i + 1, r = 2 * i + 2;
+      let smallest = i;
+      if (l < n && this.h[l].p < this.h[smallest].p) smallest = l;
+      if (r < n && this.h[r].p < this.h[smallest].p) smallest = r;
+      if (smallest === i) break;
+      [this.h[i], this.h[smallest]] = [this.h[smallest], this.h[i]];
+      i = smallest;
+    }
+  }
+}
+
+function geodesicPath(startIdx, endIdx) {
+  const n = neighbors.length;
+  // Float64 is required: Float32 rounds `dist[v] = alt` down, so the
+  // double-precision priority `d` later satisfies `d > dist[u]` and the pop
+  // is skipped as stale — cutting off whole regions of the graph.
+  const dist = new Float64Array(n).fill(Infinity);
+  const prev = new Int32Array(n).fill(-1);
+  dist[startIdx] = 0;
+  const heap = new MinHeap();
+  heap.push(startIdx, 0);
+  const pos = bodyGeo.attributes.position.array;
+  let found = false;
+  while (heap.size()) {
+    const {k: u, p: d} = heap.pop();
+    if (u === endIdx) { found = true; break; }
+    if (d > dist[u]) continue;
+    const nb = neighbors[u];
+    const ux = pos[u*3], uy = pos[u*3+1], uz = pos[u*3+2];
+    for (let kk = 0; kk < nb.length; kk++) {
+      const v = nb[kk];
+      const dx = pos[v*3] - ux;
+      const dy = pos[v*3+1] - uy;
+      const dz = pos[v*3+2] - uz;
+      const w = Math.sqrt(dx*dx + dy*dy + dz*dz);
+      const alt = d + w;
+      if (alt < dist[v]) {
+        dist[v] = alt;
+        prev[v] = u;
+        heap.push(v, alt);
+      }
+    }
+  }
+  if (!found) return null;
+  const path = [];
+  let u = endIdx;
+  while (u !== -1) {
+    path.push(u);
+    u = prev[u];
+  }
+  path.reverse();
+  return path;
+}
+
+function createStrap(startIdx, endIdx) {
+  const path = geodesicPath(startIdx, endIdx);
+  if (!path || path.length < 2) return false;
+  const pos = bodyGeo.attributes.position.array;
+  const nrm = bodyGeo.attributes.normal.array;
+  const pts = path.map(i => new THREE.Vector3(
+    pos[i*3] + nrm[i*3] * 0.003,
+    pos[i*3+1] + nrm[i*3+1] * 0.003,
+    pos[i*3+2] + nrm[i*3+2] * 0.003,
+  ));
+  // Downsample path to avoid jitter
+  const step = Math.max(1, Math.floor(pts.length / 40));
+  const down = [];
+  for (let i = 0; i < pts.length; i += step) down.push(pts[i]);
+  if (down[down.length - 1] !== pts[pts.length - 1]) down.push(pts[pts.length - 1]);
+  if (down.length < 2) return false;
+
+  const curve = new THREE.CatmullRomCurve3(down);
+  const tube = new THREE.TubeGeometry(curve, down.length * 4, 0.004, 8, false);
+  const strapMat = new THREE.MeshStandardMaterial({ color: STRAP_COLOR, roughness: 0.45, metalness: 0.1 });
+  const strapMesh = new THREE.Mesh(tube, strapMat);
+  scene.add(strapMesh);
+  strapMeshes.push(strapMesh);
+  strapEndpoints.push({ startIdx, endIdx });
+  document.getElementById('stat-straps').textContent = `绑带数: ${strapMeshes.length}`;
+  return true;
+}
+
+function clearStraps() {
+  for (const m of strapMeshes) {
+    scene.remove(m);
+    m.geometry.dispose();
+    m.material.dispose();
+  }
+  strapMeshes.length = 0;
+  strapEndpoints.length = 0;
+  document.getElementById('stat-straps').textContent = `绑带数: 0`;
+}
+
+// ============================================================================
+// MOUSE / EVENT HANDLING
+// ============================================================================
+function updateNDC(e) {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouseNDC.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+  mouseNDC.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+}
+
+function raycastBody() {
+  if (!bodyMesh) return null;
+  raycaster.setFromCamera(mouseNDC, camera);
+  const hits = raycaster.intersectObject(bodyMesh, false);
+  return hits.length > 0 ? hits[0] : null;
+}
+
+function updateCursor() {
+  const hit = raycastBody();
+  hoverHit = hit;
+  if (hit && (state.tool === 'cover' || state.tool === 'eraser' || state.tool === 'strap')) {
+    cursorRing.visible = true;
+    cursorRing.position.copy(hit.point);
+    // Orient ring to face along the body's surface normal
+    const normal = hit.face.normal.clone().transformDirection(bodyMesh.matrixWorld).normalize();
+    const up = new THREE.Vector3(0, 0, 1);
+    const q = new THREE.Quaternion().setFromUnitVectors(up, normal);
+    cursorRing.quaternion.copy(q);
+    // Small lift to avoid z-fighting
+    cursorRing.position.addScaledVector(normal, 0.002);
+    document.getElementById('viewport-cursor-info').textContent =
+      `X=${hit.point.x.toFixed(2)} Y=${hit.point.y.toFixed(2)} Z=${hit.point.z.toFixed(2)}`;
+  } else {
+    cursorRing.visible = false;
+    document.getElementById('viewport-cursor-info').textContent = '';
+  }
+}
+
+function pushUndoSnapshot() {
+  // Snapshot coverage + counts of fabric/strap meshes.
+  // Capped at 20 entries.
+  const snap = {
+    coverage: coverage.slice(),
+    fabricCount: fabricMeshes.length,
+    strapCount: strapMeshes.length,
+    bindingCount: edgeBindingMeshes.length,
+    seamCount: seamLineMeshes.length,
+  };
+  undoStack.push(snap);
+  if (undoStack.length > 20) undoStack.shift();
+}
+
+function undo() {
+  if (undoStack.length === 0) { setStatus('无可撤销'); return; }
+  const snap = undoStack.pop();
+  coverage.set(snap.coverage);
+  resetBodyColors();
+  // Pop any fabric/strap meshes created after this snapshot
+  while (fabricMeshes.length > snap.fabricCount) {
+    const m = fabricMeshes.pop();
+    scene.remove(m); m.geometry.dispose(); m.material.dispose();
+  }
+  while (strapMeshes.length > snap.strapCount) {
+    const m = strapMeshes.pop();
+    scene.remove(m); m.geometry.dispose(); m.material.dispose();
+  }
+  while (strapEndpoints.length > snap.strapCount) strapEndpoints.pop();
+  while (edgeBindingMeshes.length > snap.bindingCount) {
+    const m = edgeBindingMeshes.pop();
+    scene.remove(m); m.geometry.dispose(); m.material.dispose();
+  }
+  while (seamLineMeshes.length > snap.seamCount) {
+    const m = seamLineMeshes.pop();
+    scene.remove(m); m.geometry.dispose(); m.material.dispose();
+  }
+  document.getElementById('stat-fabric-tris').textContent = `布料三角形: ${fabricMeshes.reduce((s,m)=>s + (m.geometry.index.count/3), 0).toLocaleString()}`;
+  document.getElementById('stat-straps').textContent = `绑带数: ${strapMeshes.length}`;
+  document.getElementById('stat-covered').textContent = `已涂: ${countCovered()}`;
+  regenerateFabric();
+  setStatus('已撤销');
+}
+
+function clearAll() {
+  pushUndoSnapshot();
+  coverage.fill(0);
+  resetBodyColors();
+  clearFabrics();
+  clearStraps();
+  document.getElementById('stat-fabric-tris').textContent = `布料三角形: 0`;
+  document.getElementById('stat-covered').textContent = `已涂: 0`;
+  state.strapStart = -1;
+  strapStartMarker.visible = false;
+  setStatus('已清空');
+}
+
+// ============================================================================
+// STABILITY ANALYSIS — static check: will the fabric fall under gravity?
+// ============================================================================
+function analyzeStability() {
+  if (!coverage || !bodyGeo) { setStatus('没有布料可分析'); return; }
+
+  const threshold = 64;
+  const pos = bodyGeo.attributes.position.array;
+  const nrm = bodyGeo.attributes.normal.array;
+  const nVerts = coverage.length;
+
+  // --- Step 1: Connected components (islands) of covered vertices ---
+  const visited = new Uint8Array(nVerts);
+  const islandOf = new Int32Array(nVerts).fill(-1);
+  const islands = [];
+
+  for (let seed = 0; seed < nVerts; seed++) {
+    if (coverage[seed] < threshold || visited[seed]) continue;
+    const verts = [];
+    const queue = [seed];
+    visited[seed] = 1;
+    let head = 0;
+    while (head < queue.length) {
+      const v = queue[head++];
+      verts.push(v);
+      islandOf[v] = islands.length;
+      const nb = neighbors[v];
+      for (let k = 0; k < nb.length; k++) {
+        const u = nb[k];
+        if (!visited[u] && coverage[u] >= threshold) {
+          visited[u] = 1;
+          queue.push(u);
+        }
+      }
+    }
+    let minY = Infinity, maxY = -Infinity;
+    let sumX = 0, sumY = 0, sumZ = 0;
+    for (const v of verts) {
+      const y = pos[v*3+1];
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+      sumX += pos[v*3]; sumY += y; sumZ += pos[v*3+2];
+    }
+    islands.push({ verts, minY, maxY,
+      cx: sumX / verts.length, cy: sumY / verts.length, cz: sumZ / verts.length });
+  }
+
+  if (islands.length === 0) { showStabilityPanel([]); setStatus('没有已涂覆区域'); return; }
+
+  const bodyH = bodyBounds ? bodyBounds.maxY : 1.8;
+  const results = [];
+
+  for (let i = 0; i < islands.length; i++) {
+    const isl = islands[i];
+    if (isl.verts.length < 5) continue; // skip noise
+
+    // --- Check A: Strap suspension ---
+    let hasStrap = false, strapLift = 0;
+    for (const ep of strapEndpoints) {
+      const sI = islandOf[ep.startIdx], eI = islandOf[ep.endIdx];
+      const sY = pos[ep.startIdx*3+1], eY = pos[ep.endIdx*3+1];
+      if (sI === i && eI !== i && eY > isl.cy) {
+        hasStrap = true; strapLift = Math.max(strapLift, eY - isl.cy);
+      }
+      if (eI === i && sI !== i && sY > isl.cy) {
+        hasStrap = true; strapLift = Math.max(strapLift, sY - isl.cy);
+      }
+    }
+
+    // --- Check B: Friction wrapping (angular span around body) ---
+    const nBins = Math.max(5, Math.ceil((isl.maxY - isl.minY) / 0.01));
+    const binH = (isl.maxY - isl.minY) / nBins || 0.01;
+    let maxWrap = 0;
+    for (let b = 0; b < nBins; b++) {
+      const yLo = isl.minY + b * binH, yHi = yLo + binH;
+      const angles = [];
+      for (const v of isl.verts) {
+        if (pos[v*3+1] >= yLo && pos[v*3+1] < yHi) {
+          angles.push(Math.atan2(pos[v*3+2], pos[v*3]));
+        }
+      }
+      if (angles.length < 3) continue;
+      angles.sort((a, b) => a - b);
+      let maxGap = angles[0] + 2*Math.PI - angles[angles.length-1];
+      for (let j = 1; j < angles.length; j++) {
+        maxGap = Math.max(maxGap, angles[j] - angles[j-1]);
+      }
+      maxWrap = Math.max(maxWrap, 2*Math.PI - maxGap);
+    }
+    const wrapDeg = maxWrap * 180 / Math.PI;
+
+    // --- Check C: Concave body support (normals pointing up = body cradles fabric) ---
+    let sumNy = 0;
+    for (const v of isl.verts) sumNy += nrm[v*3+1];
+    const avgNy = sumNy / isl.verts.length;
+    const concave = avgNy > 0.3;
+
+    // --- Location name ---
+    const relY = isl.cy / bodyH;
+    let location;
+    if (relY > 0.75) location = '肩部区域';
+    else if (relY > 0.60) location = '胸部区域';
+    else if (relY > 0.45) location = '腰部区域';
+    else if (relY > 0.30) location = '臀部区域';
+    else location = '腿部区域';
+
+    // --- Verdict ---
+    let score, verdict, color;
+    if (hasStrap && strapLift > 0.05) {
+      score = 3; verdict = '稳定 — 绑带悬挂支撑'; color = '#4caf50';
+    } else if (wrapDeg >= 270) {
+      score = 3; verdict = '稳定 — 充分包裹体表'; color = '#4caf50';
+    } else if (hasStrap) {
+      score = 2; verdict = '较稳定 — 有绑带辅助'; color = '#8bc34a';
+    } else if (wrapDeg >= 180) {
+      score = 2; verdict = '较稳定 — 摩擦力支撑'; color = '#ffeb3b';
+    } else if (concave) {
+      score = 2; verdict = '较稳定 — 凹面托住'; color = '#ffeb3b';
+    } else if (wrapDeg >= 90) {
+      score = 1; verdict = '不稳定 — 包裹不足'; color = '#ff9800';
+    } else {
+      score = 0; verdict = '会掉落 — 无有效支撑'; color = '#f44336';
+    }
+
+    results.push({ index: i, location, vertexCount: isl.verts.length,
+      hasStrap, strapLift, wrapDeg, concave, avgNy, score, verdict, color, verts: isl.verts });
+  }
+
+  results.sort((a, b) => a.score - b.score);
+  showStabilityPanel(results);
+
+  // Visual: tint body vertices by stability color, hide fabric to show
+  const cArr = bodyColorAttr.array;
+  for (const r of results) {
+    const c = new THREE.Color(r.color);
+    for (const v of r.verts) {
+      cArr[v*3+0] = c.r * 0.6 + SKIN_COLOR.r * 0.4;
+      cArr[v*3+1] = c.g * 0.6 + SKIN_COLOR.g * 0.4;
+      cArr[v*3+2] = c.b * 0.6 + SKIN_COLOR.b * 0.4;
+    }
+  }
+  bodyColorAttr.needsUpdate = true;
+  for (const m of fabricMeshes) m.visible = false;
+  setStatus(`分析完成: ${results.length} 个布料区域`);
+}
+
+function showStabilityPanel(results) {
+  document.getElementById('analysis-title').textContent = '布料稳定性分析';
+  const container = document.getElementById('analysis-results');
+  if (results.length === 0) {
+    container.innerHTML = '<div style="color:#888;font-size:0.85rem">没有检测到布料区域</div>';
+  } else {
+    let html = '';
+    const worst = results[0].score;
+    const summaryColor = worst >= 3 ? '#4caf50' : worst >= 2 ? '#ffeb3b' : worst >= 1 ? '#ff9800' : '#f44336';
+    const summaryText = worst >= 3 ? '✓ 所有布料区域都稳定' :
+      worst >= 2 ? '⚠ 部分区域稳定性一般' :
+      worst >= 1 ? '⚠ 存在不稳定区域' : '✗ 有布料会掉落';
+    html += `<div style="font-size:0.9rem;font-weight:600;color:${summaryColor};margin-bottom:16px">${summaryText}</div>`;
+    for (const r of results) {
+      html += `<div class="stability-island" style="border-left-color:${r.color}">`;
+      html += `<div class="island-header">${r.location} (${r.vertexCount} 顶点)</div>`;
+      html += `<div class="island-detail">`;
+      html += `包裹角度: ${r.wrapDeg.toFixed(0)}°<br>`;
+      html += `绑带支撑: ${r.hasStrap ? '有 (提升 ' + (r.strapLift*100).toFixed(1) + 'cm)' : '无'}<br>`;
+      html += `凹面支撑: ${r.concave ? '有' : '无'} (法线Y=${r.avgNy.toFixed(2)})`;
+      html += `</div>`;
+      html += `<div class="island-verdict" style="color:${r.color}">${r.verdict}</div>`;
+      html += `</div>`;
+    }
+    container.innerHTML = html;
+  }
+  document.getElementById('analysis-overlay').style.display = 'flex';
+}
+
+function dismissAnalysis() {
+  document.getElementById('analysis-overlay').style.display = 'none';
+  resetBodyColors();
+  const showFabric = document.getElementById('chk-show-fabric').checked;
+  for (const m of fabricMeshes) m.visible = showFabric;
+  for (const m of edgeBindingMeshes) m.visible = showFabric;
+  for (const m of seamLineMeshes) m.visible = showFabric;
+}
+
+// ============================================================================
+// PRIVACY COVERAGE CHECK — are intimate areas adequately covered?
+// ============================================================================
+function checkPrivacyCoverage() {
+  if (!coverage || !bodyGeo || !bodyBounds) { setStatus('没有身体可检查'); return; }
+
+  const threshold = 64;
+  const pos = bodyGeo.attributes.position.array;
+  const nrm = bodyGeo.attributes.normal.array;
+  const nVerts = coverage.length;
+  const bodyH = bodyBounds.maxY;
+
+  // Define privacy zones by body-relative coordinates + normal direction
+  const zones = [
+    { name: '左胸',     relYMin: 0.69, relYMax: 0.79, xMin: -0.15, xMax: -0.015, nzMin: 0.0 },
+    { name: '右胸',     relYMin: 0.69, relYMax: 0.79, xMin:  0.015, xMax:  0.15, nzMin: 0.0 },
+    { name: '下体(前)', relYMin: 0.45, relYMax: 0.56, xMin: -0.10, xMax: 0.10, nzMin: -0.3 },
+    { name: '臀部',     relYMin: 0.47, relYMax: 0.60, xMin: -0.12, xMax: 0.12, nzMax: -0.1 },
+  ];
+
+  const results = [];
+  const allZoneVerts = [];
+
+  for (const zone of zones) {
+    const verts = [];
+    let coveredCount = 0;
+    for (let i = 0; i < nVerts; i++) {
+      const x = pos[i*3], y = pos[i*3+1], nz = nrm[i*3+2];
+      const relY = y / bodyH;
+      if (relY < zone.relYMin || relY > zone.relYMax) continue;
+      if (x < zone.xMin || x > zone.xMax) continue;
+      if (zone.nzMin !== undefined && nz < zone.nzMin) continue;
+      if (zone.nzMax !== undefined && nz > zone.nzMax) continue;
+      verts.push(i);
+      if (coverage[i] >= threshold) coveredCount++;
+    }
+    const ratio = verts.length > 0 ? coveredCount / verts.length : 0;
+    const pct = Math.round(ratio * 100);
+
+    let verdict, color;
+    if (pct >= 80) { verdict = '覆盖充分'; color = '#4caf50'; }
+    else if (pct >= 50) { verdict = '部分覆盖'; color = '#ffeb3b'; }
+    else if (pct >= 20) { verdict = '覆盖不足'; color = '#ff9800'; }
+    else { verdict = '暴露'; color = '#f44336'; }
+
+    results.push({ name: zone.name, totalVerts: verts.length, coveredCount, pct, verdict, color, verts });
+    allZoneVerts.push(...verts.map(v => ({ v, covered: coverage[v] >= threshold })));
+  }
+
+  // Overall score
+  const allOk = results.every(r => r.pct >= 80);
+  const anyExposed = results.some(r => r.pct < 20);
+
+  // Show panel
+  document.getElementById('analysis-title').textContent = '隐私部位覆盖检查';
+  const container = document.getElementById('analysis-results');
+  let html = '';
+
+  // Summary
+  const summaryColor = allOk ? '#4caf50' : anyExposed ? '#f44336' : '#ffeb3b';
+  const summaryText = allOk ? '✓ 所有隐私部位覆盖充分' :
+    anyExposed ? '✗ 有隐私部位暴露' : '⚠ 部分区域覆盖不足';
+  html += `<div style="font-size:0.9rem;font-weight:600;color:${summaryColor};margin-bottom:16px">${summaryText}</div>`;
+
+  for (const r of results) {
+    html += `<div class="stability-island" style="border-left-color:${r.color}">`;
+    html += `<div class="island-header">${r.name}</div>`;
+    html += `<div class="island-detail">`;
+    html += `区域顶点: ${r.totalVerts} &nbsp;|&nbsp; 已覆盖: ${r.coveredCount}`;
+    html += `<div class="progress-bar"><div class="fill" style="width:${r.pct}%;background:${r.color}"></div></div>`;
+    html += `</div>`;
+    html += `<div class="island-verdict" style="color:${r.color}">${r.verdict} (${r.pct}%)</div>`;
+    html += `</div>`;
+  }
+  container.innerHTML = html;
+  document.getElementById('analysis-overlay').style.display = 'flex';
+
+  // Visual: tint zone vertices on body (green=covered, red=exposed)
+  const cArr = bodyColorAttr.array;
+  resetBodyColors();
+  for (const { v, covered } of allZoneVerts) {
+    if (covered) {
+      cArr[v*3+0] = 0.3; cArr[v*3+1] = 0.75; cArr[v*3+2] = 0.3;
+    } else {
+      cArr[v*3+0] = 0.95; cArr[v*3+1] = 0.15; cArr[v*3+2] = 0.15;
+    }
+  }
+  bodyColorAttr.needsUpdate = true;
+  for (const m of fabricMeshes) m.visible = false;
+  setStatus('隐私覆盖检查完成');
+}
+
+// ============================================================================
+// AUTO-GENERATE SWIMWEAR — transform rough paint into realistic garment
+// ============================================================================
+function autoGenerateSwimwear() {
+  if (!coverage || !bodyGeo || !bodyBounds) { setStatus('没有涂抹区域'); return; }
+  if (countCovered() < 10) { setStatus('请先涂抹一些区域'); return; }
+
+  pushUndoSnapshot();
+  setStatus('自动生成泳衣...');
+
+  // Step 1: Morphological cleanup — smooth edges, fill gaps
+  cleanupCoverage();
+
+  // Step 2: Regenerate fabric mesh with cleaned coverage
+  regenerateFabric();
+
+  // Step 3: Edge binding (fold-over elastic) along all fabric boundaries
+  generateEdgeBinding();
+
+  // Step 4: Seam lines for garment construction realism
+  generateSeamLines();
+
+  // Step 5: Auto-add straps if top coverage exists without straps
+  autoAddStraps();
+
+  document.getElementById('stat-covered').textContent = `已涂: ${countCovered()}`;
+  setStatus('泳衣生成完成');
+}
+
+// --- Morphological cleanup: dilate→smooth→erode to clean raw brush strokes ---
+function cleanupCoverage() {
+  const threshold = 64;
+  const nVerts = coverage.length;
+
+  // Pass 1: Dilate — fill small holes (3 passes)
+  for (let pass = 0; pass < 3; pass++) {
+    const next = coverage.slice();
+    for (let i = 0; i < nVerts; i++) {
+      if (coverage[i] >= threshold) continue;
+      const nb = neighbors[i];
+      let covCount = 0;
+      for (let k = 0; k < nb.length; k++) {
+        if (coverage[nb[k]] >= threshold) covCount++;
+      }
+      if (covCount >= Math.ceil(nb.length * 0.5)) {
+        next[i] = 128;
+      }
+    }
+    coverage.set(next);
+  }
+
+  // Pass 2: Smooth — Gaussian-like averaging (2 passes)
+  for (let pass = 0; pass < 2; pass++) {
+    const next = coverage.slice();
+    for (let i = 0; i < nVerts; i++) {
+      const nb = neighbors[i];
+      let sum = coverage[i] * 2;
+      let weight = 2;
+      for (let k = 0; k < nb.length; k++) {
+        sum += coverage[nb[k]];
+        weight++;
+      }
+      next[i] = Math.round(sum / weight);
+    }
+    coverage.set(next);
+  }
+
+  // Pass 3: Erode — remove thin protrusions (1 pass)
+  {
+    const next = coverage.slice();
+    for (let i = 0; i < nVerts; i++) {
+      if (coverage[i] < threshold) continue;
+      const nb = neighbors[i];
+      let covCount = 0;
+      for (let k = 0; k < nb.length; k++) {
+        if (coverage[nb[k]] >= threshold) covCount++;
+      }
+      if (covCount < Math.ceil(nb.length * 0.3)) {
+        next[i] = 0;
+      }
+    }
+    coverage.set(next);
+  }
+
+  // Pass 4: Final smooth for clean boundary (1 pass)
+  {
+    const next = coverage.slice();
+    for (let i = 0; i < nVerts; i++) {
+      const nb = neighbors[i];
+      let sum = coverage[i] * 2;
+      let weight = 2;
+      for (let k = 0; k < nb.length; k++) {
+        sum += coverage[nb[k]];
+        weight++;
+      }
+      next[i] = Math.round(sum / weight);
+    }
+    coverage.set(next);
+  }
+}
+
+// --- Edge binding: fold-over elastic strips along fabric boundaries ---
+function clearEdgeBindings() {
+  for (const m of edgeBindingMeshes) {
+    scene.remove(m); m.geometry.dispose(); m.material.dispose();
+  }
+  edgeBindingMeshes.length = 0;
+}
+
+function generateEdgeBinding() {
+  clearEdgeBindings();
+  if (fabricMeshes.length === 0) return;
+
+  for (const fMesh of fabricMeshes) {
+    const geo = fMesh.geometry;
+    const fPos = geo.attributes.position.array;
+    const fNrm = geo.attributes.normal.array;
+    const idx = geo.index.array;
+
+    // Find boundary edges (edges appearing in exactly one triangle)
+    const edgeCount = new Map();
+    for (let f = 0; f < idx.length; f += 3) {
+      for (let j = 0; j < 3; j++) {
+        const a = idx[f + j], b = idx[f + (j + 1) % 3];
+        const key = Math.min(a, b) + ',' + Math.max(a, b);
+        edgeCount.set(key, (edgeCount.get(key) || 0) + 1);
+      }
+    }
+
+    // Build boundary adjacency
+    const bndAdj = new Map();
+    for (const [key, cnt] of edgeCount) {
+      if (cnt !== 1) continue;
+      const [a, b] = key.split(',').map(Number);
+      if (!bndAdj.has(a)) bndAdj.set(a, []);
+      if (!bndAdj.has(b)) bndAdj.set(b, []);
+      bndAdj.get(a).push(b);
+      bndAdj.get(b).push(a);
+    }
+
+    if (bndAdj.size === 0) continue;
+
+    // Order boundary vertices into chains/loops
+    const chains = [];
+    const visited = new Set();
+    for (const startV of bndAdj.keys()) {
+      if (visited.has(startV)) continue;
+      const chain = [startV];
+      visited.add(startV);
+      let curr = startV;
+      while (true) {
+        const adj = bndAdj.get(curr);
+        let next = -1;
+        for (let k = 0; k < adj.length; k++) {
+          if (!visited.has(adj[k])) { next = adj[k]; break; }
+        }
+        if (next < 0) break;
+        visited.add(next);
+        chain.push(next);
+        curr = next;
+      }
+      if (chain.length >= 4) chains.push(chain);
+    }
+
+    // For each chain, create a ribbon (elastic binding strip)
+    const bindW = 0.0028;   // 2.8mm binding width
+    const bindH = 0.0008;   // 0.8mm raised height
+
+    for (const chain of chains) {
+      const rPos = [], rNrm = [], rIdx = [], rUV = [];
+
+      for (let ci = 0; ci < chain.length; ci++) {
+        const vi = chain[ci];
+        const px = fPos[vi*3], py = fPos[vi*3+1], pz = fPos[vi*3+2];
+        const nx = fNrm[vi*3], ny = fNrm[vi*3+1], nz = fNrm[vi*3+2];
+
+        // Tangent along chain
+        let tx = 0, ty = 0, tz = 0;
+        if (ci > 0) {
+          const pi = chain[ci-1];
+          tx += fPos[vi*3]-fPos[pi*3]; ty += fPos[vi*3+1]-fPos[pi*3+1]; tz += fPos[vi*3+2]-fPos[pi*3+2];
+        }
+        if (ci < chain.length-1) {
+          const ni = chain[ci+1];
+          tx += fPos[ni*3]-fPos[vi*3]; ty += fPos[ni*3+1]-fPos[vi*3+1]; tz += fPos[ni*3+2]-fPos[vi*3+2];
+        }
+        const tLen = Math.sqrt(tx*tx+ty*ty+tz*tz) || 1;
+        tx/=tLen; ty/=tLen; tz/=tLen;
+
+        // Outward direction = normal × tangent
+        let ox = ny*tz - nz*ty;
+        let oy = nz*tx - nx*tz;
+        let oz = nx*ty - ny*tx;
+        const oLen = Math.sqrt(ox*ox+oy*oy+oz*oz) || 1;
+        ox/=oLen; oy/=oLen; oz/=oLen;
+
+        const base = rPos.length / 3;
+        // Inner edge (on fabric surface, slightly inset)
+        rPos.push(
+          px - ox*bindW*0.25 + nx*bindH,
+          py - oy*bindW*0.25 + ny*bindH,
+          pz - oz*bindW*0.25 + nz*bindH
+        );
+        // Outer edge (beyond fabric boundary)
+        rPos.push(
+          px + ox*bindW + nx*bindH*0.4,
+          py + oy*bindW + ny*bindH*0.4,
+          pz + oz*bindW + nz*bindH*0.4
+        );
+        rNrm.push(nx, ny, nz, nx, ny, nz);
+        rUV.push(ci/chain.length*10, 0, ci/chain.length*10, 1);
+
+        if (ci > 0) {
+          const pb = base - 2;
+          rIdx.push(pb, pb+1, base);
+          rIdx.push(base, pb+1, base+1);
+        }
+      }
+
+      if (rIdx.length === 0) continue;
+
+      const ribbonGeo = new THREE.BufferGeometry();
+      ribbonGeo.setAttribute('position', new THREE.Float32BufferAttribute(rPos, 3));
+      ribbonGeo.setAttribute('normal', new THREE.Float32BufferAttribute(rNrm, 3));
+      ribbonGeo.setAttribute('uv', new THREE.Float32BufferAttribute(rUV, 2));
+      ribbonGeo.setIndex(rIdx);
+      ribbonGeo.computeVertexNormals();
+
+      const ribbonMat = new THREE.MeshStandardMaterial({
+        color: 0xa01838,    // slightly darker than fabric — like FOE binding
+        roughness: 0.28,    // shinier than fabric (elastic sheen)
+        metalness: 0.04,
+        side: THREE.DoubleSide,
+      });
+      const ribbonMesh = new THREE.Mesh(ribbonGeo, ribbonMat);
+      ribbonMesh.visible = document.getElementById('chk-show-fabric').checked;
+      scene.add(ribbonMesh);
+      edgeBindingMeshes.push(ribbonMesh);
+    }
+  }
+}
+
+// --- Seam lines: construction detail on fabric surface ---
+function clearSeamLines() {
+  for (const m of seamLineMeshes) {
+    scene.remove(m); m.geometry.dispose(); m.material.dispose();
+  }
+  seamLineMeshes.length = 0;
+}
+
+function generateSeamLines() {
+  clearSeamLines();
+  if (fabricMeshes.length === 0 || !bodyBounds) return;
+
+  const threshold = 64;
+  const pos = bodyGeo.attributes.position.array;
+  const nrm = bodyGeo.attributes.normal.array;
+  const bodyH = bodyBounds.maxY;
+
+  // Collect covered vertices by zone
+  const topVerts = [], bottomVerts = [];
+  for (let i = 0; i < coverage.length; i++) {
+    if (coverage[i] < threshold) continue;
+    const relY = pos[i*3+1] / bodyH;
+    if (relY > 0.62 && relY < 0.82) topVerts.push(i);
+    else if (relY > 0.42 && relY < 0.60) bottomVerts.push(i);
+  }
+
+  // --- Top piece seams ---
+  if (topVerts.length > 30) {
+    const leftCup = topVerts.filter(i => pos[i*3] < -0.015);
+    const rightCup = topVerts.filter(i => pos[i*3] > 0.015);
+
+    // Cup dart seams (vertical through cup center)
+    if (leftCup.length > 15) addCupDartSeam(leftCup);
+    if (rightCup.length > 15) addCupDartSeam(rightCup);
+
+    // Bridge seam (horizontal connecting cups at center)
+    if (leftCup.length > 0 && rightCup.length > 0) {
+      let lcInner = leftCup[0], rcInner = rightCup[0];
+      for (const v of leftCup) if (pos[v*3] > pos[lcInner*3]) lcInner = v;
+      for (const v of rightCup) if (pos[v*3] < pos[rcInner*3]) rcInner = v;
+      addSeamLine(lcInner, rcInner);
+    }
+  }
+
+  // --- Bottom piece seams ---
+  if (bottomVerts.length > 30) {
+    // Center front seam
+    const centerBottom = bottomVerts.filter(i => Math.abs(pos[i*3]) < 0.025 && nrm[i*3+2] > -0.2);
+    if (centerBottom.length > 5) {
+      let topV = centerBottom[0], botV = centerBottom[0];
+      for (const v of centerBottom) {
+        if (pos[v*3+1] > pos[topV*3+1]) topV = v;
+        if (pos[v*3+1] < pos[botV*3+1]) botV = v;
+      }
+      if (topV !== botV) addSeamLine(topV, botV);
+    }
+
+    // Side seams (left and right at hip edges)
+    for (const side of [-1, 1]) {
+      const sideVerts = bottomVerts.filter(i => pos[i*3] * side > 0.06);
+      if (sideVerts.length > 5) {
+        let topV = sideVerts[0], botV = sideVerts[0];
+        for (const v of sideVerts) {
+          if (pos[v*3+1] > pos[topV*3+1]) topV = v;
+          if (pos[v*3+1] < pos[botV*3+1]) botV = v;
+        }
+        if (topV !== botV) addSeamLine(topV, botV);
+      }
+    }
+  }
+}
+
+function addCupDartSeam(cupVerts) {
+  const pos = bodyGeo.attributes.position.array;
+  let cx = 0, cy = 0;
+  for (const v of cupVerts) { cx += pos[v*3]; cy += pos[v*3+1]; }
+  cx /= cupVerts.length; cy /= cupVerts.length;
+
+  // Find top and bottom vertices near cup center-X
+  const near = cupVerts.filter(v => Math.abs(pos[v*3] - cx) < 0.018);
+  if (near.length < 4) return;
+  let topV = near[0], botV = near[0];
+  for (const v of near) {
+    if (pos[v*3+1] > pos[topV*3+1]) topV = v;
+    if (pos[v*3+1] < pos[botV*3+1]) botV = v;
+  }
+  if (topV !== botV) addSeamLine(topV, botV);
+}
+
+function addSeamLine(startIdx, endIdx) {
+  const path = geodesicPath(startIdx, endIdx);
+  if (!path || path.length < 2) return;
+
+  const pos = bodyGeo.attributes.position.array;
+  const nrm = bodyGeo.attributes.normal.array;
+  const offset = state.fabricOffset + 0.0012; // slightly above fabric surface
+
+  const pts = path.map(i => new THREE.Vector3(
+    pos[i*3] + nrm[i*3] * offset,
+    pos[i*3+1] + nrm[i*3+1] * offset,
+    pos[i*3+2] + nrm[i*3+2] * offset
+  ));
+
+  // Downsample for smooth curve
+  const step = Math.max(1, Math.floor(pts.length / 30));
+  const down = [];
+  for (let i = 0; i < pts.length; i += step) down.push(pts[i]);
+  if (down.length > 0 && down[down.length-1] !== pts[pts.length-1]) down.push(pts[pts.length-1]);
+  if (down.length < 2) return;
+
+  const curve = new THREE.CatmullRomCurve3(down);
+  const tube = new THREE.TubeGeometry(curve, down.length * 3, 0.0007, 4, false);
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x801030,    // dark thread/stitch color
+    roughness: 0.65,
+    metalness: 0.0,
+    side: THREE.DoubleSide,
+  });
+  const mesh = new THREE.Mesh(tube, mat);
+  mesh.visible = document.getElementById('chk-show-fabric').checked;
+  scene.add(mesh);
+  seamLineMeshes.push(mesh);
+}
+
+// --- Auto-add straps if top coverage lacks support ---
+function autoAddStraps() {
+  if (strapMeshes.length > 0) return; // user already added straps
+
+  const threshold = 64;
+  const pos = bodyGeo.attributes.position.array;
+  const bodyH = bodyBounds.maxY;
+
+  // Check for top coverage (breast area)
+  let topLeftApex = -1, topRightApex = -1;
+  let leftMaxY = 0, rightMaxY = 0;
+  let hasTop = false;
+
+  for (let i = 0; i < coverage.length; i++) {
+    if (coverage[i] < threshold) continue;
+    const relY = pos[i*3+1] / bodyH;
+    if (relY > 0.64 && relY < 0.82) {
+      hasTop = true;
+      if (pos[i*3] < -0.015 && pos[i*3+1] > leftMaxY) {
+        leftMaxY = pos[i*3+1]; topLeftApex = i;
+      }
+      if (pos[i*3] > 0.015 && pos[i*3+1] > rightMaxY) {
+        rightMaxY = pos[i*3+1]; topRightApex = i;
+      }
+    }
+  }
+
+  if (!hasTop || topLeftApex < 0 || topRightApex < 0) return;
+
+  // Find shoulder vertices (high on body, lateral position)
+  const shoulderRelY = 0.87;
+  let leftShoulder = -1, rightShoulder = -1;
+  let lsBest = Infinity, rsBest = Infinity;
+  for (let i = 0; i < coverage.length; i++) {
+    const relY = pos[i*3+1] / bodyH;
+    const x = pos[i*3];
+    const nz = bodyGeo.attributes.normal.array[i*3+2];
+    if (nz < 0) continue; // only front-facing
+    const dist = Math.abs(relY - shoulderRelY);
+    if (x < -0.04 && x > -0.14 && dist < lsBest) { lsBest = dist; leftShoulder = i; }
+    if (x > 0.04 && x < 0.14 && dist < rsBest) { rsBest = dist; rightShoulder = i; }
+  }
+
+  if (leftShoulder >= 0) createStrap(topLeftApex, leftShoulder);
+  if (rightShoulder >= 0) createStrap(topRightApex, rightShoulder);
+}
+
+function applyPaintAt(hit) {
+  // Paint from nearest vertex of the hit face
+  const vi = nearestVertexOnHit(hit);
+  if (vi < 0) return;
+  const erase = state.tool === 'eraser';
+  paintAtVertex(vi, state.brushRadius, state.brushStrength, erase);
+  if (state.symmetry) {
+    // Mirror hit point across YZ (negate X), find nearest body vertex
+    const mirrored = new THREE.Vector3(-hit.point.x, hit.point.y, hit.point.z);
+    const mvi = nearestVertexToPoint(mirrored);
+    if (mvi >= 0 && mvi !== vi) {
+      paintAtVertex(mvi, state.brushRadius, state.brushStrength, erase);
+    }
+  }
+}
+
+function onPointerDown(e) {
+  if (e.button !== 0) return; // only left button
+  updateNDC(e);
+  const hit = raycastBody();
+  if (!hit) return;
+
+  if (state.tool === 'cover' || state.tool === 'eraser') {
+    pushUndoSnapshot();
+    state.painting = true;
+    applyPaintAt(hit);
+    document.getElementById('stat-covered').textContent = `已涂: ${countCovered()}`;
+  } else if (state.tool === 'strap') {
+    const vi = nearestVertexOnHit(hit);
+    if (state.strapStart < 0) {
+      state.strapStart = vi;
+      strapStartMarker.visible = true;
+      strapStartMarker.position.copy(hit.point);
+      setStatus('绑带起点已标记 — 点击终点');
+    } else {
+      pushUndoSnapshot();
+      const ok1 = createStrap(state.strapStart, vi);
+      let ok2 = null;
+      if (state.symmetry) {
+        // Mirror both endpoints
+        const ps = bodyGeo.attributes.position.array;
+        const mStart = new THREE.Vector3(-ps[state.strapStart*3], ps[state.strapStart*3+1], ps[state.strapStart*3+2]);
+        const mEnd = new THREE.Vector3(-ps[vi*3], ps[vi*3+1], ps[vi*3+2]);
+        const mStartIdx = nearestVertexToPoint(mStart);
+        const mEndIdx = nearestVertexToPoint(mEnd);
+        if (mStartIdx >= 0 && mEndIdx >= 0 && mStartIdx !== state.strapStart) {
+          ok2 = createStrap(mStartIdx, mEndIdx);
+        }
+      }
+      if (!ok1 && ok2 !== true) {
+        setStatus('⚠ 找不到路径');
+      } else if (ok1 && ok2 === false) {
+        setStatus('绑带已生成（镜像侧未找到路径）');
+      } else if (ok1 && ok2 === true) {
+        setStatus('绑带已生成（含镜像）');
+      } else {
+        setStatus('绑带已生成');
+      }
+      state.strapStart = -1;
+      strapStartMarker.visible = false;
+    }
+  }
+}
+
+function onPointerMove(e) {
+  updateNDC(e);
+  updateCursor();
+  if (state.painting && (state.tool === 'cover' || state.tool === 'eraser')) {
+    const hit = raycastBody();
+    if (hit) {
+      applyPaintAt(hit);
+      document.getElementById('stat-covered').textContent = `已涂: ${countCovered()}`;
+    }
+  }
+}
+
+function onPointerUp(e) {
+  if (state.painting) {
+    state.painting = false;
+    // Trigger fabric regeneration after release
+    regenerateFabric();
+    setStatus('布料已生成');
+  }
+}
+
+// ============================================================================
+// UI EVENTS — toolbar, sliders, checkboxes, buttons, keyboard
+// ============================================================================
+function setTool(tool) {
+  state.tool = tool;
+  document.querySelectorAll('.tool').forEach(el => {
+    el.classList.toggle('active', el.dataset.tool === tool);
+  });
+  // Reset pending strap when switching tools
+  if (tool !== 'strap') {
+    state.strapStart = -1;
+    strapStartMarker.visible = false;
+  }
+  // Change ring color to reflect tool
+  if (tool === 'eraser') cursorRing.material.color.setHex(0x00c0ff);
+  else if (tool === 'strap') cursorRing.material.color.setHex(0x00e0ff);
+  else cursorRing.material.color.setHex(0xff4081);
+  controls.enableRotate = (tool === 'orbit');
+  controls.enabled = (tool === 'orbit');
+  // Always allow right-click rotate
+  if (tool !== 'orbit') {
+    controls.enabled = true;
+    controls.enableRotate = false;
+    controls.mouseButtons = {
+      LEFT: null, MIDDLE: THREE.MOUSE.PAN, RIGHT: THREE.MOUSE.ROTATE,
+    };
+  } else {
+    controls.mouseButtons = {
+      LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.PAN, RIGHT: THREE.MOUSE.ROTATE,
+    };
+  }
+  setStatus(`工具: ${ {cover:'覆盖画笔', eraser:'橡皮擦', strap:'绑带画笔', orbit:'仅旋转'}[tool] }`);
+}
+
+function setBrushRadius(meters) {
+  state.brushRadius = meters;
+  document.getElementById('val-radius').textContent = `${(meters * 100).toFixed(1)} cm`;
+  document.getElementById('rng-radius').value = Math.round(meters * 1000);
+  // Rebuild ring geometry
+  cursorRing.geometry.dispose();
+  cursorRing.geometry = new THREE.RingGeometry(meters * 0.92, meters, 48);
+}
+
+function setStatus(msg) {
+  document.getElementById('status').textContent = msg;
+  state.lastStatusClear = performance.now();
+}
+
+function initUI() {
+  // Toolbar
+  document.querySelectorAll('.tool').forEach(el => {
+    el.addEventListener('click', () => setTool(el.dataset.tool));
+  });
+
+  // Sliders
+  document.getElementById('rng-radius').addEventListener('input', e => {
+    setBrushRadius(parseFloat(e.target.value) / 1000);
+  });
+  document.getElementById('rng-strength').addEventListener('input', e => {
+    state.brushStrength = parseFloat(e.target.value) / 100;
+    document.getElementById('val-strength').textContent = state.brushStrength.toFixed(2);
+  });
+  document.getElementById('rng-offset').addEventListener('input', e => {
+    state.fabricOffset = parseFloat(e.target.value) / 10000; // 1=0.1mm
+    document.getElementById('val-offset').textContent = `${(state.fabricOffset * 1000).toFixed(1)} mm`;
+  });
+
+  // Checkboxes
+  document.getElementById('chk-symmetry').addEventListener('change', e => {
+    state.symmetry = e.target.checked;
+  });
+  document.getElementById('chk-show-body').addEventListener('change', e => {
+    if (bodyMesh) bodyMesh.visible = e.target.checked;
+  });
+  document.getElementById('chk-show-fabric').addEventListener('change', e => {
+    for (const m of fabricMeshes) m.visible = e.target.checked;
+    for (const m of strapMeshes) m.visible = e.target.checked;
+    for (const m of edgeBindingMeshes) m.visible = e.target.checked;
+    for (const m of seamLineMeshes) m.visible = e.target.checked;
+  });
+
+  // Buttons
+  document.getElementById('btn-clear').addEventListener('click', clearAll);
+  document.getElementById('btn-undo').addEventListener('click', undo);
+  document.getElementById('btn-regen').addEventListener('click', regenerateFabric);
+  document.getElementById('btn-export').addEventListener('click', exportOBJ);
+  document.getElementById('btn-stability').addEventListener('click', analyzeStability);
+  document.getElementById('btn-privacy').addEventListener('click', checkPrivacyCoverage);
+  document.getElementById('btn-auto').addEventListener('click', autoGenerateSwimwear);
+  document.getElementById('analysis-close').addEventListener('click', dismissAnalysis);
+
+  // Canvas events
+  const canvas = renderer.domElement;
+  canvas.addEventListener('pointerdown', onPointerDown);
+  canvas.addEventListener('pointermove', onPointerMove);
+  canvas.addEventListener('pointerup', onPointerUp);
+  canvas.addEventListener('pointerleave', onPointerUp);
+  canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+  // Keyboard
+  window.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT') return;
+    if (e.key === '1') setTool('cover');
+    else if (e.key === '2') setTool('eraser');
+    else if (e.key === '3') setTool('strap');
+    else if (e.key === '4') setTool('orbit');
+    else if (e.key === '5') analyzeStability();
+    else if (e.key === '6') checkPrivacyCoverage();
+    else if (e.key === '7') autoGenerateSwimwear();
+    else if (e.key === '[') setBrushRadius(Math.max(0.005, state.brushRadius - 0.005));
+    else if (e.key === ']') setBrushRadius(Math.min(0.08, state.brushRadius + 0.005));
+    else if (e.key === 's' || e.key === 'S') {
+      const cb = document.getElementById('chk-symmetry');
+      cb.checked = !cb.checked;
+      state.symmetry = cb.checked;
+      setStatus(`对称: ${state.symmetry ? '开' : '关'}`);
+    }
+    else if ((e.metaKey || e.ctrlKey) && (e.key === 'z' || e.key === 'Z')) {
+      e.preventDefault();
+      undo();
+    }
+  });
+}
+
+// ============================================================================
+// EXPORT OBJ
+// ============================================================================
+function exportOBJ() {
+  if (fabricMeshes.length === 0 && strapMeshes.length === 0) {
+    setStatus('没有布料或绑带可导出');
+    return;
+  }
+  let s = `# Paint Bikini Export\n# Generated ${new Date().toISOString()}\n\n`;
+  let vOffset = 1;
+  const all = [
+    ...fabricMeshes.map((m, i) => ({ mesh: m, name: `fabric_${i}` })),
+    ...strapMeshes.map((m, i) => ({ mesh: m, name: `strap_${i}` })),
+    ...edgeBindingMeshes.map((m, i) => ({ mesh: m, name: `binding_${i}` })),
+    ...seamLineMeshes.map((m, i) => ({ mesh: m, name: `seam_${i}` })),
+  ];
+  for (const { mesh, name } of all) {
+    s += `o ${name}\n`;
+    const geo = mesh.geometry;
+    const pos = geo.attributes.position;
+    for (let v = 0; v < pos.count; v++) {
+      s += `v ${pos.getX(v).toFixed(6)} ${pos.getY(v).toFixed(6)} ${pos.getZ(v).toFixed(6)}\n`;
+    }
+    const idx = geo.index ? geo.index.array : null;
+    if (idx) {
+      for (let f = 0; f < idx.length; f += 3) {
+        s += `f ${idx[f]+vOffset} ${idx[f+1]+vOffset} ${idx[f+2]+vOffset}\n`;
+      }
+    } else {
+      for (let f = 0; f < pos.count; f += 3) {
+        s += `f ${f+vOffset} ${f+1+vOffset} ${f+2+vOffset}\n`;
+      }
+    }
+    vOffset += pos.count;
+    s += '\n';
+  }
+  const blob = new Blob([s], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'paint_bikini.obj';
+  a.click();
+  URL.revokeObjectURL(url);
+  setStatus(`已导出 ${all.length} 个部件`);
+}
+
+// ============================================================================
+// RENDER LOOP + STARTUP
+// ============================================================================
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+// --- TEST HOOKS ---
+window.__test = {
+  getBodyBounds() {
+    if (!bodyGeo) return null;
+    const pos = bodyGeo.attributes.position.array;
+    let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity,minZ=Infinity,maxZ=-Infinity;
+    for (let i=0;i<pos.length;i+=3){
+      if(pos[i]<minX)minX=pos[i];if(pos[i]>maxX)maxX=pos[i];
+      if(pos[i+1]<minY)minY=pos[i+1];if(pos[i+1]>maxY)maxY=pos[i+1];
+      if(pos[i+2]<minZ)minZ=pos[i+2];if(pos[i+2]>maxZ)maxZ=pos[i+2];
+    }
+    return {min:{x:minX,y:minY,z:minZ},max:{x:maxX,y:maxY,z:maxZ}};
+  },
+  projectToScreen(wx,wy,wz) {
+    const v = new THREE.Vector3(wx,wy,wz);
+    v.project(camera);
+    const rect = renderer.domElement.getBoundingClientRect();
+    return {x:(v.x+1)/2*rect.width+rect.left, y:(-v.y+1)/2*rect.height+rect.top};
+  },
+  probeScreen(sx,sy) {
+    const rect = renderer.domElement.getBoundingClientRect();
+    const ndc = new THREE.Vector2(((sx-rect.left)/rect.width)*2-1, -((sy-rect.top)/rect.height)*2+1);
+    const rc = new THREE.Raycaster();
+    rc.setFromCamera(ndc, camera);
+    const hits = rc.intersectObject(bodyMesh, false);
+    return hits.length > 0 ? {x:sx,y:sy,point:hits[0].point} : null;
+  },
+  sceneInfo() {
+    return {fabrics:fabricMeshes.length, straps:strapMeshes.length, bindings:edgeBindingMeshes.length, seams:seamLineMeshes.length};
+  },
+  vertexCount() { return bodyGeo ? bodyGeo.attributes.position.count : 0; },
+};
+
+async function main() {
+  try {
+    initScene();
+    await loadBody();
+    initUI();
+    setTool('cover');
+    setBrushRadius(0.03);
+    animate();
+  } catch (err) {
+    console.error(err);
+    document.getElementById('loading').innerHTML =
+      `<div class="inner" style="color:#ff6060;max-width:400px;padding:24px">` +
+      `<strong>加载失败</strong><br><br>` +
+      `<code style="font-size:0.75rem">${err.message || err}</code><br><br>` +
+      `本文件需要通过静态服务器打开（不是 file://）。<br>` +
+      `在仓库根目录运行：<br><code>python -m http.server 8000</code><br>` +
+      `然后浏览器访问 <code>http://localhost:8000/paint_bikini.html</code>` +
+      `</div>`;
+  }
+}
+
+main();
+</script>
+</body>
+</html>
+
