@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>21点 - Blackjack</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <h1>21点 Blackjack</h1>
+
+        <!-- Chips / Balance -->
+        <div id="info-bar">
+            <div id="balance-display">筹码: <span id="balance">1000</span></div>
+            <div id="bet-display">当前下注: <span id="current-bet">0</span></div>
+        </div>
+
+        <!-- Dealer area -->
+        <div id="dealer-area" class="player-area">
+            <h2>庄家 <span id="dealer-score" class="score-badge"></span></h2>
+            <div id="dealer-cards" class="card-row"></div>
+        </div>
+
+        <!-- Player area -->
+        <div id="player-area" class="player-area">
+            <h2>玩家 <span id="player-score" class="score-badge"></span></h2>
+            <div id="player-cards" class="card-row"></div>
+        </div>
+
+        <!-- Betting controls -->
+        <div id="bet-controls">
+            <button class="chip-btn" data-amount="10">10</button>
+            <button class="chip-btn" data-amount="25">25</button>
+            <button class="chip-btn" data-amount="50">50</button>
+            <button class="chip-btn" data-amount="100">100</button>
+            <button id="deal-btn" class="action-btn">发牌</button>
+        </div>
+
+        <!-- Game controls -->
+        <div id="game-controls" class="hidden">
+            <button id="hit-btn" class="action-btn">要牌</button>
+            <button id="stand-btn" class="action-btn">停牌</button>
+            <button id="double-btn" class="action-btn">加倍</button>
+        </div>
+
+        <!-- Message overlay -->
+        <div id="message" class="hidden"></div>
+
+        <!-- New round -->
+        <button id="new-round-btn" class="action-btn hidden">新一局</button>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

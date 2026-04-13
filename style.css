@@ -1,0 +1,309 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #0b5e2f;
+    background-image:
+        radial-gradient(ellipse at center, #0d7a3a 0%, #064a23 70%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    color: #fff;
+}
+
+#game-container {
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+}
+
+h1 {
+    font-size: 2.2rem;
+    text-shadow: 2px 2px 6px rgba(0,0,0,.5);
+    margin-bottom: 10px;
+    letter-spacing: 4px;
+}
+
+/* Info bar */
+#info-bar {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+}
+
+#info-bar > div {
+    background: rgba(0,0,0,.35);
+    padding: 8px 20px;
+    border-radius: 20px;
+}
+
+#balance {
+    color: #ffd700;
+    font-weight: bold;
+}
+
+#current-bet {
+    color: #ff6b6b;
+    font-weight: bold;
+}
+
+/* Player areas */
+.player-area {
+    margin: 16px 0;
+    min-height: 140px;
+}
+
+.player-area h2 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,.4);
+}
+
+.score-badge {
+    background: rgba(0,0,0,.5);
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: .9rem;
+    margin-left: 6px;
+}
+
+/* Card row */
+.card-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-height: 120px;
+    align-items: center;
+}
+
+/* Cards */
+.card {
+    width: 80px;
+    height: 116px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.4rem;
+    font-weight: bold;
+    box-shadow: 2px 3px 10px rgba(0,0,0,.4);
+    transition: transform .3s ease, opacity .3s ease;
+    position: relative;
+    user-select: none;
+}
+
+.card.deal-animation {
+    animation: dealCard .4s ease-out;
+}
+
+@keyframes dealCard {
+    from {
+        transform: translateY(-80px) rotate(-10deg) scale(.5);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) rotate(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.card-front {
+    background: #fff;
+    color: #222;
+    border: 2px solid #ccc;
+}
+
+.card-front.red {
+    color: #c0392b;
+}
+
+.card-front .card-rank {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.card-front .card-suit {
+    font-size: 1.8rem;
+    line-height: 1;
+    margin-top: 2px;
+}
+
+.card-back {
+    background: linear-gradient(135deg, #1a3a6b 0%, #2c5aa0 50%, #1a3a6b 100%);
+    border: 2px solid #4a7abf;
+    color: #8ab4f8;
+    font-size: 2rem;
+}
+
+.card-back::after {
+    content: "\2666";
+    font-size: 2.5rem;
+    opacity: .4;
+}
+
+/* Buttons */
+.action-btn {
+    background: linear-gradient(to bottom, #e8c547 0%, #d4a730 100%);
+    color: #2c1810;
+    border: none;
+    padding: 12px 28px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+    box-shadow: 0 3px 8px rgba(0,0,0,.3);
+    margin: 4px;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0,0,0,.4);
+}
+
+.action-btn:active {
+    transform: translateY(0);
+}
+
+.action-btn:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Chip buttons */
+#bet-controls {
+    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.chip-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 4px dashed rgba(255,255,255,.6);
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+    box-shadow: 0 3px 8px rgba(0,0,0,.3);
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0,0,0,.5);
+}
+
+.chip-btn:hover {
+    transform: scale(1.1);
+}
+
+.chip-btn:active {
+    transform: scale(.95);
+}
+
+.chip-btn:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.chip-btn[data-amount="10"] {
+    background: radial-gradient(circle, #5cb85c 60%, #3d8b3d 100%);
+}
+.chip-btn[data-amount="25"] {
+    background: radial-gradient(circle, #f0ad4e 60%, #c78d30 100%);
+}
+.chip-btn[data-amount="50"] {
+    background: radial-gradient(circle, #d9534f 60%, #a94442 100%);
+}
+.chip-btn[data-amount="100"] {
+    background: radial-gradient(circle, #333 60%, #111 100%);
+}
+
+/* Game controls */
+#game-controls {
+    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+#hit-btn {
+    background: linear-gradient(to bottom, #27ae60 0%, #1e8449 100%);
+    color: #fff;
+}
+
+#stand-btn {
+    background: linear-gradient(to bottom, #c0392b 0%, #96281b 100%);
+    color: #fff;
+}
+
+#double-btn {
+    background: linear-gradient(to bottom, #8e44ad 0%, #6c3483 100%);
+    color: #fff;
+}
+
+/* Message */
+#message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,.85);
+    padding: 24px 40px;
+    border-radius: 16px;
+    font-size: 1.6rem;
+    font-weight: bold;
+    z-index: 10;
+    border: 2px solid #ffd700;
+    text-shadow: 1px 1px 3px rgba(0,0,0,.6);
+    animation: popIn .3s ease-out;
+}
+
+@keyframes popIn {
+    from { transform: translate(-50%, -50%) scale(.7); opacity: 0; }
+    to   { transform: translate(-50%, -50%) scale(1);  opacity: 1; }
+}
+
+#message.win   { color: #2ecc71; }
+#message.lose  { color: #e74c3c; }
+#message.push  { color: #f39c12; }
+#message.blackjack { color: #ffd700; }
+
+#new-round-btn {
+    margin-top: 16px;
+}
+
+/* Utility */
+.hidden {
+    display: none !important;
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+    .card {
+        width: 62px;
+        height: 90px;
+        font-size: 1.1rem;
+    }
+    .card-front .card-suit { font-size: 1.4rem; }
+    .card-front .card-rank { font-size: 1.2rem; }
+    h1 { font-size: 1.5rem; }
+    .chip-btn { width: 50px; height: 50px; font-size: .85rem; }
+    .action-btn { padding: 10px 18px; font-size: .95rem; }
+    #message { font-size: 1.2rem; padding: 18px 28px; }
+}
