@@ -13,7 +13,7 @@
     let playerHand = [];
     let balance = INITIAL_BALANCE;
     let currentBet = 0;
-    let gamePhase = "betting"; // betting | playing | done
+    let gamePhase = "betting"; // betting | playing | dealer-turn | done
 
     // ── DOM refs ─────────────────────────────────────────────────
     const $balance      = document.getElementById("balance");
@@ -195,13 +195,15 @@
         updateScores(true);
         showPlaying();
 
-        // Check for player blackjack
-        if (isBlackjack(playerHand)) {
+        // Check for blackjack
+        if (isBlackjack(playerHand) || isBlackjack(dealerHand)) {
             revealDealer();
-            if (isBlackjack(dealerHand)) {
+            if (isBlackjack(playerHand) && isBlackjack(dealerHand)) {
                 endRound("push");
-            } else {
+            } else if (isBlackjack(playerHand)) {
                 endRound("blackjack");
+            } else {
+                endRound("dealer-blackjack");
             }
         }
     }
@@ -223,6 +225,8 @@
 
     function stand() {
         if (gamePhase !== "playing") return;
+        gamePhase = "dealer-turn";
+        $gameControls.classList.add("hidden");
         revealDealer();
         dealerPlay();
     }
@@ -243,6 +247,8 @@
             revealDealer();
             endRound("bust");
         } else {
+            gamePhase = "dealer-turn";
+            $gameControls.classList.add("hidden");
             revealDealer();
             dealerPlay();
         }
@@ -301,6 +307,10 @@
                 break;
             case "bust":
                 msg = "爆牌! 你输了!";
+                cls = "lose";
+                break;
+            case "dealer-blackjack":
+                msg = "庄家 Blackjack!";
                 cls = "lose";
                 break;
             case "lose":
