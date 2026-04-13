@@ -76,6 +76,7 @@ input[type=checkbox] { accent-color:#ff4081; }
     <div class="spacer"></div>
     <button class="ghost" id="btn-stability">检查稳定性</button>
     <button class="ghost" id="btn-privacy">隐私检查</button>
+    <button id="btn-auto">自动生成泳衣</button>
     <button class="ghost" id="btn-clear">清空</button>
     <button class="ghost" id="btn-undo">撤销 ⌘Z</button>
     <button id="btn-export">导出 OBJ</button>
@@ -157,6 +158,7 @@ input[type=checkbox] { accent-color:#ff4081; }
         <span class="key">4</span> 仅旋转<br>
         <span class="key">5</span> 检查稳定性<br>
         <span class="key">6</span> 隐私检查<br>
+        <span class="key">7</span> 自动生成泳衣<br>
         <span class="key">[</span> / <span class="key">]</span> 缩小/放大笔刷<br>
         <span class="key">⌘Z</span> / <span class="key">Ctrl+Z</span> 撤销<br>
         <span class="key">S</span> 切换对称
@@ -208,6 +210,8 @@ let bodyColorAttr = null;
 let fabricMeshes = [];
 let strapMeshes = [];
 let strapEndpoints = [];  // [{startIdx, endIdx}, ...] body vertex indices per strap
+let edgeBindingMeshes = [];  // fold-over elastic binding along fabric edges
+let seamLineMeshes = [];     // construction seam lines on fabric surface
 let bodyBounds = null;    // {minY, maxY} in world coords after centering
 let cursorRing = null;
 let strapStartMarker = null;
@@ -222,49 +226,92 @@ const FABRIC_COLOR = 0xc62850;
 const STRAP_COLOR = 0x9a1040;
 
 // Procedural fabric weave texture (created once, reused)
+// Simulates lycra/spandex swimwear: fine jersey knit with subtle sheen
 let fabricTexture = null;
 let fabricBumpMap = null;
 function ensureFabricTexture() {
   if (fabricTexture) return;
-  const size = 256;
+  const size = 512;
   const canvas = document.createElement('canvas');
   canvas.width = size; canvas.height = size;
   const ctx = canvas.getContext('2d');
-  // Base
+
+  // Base swim fabric color
   ctx.fillStyle = '#c62850';
   ctx.fillRect(0, 0, size, size);
-  // Warp threads (horizontal)
-  for (let y = 0; y < size; y += 4) {
-    const bright = (y % 8 < 4) ? 12 : -8;
-    ctx.fillStyle = `rgb(${198+bright},${40+bright},${80+bright})`;
-    ctx.fillRect(0, y, size, 2);
-  }
-  // Weft threads (vertical, offset every other row for weave)
-  for (let x = 0; x < size; x += 4) {
-    for (let y = 0; y < size; y += 8) {
-      const shift = (x % 8 < 4) ? 0 : 4;
-      ctx.fillStyle = 'rgba(0,0,0,0.06)';
-      ctx.fillRect(x, y + shift, 2, 4);
+
+  // Fine jersey knit — horizontal courses (rows of knit loops)
+  for (let y = 0; y < size; y++) {
+    const phase = y % 4;
+    if (phase === 0) {
       ctx.fillStyle = 'rgba(255,255,255,0.04)';
-      ctx.fillRect(x, y + shift + 4, 2, 4);
+      ctx.fillRect(0, y, size, 1);
+    } else if (phase === 2) {
+      ctx.fillStyle = 'rgba(0,0,0,0.035)';
+      ctx.fillRect(0, y, size, 1);
     }
   }
+
+  // Vertical wales (knit columns) — very subtle
+  for (let x = 0; x < size; x += 3) {
+    ctx.fillStyle = (x % 6 < 3) ? 'rgba(0,0,0,0.018)' : 'rgba(255,255,255,0.012)';
+    ctx.fillRect(x, 0, 1, size);
+  }
+
+  // Micro diagonal texture (characteristic of warp-knit tricot)
+  ctx.save();
+  ctx.globalAlpha = 0.018;
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 0.5;
+  for (let i = -size; i < size * 2; i += 8) {
+    ctx.beginPath();
+    ctx.moveTo(i, 0);
+    ctx.lineTo(i + size * 0.25, size);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 0.012;
+  ctx.strokeStyle = '#fff';
+  for (let i = -size; i < size * 2; i += 8) {
+    ctx.beginPath();
+    ctx.moveTo(i + 4, 0);
+    ctx.lineTo(i + 4 + size * 0.25, size);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // Subtle noise for fabric grain
+  const imgData = ctx.getImageData(0, 0, size, size);
+  for (let i = 0; i < imgData.data.length; i += 4) {
+    const noise = (Math.random() - 0.5) * 4;
+    imgData.data[i] = Math.max(0, Math.min(255, imgData.data[i] + noise));
+    imgData.data[i+1] = Math.max(0, Math.min(255, imgData.data[i+1] + noise));
+    imgData.data[i+2] = Math.max(0, Math.min(255, imgData.data[i+2] + noise));
+  }
+  ctx.putImageData(imgData, 0, 0);
+
   fabricTexture = new THREE.CanvasTexture(canvas);
   fabricTexture.wrapS = THREE.RepeatWrapping;
   fabricTexture.wrapT = THREE.RepeatWrapping;
 
-  // Bump map for cloth relief
+  // Bump map — fine horizontal ribbing characteristic of jersey knit
+  const bSize = 128;
   const bCanvas = document.createElement('canvas');
-  bCanvas.width = 64; bCanvas.height = 64;
+  bCanvas.width = bSize; bCanvas.height = bSize;
   const bCtx = bCanvas.getContext('2d');
   bCtx.fillStyle = '#808080';
-  bCtx.fillRect(0, 0, 64, 64);
-  for (let y = 0; y < 64; y += 4) {
-    for (let x = 0; x < 64; x += 4) {
-      const v = ((x + y) % 8 < 4) ? 148 : 108;
-      bCtx.fillStyle = `rgb(${v},${v},${v})`;
-      bCtx.fillRect(x, y, 2, 2);
-    }
+  bCtx.fillRect(0, 0, bSize, bSize);
+  for (let y = 0; y < bSize; y++) {
+    const v = 128 + Math.sin(y * Math.PI / 1.5) * 12;
+    bCtx.fillStyle = `rgb(${v|0},${v|0},${v|0})`;
+    bCtx.fillRect(0, y, bSize, 1);
+  }
+  // Subtle vertical wale structure
+  for (let x = 0; x < bSize; x += 3) {
+    const v = (x % 6 < 3) ? 136 : 120;
+    bCtx.globalAlpha = 0.25;
+    bCtx.fillStyle = `rgb(${v},${v},${v})`;
+    bCtx.fillRect(x, 0, 1, bSize);
+    bCtx.globalAlpha = 1;
   }
   fabricBumpMap = new THREE.CanvasTexture(bCanvas);
   fabricBumpMap.wrapS = THREE.RepeatWrapping;
@@ -592,6 +639,8 @@ function clearFabrics() {
     m.material.dispose();
   }
   fabricMeshes.length = 0;
+  clearEdgeBindings();
+  clearSeamLines();
 }
 
 function regenerateFabric() {
@@ -735,9 +784,9 @@ function regenerateFabric() {
     color: 0xffffff,
     map: fabricTexture,
     bumpMap: fabricBumpMap,
-    bumpScale: 0.0008,
-    roughness: 0.85,
-    metalness: 0.0,
+    bumpScale: 0.0006,
+    roughness: 0.55,     // lycra/spandex has subtle sheen
+    metalness: 0.02,
     side: THREE.DoubleSide,
   });
   const fabricMesh = new THREE.Mesh(fabricGeo, fabricMat);
@@ -930,6 +979,8 @@ function pushUndoSnapshot() {
     coverage: coverage.slice(),
     fabricCount: fabricMeshes.length,
     strapCount: strapMeshes.length,
+    bindingCount: edgeBindingMeshes.length,
+    seamCount: seamLineMeshes.length,
   };
   undoStack.push(snap);
   if (undoStack.length > 20) undoStack.shift();
@@ -950,6 +1001,14 @@ function undo() {
     scene.remove(m); m.geometry.dispose(); m.material.dispose();
   }
   while (strapEndpoints.length > snap.strapCount) strapEndpoints.pop();
+  while (edgeBindingMeshes.length > snap.bindingCount) {
+    const m = edgeBindingMeshes.pop();
+    scene.remove(m); m.geometry.dispose(); m.material.dispose();
+  }
+  while (seamLineMeshes.length > snap.seamCount) {
+    const m = seamLineMeshes.pop();
+    scene.remove(m); m.geometry.dispose(); m.material.dispose();
+  }
   document.getElementById('stat-fabric-tris').textContent = `布料三角形: ${fabricMeshes.reduce((s,m)=>s + (m.geometry.index.count/3), 0).toLocaleString()}`;
   document.getElementById('stat-straps').textContent = `绑带数: ${strapMeshes.length}`;
   document.getElementById('stat-covered').textContent = `已涂: ${countCovered()}`;
@@ -1150,6 +1209,8 @@ function dismissAnalysis() {
   resetBodyColors();
   const showFabric = document.getElementById('chk-show-fabric').checked;
   for (const m of fabricMeshes) m.visible = showFabric;
+  for (const m of edgeBindingMeshes) m.visible = showFabric;
+  for (const m of seamLineMeshes) m.visible = showFabric;
 }
 
 // ============================================================================
@@ -1242,6 +1303,419 @@ function checkPrivacyCoverage() {
   bodyColorAttr.needsUpdate = true;
   for (const m of fabricMeshes) m.visible = false;
   setStatus('隐私覆盖检查完成');
+}
+
+// ============================================================================
+// AUTO-GENERATE SWIMWEAR — transform rough paint into realistic garment
+// ============================================================================
+function autoGenerateSwimwear() {
+  if (!coverage || !bodyGeo || !bodyBounds) { setStatus('没有涂抹区域'); return; }
+  if (countCovered() < 10) { setStatus('请先涂抹一些区域'); return; }
+
+  pushUndoSnapshot();
+  setStatus('自动生成泳衣...');
+
+  // Step 1: Morphological cleanup — smooth edges, fill gaps
+  cleanupCoverage();
+
+  // Step 2: Regenerate fabric mesh with cleaned coverage
+  regenerateFabric();
+
+  // Step 3: Edge binding (fold-over elastic) along all fabric boundaries
+  generateEdgeBinding();
+
+  // Step 4: Seam lines for garment construction realism
+  generateSeamLines();
+
+  // Step 5: Auto-add straps if top coverage exists without straps
+  autoAddStraps();
+
+  document.getElementById('stat-covered').textContent = `已涂: ${countCovered()}`;
+  setStatus('泳衣生成完成');
+}
+
+// --- Morphological cleanup: dilate→smooth→erode to clean raw brush strokes ---
+function cleanupCoverage() {
+  const threshold = 64;
+  const nVerts = coverage.length;
+
+  // Pass 1: Dilate — fill small holes (3 passes)
+  for (let pass = 0; pass < 3; pass++) {
+    const next = coverage.slice();
+    for (let i = 0; i < nVerts; i++) {
+      if (coverage[i] >= threshold) continue;
+      const nb = neighbors[i];
+      let covCount = 0;
+      for (let k = 0; k < nb.length; k++) {
+        if (coverage[nb[k]] >= threshold) covCount++;
+      }
+      if (covCount >= Math.ceil(nb.length * 0.5)) {
+        next[i] = 128;
+      }
+    }
+    coverage.set(next);
+  }
+
+  // Pass 2: Smooth — Gaussian-like averaging (2 passes)
+  for (let pass = 0; pass < 2; pass++) {
+    const next = coverage.slice();
+    for (let i = 0; i < nVerts; i++) {
+      const nb = neighbors[i];
+      let sum = coverage[i] * 2;
+      let weight = 2;
+      for (let k = 0; k < nb.length; k++) {
+        sum += coverage[nb[k]];
+        weight++;
+      }
+      next[i] = Math.round(sum / weight);
+    }
+    coverage.set(next);
+  }
+
+  // Pass 3: Erode — remove thin protrusions (1 pass)
+  {
+    const next = coverage.slice();
+    for (let i = 0; i < nVerts; i++) {
+      if (coverage[i] < threshold) continue;
+      const nb = neighbors[i];
+      let covCount = 0;
+      for (let k = 0; k < nb.length; k++) {
+        if (coverage[nb[k]] >= threshold) covCount++;
+      }
+      if (covCount < Math.ceil(nb.length * 0.3)) {
+        next[i] = 0;
+      }
+    }
+    coverage.set(next);
+  }
+
+  // Pass 4: Final smooth for clean boundary (1 pass)
+  {
+    const next = coverage.slice();
+    for (let i = 0; i < nVerts; i++) {
+      const nb = neighbors[i];
+      let sum = coverage[i] * 2;
+      let weight = 2;
+      for (let k = 0; k < nb.length; k++) {
+        sum += coverage[nb[k]];
+        weight++;
+      }
+      next[i] = Math.round(sum / weight);
+    }
+    coverage.set(next);
+  }
+}
+
+// --- Edge binding: fold-over elastic strips along fabric boundaries ---
+function clearEdgeBindings() {
+  for (const m of edgeBindingMeshes) {
+    scene.remove(m); m.geometry.dispose(); m.material.dispose();
+  }
+  edgeBindingMeshes.length = 0;
+}
+
+function generateEdgeBinding() {
+  clearEdgeBindings();
+  if (fabricMeshes.length === 0) return;
+
+  for (const fMesh of fabricMeshes) {
+    const geo = fMesh.geometry;
+    const fPos = geo.attributes.position.array;
+    const fNrm = geo.attributes.normal.array;
+    const idx = geo.index.array;
+
+    // Find boundary edges (edges appearing in exactly one triangle)
+    const edgeCount = new Map();
+    for (let f = 0; f < idx.length; f += 3) {
+      for (let j = 0; j < 3; j++) {
+        const a = idx[f + j], b = idx[f + (j + 1) % 3];
+        const key = Math.min(a, b) + ',' + Math.max(a, b);
+        edgeCount.set(key, (edgeCount.get(key) || 0) + 1);
+      }
+    }
+
+    // Build boundary adjacency
+    const bndAdj = new Map();
+    for (const [key, cnt] of edgeCount) {
+      if (cnt !== 1) continue;
+      const [a, b] = key.split(',').map(Number);
+      if (!bndAdj.has(a)) bndAdj.set(a, []);
+      if (!bndAdj.has(b)) bndAdj.set(b, []);
+      bndAdj.get(a).push(b);
+      bndAdj.get(b).push(a);
+    }
+
+    if (bndAdj.size === 0) continue;
+
+    // Order boundary vertices into chains/loops
+    const chains = [];
+    const visited = new Set();
+    for (const startV of bndAdj.keys()) {
+      if (visited.has(startV)) continue;
+      const chain = [startV];
+      visited.add(startV);
+      let curr = startV;
+      while (true) {
+        const adj = bndAdj.get(curr);
+        let next = -1;
+        for (let k = 0; k < adj.length; k++) {
+          if (!visited.has(adj[k])) { next = adj[k]; break; }
+        }
+        if (next < 0) break;
+        visited.add(next);
+        chain.push(next);
+        curr = next;
+      }
+      if (chain.length >= 4) chains.push(chain);
+    }
+
+    // For each chain, create a ribbon (elastic binding strip)
+    const bindW = 0.0028;   // 2.8mm binding width
+    const bindH = 0.0008;   // 0.8mm raised height
+
+    for (const chain of chains) {
+      const rPos = [], rNrm = [], rIdx = [], rUV = [];
+
+      for (let ci = 0; ci < chain.length; ci++) {
+        const vi = chain[ci];
+        const px = fPos[vi*3], py = fPos[vi*3+1], pz = fPos[vi*3+2];
+        const nx = fNrm[vi*3], ny = fNrm[vi*3+1], nz = fNrm[vi*3+2];
+
+        // Tangent along chain
+        let tx = 0, ty = 0, tz = 0;
+        if (ci > 0) {
+          const pi = chain[ci-1];
+          tx += fPos[vi*3]-fPos[pi*3]; ty += fPos[vi*3+1]-fPos[pi*3+1]; tz += fPos[vi*3+2]-fPos[pi*3+2];
+        }
+        if (ci < chain.length-1) {
+          const ni = chain[ci+1];
+          tx += fPos[ni*3]-fPos[vi*3]; ty += fPos[ni*3+1]-fPos[vi*3+1]; tz += fPos[ni*3+2]-fPos[vi*3+2];
+        }
+        const tLen = Math.sqrt(tx*tx+ty*ty+tz*tz) || 1;
+        tx/=tLen; ty/=tLen; tz/=tLen;
+
+        // Outward direction = normal × tangent
+        let ox = ny*tz - nz*ty;
+        let oy = nz*tx - nx*tz;
+        let oz = nx*ty - ny*tx;
+        const oLen = Math.sqrt(ox*ox+oy*oy+oz*oz) || 1;
+        ox/=oLen; oy/=oLen; oz/=oLen;
+
+        const base = rPos.length / 3;
+        // Inner edge (on fabric surface, slightly inset)
+        rPos.push(
+          px - ox*bindW*0.25 + nx*bindH,
+          py - oy*bindW*0.25 + ny*bindH,
+          pz - oz*bindW*0.25 + nz*bindH
+        );
+        // Outer edge (beyond fabric boundary)
+        rPos.push(
+          px + ox*bindW + nx*bindH*0.4,
+          py + oy*bindW + ny*bindH*0.4,
+          pz + oz*bindW + nz*bindH*0.4
+        );
+        rNrm.push(nx, ny, nz, nx, ny, nz);
+        rUV.push(ci/chain.length*10, 0, ci/chain.length*10, 1);
+
+        if (ci > 0) {
+          const pb = base - 2;
+          rIdx.push(pb, pb+1, base);
+          rIdx.push(base, pb+1, base+1);
+        }
+      }
+
+      if (rIdx.length === 0) continue;
+
+      const ribbonGeo = new THREE.BufferGeometry();
+      ribbonGeo.setAttribute('position', new THREE.Float32BufferAttribute(rPos, 3));
+      ribbonGeo.setAttribute('normal', new THREE.Float32BufferAttribute(rNrm, 3));
+      ribbonGeo.setAttribute('uv', new THREE.Float32BufferAttribute(rUV, 2));
+      ribbonGeo.setIndex(rIdx);
+      ribbonGeo.computeVertexNormals();
+
+      const ribbonMat = new THREE.MeshStandardMaterial({
+        color: 0xa01838,    // slightly darker than fabric — like FOE binding
+        roughness: 0.28,    // shinier than fabric (elastic sheen)
+        metalness: 0.04,
+        side: THREE.DoubleSide,
+      });
+      const ribbonMesh = new THREE.Mesh(ribbonGeo, ribbonMat);
+      ribbonMesh.visible = document.getElementById('chk-show-fabric').checked;
+      scene.add(ribbonMesh);
+      edgeBindingMeshes.push(ribbonMesh);
+    }
+  }
+}
+
+// --- Seam lines: construction detail on fabric surface ---
+function clearSeamLines() {
+  for (const m of seamLineMeshes) {
+    scene.remove(m); m.geometry.dispose(); m.material.dispose();
+  }
+  seamLineMeshes.length = 0;
+}
+
+function generateSeamLines() {
+  clearSeamLines();
+  if (fabricMeshes.length === 0 || !bodyBounds) return;
+
+  const threshold = 64;
+  const pos = bodyGeo.attributes.position.array;
+  const nrm = bodyGeo.attributes.normal.array;
+  const bodyH = bodyBounds.maxY;
+
+  // Collect covered vertices by zone
+  const topVerts = [], bottomVerts = [];
+  for (let i = 0; i < coverage.length; i++) {
+    if (coverage[i] < threshold) continue;
+    const relY = pos[i*3+1] / bodyH;
+    if (relY > 0.62 && relY < 0.82) topVerts.push(i);
+    else if (relY > 0.42 && relY < 0.60) bottomVerts.push(i);
+  }
+
+  // --- Top piece seams ---
+  if (topVerts.length > 30) {
+    const leftCup = topVerts.filter(i => pos[i*3] < -0.015);
+    const rightCup = topVerts.filter(i => pos[i*3] > 0.015);
+
+    // Cup dart seams (vertical through cup center)
+    if (leftCup.length > 15) addCupDartSeam(leftCup);
+    if (rightCup.length > 15) addCupDartSeam(rightCup);
+
+    // Bridge seam (horizontal connecting cups at center)
+    if (leftCup.length > 0 && rightCup.length > 0) {
+      let lcInner = leftCup[0], rcInner = rightCup[0];
+      for (const v of leftCup) if (pos[v*3] > pos[lcInner*3]) lcInner = v;
+      for (const v of rightCup) if (pos[v*3] < pos[rcInner*3]) rcInner = v;
+      addSeamLine(lcInner, rcInner);
+    }
+  }
+
+  // --- Bottom piece seams ---
+  if (bottomVerts.length > 30) {
+    // Center front seam
+    const centerBottom = bottomVerts.filter(i => Math.abs(pos[i*3]) < 0.025 && nrm[i*3+2] > -0.2);
+    if (centerBottom.length > 5) {
+      let topV = centerBottom[0], botV = centerBottom[0];
+      for (const v of centerBottom) {
+        if (pos[v*3+1] > pos[topV*3+1]) topV = v;
+        if (pos[v*3+1] < pos[botV*3+1]) botV = v;
+      }
+      if (topV !== botV) addSeamLine(topV, botV);
+    }
+
+    // Side seams (left and right at hip edges)
+    for (const side of [-1, 1]) {
+      const sideVerts = bottomVerts.filter(i => pos[i*3] * side > 0.06);
+      if (sideVerts.length > 5) {
+        let topV = sideVerts[0], botV = sideVerts[0];
+        for (const v of sideVerts) {
+          if (pos[v*3+1] > pos[topV*3+1]) topV = v;
+          if (pos[v*3+1] < pos[botV*3+1]) botV = v;
+        }
+        if (topV !== botV) addSeamLine(topV, botV);
+      }
+    }
+  }
+}
+
+function addCupDartSeam(cupVerts) {
+  const pos = bodyGeo.attributes.position.array;
+  let cx = 0, cy = 0;
+  for (const v of cupVerts) { cx += pos[v*3]; cy += pos[v*3+1]; }
+  cx /= cupVerts.length; cy /= cupVerts.length;
+
+  // Find top and bottom vertices near cup center-X
+  const near = cupVerts.filter(v => Math.abs(pos[v*3] - cx) < 0.018);
+  if (near.length < 4) return;
+  let topV = near[0], botV = near[0];
+  for (const v of near) {
+    if (pos[v*3+1] > pos[topV*3+1]) topV = v;
+    if (pos[v*3+1] < pos[botV*3+1]) botV = v;
+  }
+  if (topV !== botV) addSeamLine(topV, botV);
+}
+
+function addSeamLine(startIdx, endIdx) {
+  const path = geodesicPath(startIdx, endIdx);
+  if (!path || path.length < 2) return;
+
+  const pos = bodyGeo.attributes.position.array;
+  const nrm = bodyGeo.attributes.normal.array;
+  const offset = state.fabricOffset + 0.0012; // slightly above fabric surface
+
+  const pts = path.map(i => new THREE.Vector3(
+    pos[i*3] + nrm[i*3] * offset,
+    pos[i*3+1] + nrm[i*3+1] * offset,
+    pos[i*3+2] + nrm[i*3+2] * offset
+  ));
+
+  // Downsample for smooth curve
+  const step = Math.max(1, Math.floor(pts.length / 30));
+  const down = [];
+  for (let i = 0; i < pts.length; i += step) down.push(pts[i]);
+  if (down.length > 0 && down[down.length-1] !== pts[pts.length-1]) down.push(pts[pts.length-1]);
+  if (down.length < 2) return;
+
+  const curve = new THREE.CatmullRomCurve3(down);
+  const tube = new THREE.TubeGeometry(curve, down.length * 3, 0.0007, 4, false);
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x801030,    // dark thread/stitch color
+    roughness: 0.65,
+    metalness: 0.0,
+    side: THREE.DoubleSide,
+  });
+  const mesh = new THREE.Mesh(tube, mat);
+  mesh.visible = document.getElementById('chk-show-fabric').checked;
+  scene.add(mesh);
+  seamLineMeshes.push(mesh);
+}
+
+// --- Auto-add straps if top coverage lacks support ---
+function autoAddStraps() {
+  if (strapMeshes.length > 0) return; // user already added straps
+
+  const threshold = 64;
+  const pos = bodyGeo.attributes.position.array;
+  const bodyH = bodyBounds.maxY;
+
+  // Check for top coverage (breast area)
+  let topLeftApex = -1, topRightApex = -1;
+  let leftMaxY = 0, rightMaxY = 0;
+  let hasTop = false;
+
+  for (let i = 0; i < coverage.length; i++) {
+    if (coverage[i] < threshold) continue;
+    const relY = pos[i*3+1] / bodyH;
+    if (relY > 0.64 && relY < 0.82) {
+      hasTop = true;
+      if (pos[i*3] < -0.015 && pos[i*3+1] > leftMaxY) {
+        leftMaxY = pos[i*3+1]; topLeftApex = i;
+      }
+      if (pos[i*3] > 0.015 && pos[i*3+1] > rightMaxY) {
+        rightMaxY = pos[i*3+1]; topRightApex = i;
+      }
+    }
+  }
+
+  if (!hasTop || topLeftApex < 0 || topRightApex < 0) return;
+
+  // Find shoulder vertices (high on body, lateral position)
+  const shoulderRelY = 0.87;
+  let leftShoulder = -1, rightShoulder = -1;
+  let lsBest = Infinity, rsBest = Infinity;
+  for (let i = 0; i < coverage.length; i++) {
+    const relY = pos[i*3+1] / bodyH;
+    const x = pos[i*3];
+    const nz = bodyGeo.attributes.normal.array[i*3+2];
+    if (nz < 0) continue; // only front-facing
+    const dist = Math.abs(relY - shoulderRelY);
+    if (x < -0.04 && x > -0.14 && dist < lsBest) { lsBest = dist; leftShoulder = i; }
+    if (x > 0.04 && x < 0.14 && dist < rsBest) { rsBest = dist; rightShoulder = i; }
+  }
+
+  if (leftShoulder >= 0) createStrap(topLeftApex, leftShoulder);
+  if (rightShoulder >= 0) createStrap(topRightApex, rightShoulder);
 }
 
 function applyPaintAt(hit) {
@@ -1406,6 +1880,8 @@ function initUI() {
   document.getElementById('chk-show-fabric').addEventListener('change', e => {
     for (const m of fabricMeshes) m.visible = e.target.checked;
     for (const m of strapMeshes) m.visible = e.target.checked;
+    for (const m of edgeBindingMeshes) m.visible = e.target.checked;
+    for (const m of seamLineMeshes) m.visible = e.target.checked;
   });
 
   // Buttons
@@ -1415,6 +1891,7 @@ function initUI() {
   document.getElementById('btn-export').addEventListener('click', exportOBJ);
   document.getElementById('btn-stability').addEventListener('click', analyzeStability);
   document.getElementById('btn-privacy').addEventListener('click', checkPrivacyCoverage);
+  document.getElementById('btn-auto').addEventListener('click', autoGenerateSwimwear);
   document.getElementById('analysis-close').addEventListener('click', dismissAnalysis);
 
   // Canvas events
@@ -1434,6 +1911,7 @@ function initUI() {
     else if (e.key === '4') setTool('orbit');
     else if (e.key === '5') analyzeStability();
     else if (e.key === '6') checkPrivacyCoverage();
+    else if (e.key === '7') autoGenerateSwimwear();
     else if (e.key === '[') setBrushRadius(Math.max(0.005, state.brushRadius - 0.005));
     else if (e.key === ']') setBrushRadius(Math.min(0.08, state.brushRadius + 0.005));
     else if (e.key === 's' || e.key === 'S') {
@@ -1462,6 +1940,8 @@ function exportOBJ() {
   const all = [
     ...fabricMeshes.map((m, i) => ({ mesh: m, name: `fabric_${i}` })),
     ...strapMeshes.map((m, i) => ({ mesh: m, name: `strap_${i}` })),
+    ...edgeBindingMeshes.map((m, i) => ({ mesh: m, name: `binding_${i}` })),
+    ...seamLineMeshes.map((m, i) => ({ mesh: m, name: `seam_${i}` })),
   ];
   for (const { mesh, name } of all) {
     s += `o ${name}\n`;
