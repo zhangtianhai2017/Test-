@@ -100,18 +100,96 @@ function render(): void {
   ($("deal") as HTMLButtonElement).disabled = s.phase !== "betting";
 }
 
-function showBanner(text: string, cls: string): void {
+function showBanner(titleHtml: string, subtitle: string, cls: string, holdMs = 4200): void {
   const b = document.getElementById("resultBanner");
   if (!b) return;
-  b.textContent = text;
+  b.innerHTML = `<div class="banner-title">${titleHtml}</div><div class="banner-sub">${subtitle}</div>`;
   b.className = `banner ${cls} show`;
-  setTimeout(() => { b.className = `banner ${cls}`; }, 3500);
+  setTimeout(() => { b.className = `banner ${cls}`; }, holdMs);
+}
+
+interface SideBetWon { kind: string; label: string; payout: number; }
+let roundSideBets: SideBetWon[] = [];
+
+function handReason(r: { outcome: string; total: number; cards: readonly Card[] }, dealerTotal: number, dealerBust: boolean, dealerBJ: boolean): string {
+  if (r.outcome === "blackjack") return "两张牌凑 21 — 天胡";
+  if (r.outcome === "bust") return `玩家爆牌(${r.total})`;
+  if (r.outcome === "surrender") return "中途投降,返一半";
+  if (r.outcome === "push") return `平手(双方都是 ${r.total})`;
+  if (r.outcome === "win") {
+    if (r.cards.length >= 5 && r.total === 21) return `五龙 21!${r.cards.length} 张牌凑 21`;
+    if (dealerBust) return `庄家爆牌(${dealerTotal}),你 ${r.total} 稳赢`;
+    if (r.total === 21) return `你 21 大过庄家 ${dealerTotal}`;
+    return `${r.total} 大过庄家 ${dealerTotal}`;
+  }
+  if (r.outcome === "loss") {
+    if (dealerBJ) return `庄家天胡(${dealerTotal})`;
+    return `${r.total} 小过庄家 ${dealerTotal}`;
+  }
+  return "";
+}
+
+function bannerForRound(totalNet: number, reasons: string[], isBlackjack: boolean, has5Card21: boolean): { title: string; sub: string; cls: string } {
+  const sideBonus = roundSideBets.reduce((s, x) => s + x.payout, 0);
+  const sideBigWin = roundSideBets.find((x) => x.payout >= 100);
+
+  if (sideBigWin) {
+    return {
+      title: `💎 边注巨奖 💎<br><span class="banner-mega">${sideBigWin.label}</span>`,
+      sub: `+${sideBonus} 筹码 — ${reasons.join(" · ")}`,
+      cls: "banner-mega",
+    };
+  }
+  if (isBlackjack) {
+    return {
+      title: `★ 天 胡 ★<br><span class="banner-bj">B L A C K J A C K</span>`,
+      sub: `+${totalNet} 筹码 · 3:2 赔率`,
+      cls: "banner-blackjack",
+    };
+  }
+  if (has5Card21) {
+    return {
+      title: `🐉 五 龙 21 🐉`,
+      sub: `+${totalNet} 筹码 · ${reasons.join(" · ")}`,
+      cls: "banner-bigwin",
+    };
+  }
+  if (totalNet >= 200) {
+    return {
+      title: `💰 爆 赢 +${totalNet} 💰`,
+      sub: reasons.join(" · "),
+      cls: "banner-bigwin",
+    };
+  }
+  if (totalNet > 0) {
+    return {
+      title: `✓ 本轮赢 +${totalNet}`,
+      sub: reasons.join(" · "),
+      cls: "banner-win",
+    };
+  }
+  if (totalNet < 0) {
+    return {
+      title: `✗ 本轮输 ${totalNet}`,
+      sub: reasons.join(" · "),
+      cls: "banner-loss",
+    };
+  }
+  return {
+    title: `= 本轮平局 ±0`,
+    sub: reasons.join(" · "),
+    cls: "banner-push",
+  };
 }
 
 game.on((e: EngineEvent) => {
   switch (e.type) {
+    case "PHASE_CHANGED":
+      if (e.phase === "betting") roundSideBets = [];
+      break;
     case "SIDEBET_WIN":
-      log(`边注: ${e.label} +${e.payout}`, "log-side");
+      roundSideBets.push({ kind: e.kind, label: e.label, payout: e.payout });
+      log(`边注中奖: ${e.label} +${e.payout}`, "log-side");
       break;
     case "BET_SETTLED": {
       const bet = game.getState().hands[e.handIndex]?.bet ?? 0;
@@ -122,14 +200,23 @@ game.on((e: EngineEvent) => {
       break;
     }
     case "ROUND_OVER": {
+      const s = game.getState();
+      const dealerEval = s.dealerValue;
+      const dealerBust = dealerEval.isBust;
+      const dealerBJ = s.dealer.length === 2 && dealerEval.total === 21;
       let totalNet = 0;
+      let anyBJ = false;
+      let any5Card21 = false;
+      const reasons: string[] = [];
       for (const r of e.results) {
-        const bet = game.getState().hands[r.handIndex]?.bet ?? 0;
+        const bet = s.hands[r.handIndex]?.bet ?? 0;
         totalNet += r.payout - bet;
+        if (r.outcome === "blackjack") anyBJ = true;
+        if (r.outcome === "win" && r.cards.length >= 5 && r.total === 21) any5Card21 = true;
+        reasons.push(handReason(r, dealerEval.total, dealerBust, dealerBJ));
       }
-      if (totalNet > 0) showBanner(`本轮 赢 +${totalNet}`, "banner-win");
-      else if (totalNet < 0) showBanner(`本轮 输 ${totalNet}`, "banner-loss");
-      else showBanner(`本轮 平局 ±0`, "banner-push");
+      const { title, sub, cls } = bannerForRound(totalNet, reasons, anyBJ, any5Card21);
+      showBanner(title, sub, cls);
       break;
     }
     case "NATURAL_BLACKJACK":

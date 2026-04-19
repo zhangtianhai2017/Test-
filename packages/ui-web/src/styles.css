@@ -111,17 +111,91 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 
 .banner {
   text-align: center;
-  font-size: 24px;
-  font-weight: 700;
-  padding: 14px 20px;
+  padding: 16px 20px;
   margin: 12px 0 0;
-  border-radius: 10px;
+  border-radius: 12px;
   opacity: 0;
-  transform: translateY(-8px);
-  transition: opacity 200ms, transform 200ms;
+  transform: translateY(-8px) scale(0.96);
+  transition: opacity 240ms ease-out, transform 240ms ease-out;
   pointer-events: none;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.45);
 }
-.banner.show { opacity: 1; transform: translateY(0); }
+.banner.show { opacity: 1; transform: translateY(0) scale(1); }
+.banner-title {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  line-height: 1.15;
+  font-family: Georgia, "Playfair Display", ui-serif, serif;
+}
+.banner-sub {
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.88;
+  font-style: italic;
+}
 .banner-win  { background: linear-gradient(90deg, #0a6 0%, #6cff9a 100%); color: #003; }
 .banner-loss { background: linear-gradient(90deg, #800 0%, #ff5555 100%); color: #fff; }
-.banner-push { background: #444; color: #eee; }
+.banner-push { background: #333; color: #eee; }
+
+/* Natural blackjack — gold gradient, pulsing glow */
+.banner-blackjack {
+  background: linear-gradient(135deg, #2a1a0f 0%, #c99b3a 50%, #f6d870 75%, #c99b3a 100%);
+  color: #2a1a0f;
+  animation: bj-pulse 900ms ease-in-out infinite alternate;
+}
+.banner-blackjack .banner-title { font-size: 40px; text-shadow: 0 2px 0 rgba(255,255,255,0.45); }
+.banner-blackjack .banner-bj {
+  display: inline-block;
+  letter-spacing: 12px;
+  font-size: 22px;
+  font-weight: 900;
+}
+@keyframes bj-pulse {
+  from { box-shadow: 0 0 20px #f6d870, 0 0 40px #c99b3a; }
+  to   { box-shadow: 0 0 40px #f6d870, 0 0 80px #f6d870; }
+}
+
+/* Big wins — red-gold, shaky */
+.banner-bigwin {
+  background: linear-gradient(90deg, #7a0b0b 0%, #ffb347 50%, #ffcc33 100%);
+  color: #2a0000;
+  animation: big-shake 520ms cubic-bezier(.36,.07,.19,.97) both;
+}
+.banner-bigwin .banner-title { font-size: 44px; text-shadow: 0 2px 0 rgba(255,255,255,0.4); }
+@keyframes big-shake {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  20% { transform: translateY(0) rotate(-1.2deg); }
+  40% { transform: translateY(-2px) rotate(1.2deg); }
+  60% { transform: translateY(2px) rotate(-0.8deg); }
+  80% { transform: translateY(-1px) rotate(0.6deg); }
+}
+
+/* Side-bet mega jackpot — rainbow sweep */
+.banner-mega {
+  display: inline-block;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, #ff3d3d, #ffce4a, #6cff9a, #5cb3ff, #d66bff, #ff3d3d);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: mega-sweep 1.6s linear infinite;
+}
+.banner.banner-mega {
+  background: #111;
+  color: #fff;
+  animation: mega-glow 900ms ease-in-out infinite alternate;
+}
+.banner.banner-mega .banner-title { font-size: 34px; }
+@keyframes mega-sweep {
+  from { background-position: 0% 0; }
+  to   { background-position: 200% 0; }
+}
+@keyframes mega-glow {
+  from { box-shadow: 0 0 24px #ffce4a, 0 0 60px #d66bff inset; }
+  to   { box-shadow: 0 0 48px #6cff9a, 0 0 100px #5cb3ff inset; }
+}
