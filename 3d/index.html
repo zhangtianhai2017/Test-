@@ -23,19 +23,70 @@
       .banner {
         position: fixed; top: 50%; left: 50%;
         transform: translate(-50%, -50%) scale(0.9);
-        padding: 22px 48px; border-radius: 14px;
-        font-size: 36px; font-weight: 800; letter-spacing: 1px;
+        padding: 28px 56px; border-radius: 16px;
         opacity: 0; pointer-events: none;
-        transition: opacity 220ms, transform 220ms;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        z-index: 50;
+        transition: opacity 240ms, transform 240ms;
+        box-shadow: 0 12px 48px rgba(0,0,0,0.6);
+        z-index: 50; text-align: center;
+        max-width: 92vw;
       }
       .banner.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      .banner-title {
+        font-size: 46px; font-weight: 900; letter-spacing: 1.5px;
+        line-height: 1.1; font-family: Georgia, "Playfair Display", ui-serif, serif;
+      }
+      .banner-sub {
+        margin-top: 10px; font-size: 16px; font-weight: 500;
+        opacity: 0.88; font-style: italic;
+      }
       .banner-win  { background: linear-gradient(90deg, #0a6 0%, #6cff9a 100%); color: #003; }
       .banner-loss { background: linear-gradient(90deg, #800 0%, #ff5555 100%); color: #fff; }
-      .banner-push { background: #444; color: #eee; }
+      .banner-push { background: #333; color: #eee; }
+
+      .banner-blackjack {
+        background: linear-gradient(135deg, #2a1a0f 0%, #c99b3a 50%, #f6d870 75%, #c99b3a 100%);
+        color: #2a1a0f;
+        animation: bj-pulse 900ms ease-in-out infinite alternate;
+      }
+      .banner-blackjack .banner-title { font-size: 58px; text-shadow: 0 2px 0 rgba(255,255,255,0.45); }
+      .banner-blackjack .banner-bj { display: inline-block; letter-spacing: 14px; font-size: 28px; font-weight: 900; }
+      @keyframes bj-pulse {
+        from { box-shadow: 0 0 30px #f6d870, 0 0 80px #c99b3a; }
+        to   { box-shadow: 0 0 60px #f6d870, 0 0 140px #f6d870; }
+      }
+
+      .banner-bigwin {
+        background: linear-gradient(90deg, #7a0b0b 0%, #ffb347 50%, #ffcc33 100%);
+        color: #2a0000;
+        animation: big-shake 520ms cubic-bezier(.36,.07,.19,.97) both;
+      }
+      .banner-bigwin .banner-title { font-size: 64px; text-shadow: 0 2px 0 rgba(255,255,255,0.4); }
+      @keyframes big-shake {
+        0%, 100% { transform: translate(-50%, -50%) rotate(0); }
+        20% { transform: translate(calc(-50% - 6px), -50%) rotate(-1.2deg); }
+        40% { transform: translate(calc(-50% + 6px), calc(-50% - 3px)) rotate(1.2deg); }
+        60% { transform: translate(calc(-50% - 4px), calc(-50% + 3px)) rotate(-0.8deg); }
+        80% { transform: translate(calc(-50% + 3px), -50%) rotate(0.6deg); }
+      }
+
+      .banner-mega {
+        display: inline-block; font-size: 28px; font-weight: 900; letter-spacing: 3px;
+        background: linear-gradient(90deg, #ff3d3d, #ffce4a, #6cff9a, #5cb3ff, #d66bff, #ff3d3d);
+        background-size: 200% 100%;
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+        animation: mega-sweep 1.6s linear infinite;
+      }
+      .banner.banner-mega { background: #111; color: #fff;
+        animation: mega-glow 900ms ease-in-out infinite alternate;
+      }
+      .banner.banner-mega .banner-title { font-size: 50px; }
+      @keyframes mega-sweep { from { background-position: 0% 0; } to { background-position: 200% 0; } }
+      @keyframes mega-glow {
+        from { box-shadow: 0 0 40px #ffce4a, inset 0 0 80px #d66bff; }
+        to   { box-shadow: 0 0 80px #6cff9a, inset 0 0 140px #5cb3ff; }
+      }
     </style>
-    <script type="module" crossorigin src="./assets/index-Dw-5fIWI.js"></script>
+    <script type="module" crossorigin src="./assets/index-BNTzjHyT.js"></script>
   </head>
   <body>
     <div id="hud">

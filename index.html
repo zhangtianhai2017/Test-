@@ -11,16 +11,7 @@
       p { opacity: 0.85; line-height: 1.5; }
       .cards { display: grid; gap: 16px; margin-top: 32px; grid-template-columns: 1fr; }
       @media (min-width: 560px) { .cards { grid-template-columns: 1fr 1fr; } }
-      a.card {
-        display: block;
-        background: rgba(0,0,0,0.35);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 14px;
-        padding: 24px;
-        color: #eee;
-        text-decoration: none;
-        transition: transform 120ms, border-color 120ms;
-      }
+      a.card { display: block; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 24px; color: #eee; text-decoration: none; transition: transform 120ms, border-color 120ms; }
       a.card:hover { transform: translateY(-2px); border-color: #ffce4a; }
       a.card h2 { margin: 0 0 6px; font-size: 20px; color: #ffce4a; }
       a.card p { margin: 0; font-size: 14px; }
@@ -31,21 +22,12 @@
   <body>
     <main>
       <h1>Blackjack · 21点</h1>
-      <p>支持 Vegas / Spanish 21 / Pontoon / Super Fun 21 四种规则,附加边注(21+3、Perfect Pairs、Lucky Ladies)。2D 和 3D 共用同一套规则引擎。</p>
+      <p>支持 Vegas / Spanish 21 / Pontoon / Super Fun 21 四种规则,附加边注(21+3、Perfect Pairs、Lucky Ladies)。每轮结束会显示具体赢/输的原因,天胡、五龙、边注巨奖有夸张动画。</p>
       <div class="cards">
-        <a class="card" href="./2d/">
-          <h2>2D 牌桌 →</h2>
-          <p>俯视视角,触屏/键鼠都友好。</p>
-        </a>
-        <a class="card" href="./3d/">
-          <h2>3D 牌桌 →</h2>
-          <p>Three.js 场景,发牌有动画。</p>
-        </a>
+        <a class="card" href="./2d/"><h2>2D 牌桌 →</h2><p>俯视视角,触屏/键鼠都友好。</p></a>
+        <a class="card" href="./3d/"><h2>3D 牌桌 →</h2><p>Three.js 场景,发牌有动画。</p></a>
       </div>
-      <footer>
-        源码: <a class="src" href="https://github.com/zhangtianhai2017/test-">zhangtianhai2017/test-</a>
-        · 分支 <code>claude/blackjack-game-architecture-k3Yf6</code>
-      </footer>
+      <footer>源码: <a class="src" href="https://github.com/zhangtianhai2017/test-">zhangtianhai2017/test-</a></footer>
     </main>
   </body>
 </html>
