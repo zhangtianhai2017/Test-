@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Blackjack — Play</title>
+    <style>
+      html,body { margin:0; height:100%; background: radial-gradient(circle at top, #0b5e2c 0%, #07381a 80%); color:#eee; font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; }
+      main { max-width: 720px; margin: 0 auto; padding: 48px 24px; }
+      h1 { font-weight: 600; letter-spacing: 0.5px; margin: 0 0 8px; font-size: 32px; }
+      p { opacity: 0.85; line-height: 1.5; }
+      .cards { display: grid; gap: 16px; margin-top: 32px; grid-template-columns: 1fr; }
+      @media (min-width: 560px) { .cards { grid-template-columns: 1fr 1fr; } }
+      a.card {
+        display: block;
+        background: rgba(0,0,0,0.35);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 14px;
+        padding: 24px;
+        color: #eee;
+        text-decoration: none;
+        transition: transform 120ms, border-color 120ms;
+      }
+      a.card:hover { transform: translateY(-2px); border-color: #ffce4a; }
+      a.card h2 { margin: 0 0 6px; font-size: 20px; color: #ffce4a; }
+      a.card p { margin: 0; font-size: 14px; }
+      footer { margin-top: 48px; font-size: 12px; opacity: 0.5; }
+      a.src { color: #ffce4a; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Blackjack</h1>
+      <p>Classic casino blackjack with Vegas / Spanish 21 / Pontoon / Super Fun 21 variants and side bets (21+3, Perfect Pairs, Lucky Ladies). Same rules engine drives both frontends.</p>
+      <div class="cards">
+        <a class="card" href="./2d/">
+          <h2>2D Felt Table →</h2>
+          <p>Classic top-down view. Keyboard &amp; touch friendly.</p>
+        </a>
+        <a class="card" href="./3d/">
+          <h2>3D Table →</h2>
+          <p>Three.js scene with tweened card meshes and chip stacks.</p>
+        </a>
+      </div>
+      <footer>
+        Source: <a class="src" href="https://github.com/zhangtianhai2017/test-">zhangtianhai2017/test-</a>
+        · Branch <code>claude/blackjack-game-architecture-k3Yf6</code>
+      </footer>
+    </main>
+  </body>
+</html>
