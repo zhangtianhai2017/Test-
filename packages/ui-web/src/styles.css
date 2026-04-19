@@ -95,3 +95,33 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 .log-loss { color: #ff9a9a; }
 .log-push { color: #eee; }
 .log-side { color: var(--accent); }
+
+.result-tag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 12px;
+  background: rgba(0,0,0,0.35);
+}
+.result-tag.log-win  { color: #0a2; background: #6cff9a; }
+.result-tag.log-loss { color: #600; background: #ff9a9a; }
+.result-tag.log-push { color: #111; background: #e0e0e0; }
+
+.banner {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  padding: 14px 20px;
+  margin: 12px 0 0;
+  border-radius: 10px;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 200ms, transform 200ms;
+  pointer-events: none;
+}
+.banner.show { opacity: 1; transform: translateY(0); }
+.banner-win  { background: linear-gradient(90deg, #0a6 0%, #6cff9a 100%); color: #003; }
+.banner-loss { background: linear-gradient(90deg, #800 0%, #ff5555 100%); color: #fff; }
+.banner-push { background: #444; color: #eee; }

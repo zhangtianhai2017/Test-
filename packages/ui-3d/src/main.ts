@@ -1,5 +1,14 @@
 import * as THREE from "three";
-import { createGame, type Card, type EngineEvent, type RuleSetId } from "@blackjack/engine";
+import { createGame, type Card, type EngineEvent, type Outcome, type RuleSetId } from "@blackjack/engine";
+
+const OUTCOME_LABEL: Record<Outcome, { zh: string; symbol: string }> = {
+  win:       { zh: "赢",       symbol: "✓" },
+  blackjack: { zh: "黑杰克!",  symbol: "★" },
+  push:      { zh: "平局",     symbol: "=" },
+  loss:      { zh: "输",       symbol: "✗" },
+  bust:      { zh: "爆牌",     symbol: "✗" },
+  surrender: { zh: "投降",     symbol: "⤺" },
+};
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x05331a);
@@ -223,10 +232,18 @@ function log(msg: string): void {
   logEl.prepend(line);
 }
 
+function showBanner(text: string, cls: string): void {
+  const b = document.getElementById("resultBanner");
+  if (!b) return;
+  b.textContent = text;
+  b.className = `banner ${cls} show`;
+  setTimeout(() => { b.className = `banner ${cls}`; }, 3500);
+}
+
 function updateHUD(): void {
   const s = game.getState();
-  bankrollEl.textContent = `bankroll: ${s.bankroll}`;
-  phaseEl.textContent = `phase: ${s.phase}`;
+  bankrollEl.textContent = `筹码: ${s.bankroll}`;
+  phaseEl.textContent = `阶段: ${s.phase}`;
   const legal = new Set(s.legalActions);
   document.querySelectorAll<HTMLButtonElement>("#actGroup button").forEach((b) => {
     b.disabled = !legal.has(b.dataset.action as never);
@@ -237,23 +254,35 @@ function updateHUD(): void {
 game.on((e: EngineEvent) => {
   switch (e.type) {
     case "CARD_DEALT":
-      log(`${e.to}[${e.handIndex}] ← ${e.card.rank}${e.card.suit}${e.faceDown ? " (hole)" : ""}`);
+      log(`${e.to === "dealer" ? "庄家" : "玩家"}[${e.handIndex}] ← ${e.card.rank}${e.card.suit}${e.faceDown ? " (暗牌)" : ""}`);
       break;
     case "HOLE_CARD_REVEALED":
-      log(`dealer reveals: ${e.card.rank}${e.card.suit}`);
+      log(`庄家翻暗牌: ${e.card.rank}${e.card.suit}`);
       break;
     case "NATURAL_BLACKJACK":
-      log("★ BLACKJACK!");
+      log("★ 天胡!(Blackjack)");
       break;
     case "HAND_BUST":
-      log(`hand ${e.handIndex} BUST`);
+      log(`第${e.handIndex + 1}手 爆牌`);
       break;
     case "SIDEBET_WIN":
-      log(`side bet: ${e.label} +${e.payout}`);
+      log(`边注: ${e.label} +${e.payout}`);
       break;
-    case "ROUND_OVER":
-      for (const r of e.results) log(`hand ${r.handIndex}: ${r.outcome} +${r.payout}`);
+    case "ROUND_OVER": {
+      let totalNet = 0;
+      for (const r of e.results) {
+        const bet = game.getState().hands[r.handIndex]?.bet ?? 0;
+        const net = r.payout - bet;
+        totalNet += net;
+        const L = OUTCOME_LABEL[r.outcome];
+        const netStr = net > 0 ? `净赚 +${net}` : net < 0 ? `净亏 ${net}` : `±0`;
+        log(`${L.symbol} 第${r.handIndex + 1}手: ${L.zh} · 押${bet} · ${netStr}`);
+      }
+      if (totalNet > 0) showBanner(`本轮 赢 +${totalNet}`, "banner-win");
+      else if (totalNet < 0) showBanner(`本轮 输 ${totalNet}`, "banner-loss");
+      else showBanner(`本轮 平局 ±0`, "banner-push");
       break;
+    }
     case "PHASE_CHANGED":
       if (e.phase === "betting") clearCards();
       break;

@@ -1,6 +1,20 @@
-import { createGame, type Card, type EngineEvent, type RuleSetId } from "@blackjack/engine";
+import { createGame, type Card, type EngineEvent, type Outcome, type RuleSetId } from "@blackjack/engine";
 
 const game = createGame({ ruleSetId: "VEGAS" });
+
+const OUTCOME_LABEL: Record<Outcome, { zh: string; en: string; symbol: string }> = {
+  win:       { zh: "赢",       en: "WIN",       symbol: "✓" },
+  blackjack: { zh: "黑杰克!",  en: "BLACKJACK", symbol: "★" },
+  push:      { zh: "平局",     en: "PUSH",      symbol: "=" },
+  loss:      { zh: "输",       en: "LOSS",      symbol: "✗" },
+  bust:      { zh: "爆牌",     en: "BUST",      symbol: "✗" },
+  surrender: { zh: "投降",     en: "SURR",      symbol: "⤺" },
+};
+function outcomeCls(o: Outcome): string {
+  if (o === "win" || o === "blackjack") return "log-win";
+  if (o === "push") return "log-push";
+  return "log-loss";
+}
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string): T =>
   document.getElementById(id) as T;
@@ -35,10 +49,16 @@ function log(msg: string, cls = ""): void {
   logEl.prepend(line);
 }
 
+const PHASE_ZH: Record<string, string> = {
+  betting: "下注", dealing: "发牌中", insurance: "保险",
+  playerTurn: "你的回合", dealerTurn: "庄家回合",
+  settlement: "结算中", roundOver: "本轮结束",
+};
+
 function render(): void {
   const s = game.getState();
-  bankrollEl.textContent = `bankroll: ${s.bankroll}`;
-  phaseEl.textContent = `phase: ${s.phase}`;
+  bankrollEl.textContent = `筹码: ${s.bankroll}`;
+  phaseEl.textContent = `阶段: ${PHASE_ZH[s.phase] ?? s.phase}`;
   ruleSetSel.value = s.ruleSet.id;
 
   dealerCards.replaceChildren();
@@ -59,8 +79,16 @@ function render(): void {
     hd.appendChild(cc);
     const meta = document.createElement("div");
     const hv = s.handValues[i]!;
+    const result = s.roundResults.find((r) => r.handIndex === i);
+    let resultTag = "";
+    if (result) {
+      const L = OUTCOME_LABEL[result.outcome];
+      const net = result.payout - h.bet;
+      const netStr = net > 0 ? `+${net}` : net < 0 ? `${net}` : "±0";
+      resultTag = `  <span class="result-tag ${outcomeCls(result.outcome)}">${L.symbol} ${L.zh} ${netStr}</span>`;
+    }
     meta.className = "bet";
-    meta.textContent = `bet=${h.bet}  total=${hv.total}${hv.soft ? " soft" : ""}${h.doubled ? "  (doubled)" : ""}${h.surrendered ? "  (surrendered)" : ""}`;
+    meta.innerHTML = `押注 ${h.bet}  ·  点数 ${hv.total}${hv.soft ? " 软" : ""}${h.doubled ? "  (加倍)" : ""}${h.surrendered ? "  (投降)" : ""}${resultTag}`;
     hd.appendChild(meta);
     playerHands.appendChild(hd);
   });
@@ -72,25 +100,46 @@ function render(): void {
   ($("deal") as HTMLButtonElement).disabled = s.phase !== "betting";
 }
 
+function showBanner(text: string, cls: string): void {
+  const b = document.getElementById("resultBanner");
+  if (!b) return;
+  b.textContent = text;
+  b.className = `banner ${cls} show`;
+  setTimeout(() => { b.className = `banner ${cls}`; }, 3500);
+}
+
 game.on((e: EngineEvent) => {
   switch (e.type) {
     case "SIDEBET_WIN":
-      log(`side bet ${e.kind}: ${e.label} +${e.payout}`, "log-side");
+      log(`边注: ${e.label} +${e.payout}`, "log-side");
       break;
-    case "BET_SETTLED":
-      log(
-        `hand ${e.handIndex}: ${e.outcome} +${e.payout}`,
-        e.outcome === "win" || e.outcome === "blackjack" ? "log-win" : e.outcome === "push" ? "log-push" : "log-loss",
-      );
+    case "BET_SETTLED": {
+      const bet = game.getState().hands[e.handIndex]?.bet ?? 0;
+      const net = e.payout - bet;
+      const L = OUTCOME_LABEL[e.outcome];
+      const netStr = net > 0 ? `净赚 +${net}` : net < 0 ? `净亏 ${net}` : `平 ±0`;
+      log(`${L.symbol} 第${e.handIndex + 1}手: ${L.zh} · 押${bet} · ${netStr}`, outcomeCls(e.outcome));
       break;
+    }
+    case "ROUND_OVER": {
+      let totalNet = 0;
+      for (const r of e.results) {
+        const bet = game.getState().hands[r.handIndex]?.bet ?? 0;
+        totalNet += r.payout - bet;
+      }
+      if (totalNet > 0) showBanner(`本轮 赢 +${totalNet}`, "banner-win");
+      else if (totalNet < 0) showBanner(`本轮 输 ${totalNet}`, "banner-loss");
+      else showBanner(`本轮 平局 ±0`, "banner-push");
+      break;
+    }
     case "NATURAL_BLACKJACK":
-      log("★ BLACKJACK!", "log-win");
+      log("★ 天胡!(Blackjack)", "log-win");
       break;
     case "HAND_BUST":
-      log(`hand ${e.handIndex} BUST`, "log-loss");
+      log(`第${e.handIndex + 1}手 爆牌`, "log-loss");
       break;
     case "SHOE_SHUFFLED":
-      log("— shoe reshuffled —");
+      log("— 洗牌 —");
       break;
     case "ERROR":
       log(`! ${e.code}: ${e.message}`, "log-loss");
