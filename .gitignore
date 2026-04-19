@@ -12,3 +12,13 @@ packages/ue-plugin/SampleProject/Saved/
 packages/ue-plugin/SampleProject/DerivedDataCache/
 packages/ue-plugin/Binaries/
 packages/ue-plugin/Intermediate/
+
+# dealer-ai
+packages/dealer-ai/models/
+packages/dealer-ai/.venv/
+packages/dealer-ai/**/__pycache__/
+packages/dealer-ai/*.egg-info/
+packages/dealer-ai/.pytest_cache/
+packages/dealer-ai/build/
+packages/dealer-ai/dist/
+packages/dealer-ai/src/dealer_ai.egg-info/

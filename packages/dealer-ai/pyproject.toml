@@ -1,0 +1,46 @@
+[project]
+name = "dealer-ai"
+version = "0.1.0"
+description = "Headless bilingual blackjack dealer AI service (LLM + TTS) for web and UE clients"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "pydantic>=2.8",
+    "httpx>=0.27",
+    "python-multipart>=0.0.9",
+    # LLM: llama-cpp-python ships pure-Python wheels on Win/Linux/macOS.
+    # CPU-only by default; GPU builds available via extras (CUDA/Metal/Vulkan).
+    "llama-cpp-python>=0.3.2",
+]
+
+[project.optional-dependencies]
+tts = [
+    # CosyVoice + deps — heavy (~4 GB), install only on machines with GPU.
+    "torch>=2.2",
+    "torchaudio>=2.2",
+    "modelscope>=1.15",
+    "cosyvoice-ng ; python_version>='3.10'",  # placeholder — pinned in docs
+]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.6",
+]
+
+[project.scripts]
+dealer-ai = "dealer_ai.main:cli"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+dealer_ai = ["personas/*.json", "prompts/*.txt", "fallback/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "strict"

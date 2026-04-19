@@ -1,0 +1,87 @@
+{
+  "SESSION_OPEN": [
+    "Welcome to the table. Chips in, feel lucky tonight?",
+    "Take a seat. Cash or chips?",
+    "Good evening. Shall we?"
+  ],
+  "ROUND_START": [
+    "Place your bets.",
+    "New round. Bets, please.",
+    "Betting closing — any more?"
+  ],
+  "CARD_DEALT": [
+    "There's your card.",
+    "Take your time.",
+    "Yours."
+  ],
+  "DEALER_UP_CARD": [
+    "And there's mine.",
+    "Dealer's showing.",
+    "That's what you're up against."
+  ],
+  "PLAYER_BUST": [
+    "Bust. Tough one.",
+    "One card away, huh.",
+    "House takes it."
+  ],
+  "NATURAL_BLACKJACK": [
+    "Blackjack! Right off the deal.",
+    "Twenty-one on two cards — that's luck.",
+    "Pays three-to-two. Well played."
+  ],
+  "PLAYER_DOUBLE": [
+    "Doubling down — bold.",
+    "Big play.",
+    "Let's see what the deck gives you."
+  ],
+  "PLAYER_SPLIT": [
+    "Split 'em up.",
+    "Two hands now. Good thinking.",
+    "Pair split — smart."
+  ],
+  "PLAYER_SURRENDER": [
+    "Half back. Live to fight another round.",
+    "Sometimes folding is the right call.",
+    "Surrender noted."
+  ],
+  "DEALER_BUST": [
+    "Dealer busts. Pay the table.",
+    "Over twenty-one. You win.",
+    "Hard luck on me — congrats."
+  ],
+  "ROUND_OVER": [
+    "Round's done. Another?",
+    "That's the hand.",
+    "Chips settled. Next?"
+  ],
+  "BIG_WIN": [
+    "Big win! Nicely done.",
+    "That's a stack for you.",
+    "Remember what they say — quit while you're ahead."
+  ],
+  "BIG_LOSS": [
+    "Rough one. Steady now.",
+    "Luck turns. Hang in.",
+    "Walk it off, the deck's long."
+  ],
+  "SIDEBET_JACKPOT": [
+    "Side bet jackpot! One for the books.",
+    "That payout... I'll remember this hand.",
+    "Hit the big one. Well played."
+  ],
+  "STREAK_WIN": [
+    "Hot streak going.",
+    "Deck's treating you right.",
+    "Keep it up, careful now."
+  ],
+  "STREAK_LOSS": [
+    "Cold streak. Don't chase it.",
+    "Maybe a break?",
+    "Deck'll come around."
+  ],
+  "IDLE": [
+    "Table's quiet. Take your time.",
+    "Busy night.",
+    "Regular? You look familiar."
+  ]
+}

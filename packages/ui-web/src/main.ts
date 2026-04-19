@@ -1,4 +1,14 @@
 import { createGame, type Card, type EngineEvent, type Outcome, type RuleSetId } from "@blackjack/engine";
+import { createDealerClient, type EventType as DealerEvent, type Language as DealerLang } from "./dealerClient.js";
+
+const dealerClient = createDealerClient();
+let uiLanguage: DealerLang = "zh";
+let chosenPersona = "veteran";
+const PERSONA_NAME: Record<string, { zh: string; en: string }> = {
+  veteran: { zh: "老江湖 · 陈师傅", en: "Veteran · Mr. Chen" },
+  hostess: { zh: "热情阿姨 · 王姐", en: "Hostess · Auntie Wang" },
+  mystic:  { zh: "神秘赌神",        en: "The Mystic" },
+};
 
 const game = createGame({ ruleSetId: "VEGAS" });
 
@@ -265,4 +275,111 @@ ruleSetSel.addEventListener("change", () => {
   log(`ruleset → ${ruleSetSel.value}`);
 });
 
+// --- Dealer AI integration ---------------------------------------------
+
+function showDealerBubble(text: string, source: string): void {
+  const b = document.getElementById("dealerBubble");
+  if (!b) return;
+  (document.getElementById("dealerName") as HTMLElement).textContent =
+    PERSONA_NAME[chosenPersona]?.[uiLanguage] ?? "Dealer";
+  (document.getElementById("dealerText") as HTMLElement).textContent = text;
+  (document.getElementById("dealerSrc") as HTMLElement).textContent = source;
+  b.classList.add("show");
+  window.clearTimeout((showDealerBubble as any)._t);
+  (showDealerBubble as any)._t = window.setTimeout(() => b.classList.remove("show"), 5000);
+}
+
+async function askDealer(event: DealerEvent, state: Parameters<typeof dealerClient.quip>[1]): Promise<void> {
+  const q = await dealerClient.quip(event, state);
+  if (q) showDealerBubble(q.text, `${q.source} · ${q.latency_ms}ms`);
+}
+
+// Hook into engine events — fires alongside existing UI logic.
+game.on((e) => {
+  const s = game.getState();
+  const dv = s.dealerValue;
+  switch (e.type) {
+    case "NATURAL_BLACKJACK":
+      askDealer("NATURAL_BLACKJACK", { player_total: 21, bet: s.hands[0]?.bet, rare_hand: "natural-blackjack" });
+      break;
+    case "HAND_BUST":
+      askDealer("PLAYER_BUST", { player_total: s.handValues[e.handIndex]?.total, bet: s.hands[e.handIndex]?.bet });
+      break;
+    case "SIDEBET_WIN":
+      if (e.payout >= 100) askDealer("SIDEBET_JACKPOT", { rare_hand: e.kind, net: e.payout });
+      break;
+    case "PLAYER_ACTION":
+      if (e.action === "DOUBLE") askDealer("PLAYER_DOUBLE", { seat_index: e.handIndex });
+      else if (e.action === "SPLIT") askDealer("PLAYER_SPLIT", { seat_index: e.handIndex });
+      else if (e.action === "SURRENDER") askDealer("PLAYER_SURRENDER", { seat_index: e.handIndex });
+      break;
+    case "ROUND_OVER": {
+      let totalNet = 0, anyBJ = false, anyBust = false;
+      for (const r of e.results) {
+        const bet = s.hands[r.handIndex]?.bet ?? 0;
+        totalNet += r.payout - bet;
+        if (r.outcome === "blackjack") anyBJ = true;
+        if (r.outcome === "bust") anyBust = true;
+      }
+      const state = {
+        player_total: s.handValues[0]?.total,
+        dealer_total: dv.total,
+        outcome: anyBJ ? "blackjack" as const : anyBust ? "bust" as const : totalNet > 0 ? "win" as const : totalNet < 0 ? "loss" as const : "push" as const,
+        bet: s.hands[0]?.bet,
+        net: totalNet,
+        bankroll: s.bankroll,
+      };
+      if (dv.isBust) askDealer("DEALER_BUST", state);
+      else if (totalNet >= 200) askDealer("BIG_WIN", state);
+      else if (totalNet <= -100) askDealer("BIG_LOSS", state);
+      else askDealer("ROUND_OVER", state);
+      break;
+    }
+  }
+});
+
+// --- Startup modal -----------------------------------------------------
+
+async function bootDealerFlow(): Promise<void> {
+  const modal = document.getElementById("startupModal")!;
+  const statusEl = document.getElementById("serverStatus")!;
+  const setSeg = (id: string, val: string) => {
+    const group = document.getElementById(id)!;
+    group.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b.dataset.val === val));
+  };
+  document.getElementById("langSeg")!.addEventListener("click", (e) => {
+    const t = e.target as HTMLButtonElement;
+    if (t.dataset.val) { uiLanguage = t.dataset.val as DealerLang; setSeg("langSeg", uiLanguage); }
+  });
+  document.getElementById("personaSeg")!.addEventListener("click", (e) => {
+    const t = e.target as HTMLButtonElement;
+    if (t.dataset.val) { chosenPersona = t.dataset.val; setSeg("personaSeg", chosenPersona); }
+  });
+
+  // Probe server health.
+  try {
+    const r = await fetch(`${dealerClient.baseUrl}/health`, { signal: AbortSignal.timeout(1500) });
+    if (r.ok) {
+      const h = await r.json();
+      const llm = h.llm?.ready ? "LLM on" : "fallback";
+      const tts = h.tts?.ready ? "TTS on" : "no TTS";
+      statusEl.textContent = `${h.version} · ${llm} · ${tts}`;
+      statusEl.className = h.llm?.ready ? "ok" : "warn";
+    } else {
+      statusEl.textContent = "server error — fallback quips only";
+      statusEl.className = "err";
+    }
+  } catch {
+    statusEl.textContent = "offline — fallback quips only";
+    statusEl.className = "err";
+  }
+
+  document.getElementById("startBtn")!.addEventListener("click", async () => {
+    modal.classList.add("hidden");
+    await dealerClient.open(uiLanguage, chosenPersona);
+    askDealer("SESSION_OPEN", { bankroll: game.getState().bankroll });
+  }, { once: true });
+}
+
+bootDealerFlow();
 render();

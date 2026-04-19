@@ -7,6 +7,40 @@
     <link rel="stylesheet" href="/src/styles.css" />
   </head>
   <body>
+    <!-- Startup dialog — language + dealer persona pick, one-time per session. -->
+    <div id="startupModal" class="modal-overlay">
+      <div class="modal">
+        <h2>Welcome · 欢迎</h2>
+        <div class="modal-row">
+          <label>Language · 语言</label>
+          <div class="seg" id="langSeg">
+            <button data-val="zh" class="on">中文</button>
+            <button data-val="en">English</button>
+          </div>
+        </div>
+        <div class="modal-row">
+          <label>Dealer · 荷官</label>
+          <div class="seg" id="personaSeg">
+            <button data-val="veteran" class="on">老江湖</button>
+            <button data-val="hostess">热情阿姨</button>
+            <button data-val="mystic">神秘赌神</button>
+          </div>
+        </div>
+        <div class="modal-row" id="serverStatusRow">
+          <label>AI Service</label>
+          <div id="serverStatus">checking...</div>
+        </div>
+        <button id="startBtn" class="start-btn">开始 · Start</button>
+      </div>
+    </div>
+
+    <!-- Dealer speech bubble — appears on game events. -->
+    <div id="dealerBubble" class="dealer-bubble">
+      <div class="dealer-name" id="dealerName">庄家</div>
+      <div class="dealer-text" id="dealerText"></div>
+      <div class="dealer-src" id="dealerSrc"></div>
+    </div>
+
     <div id="app">
       <header>
         <h1>Blackjack</h1>
