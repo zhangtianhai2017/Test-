@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Blackjack — 2D</title>
-    <script type="module" crossorigin src="./assets/index-B_AixB7E.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-C3E8LUta.css">
+    <script type="module" crossorigin src="./assets/index-DgTPh_eL.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-Bjmb7U1b.css">
   </head>
   <body>
     <div id="app">
@@ -20,37 +20,38 @@
               <option value="SUPER_FUN_21">Super Fun 21</option>
             </select>
           </label>
-          <span id="bankroll">bankroll: 1000</span>
-          <span id="phase">phase: betting</span>
+          <span id="bankroll">筹码: 1000</span>
+          <span id="phase">阶段: 下注</span>
         </div>
       </header>
+      <div id="resultBanner" class="banner"></div>
       <main>
         <section id="dealer" class="zone">
-          <h2>Dealer</h2>
+          <h2>庄家</h2>
           <div id="dealerCards" class="cards"></div>
           <div id="dealerTotal" class="total"></div>
         </section>
         <section id="player" class="zone">
-          <h2>Player</h2>
+          <h2>玩家</h2>
           <div id="playerHands"></div>
         </section>
         <section id="controls">
           <div id="betControls" class="betControls">
-            <label>Bet <input id="betAmount" type="number" value="25" min="5" /></label>
+            <label>主注 <input id="betAmount" type="number" value="25" min="5" /></label>
             <label>Perfect Pairs <input id="sbPP" type="number" value="0" min="0" /></label>
             <label>21+3 <input id="sb213" type="number" value="0" min="0" /></label>
             <label>Lucky Ladies <input id="sbLL" type="number" value="0" min="0" /></label>
-            <button id="deal">DEAL</button>
+            <button id="deal">发牌</button>
           </div>
           <div id="actions" class="actions">
-            <button data-action="HIT">Hit</button>
-            <button data-action="STAND">Stand</button>
-            <button data-action="DOUBLE">Double</button>
-            <button data-action="SPLIT">Split</button>
-            <button data-action="SURRENDER">Surrender</button>
-            <button data-action="INSURE">Insure</button>
-            <button data-action="DECLINE_INSURANCE">No Ins</button>
-            <button data-action="NEW_ROUND">New Round</button>
+            <button data-action="HIT">要牌</button>
+            <button data-action="STAND">停牌</button>
+            <button data-action="DOUBLE">加倍</button>
+            <button data-action="SPLIT">分牌</button>
+            <button data-action="SURRENDER">投降</button>
+            <button data-action="INSURE">保险</button>
+            <button data-action="DECLINE_INSURANCE">不保险</button>
+            <button data-action="NEW_ROUND">下一局</button>
           </div>
         </section>
         <section id="log" aria-live="polite"></section>

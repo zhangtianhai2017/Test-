@@ -20,8 +20,22 @@
       #bottom { position: fixed; bottom: 12px; left: 12px; right: 12px; display: flex; justify-content: center; gap: 8px; }
       #bottom .grp { background: rgba(0,0,0,0.55); padding: 10px 14px; border-radius: 10px; }
       #log { position: fixed; right: 12px; bottom: 80px; width: 300px; max-height: 180px; overflow: auto; background: rgba(0,0,0,0.55); padding: 8px 12px; border-radius: 8px; font-family: ui-monospace, monospace; font-size: 11px; }
+      .banner {
+        position: fixed; top: 50%; left: 50%;
+        transform: translate(-50%, -50%) scale(0.9);
+        padding: 22px 48px; border-radius: 14px;
+        font-size: 36px; font-weight: 800; letter-spacing: 1px;
+        opacity: 0; pointer-events: none;
+        transition: opacity 220ms, transform 220ms;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        z-index: 50;
+      }
+      .banner.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      .banner-win  { background: linear-gradient(90deg, #0a6 0%, #6cff9a 100%); color: #003; }
+      .banner-loss { background: linear-gradient(90deg, #800 0%, #ff5555 100%); color: #fff; }
+      .banner-push { background: #444; color: #eee; }
     </style>
-    <script type="module" crossorigin src="./assets/index-Dd1VXrLW.js"></script>
+    <script type="module" crossorigin src="./assets/index-Dw-5fIWI.js"></script>
   </head>
   <body>
     <div id="hud">
@@ -54,5 +68,6 @@
       </div>
     </div>
     <div id="log"></div>
+    <div id="resultBanner" class="banner"></div>
   </body>
 </html>
