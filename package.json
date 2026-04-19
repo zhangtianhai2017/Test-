@@ -1,0 +1,26 @@
+{
+  "name": "blackjack-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "packages/engine",
+    "packages/ui-cli",
+    "packages/ui-web",
+    "packages/ui-3d",
+    "packages/conformance"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspace=@blackjack/engine",
+    "dev:web": "npm run dev --workspace=@blackjack/ui-web",
+    "dev:3d": "npm run dev --workspace=@blackjack/ui-3d",
+    "cli": "npm run start --workspace=@blackjack/ui-cli",
+    "conformance:export": "npm run export --workspace=@blackjack/conformance"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "vitest": "^1.6.0",
+    "vite": "^5.3.0",
+    "tsx": "^4.15.0"
+  }
+}

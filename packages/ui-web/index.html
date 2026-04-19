@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Blackjack — 2D</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header>
+        <h1>Blackjack</h1>
+        <div class="meta">
+          <label>Rules
+            <select id="ruleSet">
+              <option value="VEGAS">Classic Vegas</option>
+              <option value="SPANISH21">Spanish 21</option>
+              <option value="PONTOON">Pontoon</option>
+              <option value="SUPER_FUN_21">Super Fun 21</option>
+            </select>
+          </label>
+          <span id="bankroll">bankroll: 1000</span>
+          <span id="phase">phase: betting</span>
+        </div>
+      </header>
+      <main>
+        <section id="dealer" class="zone">
+          <h2>Dealer</h2>
+          <div id="dealerCards" class="cards"></div>
+          <div id="dealerTotal" class="total"></div>
+        </section>
+        <section id="player" class="zone">
+          <h2>Player</h2>
+          <div id="playerHands"></div>
+        </section>
+        <section id="controls">
+          <div id="betControls" class="betControls">
+            <label>Bet <input id="betAmount" type="number" value="25" min="5" /></label>
+            <label>Perfect Pairs <input id="sbPP" type="number" value="0" min="0" /></label>
+            <label>21+3 <input id="sb213" type="number" value="0" min="0" /></label>
+            <label>Lucky Ladies <input id="sbLL" type="number" value="0" min="0" /></label>
+            <button id="deal">DEAL</button>
+          </div>
+          <div id="actions" class="actions">
+            <button data-action="HIT">Hit</button>
+            <button data-action="STAND">Stand</button>
+            <button data-action="DOUBLE">Double</button>
+            <button data-action="SPLIT">Split</button>
+            <button data-action="SURRENDER">Surrender</button>
+            <button data-action="INSURE">Insure</button>
+            <button data-action="DECLINE_INSURANCE">No Ins</button>
+            <button data-action="NEW_ROUND">New Round</button>
+          </div>
+        </section>
+        <section id="log" aria-live="polite"></section>
+      </main>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

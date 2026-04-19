@@ -1,0 +1,198 @@
+{
+  "description": "bet 25, hit, stand",
+  "ruleSetId": "VEGAS",
+  "seed": 2,
+  "steps": [
+    {
+      "action": {
+        "type": "PLACE_BET",
+        "amount": 25
+      },
+      "events": [
+        {
+          "type": "BANKROLL_CHANGED",
+          "bankroll": 975,
+          "delta": -25
+        },
+        {
+          "type": "BET_PLACED",
+          "amount": 25,
+          "sideBets": {
+            "perfectPairs": 0,
+            "twentyOneP3": 0,
+            "luckyLadies": 0
+          }
+        },
+        {
+          "type": "PHASE_CHANGED",
+          "phase": "dealing"
+        },
+        {
+          "type": "CARD_DEALT",
+          "to": "player",
+          "handIndex": 0,
+          "card": {
+            "rank": "6",
+            "suit": "♦"
+          },
+          "faceDown": false
+        },
+        {
+          "type": "CARD_DEALT",
+          "to": "dealer",
+          "handIndex": 0,
+          "card": {
+            "rank": "3",
+            "suit": "♣"
+          },
+          "faceDown": false
+        },
+        {
+          "type": "CARD_DEALT",
+          "to": "player",
+          "handIndex": 0,
+          "card": {
+            "rank": "8",
+            "suit": "♦"
+          },
+          "faceDown": false
+        },
+        {
+          "type": "CARD_DEALT",
+          "to": "dealer",
+          "handIndex": 0,
+          "card": {
+            "rank": "A",
+            "suit": "♦"
+          },
+          "faceDown": true
+        },
+        {
+          "type": "PHASE_CHANGED",
+          "phase": "playerTurn"
+        }
+      ],
+      "bankrollAfter": 975,
+      "phaseAfter": "playerTurn"
+    },
+    {
+      "action": {
+        "type": "HIT"
+      },
+      "events": [
+        {
+          "type": "PLAYER_ACTION",
+          "action": "HIT",
+          "handIndex": 0
+        },
+        {
+          "type": "CARD_DEALT",
+          "to": "player",
+          "handIndex": 0,
+          "card": {
+            "rank": "4",
+            "suit": "♦"
+          },
+          "faceDown": false
+        }
+      ],
+      "bankrollAfter": 975,
+      "phaseAfter": "playerTurn"
+    },
+    {
+      "action": {
+        "type": "STAND"
+      },
+      "events": [
+        {
+          "type": "PLAYER_ACTION",
+          "action": "STAND",
+          "handIndex": 0
+        },
+        {
+          "type": "PHASE_CHANGED",
+          "phase": "dealerTurn"
+        },
+        {
+          "type": "HOLE_CARD_REVEALED",
+          "card": {
+            "rank": "A",
+            "suit": "♦"
+          }
+        },
+        {
+          "type": "DEALER_ACTION",
+          "action": "HIT",
+          "total": 21,
+          "soft": true
+        },
+        {
+          "type": "CARD_DEALT",
+          "to": "dealer",
+          "handIndex": 0,
+          "card": {
+            "rank": "7",
+            "suit": "♦"
+          },
+          "faceDown": false
+        },
+        {
+          "type": "DEALER_ACTION",
+          "action": "STAND",
+          "total": 21,
+          "soft": true
+        },
+        {
+          "type": "PHASE_CHANGED",
+          "phase": "settlement"
+        },
+        {
+          "type": "BET_SETTLED",
+          "handIndex": 0,
+          "outcome": "loss",
+          "payout": 0
+        },
+        {
+          "type": "ROUND_OVER",
+          "results": [
+            {
+              "handIndex": 0,
+              "outcome": "loss",
+              "payout": 0,
+              "total": 18,
+              "cards": [
+                {
+                  "rank": "6",
+                  "suit": "♦"
+                },
+                {
+                  "rank": "8",
+                  "suit": "♦"
+                },
+                {
+                  "rank": "4",
+                  "suit": "♦"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "PHASE_CHANGED",
+          "phase": "roundOver"
+        }
+      ],
+      "bankrollAfter": 975,
+      "phaseAfter": "roundOver"
+    }
+  ],
+  "finalBankroll": 975,
+  "finalResults": [
+    {
+      "handIndex": 0,
+      "outcome": "loss",
+      "payout": 0,
+      "total": 18
+    }
+  ]
+}

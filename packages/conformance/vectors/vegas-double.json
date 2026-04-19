@@ -1,0 +1,171 @@
+{
+  "description": "bet 25, double",
+  "ruleSetId": "VEGAS",
+  "seed": 3,
+  "steps": [
+    {
+      "action": {
+        "type": "PLACE_BET",
+        "amount": 25
+      },
+      "events": [
+        {
+          "type": "BANKROLL_CHANGED",
+          "bankroll": 975,
+          "delta": -25
+        },
+        {
+          "type": "BET_PLACED",
+          "amount": 25,
+          "sideBets": {
+            "perfectPairs": 0,
+            "twentyOneP3": 0,
+            "luckyLadies": 0
+          }
+        },
+        {
+          "type": "PHASE_CHANGED",
+          "phase": "dealing"
+        },
+        {
+          "type": "CARD_DEALT",
+          "to": "player",
+          "handIndex": 0,
+          "card": {
+            "rank": "8",
+            "suit": "♠"
+          },
+          "faceDown": false
+        },
+        {
+          "type": "CARD_DEALT",
+          "to": "dealer",
+          "handIndex": 0,
+          "card": {
+            "rank": "9",
+            "suit": "♥"
+          },
+          "faceDown": false
+        },
+        {
+          "type": "CARD_DEALT",
+          "to": "player",
+          "handIndex": 0,
+          "card": {
+            "rank": "4",
+            "suit": "♣"
+          },
+          "faceDown": false
+        },
+        {
+          "type": "CARD_DEALT",
+          "to": "dealer",
+          "handIndex": 0,
+          "card": {
+            "rank": "6",
+            "suit": "♥"
+          },
+          "faceDown": true
+        },
+        {
+          "type": "PHASE_CHANGED",
+          "phase": "playerTurn"
+        }
+      ],
+      "bankrollAfter": 975,
+      "phaseAfter": "playerTurn"
+    },
+    {
+      "action": {
+        "type": "DOUBLE"
+      },
+      "events": [
+        {
+          "type": "BANKROLL_CHANGED",
+          "bankroll": 950,
+          "delta": -25
+        },
+        {
+          "type": "PLAYER_ACTION",
+          "action": "DOUBLE",
+          "handIndex": 0
+        },
+        {
+          "type": "CARD_DEALT",
+          "to": "player",
+          "handIndex": 0,
+          "card": {
+            "rank": "Q",
+            "suit": "♦"
+          },
+          "faceDown": false
+        },
+        {
+          "type": "HAND_BUST",
+          "handIndex": 0
+        },
+        {
+          "type": "PHASE_CHANGED",
+          "phase": "dealerTurn"
+        },
+        {
+          "type": "HOLE_CARD_REVEALED",
+          "card": {
+            "rank": "6",
+            "suit": "♥"
+          }
+        },
+        {
+          "type": "PHASE_CHANGED",
+          "phase": "settlement"
+        },
+        {
+          "type": "BET_SETTLED",
+          "handIndex": 0,
+          "outcome": "bust",
+          "payout": 0
+        },
+        {
+          "type": "ROUND_OVER",
+          "results": [
+            {
+              "handIndex": 0,
+              "outcome": "bust",
+              "payout": 0,
+              "total": 22,
+              "cards": [
+                {
+                  "rank": "8",
+                  "suit": "♠"
+                },
+                {
+                  "rank": "4",
+                  "suit": "♣"
+                },
+                {
+                  "rank": "Q",
+                  "suit": "♦"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "PHASE_CHANGED",
+          "phase": "roundOver"
+        }
+      ],
+      "bankrollAfter": 950,
+      "phaseAfter": "roundOver"
+    }
+  ],
+  "finalBankroll": 950,
+  "finalResults": [
+    {
+      "handIndex": 0,
+      "outcome": "bust",
+      "payout": 0,
+      "total": 22
+    }
+  ]
+}

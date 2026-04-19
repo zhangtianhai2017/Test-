@@ -1,0 +1,17 @@
+{
+  "name": "@blackjack/ui-3d",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@blackjack/engine": "*",
+    "three": "^0.166.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.166.0"
+  }
+}

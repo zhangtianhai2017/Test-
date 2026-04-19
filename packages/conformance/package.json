@@ -1,0 +1,11 @@
+{
+  "name": "@blackjack/conformance",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "export": "tsx src/export.ts"
+  },
+  "dependencies": {
+    "@blackjack/engine": "*"
+  }
+}

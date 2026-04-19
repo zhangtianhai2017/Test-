@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.log
+.vite/
+coverage/
+.DS_Store
+
+# UE build artefacts (sample project)
+packages/ue-plugin/SampleProject/Binaries/
+packages/ue-plugin/SampleProject/Intermediate/
+packages/ue-plugin/SampleProject/Saved/
+packages/ue-plugin/SampleProject/DerivedDataCache/
+packages/ue-plugin/Binaries/
+packages/ue-plugin/Intermediate/

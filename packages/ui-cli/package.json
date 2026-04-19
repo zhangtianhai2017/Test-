@@ -1,0 +1,11 @@
+{
+  "name": "@blackjack/ui-cli",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/main.ts"
+  },
+  "dependencies": {
+    "@blackjack/engine": "*"
+  }
+}

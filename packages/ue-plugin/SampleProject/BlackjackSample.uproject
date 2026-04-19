@@ -1,0 +1,21 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "5.3",
+  "Category": "",
+  "Description": "Sample UE 5.x project demonstrating the Blackjack plugin in a 3D casino scene.",
+  "Modules": [
+    {
+      "Name": "BlackjackSample",
+      "Type": "Runtime",
+      "LoadingPhase": "Default",
+      "AdditionalDependencies": [ "Engine", "CoreUObject", "BlackjackCore", "BlackjackUE" ]
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "Blackjack",
+      "Enabled": true
+    }
+  ],
+  "AdditionalPluginDirectories": [ ".." ]
+}

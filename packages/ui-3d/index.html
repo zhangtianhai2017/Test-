@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Blackjack — 3D</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #060; overflow: hidden; font-family: ui-sans-serif, system-ui, sans-serif; color: #eee; }
+      canvas { display: block; }
+      #hud {
+        position: fixed; top: 12px; left: 12px; right: 12px;
+        display: flex; justify-content: space-between; align-items: center;
+        pointer-events: none;
+      }
+      #hud > * { pointer-events: auto; }
+      #hud .grp { background: rgba(0,0,0,0.45); padding: 10px 14px; border-radius: 10px; backdrop-filter: blur(4px); font-size: 13px; }
+      button { background: #c99b3a; color: #111; border: 0; border-radius: 6px; padding: 6px 10px; margin-right: 6px; font-weight: 600; cursor: pointer; }
+      button:disabled { opacity: 0.3; }
+      select, input { background: #111; color: #eee; border: 1px solid #333; border-radius: 4px; padding: 4px 6px; }
+      #bottom { position: fixed; bottom: 12px; left: 12px; right: 12px; display: flex; justify-content: center; gap: 8px; }
+      #bottom .grp { background: rgba(0,0,0,0.55); padding: 10px 14px; border-radius: 10px; }
+      #log { position: fixed; right: 12px; bottom: 80px; width: 300px; max-height: 180px; overflow: auto; background: rgba(0,0,0,0.55); padding: 8px 12px; border-radius: 8px; font-family: ui-monospace, monospace; font-size: 11px; }
+    </style>
+  </head>
+  <body>
+    <div id="hud">
+      <div class="grp">
+        <label>Rules
+          <select id="ruleSet">
+            <option value="VEGAS">Vegas</option>
+            <option value="SPANISH21">Spanish 21</option>
+            <option value="PONTOON">Pontoon</option>
+            <option value="SUPER_FUN_21">Super Fun 21</option>
+          </select>
+        </label>
+      </div>
+      <div class="grp">
+        <span id="bankroll">bankroll: 1000</span> &nbsp; <span id="phase">phase: betting</span>
+      </div>
+    </div>
+    <div id="bottom">
+      <div class="grp" id="betGroup">
+        <label>Bet <input id="betAmount" type="number" value="25" min="5" style="width:70px" /></label>
+        <button id="deal">DEAL</button>
+      </div>
+      <div class="grp" id="actGroup">
+        <button data-action="HIT">Hit</button>
+        <button data-action="STAND">Stand</button>
+        <button data-action="DOUBLE">Double</button>
+        <button data-action="SPLIT">Split</button>
+        <button data-action="SURRENDER">Surrender</button>
+        <button data-action="NEW_ROUND">New Round</button>
+      </div>
+    </div>
+    <div id="log"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

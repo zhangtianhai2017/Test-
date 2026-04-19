@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "vectors": [
+    {
+      "name": "vegas-stand",
+      "file": "vegas-stand.json",
+      "ruleSetId": "VEGAS",
+      "seed": 1
+    },
+    {
+      "name": "vegas-hit-stand",
+      "file": "vegas-hit-stand.json",
+      "ruleSetId": "VEGAS",
+      "seed": 2
+    },
+    {
+      "name": "vegas-double",
+      "file": "vegas-double.json",
+      "ruleSetId": "VEGAS",
+      "seed": 3
+    },
+    {
+      "name": "vegas-stand-seed-123",
+      "file": "vegas-stand-seed-123.json",
+      "ruleSetId": "VEGAS",
+      "seed": 123
+    },
+    {
+      "name": "vegas-stand-seed-7777",
+      "file": "vegas-stand-seed-7777.json",
+      "ruleSetId": "VEGAS",
+      "seed": 7777
+    },
+    {
+      "name": "spanish21-stand",
+      "file": "spanish21-stand.json",
+      "ruleSetId": "SPANISH21",
+      "seed": 1
+    },
+    {
+      "name": "pontoon-stand",
+      "file": "pontoon-stand.json",
+      "ruleSetId": "PONTOON",
+      "seed": 1
+    },
+    {
+      "name": "superfun-stand",
+      "file": "superfun-stand.json",
+      "ruleSetId": "SUPER_FUN_21",
+      "seed": 1
+    }
+  ]
+}
