@@ -203,13 +203,14 @@ describe("game-server / WebSocket server (M3c)", () => {
   });
 
   // -------------------------------------------------------------------------
-  // 9. PLACE_BET → NOT_IMPLEMENTED (M4)
+  // 9. PLACE_BET without a table → NOT_IN_TABLE (M4b)
   // -------------------------------------------------------------------------
   //
-  // The M3c fixture used CREATE_TABLE to verify the "still stubbed"
-  // behaviour; M3d implements CREATE_TABLE, so we swap in one of the
-  // round-action frames that is still deferred to M4.
-  it("PLACE_BET returns NOT_IMPLEMENTED until M4", async () => {
+  // M3c asserted that round-action frames were still stubbed with
+  // NOT_IMPLEMENTED; M4b has now wired them through to the engine. The
+  // equivalent guard at this layer is the NOT_IN_TABLE rejection a bare
+  // (post-HELLO, pre-JOIN_TABLE) session receives.
+  it("PLACE_BET from a session with no table returns NOT_IN_TABLE", async () => {
     const ws = await connectAndWait(url(handle));
     send(ws, { v: 1, type: "HELLO", displayName: "Eve", clientVersion: "test-0" });
     await recv(ws);
@@ -222,7 +223,7 @@ describe("game-server / WebSocket server (M3c)", () => {
     });
     const err = await recv(ws);
     expect(err.type).toBe("ERROR");
-    expect(err.code).toBe("NOT_IMPLEMENTED");
+    expect(err.code).toBe("NOT_IN_TABLE");
     await closeSocket(ws);
   });
 

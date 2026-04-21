@@ -6,9 +6,8 @@
  * lifecycle, verifying both the acting-client response and broadcast
  * delivery to any other sessions joined on the same table.
  *
- * No betting/play/settlement is exercised here — that's M4. One regression
- * assertion confirms PLACE_BET still returns NOT_IMPLEMENTED so the M4
- * work flips it from stubbed to real in a single controlled step.
+ * No betting/play/settlement is exercised here — that's M4b, covered by
+ * `humanActions.test.ts`.
  */
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { WebSocket } from "ws";
@@ -495,33 +494,5 @@ describe("game-server / lobby + seat claiming (M3d)", () => {
     await closeSocket(wsB);
   }, 10_000);
 
-  // -------------------------------------------------------------------------
-  // 11. PLACE_BET from a seated session → NOT_IMPLEMENTED (M4 regression)
-  // -------------------------------------------------------------------------
-
-  it("PLACE_BET from a seated session still returns NOT_IMPLEMENTED (M4)", async () => {
-    const { ws } = await hello(handle, "Alice");
-    send(ws, {
-      v: 1,
-      type: "CREATE_TABLE",
-      ruleSet: "VEGAS",
-      maxSeats: 3,
-      dealerPersona: "veteran",
-      language: "zh",
-    });
-    const created = await recv(ws);
-    const tableId = created.table.tableId;
-
-    send(ws, { v: 1, type: "JOIN_TABLE", tableId });
-    await recv(ws);
-    send(ws, { v: 1, type: "CLAIM_SEAT", seatIndex: 0, name: "Alice" });
-    await recvUntil(ws, (m) => m.type === "SEAT_ASSIGNED");
-
-    send(ws, { v: 1, type: "PLACE_BET", seatIndex: 0, amount: 10 });
-    const err = await recv(ws);
-    expect(err.type).toBe("ERROR");
-    expect(err.code).toBe("NOT_IMPLEMENTED");
-
-    await closeSocket(ws);
-  });
+  // (Round-action integration coverage lives in humanActions.test.ts.)
 });

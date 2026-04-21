@@ -142,6 +142,60 @@ function broadcastTableState(ctx: DispatchContext, table: Table): void {
 }
 
 /**
+ * Shape returned by the game-action validation helpers. Either the resolved
+ * artefact (table or ok-flag) or an `{ error }` with a wire-ready code and
+ * message — the caller converts it to an `ERROR` frame.
+ */
+type ValidationErr = { error: { code: string; message: string } };
+
+/**
+ * Resolve the `Table` the session currently sits on, or produce the matching
+ * ERROR payload (NOT_IN_TABLE / NO_TABLE). Used by every game-action handler
+ * as the very first step before seat-level checks.
+ */
+function requireSessionInTable(
+  session: Session,
+  lobby: Lobby,
+): { table: Table } | ValidationErr {
+  if (session.tableId === null) {
+    return { error: { code: "NOT_IN_TABLE", message: "Session has no table" } };
+  }
+  const table = lobby.get(session.tableId);
+  if (!table) {
+    return { error: { code: "NO_TABLE", message: `table ${session.tableId} not found` } };
+  }
+  return { table };
+}
+
+/**
+ * Validate seatIndex is in range and owned by this session. Matches the
+ * pattern already used in CLAIM_SEAT / RELEASE_SEAT above.
+ */
+function requireOwnership(
+  table: Table,
+  seatIndex: number,
+  sessionId: string,
+): { ok: true } | ValidationErr {
+  if (seatIndex < 0 || seatIndex >= table.meta.maxSeats) {
+    return {
+      error: {
+        code: "BAD_SEAT_INDEX",
+        message: `seatIndex ${seatIndex} out of range for table ${table.meta.tableId}`,
+      },
+    };
+  }
+  if (table.seatOwners[seatIndex] !== sessionId) {
+    return {
+      error: {
+        code: "NOT_SEAT_OWNER",
+        message: `session does not own seat ${seatIndex}`,
+      },
+    };
+  }
+  return { ok: true };
+}
+
+/**
  * Resolve the session tied to the current connection, or emit an error and
  * return null if there isn't one. Centralises the HELLO_REQUIRED guard used
  * by every non-HELLO frame.
@@ -563,27 +617,215 @@ export function handleMessage(ctx: DispatchContext, raw: string): void {
     }
 
     // -----------------------------------------------------------------
-    // Round-phase actions — still stubbed until M4.
+    // Round-phase actions (M4b).
+    //
+    // Each handler validates:
+    //   1. Session is joined on a table (tableId set + lobby knows it).
+    //   2. seatIndex is in range and owned by this session (gesture/bet/
+    //      turn actions all require seat ownership).
+    //   3. Phase constraint for the action.
+    //   4. For turn-gated actions: activeSeatIndex === seatIndex.
+    //
+    // TODO(M4): actionId idempotency per D-022 is deferred. The grace-
+    // reconnect in M3c handles the main drop-reconnect window; full
+    // per-session replay-dedupe (last 50 ids) is post-v1.
+    //
+    // TODO(M4a): the engine may emit an ERROR event after a valid-looking
+    // dispatch (e.g. INSUFFICIENT_FUNDS on PLACE_BET). The event bridge
+    // currently broadcasts those to all table members as an ERROR wire
+    // frame. The caller therefore receives feedback, but without an
+    // actionIdRef tag. Good enough for v1.
     // -----------------------------------------------------------------
 
-    case "PLACE_BET":
+    case "PLACE_BET": {
+      const session = requireSession(ctx);
+      if (!session) return;
+      const actionIdRef = frame.actionId;
+      const tableOrErr = requireSessionInTable(session, ctx.lobby);
+      if ("error" in tableOrErr) {
+        sendError(ctx.socket, tableOrErr.error.code, tableOrErr.error.message, actionIdRef);
+        return;
+      }
+      const { table } = tableOrErr;
+      const own = requireOwnership(table, frame.seatIndex, session.id);
+      if ("error" in own) {
+        sendError(ctx.socket, own.error.code, own.error.message, actionIdRef);
+        return;
+      }
+      const snap = table.game.getState();
+      if (snap.phase !== "betting") {
+        sendError(
+          ctx.socket,
+          "WRONG_PHASE",
+          `PLACE_BET only allowed in phase "betting" (got "${snap.phase}")`,
+          actionIdRef,
+        );
+        return;
+      }
+      const betArgs: {
+        type: "PLACE_BET_FOR_SEAT";
+        seatIndex: number;
+        amount: number;
+        sideBets?: Partial<import("@blackjack/engine").SideBets>;
+      } = {
+        type: "PLACE_BET_FOR_SEAT",
+        seatIndex: frame.seatIndex,
+        amount: frame.amount,
+      };
+      if (frame.sideBets !== undefined) betArgs.sideBets = frame.sideBets;
+      table.game.dispatch(betArgs);
+      return;
+    }
+
     case "HIT":
     case "STAND":
     case "DOUBLE":
     case "SPLIT":
-    case "SURRENDER":
-    case "INSURE":
-    case "DECLINE_INSURANCE":
-    case "GESTURE":
+    case "SURRENDER": {
+      const session = requireSession(ctx);
+      if (!session) return;
+      const actionIdRef = frame.actionId;
+      const tableOrErr = requireSessionInTable(session, ctx.lobby);
+      if ("error" in tableOrErr) {
+        sendError(ctx.socket, tableOrErr.error.code, tableOrErr.error.message, actionIdRef);
+        return;
+      }
+      const { table } = tableOrErr;
+      const own = requireOwnership(table, frame.seatIndex, session.id);
+      if ("error" in own) {
+        sendError(ctx.socket, own.error.code, own.error.message, actionIdRef);
+        return;
+      }
+      const snap = table.game.getState();
+      if (snap.phase !== "playerTurn") {
+        sendError(
+          ctx.socket,
+          "WRONG_PHASE",
+          `${frame.type} only allowed in phase "playerTurn" (got "${snap.phase}")`,
+          actionIdRef,
+        );
+        return;
+      }
+      if (snap.activeSeatIndex !== frame.seatIndex) {
+        sendError(
+          ctx.socket,
+          "NOT_YOUR_TURN",
+          `seat ${frame.seatIndex} is not the active seat (active=${snap.activeSeatIndex})`,
+          actionIdRef,
+        );
+        return;
+      }
+      table.game.dispatch({ type: frame.type });
+      return;
+    }
+
+    case "INSURE": {
+      const session = requireSession(ctx);
+      if (!session) return;
+      const actionIdRef = frame.actionId;
+      const tableOrErr = requireSessionInTable(session, ctx.lobby);
+      if ("error" in tableOrErr) {
+        sendError(ctx.socket, tableOrErr.error.code, tableOrErr.error.message, actionIdRef);
+        return;
+      }
+      const { table } = tableOrErr;
+      const own = requireOwnership(table, frame.seatIndex, session.id);
+      if ("error" in own) {
+        sendError(ctx.socket, own.error.code, own.error.message, actionIdRef);
+        return;
+      }
+      const snap = table.game.getState();
+      if (snap.phase !== "insurance") {
+        sendError(
+          ctx.socket,
+          "WRONG_PHASE",
+          `INSURE only allowed in phase "insurance" (got "${snap.phase}")`,
+          actionIdRef,
+        );
+        return;
+      }
+      // Engine currently targets humanSeatIndex for insurance regardless of
+      // the seat the frame nominates (D-023 v1 note). Per-seat routing is
+      // post-v1; ownership+phase gating suffices here.
+      table.game.dispatch({ type: "INSURE", amount: frame.amount });
+      return;
+    }
+
+    case "DECLINE_INSURANCE": {
+      const session = requireSession(ctx);
+      if (!session) return;
+      const actionIdRef = frame.actionId;
+      const tableOrErr = requireSessionInTable(session, ctx.lobby);
+      if ("error" in tableOrErr) {
+        sendError(ctx.socket, tableOrErr.error.code, tableOrErr.error.message, actionIdRef);
+        return;
+      }
+      const { table } = tableOrErr;
+      const own = requireOwnership(table, frame.seatIndex, session.id);
+      if ("error" in own) {
+        sendError(ctx.socket, own.error.code, own.error.message, actionIdRef);
+        return;
+      }
+      const snap = table.game.getState();
+      if (snap.phase !== "insurance") {
+        sendError(
+          ctx.socket,
+          "WRONG_PHASE",
+          `DECLINE_INSURANCE only allowed in phase "insurance" (got "${snap.phase}")`,
+          actionIdRef,
+        );
+        return;
+      }
+      table.game.dispatch({ type: "DECLINE_INSURANCE" });
+      return;
+    }
+
     case "NEW_ROUND": {
-      if (!requireSession(ctx)) return;
-      const actionIdRef = "actionId" in frame ? (frame as { actionId?: string }).actionId : undefined;
-      sendError(
-        ctx.socket,
-        "NOT_IMPLEMENTED",
-        `${frame.type} will land in M4 (game loop)`,
-        actionIdRef,
-      );
+      const session = requireSession(ctx);
+      if (!session) return;
+      const actionIdRef = frame.actionId;
+      const tableOrErr = requireSessionInTable(session, ctx.lobby);
+      if ("error" in tableOrErr) {
+        sendError(ctx.socket, tableOrErr.error.code, tableOrErr.error.message, actionIdRef);
+        return;
+      }
+      const { table } = tableOrErr;
+      // Any seated session may trigger NEW_ROUND; no seat ownership check.
+      const snap = table.game.getState();
+      if (snap.phase !== "roundOver") {
+        sendError(
+          ctx.socket,
+          "WRONG_PHASE",
+          `NEW_ROUND only allowed in phase "roundOver" (got "${snap.phase}")`,
+          actionIdRef,
+        );
+        return;
+      }
+      table.game.dispatch({ type: "NEW_ROUND" });
+      return;
+    }
+
+    case "GESTURE": {
+      const session = requireSession(ctx);
+      if (!session) return;
+      const actionIdRef = frame.actionId;
+      const tableOrErr = requireSessionInTable(session, ctx.lobby);
+      if ("error" in tableOrErr) {
+        sendError(ctx.socket, tableOrErr.error.code, tableOrErr.error.message, actionIdRef);
+        return;
+      }
+      const { table } = tableOrErr;
+      const own = requireOwnership(table, frame.seatIndex, session.id);
+      if ("error" in own) {
+        sendError(ctx.socket, own.error.code, own.error.message, actionIdRef);
+        return;
+      }
+      // GESTURE is not phase-gated: a seated player can emote at any time.
+      table.game.dispatch({
+        type: "GESTURE",
+        seatIndex: frame.seatIndex,
+        gesture: frame.gesture,
+      });
       return;
     }
 
