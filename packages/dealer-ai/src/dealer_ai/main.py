@@ -7,6 +7,7 @@ Single entry point; runs identically on Linux and Windows:
 from __future__ import annotations
 
 import argparse
+import base64
 import logging
 import os
 import sys
@@ -14,6 +15,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, StreamingResponse
 
 from . import __version__ as VERSION  # noqa: F401
 from .fallback import FallbackProvider
@@ -26,8 +28,11 @@ from .schema import (
     OpenSessionResponse,
     QuipRequest,
     QuipResponse,
+    QuipWithAudioResponse,
+    TTSRequest,
+    VoicesResponse,
 )
-from .session import SessionManager, list_personas
+from .session import Session, SessionManager, list_personas
 from .tts import TTSConfig, TTSProvider
 
 log = logging.getLogger(__name__)
@@ -112,12 +117,8 @@ def open_session(req: OpenSessionRequest) -> OpenSessionResponse:
     )
 
 
-@app.post("/session/{sid}/quip", response_model=QuipResponse)
-def quip(sid: str, req: QuipRequest) -> QuipResponse:
-    s = state.sessions.get(sid)
-    if not s:
-        raise HTTPException(404, "session not found")
-
+def _generate_quip(s: Session, req: QuipRequest) -> QuipResponse:
+    """Shared quip pipeline: LLM first, fallback to canned quip bank on any failure."""
     if state.llm.ready:
         try:
             messages = build_messages(s.persona, req.event, req.state, s.language)
@@ -135,8 +136,84 @@ def quip(sid: str, req: QuipRequest) -> QuipResponse:
             )
         except Exception as e:
             log.warning("LLM generate failed, falling back: %s", e)
+    return state.fallback.quip(
+        req.event, req.state, s.language, seed=s.seed + len(s.recent_texts)
+    )
 
-    return state.fallback.quip(req.event, req.state, s.language, seed=s.seed + len(s.recent_texts))
+
+def _default_voice_for(s: Session) -> str | None:
+    """Pick the persona voice id matching the session's language."""
+    if s.language == Language.ZH:
+        return s.persona.voice_id_zh
+    return s.persona.voice_id_en
+
+
+@app.post("/session/{sid}/quip", response_model=QuipResponse)
+def quip(sid: str, req: QuipRequest) -> QuipResponse:
+    s = state.sessions.get(sid)
+    if not s:
+        raise HTTPException(404, "session not found")
+    return _generate_quip(s, req)
+
+
+@app.post("/session/{sid}/tts")
+def tts(sid: str, req: TTSRequest):
+    """Synthesize *req.text* into a WAV byte stream using the session's voice."""
+    s = state.sessions.get(sid)
+    if not s:
+        raise HTTPException(404, "session not found")
+    if not state.tts.ready:
+        return JSONResponse(
+            status_code=503,
+            content={"ready": False, "status": state.tts.status},
+        )
+    voice_id = req.voice_id or _default_voice_for(s)
+    wav = state.tts.synthesize_wav(req.text, voice_id, s.language.value)
+    if wav is None:
+        return JSONResponse(
+            status_code=503,
+            content={"ready": False, "status": state.tts.status or "synthesis_failed"},
+        )
+    return StreamingResponse(iter([wav]), media_type="audio/wav")
+
+
+@app.post("/session/{sid}/quip+tts", response_model=QuipWithAudioResponse)
+def quip_plus_tts(sid: str, req: QuipRequest) -> QuipWithAudioResponse:
+    """Return the quip text and (when TTS is ready) a base64-encoded WAV payload.
+
+    When TTS is unavailable the ``audio_wav_b64`` and ``audio_sample_rate`` fields
+    are both null so clients can degrade to browser / SAPI TTS cleanly.
+    """
+    s = state.sessions.get(sid)
+    if not s:
+        raise HTTPException(404, "session not found")
+    q = _generate_quip(s, req)
+    audio_b64: str | None = None
+    audio_sr: int | None = None
+    if state.tts.ready:
+        voice_id = _default_voice_for(s)
+        wav = state.tts.synthesize_wav(q.text, voice_id, s.language.value)
+        if wav is not None:
+            audio_b64 = base64.b64encode(wav).decode("ascii")
+            audio_sr = state.tts.sample_rate
+    return QuipWithAudioResponse(
+        text=q.text,
+        tone=q.tone,
+        language=q.language,
+        source=q.source,
+        latency_ms=q.latency_ms,
+        audio_wav_b64=audio_b64,
+        audio_sample_rate=audio_sr,
+    )
+
+
+@app.get("/voices", response_model=VoicesResponse)
+def voices() -> VoicesResponse:
+    return VoicesResponse(
+        voices=state.tts.list_voices(),
+        ready=state.tts.ready,
+        status=state.tts.status,
+    )
 
 
 @app.delete("/session/{sid}")

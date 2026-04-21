@@ -215,6 +215,73 @@ def test_fallback_mode_all_new_events(monkeypatch, tmp_path):
         proc.wait(timeout=5)
 
 
+def test_voices_endpoint(server):
+    """GET /voices returns a JSON object with a voices list regardless of GPU availability."""
+    r = httpx.get(f"{server}/voices")
+    assert r.status_code == 200, r.text
+    j = r.json()
+    assert "voices" in j
+    assert isinstance(j["voices"], list)
+    assert "ready" in j and isinstance(j["ready"], bool)
+    assert "status" in j and isinstance(j["status"], str)
+
+
+def test_tts_endpoint_503_when_cpu(server):
+    """POST /session/{sid}/tts should return 503 with a status payload in sandbox mode."""
+    r = httpx.post(f"{server}/session", json={"language": "zh", "persona": "veteran"})
+    sid = r.json()["session_id"]
+    resp = httpx.post(
+        f"{server}/session/{sid}/tts",
+        json={"text": "你好,欢迎来到赌场"},
+        timeout=5,
+    )
+    assert resp.status_code == 503, resp.text
+    j = resp.json()
+    assert j.get("ready") is False
+    assert isinstance(j.get("status"), str) and len(j["status"]) > 0
+
+
+def test_quip_plus_tts_endpoint_no_audio(server):
+    """POST /session/{sid}/quip+tts returns quip text; audio fields are null without a GPU."""
+    r = httpx.post(f"{server}/session", json={"language": "zh", "persona": "veteran"})
+    sid = r.json()["session_id"]
+    resp = httpx.post(
+        f"{server}/session/{sid}/quip+tts",
+        json={"event": "BIG_WIN", "state": {"net": 200}},
+        timeout=5,
+    )
+    assert resp.status_code == 200, resp.text
+    j = resp.json()
+    assert j["language"] == "zh"
+    assert len(j["text"]) > 0
+    assert j["source"] in ("llm", "fallback")
+    assert j["audio_wav_b64"] is None
+    assert j["audio_sample_rate"] is None
+
+
+def test_quip_plus_tts_schema_shape(server):
+    """Response JSON must carry the full QuipWithAudioResponse field set."""
+    r = httpx.post(f"{server}/session", json={"language": "en", "persona": "hostess"})
+    sid = r.json()["session_id"]
+    resp = httpx.post(
+        f"{server}/session/{sid}/quip+tts",
+        json={"event": "PLAYER_BUST", "state": {"player_total": 23}},
+        timeout=5,
+    )
+    assert resp.status_code == 200, resp.text
+    j = resp.json()
+    for key in (
+        "text",
+        "tone",
+        "language",
+        "source",
+        "latency_ms",
+        "audio_wav_b64",
+        "audio_sample_rate",
+    ):
+        assert key in j, f"missing key: {key}"
+
+
 def test_fallback_when_llm_disabled(monkeypatch, tmp_path):
     """If LLM can't load, server should still answer via fallback (without 500-ing)."""
     env = os.environ.copy()

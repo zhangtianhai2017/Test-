@@ -20,7 +20,12 @@ tts = [
     "torch>=2.2",
     "torchaudio>=2.2",
     "modelscope>=1.15",
-    "cosyvoice-ng ; python_version>='3.10'",  # placeholder — pinned in docs
+    "soundfile>=0.12",
+    "numpy>=1.24",
+    # CosyVoice itself is not on PyPI — install via:
+    #   pip install -r cosyvoice/requirements.txt
+    # from https://github.com/FunAudioLLM/CosyVoice and set
+    # DEALER_AI_COSYVOICE_DIR to the downloaded model directory.
 ]
 dev = [
     "pytest>=8.0",

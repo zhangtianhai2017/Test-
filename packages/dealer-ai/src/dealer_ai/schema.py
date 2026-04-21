@@ -115,6 +115,29 @@ class QuipResponse(BaseModel):
     latency_ms: int = 0
 
 
+class QuipWithAudioResponse(QuipResponse):
+    """QuipResponse extended with optional base64-encoded WAV audio.
+
+    When TTS is not ready (CPU-only sandbox, missing model, disabled via env),
+    ``audio_wav_b64`` and ``audio_sample_rate`` are both null. Clients should
+    treat null as "no audio available — fall back to browser / OS TTS".
+    """
+
+    audio_wav_b64: str | None = None
+    audio_sample_rate: int | None = None
+
+
+class TTSRequest(BaseModel):
+    text: str
+    voice_id: str | None = None
+
+
+class VoicesResponse(BaseModel):
+    voices: list[str]
+    ready: bool
+    status: str
+
+
 class HealthResponse(BaseModel):
     ok: bool
     version: str
