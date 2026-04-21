@@ -1,0 +1,13 @@
+{
+  "_comment": "Shipping defaults for the authoritative game server. Read by game-server.exe at startup. Path resolution: %ProgramData%\\Blackjack\\server-config.json (installed) or ./server-config.json (launch-local.ps1).",
+  "host": "127.0.0.1",
+  "port": 7878,
+  "dealer_ai_url": "http://127.0.0.1:8787",
+  "log_level": "info",
+  "log_dir": "%LOCALAPPDATA%\\Blackjack\\logs",
+  "table_defaults": {
+    "seats": 6,
+    "reconnect_grace_sec": 45
+  },
+  "version": 1
+}
