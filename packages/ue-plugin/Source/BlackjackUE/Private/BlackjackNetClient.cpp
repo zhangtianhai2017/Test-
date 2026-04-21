@@ -123,6 +123,274 @@ namespace
         if (s == TEXT("celebrate"))  return EBlackjackGesture::Celebrate;
         return EBlackjackGesture::Confident;
     }
+
+    // -----------------------------------------------------------------------
+    // M5b.2b — JSON -> USTRUCT parse helpers (file-local).
+    //
+    // These mirror the shapes emitted by packages/game-server/src/protocol/
+    // toProtocol.ts. Every helper is tolerant of missing fields (Try* does
+    // not touch the out parameter on failure, so struct defaults stick) and
+    // guards against null `Obj` by returning a default-constructed value.
+    //
+    // Numeric fields come over the wire as JSON numbers; TryGetNumberField's
+    // int32 overload handles the narrowing.
+    // -----------------------------------------------------------------------
+
+    FBlackjackCardPayload ParseCardPayload(const TSharedPtr<FJsonObject>& Obj)
+    {
+        FBlackjackCardPayload Out;
+        if (!Obj.IsValid())
+        {
+            UE_LOG(LogTemp, Verbose, TEXT("ParseCardPayload: null object"));
+            return Out;
+        }
+
+        bool bFaceDown = false;
+        Obj->TryGetBoolField(TEXT("faceDown"), bFaceDown);
+
+        FString Rank;
+        FString Suit;
+        const bool bHasRank = Obj->TryGetStringField(TEXT("rank"), Rank);
+        const bool bHasSuit = Obj->TryGetStringField(TEXT("suit"), Suit);
+
+        if (bFaceDown || !bHasRank || !bHasSuit)
+        {
+            Out.bFaceDown = true;
+            // Leave Rank/Suit empty.
+        }
+        else
+        {
+            Out.Rank = Rank;
+            Out.Suit = Suit;
+            Out.bFaceDown = false;
+        }
+        return Out;
+    }
+
+    FBlackjackHand ParseHand(const TSharedPtr<FJsonObject>& Obj)
+    {
+        FBlackjackHand Out;
+        if (!Obj.IsValid())
+        {
+            UE_LOG(LogTemp, Verbose, TEXT("ParseHand: null object"));
+            return Out;
+        }
+
+        const TArray<TSharedPtr<FJsonValue>>* CardsArray = nullptr;
+        if (Obj->TryGetArrayField(TEXT("cards"), CardsArray) && CardsArray)
+        {
+            Out.Cards.Reserve(CardsArray->Num());
+            for (const TSharedPtr<FJsonValue>& V : *CardsArray)
+            {
+                if (V.IsValid())
+                {
+                    Out.Cards.Add(ParseCardPayload(V->AsObject()));
+                }
+            }
+        }
+
+        Obj->TryGetNumberField(TEXT("bet"), Out.Bet);
+        Obj->TryGetBoolField(TEXT("doubled"), Out.bDoubled);
+        Obj->TryGetBoolField(TEXT("stood"), Out.bStood);
+        Obj->TryGetBoolField(TEXT("surrendered"), Out.bSurrendered);
+        // Trust server-computed total / soft / isBust (see toProtocol.ts).
+        Obj->TryGetNumberField(TEXT("total"), Out.Total);
+        Obj->TryGetBoolField(TEXT("soft"), Out.bSoft);
+        Obj->TryGetBoolField(TEXT("isBust"), Out.bIsBust);
+        return Out;
+    }
+
+    FBlackjackSeatPayload ParseSeat(const TSharedPtr<FJsonObject>& Obj)
+    {
+        FBlackjackSeatPayload Out;
+        if (!Obj.IsValid())
+        {
+            UE_LOG(LogTemp, Verbose, TEXT("ParseSeat: null object"));
+            return Out;
+        }
+
+        Obj->TryGetNumberField(TEXT("index"), Out.Index);
+
+        FString KindStr;
+        if (Obj->TryGetStringField(TEXT("kind"), KindStr))
+        {
+            Out.Kind = SeatKindFromWire(KindStr);
+        }
+
+        Obj->TryGetStringField(TEXT("name"), Out.Name);
+        Obj->TryGetStringField(TEXT("personality"), Out.Personality);
+        Obj->TryGetNumberField(TEXT("bankroll"), Out.Bankroll);
+        Obj->TryGetStringField(TEXT("ownerSessionId"), Out.OwnerSessionId);
+        Obj->TryGetNumberField(TEXT("pendingBet"), Out.PendingBet);
+        Obj->TryGetNumberField(TEXT("activeHandIndex"), Out.ActiveHandIndex);
+
+        const TArray<TSharedPtr<FJsonValue>>* HandsArray = nullptr;
+        if (Obj->TryGetArrayField(TEXT("hands"), HandsArray) && HandsArray)
+        {
+            Out.Hands.Reserve(HandsArray->Num());
+            for (const TSharedPtr<FJsonValue>& V : *HandsArray)
+            {
+                if (V.IsValid())
+                {
+                    Out.Hands.Add(ParseHand(V->AsObject()));
+                }
+            }
+        }
+
+        double TiltD = 0.0;
+        if (Obj->TryGetNumberField(TEXT("tilt"), TiltD))
+        {
+            Out.Tilt = static_cast<float>(TiltD);
+        }
+
+        const TArray<TSharedPtr<FJsonValue>>* GesturesArray = nullptr;
+        if (Obj->TryGetArrayField(TEXT("gestures"), GesturesArray) && GesturesArray)
+        {
+            Out.Gestures.Reserve(GesturesArray->Num());
+            for (const TSharedPtr<FJsonValue>& V : *GesturesArray)
+            {
+                if (V.IsValid())
+                {
+                    Out.Gestures.Add(V->AsString());
+                }
+            }
+        }
+        return Out;
+    }
+
+    FBlackjackTableHandResult ParseHandResult(const TSharedPtr<FJsonObject>& Obj)
+    {
+        FBlackjackTableHandResult Out;
+        if (!Obj.IsValid())
+        {
+            UE_LOG(LogTemp, Verbose, TEXT("ParseHandResult: null object"));
+            return Out;
+        }
+
+        Obj->TryGetNumberField(TEXT("seatIndex"), Out.SeatIndex);
+        Obj->TryGetNumberField(TEXT("handIndex"), Out.HandIndex);
+
+        FString OutcomeStr;
+        if (Obj->TryGetStringField(TEXT("outcome"), OutcomeStr))
+        {
+            Out.Outcome = OutcomeFromWire(OutcomeStr);
+        }
+
+        Obj->TryGetNumberField(TEXT("payout"), Out.Payout);
+        Obj->TryGetNumberField(TEXT("total"), Out.Total);
+        Obj->TryGetStringField(TEXT("label"), Out.Label);
+
+        const TArray<TSharedPtr<FJsonValue>>* CardsArray = nullptr;
+        if (Obj->TryGetArrayField(TEXT("cards"), CardsArray) && CardsArray)
+        {
+            Out.Cards.Reserve(CardsArray->Num());
+            for (const TSharedPtr<FJsonValue>& V : *CardsArray)
+            {
+                if (V.IsValid())
+                {
+                    Out.Cards.Add(ParseCardPayload(V->AsObject()));
+                }
+            }
+        }
+        return Out;
+    }
+
+    FBlackjackTableSummary ParseTableSummary(const TSharedPtr<FJsonObject>& Obj)
+    {
+        FBlackjackTableSummary Out;
+        if (!Obj.IsValid())
+        {
+            UE_LOG(LogTemp, Verbose, TEXT("ParseTableSummary: null object"));
+            return Out;
+        }
+
+        Obj->TryGetStringField(TEXT("tableId"), Out.TableId);
+
+        FString RuleSetStr;
+        if (Obj->TryGetStringField(TEXT("ruleSet"), RuleSetStr))
+        {
+            Out.RuleSet = RuleSetFromWire(RuleSetStr);
+        }
+
+        Obj->TryGetNumberField(TEXT("seatsTaken"), Out.SeatsTaken);
+        Obj->TryGetNumberField(TEXT("maxSeats"), Out.MaxSeats);
+        return Out;
+    }
+
+    FBlackjackTableStateSnapshot ParseTableStateSnapshot(const TSharedPtr<FJsonObject>& Obj)
+    {
+        FBlackjackTableStateSnapshot Out;
+        if (!Obj.IsValid())
+        {
+            UE_LOG(LogTemp, Verbose, TEXT("ParseTableStateSnapshot: null object"));
+            return Out;
+        }
+
+        Obj->TryGetStringField(TEXT("tableId"), Out.TableId);
+
+        FString PhaseStr;
+        if (Obj->TryGetStringField(TEXT("phase"), PhaseStr))
+        {
+            Out.Phase = PhaseFromWire(PhaseStr);
+        }
+
+        FString RuleSetStr;
+        if (Obj->TryGetStringField(TEXT("ruleSet"), RuleSetStr))
+        {
+            Out.RuleSet = RuleSetFromWire(RuleSetStr);
+        }
+
+        Obj->TryGetNumberField(TEXT("maxSeats"), Out.MaxSeats);
+        Obj->TryGetNumberField(TEXT("activeSeatIndex"), Out.ActiveSeatIndex);
+
+        const TArray<TSharedPtr<FJsonValue>>* DealerArray = nullptr;
+        if (Obj->TryGetArrayField(TEXT("dealer"), DealerArray) && DealerArray)
+        {
+            Out.Dealer.Reserve(DealerArray->Num());
+            for (const TSharedPtr<FJsonValue>& V : *DealerArray)
+            {
+                if (V.IsValid())
+                {
+                    Out.Dealer.Add(ParseCardPayload(V->AsObject()));
+                }
+            }
+        }
+
+        const TArray<TSharedPtr<FJsonValue>>* SeatsArray = nullptr;
+        if (Obj->TryGetArrayField(TEXT("seats"), SeatsArray) && SeatsArray)
+        {
+            Out.Seats.Reserve(SeatsArray->Num());
+            for (const TSharedPtr<FJsonValue>& V : *SeatsArray)
+            {
+                if (V.IsValid())
+                {
+                    Out.Seats.Add(ParseSeat(V->AsObject()));
+                }
+            }
+        }
+
+        Obj->TryGetStringField(TEXT("dealerPersona"), Out.DealerPersona);
+
+        FString LangStr;
+        if (Obj->TryGetStringField(TEXT("language"), LangStr))
+        {
+            Out.Language = LanguageFromWire(LangStr);
+        }
+
+        const TArray<TSharedPtr<FJsonValue>>* ResultsArray = nullptr;
+        if (Obj->TryGetArrayField(TEXT("roundResults"), ResultsArray) && ResultsArray)
+        {
+            Out.RoundResults.Reserve(ResultsArray->Num());
+            for (const TSharedPtr<FJsonValue>& V : *ResultsArray)
+            {
+                if (V.IsValid())
+                {
+                    Out.RoundResults.Add(ParseHandResult(V->AsObject()));
+                }
+            }
+        }
+        return Out;
+    }
 }
 
 void UBlackjackNetClient::Initialize(FSubsystemCollectionBase& Collection)

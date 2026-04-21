@@ -83,6 +83,112 @@ struct FBlackjackSeatConfig
     int32 Bankroll = 0;
 };
 
+// ---------------------------------------------------------------------------
+// M5b.2b — server-originated payload structs.
+//
+// These mirror the shapes produced by packages/game-server/src/protocol/toProtocol.ts
+// and are surfaced to Blueprints as BlueprintType USTRUCTs. They intentionally
+// use FString Rank/Suit (instead of the richer FBlackjackCard from
+// BlackjackTypes.h) because the wire format encodes cards as `{rank,suit}`
+// strings with an optional `faceDown` flag for the dealer hole card.
+// ---------------------------------------------------------------------------
+
+USTRUCT(BlueprintType)
+struct FBlackjackCardPayload
+{
+    GENERATED_BODY()
+
+    /** "" when bFaceDown == true (e.g. dealer hole card prior to reveal). */
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") FString Rank;
+
+    /** "" when bFaceDown == true (e.g. dealer hole card prior to reveal). */
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") FString Suit;
+
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") bool bFaceDown = false;
+};
+
+USTRUCT(BlueprintType)
+struct FBlackjackHand
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") TArray<FBlackjackCardPayload> Cards;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") int32 Bet = 0;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") bool bDoubled = false;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") bool bStood = false;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") bool bSurrendered = false;
+    /** Server-computed total (trust incoming; do not recompute). */
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") int32 Total = 0;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") bool bSoft = false;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") bool bIsBust = false;
+};
+
+USTRUCT(BlueprintType)
+struct FBlackjackSeatPayload
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") int32 Index = 0;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") EBlackjackSeatKind Kind = EBlackjackSeatKind::Empty;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") FString Name;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") FString Personality;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") int32 Bankroll = 0;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") FString OwnerSessionId;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") int32 PendingBet = 0;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") int32 ActiveHandIndex = 0;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") TArray<FBlackjackHand> Hands;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") float Tilt = 0.f;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") TArray<FString> Gestures;
+};
+
+// NOTE: A simpler `FBlackjackHandResult` already exists in BlackjackTypes.h
+// (HandIndex + Outcome + Payout + Total + Cards<FBlackjackCard> + Label), used
+// by the legacy local-engine components. The net protocol's result adds a
+// `SeatIndex` and uses `FBlackjackCardPayload` (strings + faceDown) instead,
+// so we expose it as a distinct `FBlackjackTableHandResult` to avoid colliding
+// with the existing UHT-registered type.
+USTRUCT(BlueprintType)
+struct FBlackjackTableHandResult
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") int32 SeatIndex = 0;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") int32 HandIndex = 0;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") EBlackjackOutcome Outcome = EBlackjackOutcome::Loss;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") int32 Payout = 0;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") int32 Total = 0;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") FString Label;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") TArray<FBlackjackCardPayload> Cards;
+};
+
+USTRUCT(BlueprintType)
+struct FBlackjackTableSummary
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") FString TableId;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") EBlackjackRuleSet RuleSet = EBlackjackRuleSet::Vegas;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") int32 SeatsTaken = 0;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") int32 MaxSeats = 6;
+};
+
+USTRUCT(BlueprintType)
+struct FBlackjackTableStateSnapshot
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") FString TableId;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") EBlackjackPhase Phase = EBlackjackPhase::Betting;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") EBlackjackRuleSet RuleSet = EBlackjackRuleSet::Vegas;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") int32 MaxSeats = 6;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") int32 ActiveSeatIndex = 0;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") TArray<FBlackjackCardPayload> Dealer;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") TArray<FBlackjackSeatPayload> Seats;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") FString DealerPersona;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") EBlackjackLanguage Language = EBlackjackLanguage::Chinese;
+    UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") TArray<FBlackjackTableHandResult> RoundResults;
+};
+
 /**
  * Authoritative game-server client. Always connects (single-player mode
  * connects to a locally-spawned server subprocess on 127.0.0.1). Handles
