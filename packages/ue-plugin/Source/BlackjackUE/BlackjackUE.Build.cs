@@ -9,10 +9,10 @@ public class BlackjackUE : ModuleRules
 
         PublicDependencyModuleNames.AddRange(new string[] {
             "Core", "CoreUObject", "Engine", "InputCore", "BlackjackCore",
-            "WebSockets", "Json", "JsonUtilities"
+            "WebSockets", "HTTP", "Json", "JsonUtilities"
         });
         PrivateDependencyModuleNames.AddRange(new string[] {
-            "Slate", "SlateCore", "UMG"
+            "Slate", "SlateCore", "UMG", "AudioMixer"
         });
     }
 }
