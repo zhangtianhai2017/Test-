@@ -10,6 +10,11 @@ export type {
   Outcome,
   SideBets,
   CreateGameOptions,
+  SeatKind,
+  NpcPersonality,
+  Gesture,
+  Player,
+  Seat,
 } from "./game.js";
 export type { EngineEvent, Listener } from "./events.js";
 export type { Card, Rank, Suit } from "./cards.js";

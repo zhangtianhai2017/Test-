@@ -100,6 +100,36 @@ export interface Game {
   setRuleSet(id: RuleSetId): void;
 }
 
+export type SeatKind = "empty" | "human" | "npc";
+
+export type NpcPersonality =
+  | "optimal" | "counter" | "amateur" | "chaser"
+  | "superstitious" | "ritualistic" | "risk_averse";
+
+export type Gesture =
+  | "confident" | "nervous" | "poker-face" | "taunt" | "sigh" | "celebrate";
+
+export interface Player {
+  id: string;
+  name: string;
+  kind: SeatKind;
+  bankroll: number;
+  personality?: NpcPersonality;
+}
+
+export interface Seat {
+  index: number;
+  player: Player;
+  hands: PlayerHand[];
+  activeHandIndex: number;
+  pendingBet: number;
+  sideBets: SideBets;
+  insuranceBet: number;
+  gestures: Gesture[];
+  tilt: number;
+  ownerSessionId: string | null;
+}
+
 export function createGame(opts: CreateGameOptions = {}): Game {
   const bus = new EventBus();
   let rules: RuleSet = PRESETS[opts.ruleSetId ?? "VEGAS"];

@@ -1,5 +1,5 @@
 import type { Card } from "./cards.js";
-import type { Phase, HandResult } from "./game.js";
+import type { Phase, HandResult, Gesture } from "./game.js";
 import type { RuleSetId } from "./rules.js";
 
 export type EngineEvent =
@@ -17,7 +17,10 @@ export type EngineEvent =
   | { type: "BANKROLL_CHANGED"; bankroll: number; delta: number }
   | { type: "SIDEBET_WIN"; kind: "perfectPairs" | "21+3" | "luckyLadies"; payout: number; label: string }
   | { type: "SHOE_SHUFFLED" }
-  | { type: "ERROR"; code: string; message: string };
+  | { type: "ERROR"; code: string; message: string }
+  | { type: "SEAT_CLAIMED"; seatIndex: number; sessionId: string; playerName: string }
+  | { type: "SEAT_RELEASED"; seatIndex: number }
+  | { type: "GESTURE_MADE"; seatIndex: number; gesture: Gesture };
 
 export type Listener = (ev: EngineEvent) => void;
 
