@@ -15,6 +15,7 @@ export type {
   Gesture,
   Player,
   Seat,
+  TableConfig,
 } from "./game.js";
 export type { EngineEvent, Listener } from "./events.js";
 export type { Card, Rank, Suit } from "./cards.js";

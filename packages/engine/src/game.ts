@@ -32,7 +32,12 @@ export type Action =
   | { type: "INSURE"; amount: number }
   | { type: "DECLINE_INSURANCE" }
   | { type: "NEW_ROUND" }
-  | { type: "SET_RULESET"; preset: RuleSetId };
+  | { type: "SET_RULESET"; preset: RuleSetId }
+  | { type: "CONFIGURE_TABLE"; config: TableConfig }
+  | { type: "CLAIM_SEAT"; seatIndex: number; sessionId: string; name: string; bankroll?: number }
+  | { type: "RELEASE_SEAT"; seatIndex: number; becomeNpc?: boolean; personality?: NpcPersonality }
+  | { type: "PLACE_BET_FOR_SEAT"; seatIndex: number; amount: number; sideBets?: Partial<SideBets> }
+  | { type: "GESTURE"; seatIndex: number; gesture: Gesture };
 
 export type ActionType = Action["type"];
 
@@ -40,6 +45,16 @@ export interface SideBets {
   perfectPairs: number;
   twentyOneP3: number;
   luckyLadies: number;
+}
+
+export interface TableConfig {
+  seats: Array<{
+    kind: SeatKind;
+    name?: string;
+    personality?: NpcPersonality;
+    bankroll?: number;
+    ownerSessionId?: string | null;
+  }>;
 }
 
 export interface PlayerHand {
@@ -640,6 +655,12 @@ export function createGame(opts: CreateGameOptions = {}): Game {
           return declineInsurance();
         case "NEW_ROUND":
           return phase === "roundOver" ? newRound() : err("ILLEGAL_ACTION", action.type);
+        case "CONFIGURE_TABLE":
+        case "CLAIM_SEAT":
+        case "RELEASE_SEAT":
+        case "PLACE_BET_FOR_SEAT":
+        case "GESTURE":
+          return err("UNIMPLEMENTED", `${action.type} pending M1c.2-4`);
         case "SET_RULESET":
           return setRuleSet(action.preset);
         case "DEAL":
