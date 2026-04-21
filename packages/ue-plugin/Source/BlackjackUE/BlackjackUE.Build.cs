@@ -8,7 +8,8 @@ public class BlackjackUE : ModuleRules
         bUseUnity = false;
 
         PublicDependencyModuleNames.AddRange(new string[] {
-            "Core", "CoreUObject", "Engine", "InputCore", "BlackjackCore"
+            "Core", "CoreUObject", "Engine", "InputCore", "BlackjackCore",
+            "WebSockets", "Json", "JsonUtilities"
         });
         PrivateDependencyModuleNames.AddRange(new string[] {
             "Slate", "SlateCore", "UMG"
