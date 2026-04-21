@@ -43,6 +43,12 @@ export interface SessionManagerOptions {
   graceSeconds?: number;
   /** How often the sweeper runs (default 5000 ms). */
   sweepIntervalMs?: number;
+  /**
+   * Invoked synchronously for every session evicted by the sweeper. Lets M3d
+   * lobby/table code release the dropped user's seats without a circular
+   * dependency from the session manager back into the lobby.
+   */
+  onExpire?: (session: Session) => void;
 }
 
 const DEFAULT_GRACE_SECONDS = 45;
