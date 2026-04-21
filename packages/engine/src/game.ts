@@ -69,37 +69,6 @@ export interface HandResult {
   label?: string;
 }
 
-export interface GameSnapshot {
-  phase: Phase;
-  ruleSet: RuleSet;
-  bankroll: number;
-  dealer: Card[];
-  dealerHoleHidden: boolean;
-  hands: PlayerHand[];
-  activeHandIndex: number;
-  pendingBet: number;
-  sideBets: SideBets;
-  insuranceBet: number;
-  roundResults: HandResult[];
-  legalActions: ActionType[];
-  handValues: { total: number; soft: boolean; isBust: boolean; is21: boolean }[];
-  dealerValue: { total: number; soft: boolean; isBust: boolean; is21: boolean };
-}
-
-export interface CreateGameOptions {
-  ruleSetId?: RuleSetId;
-  seed?: number;
-  bankroll?: number;
-}
-
-export interface Game {
-  getState(): GameSnapshot;
-  dispatch(action: Action): void;
-  on(listener: Listener): () => void;
-  getLegalActions(): ActionType[];
-  setRuleSet(id: RuleSetId): void;
-}
-
 export type SeatKind = "empty" | "human" | "npc";
 
 export type NpcPersonality =
@@ -130,6 +99,42 @@ export interface Seat {
   ownerSessionId: string | null;
 }
 
+export interface GameSnapshot {
+  phase: Phase;
+  ruleSet: RuleSet;
+  bankroll: number;
+  dealer: Card[];
+  dealerHoleHidden: boolean;
+  hands: PlayerHand[];
+  activeHandIndex: number;
+  pendingBet: number;
+  sideBets: SideBets;
+  insuranceBet: number;
+  roundResults: HandResult[];
+  legalActions: ActionType[];
+  handValues: { total: number; soft: boolean; isBust: boolean; is21: boolean }[];
+  dealerValue: { total: number; soft: boolean; isBust: boolean; is21: boolean };
+  seats: Seat[];
+  activeSeatIndex: number;
+  humanSeatIndex: number | null;
+  maxSeats: number;
+}
+
+export interface CreateGameOptions {
+  ruleSetId?: RuleSetId;
+  seed?: number;
+  bankroll?: number;
+  maxSeats?: number;
+}
+
+export interface Game {
+  getState(): GameSnapshot;
+  dispatch(action: Action): void;
+  on(listener: Listener): () => void;
+  getLegalActions(): ActionType[];
+  setRuleSet(id: RuleSetId): void;
+}
+
 export function createGame(opts: CreateGameOptions = {}): Game {
   const bus = new EventBus();
   let rules: RuleSet = PRESETS[opts.ruleSetId ?? "VEGAS"];
@@ -139,17 +144,38 @@ export function createGame(opts: CreateGameOptions = {}): Game {
     penetration: rules.penetration,
     removeTens: rules.removeTens,
   });
-  let bankroll = opts.bankroll ?? rules.startingBankroll;
+  const maxSeats = opts.maxSeats ?? 6;
+  const startingBankroll = opts.bankroll ?? rules.startingBankroll;
+
+  const seats: Seat[] = [
+    {
+      index: 0,
+      player: {
+        id: "p0",
+        name: "Player",
+        kind: "human",
+        bankroll: startingBankroll,
+      },
+      hands: [],
+      activeHandIndex: 0,
+      pendingBet: 0,
+      sideBets: { perfectPairs: 0, twentyOneP3: 0, luckyLadies: 0 },
+      insuranceBet: 0,
+      gestures: [],
+      tilt: 0,
+      ownerSessionId: null,
+    },
+  ];
+  const activeSeatIndex = 0;
+  const humanSeatIndex: number | null = 0;
+
   let phase: Phase = "betting";
   let dealer: Card[] = [];
   let dealerHoleHidden = true;
-  let hands: PlayerHand[] = [];
-  let activeHandIndex = 0;
-  let pendingBet = 0;
-  let sideBets: SideBets = { perfectPairs: 0, twentyOneP3: 0, luckyLadies: 0 };
-  let insuranceBet = 0;
   let roundResults: HandResult[] = [];
   let splitCount = 0;
+
+  const seat = (): Seat => seats[0]!;
 
   const setPhase = (p: Phase): void => {
     if (phase !== p) {
@@ -159,8 +185,8 @@ export function createGame(opts: CreateGameOptions = {}): Game {
   };
 
   const adjustBankroll = (delta: number): void => {
-    bankroll += delta;
-    bus.emit({ type: "BANKROLL_CHANGED", bankroll, delta });
+    seats[0]!.player.bankroll += delta;
+    bus.emit({ type: "BANKROLL_CHANGED", bankroll: seats[0]!.player.bankroll, delta });
   };
 
   const legalActions = (): ActionType[] => {
@@ -168,13 +194,14 @@ export function createGame(opts: CreateGameOptions = {}): Game {
     if (phase === "dealing") return [];
     if (phase === "insurance") return ["INSURE", "DECLINE_INSURANCE"];
     if (phase === "playerTurn") {
-      const h = hands[activeHandIndex];
+      const s = seat();
+      const h = s.hands[s.activeHandIndex];
       if (!h) return [];
       const acts: ActionType[] = ["HIT", "STAND"];
       if (h.cards.length === 2 && !h.splitFromAces) {
         acts.push("DOUBLE");
         if (isPair(h.cards) && splitCount < rules.maxSplits) acts.push("SPLIT");
-        if (rules.allowSurrender && hands.length === 1) acts.push("SURRENDER");
+        if (rules.allowSurrender && s.hands.length === 1) acts.push("SURRENDER");
       }
       return acts;
     }
@@ -182,24 +209,37 @@ export function createGame(opts: CreateGameOptions = {}): Game {
     return [];
   };
 
-  const snapshot = (): GameSnapshot => ({
-    phase,
-    ruleSet: rules,
-    bankroll,
-    dealer: dealer.slice(),
-    dealerHoleHidden,
-    hands: hands.map((h) => ({ ...h, cards: h.cards.slice() })),
-    activeHandIndex,
-    pendingBet,
-    sideBets: { ...sideBets },
-    insuranceBet,
-    roundResults: roundResults.slice(),
-    legalActions: legalActions(),
-    handValues: hands.map((h) => evaluate(h.cards)),
-    dealerValue: evaluate(
-      dealerHoleHidden && dealer.length > 1 ? [dealer[0]!] : dealer,
-    ),
-  });
+  const snapshot = (): GameSnapshot => {
+    const s = seat();
+    return {
+      phase,
+      ruleSet: rules,
+      bankroll: s.player.bankroll,
+      dealer: dealer.slice(),
+      dealerHoleHidden,
+      hands: s.hands.map((h) => ({ ...h, cards: h.cards.slice() })),
+      activeHandIndex: s.activeHandIndex,
+      pendingBet: s.pendingBet,
+      sideBets: { ...s.sideBets },
+      insuranceBet: s.insuranceBet,
+      roundResults: roundResults.slice(),
+      legalActions: legalActions(),
+      handValues: s.hands.map((h) => evaluate(h.cards)),
+      dealerValue: evaluate(
+        dealerHoleHidden && dealer.length > 1 ? [dealer[0]!] : dealer,
+      ),
+      seats: seats.map((st) => ({
+        ...st,
+        player: { ...st.player },
+        hands: st.hands.map((h) => ({ ...h, cards: h.cards.slice() })),
+        sideBets: { ...st.sideBets },
+        gestures: st.gestures.slice(),
+      })),
+      activeSeatIndex,
+      humanSeatIndex,
+      maxSeats,
+    };
+  };
 
   const err = (code: string, message: string): void => {
     bus.emit({ type: "ERROR", code, message });
@@ -215,7 +255,7 @@ export function createGame(opts: CreateGameOptions = {}): Game {
 
   const dealCardTo = (target: "player" | "dealer", handIndex: number, faceDown: boolean): Card => {
     const c = draw();
-    if (target === "player") hands[handIndex]!.cards.push(c);
+    if (target === "player") seat().hands[handIndex]!.cards.push(c);
     else dealer.push(c);
     bus.emit({ type: "CARD_DEALT", to: target, handIndex, card: c, faceDown });
     return c;
@@ -226,24 +266,26 @@ export function createGame(opts: CreateGameOptions = {}): Game {
     if (amount < rules.minBet || amount > rules.maxBet)
       return err("BET_OUT_OF_RANGE", `bet must be ${rules.minBet}-${rules.maxBet}`);
     const sbAmt = (sb?.perfectPairs ?? 0) + (sb?.twentyOneP3 ?? 0) + (sb?.luckyLadies ?? 0);
-    if (amount + sbAmt > bankroll) return err("INSUFFICIENT_FUNDS", "Not enough bankroll");
-    pendingBet = amount;
-    sideBets = {
+    const s = seat();
+    if (amount + sbAmt > s.player.bankroll) return err("INSUFFICIENT_FUNDS", "Not enough bankroll");
+    s.pendingBet = amount;
+    s.sideBets = {
       perfectPairs: sb?.perfectPairs ?? 0,
       twentyOneP3: sb?.twentyOneP3 ?? 0,
       luckyLadies: sb?.luckyLadies ?? 0,
     };
     adjustBankroll(-(amount + sbAmt));
-    bus.emit({ type: "BET_PLACED", amount, sideBets });
+    bus.emit({ type: "BET_PLACED", amount, sideBets: s.sideBets });
     deal();
   };
 
   const deal = (): void => {
     setPhase("dealing");
-    hands = [
+    const s = seat();
+    s.hands = [
       {
         cards: [],
-        bet: pendingBet,
+        bet: s.pendingBet,
         doubled: false,
         surrendered: false,
         settled: false,
@@ -254,7 +296,7 @@ export function createGame(opts: CreateGameOptions = {}): Game {
     dealer = [];
     dealerHoleHidden = true;
     splitCount = 0;
-    activeHandIndex = 0;
+    s.activeHandIndex = 0;
 
     dealCardTo("player", 0, false);
     dealCardTo("dealer", 0, false);
@@ -271,27 +313,28 @@ export function createGame(opts: CreateGameOptions = {}): Game {
   };
 
   const settleSideBets = (): void => {
-    const p = hands[0]!.cards;
-    if (sideBets.perfectPairs > 0) {
+    const s = seat();
+    const p = s.hands[0]!.cards;
+    if (s.sideBets.perfectPairs > 0) {
       const r = evalPerfectPairs(p);
       if (r.payout > 0) {
-        const payout = sideBets.perfectPairs * (r.payout + 1);
+        const payout = s.sideBets.perfectPairs * (r.payout + 1);
         adjustBankroll(payout);
         bus.emit({ type: "SIDEBET_WIN", kind: "perfectPairs", payout, label: r.label });
       }
     }
-    if (sideBets.twentyOneP3 > 0) {
+    if (s.sideBets.twentyOneP3 > 0) {
       const r = evalTwentyOnePlusThree(p, dealer[0]);
       if (r.payout > 0) {
-        const payout = sideBets.twentyOneP3 * (r.payout + 1);
+        const payout = s.sideBets.twentyOneP3 * (r.payout + 1);
         adjustBankroll(payout);
         bus.emit({ type: "SIDEBET_WIN", kind: "21+3", payout, label: r.label });
       }
     }
-    if (sideBets.luckyLadies > 0) {
+    if (s.sideBets.luckyLadies > 0) {
       const r = evalLuckyLadies(p, dealer);
       if (r.payout > 0) {
-        const payout = sideBets.luckyLadies * (r.payout + 1);
+        const payout = s.sideBets.luckyLadies * (r.payout + 1);
         adjustBankroll(payout);
         bus.emit({ type: "SIDEBET_WIN", kind: "luckyLadies", payout, label: r.label });
       }
@@ -299,6 +342,7 @@ export function createGame(opts: CreateGameOptions = {}): Game {
   };
 
   const afterInsurance = (): void => {
+    const s = seat();
     const dealerHasBJ = isBlackjack(dealer);
     if (dealerHasBJ && (rules.dealerPeeksOnAce || rules.dealerPeeksOnTen)) {
       const upIsTen = rankValue(dealer[0]!.rank) === 10;
@@ -309,7 +353,7 @@ export function createGame(opts: CreateGameOptions = {}): Game {
         return;
       }
     }
-    if (isBlackjack(hands[0]!.cards)) {
+    if (isBlackjack(s.hands[0]!.cards)) {
       bus.emit({ type: "NATURAL_BLACKJACK", handIndex: 0 });
       revealHole();
       settleAgainstDealer();
@@ -324,10 +368,11 @@ export function createGame(opts: CreateGameOptions = {}): Game {
   };
 
   const hit = (): void => {
-    const h = hands[activeHandIndex];
+    const s = seat();
+    const h = s.hands[s.activeHandIndex];
     if (!h) return;
-    bus.emit({ type: "PLAYER_ACTION", action: "HIT", handIndex: activeHandIndex });
-    dealCardTo("player", activeHandIndex, false);
+    bus.emit({ type: "PLAYER_ACTION", action: "HIT", handIndex: s.activeHandIndex });
+    dealCardTo("player", s.activeHandIndex, false);
     const v = evaluate(h.cards);
     if (rules.id === "PONTOON" && h.cards.length >= 5 && !v.isBust) {
       h.stood = true;
@@ -335,7 +380,7 @@ export function createGame(opts: CreateGameOptions = {}): Game {
       return;
     }
     if (v.isBust) {
-      bus.emit({ type: "HAND_BUST", handIndex: activeHandIndex });
+      bus.emit({ type: "HAND_BUST", handIndex: s.activeHandIndex });
       advanceHand();
     } else if (v.total === 21) {
       h.stood = true;
@@ -344,35 +389,38 @@ export function createGame(opts: CreateGameOptions = {}): Game {
   };
 
   const stand = (): void => {
-    const h = hands[activeHandIndex];
+    const s = seat();
+    const h = s.hands[s.activeHandIndex];
     if (!h) return;
-    bus.emit({ type: "PLAYER_ACTION", action: "STAND", handIndex: activeHandIndex });
+    bus.emit({ type: "PLAYER_ACTION", action: "STAND", handIndex: s.activeHandIndex });
     h.stood = true;
     advanceHand();
   };
 
   const doubleDown = (): void => {
-    const h = hands[activeHandIndex];
+    const s = seat();
+    const h = s.hands[s.activeHandIndex];
     if (!h) return;
     if (h.cards.length !== 2) return err("ILLEGAL_ACTION", "Double requires 2 cards");
-    if (bankroll < h.bet) return err("INSUFFICIENT_FUNDS", "Cannot cover double");
+    if (s.player.bankroll < h.bet) return err("INSUFFICIENT_FUNDS", "Cannot cover double");
     adjustBankroll(-h.bet);
     h.bet *= 2;
     h.doubled = true;
-    bus.emit({ type: "PLAYER_ACTION", action: "DOUBLE", handIndex: activeHandIndex });
-    dealCardTo("player", activeHandIndex, false);
+    bus.emit({ type: "PLAYER_ACTION", action: "DOUBLE", handIndex: s.activeHandIndex });
+    dealCardTo("player", s.activeHandIndex, false);
     h.stood = true;
     const v = evaluate(h.cards);
-    if (v.isBust) bus.emit({ type: "HAND_BUST", handIndex: activeHandIndex });
+    if (v.isBust) bus.emit({ type: "HAND_BUST", handIndex: s.activeHandIndex });
     advanceHand();
   };
 
   const split = (): void => {
-    const h = hands[activeHandIndex];
+    const s = seat();
+    const h = s.hands[s.activeHandIndex];
     if (!h) return;
     if (!isPair(h.cards)) return err("ILLEGAL_ACTION", "Not a pair");
     if (splitCount >= rules.maxSplits) return err("ILLEGAL_ACTION", "Max splits reached");
-    if (bankroll < h.bet) return err("INSUFFICIENT_FUNDS", "Cannot cover split");
+    if (s.player.bankroll < h.bet) return err("INSUFFICIENT_FUNDS", "Cannot cover split");
     const isAces = h.cards[0]!.rank === "A";
     adjustBankroll(-h.bet);
     splitCount++;
@@ -387,52 +435,55 @@ export function createGame(opts: CreateGameOptions = {}): Game {
       splitFromAces: isAces,
     };
     h.splitFromAces = isAces;
-    hands.splice(activeHandIndex + 1, 0, newHand);
-    bus.emit({ type: "PLAYER_ACTION", action: "SPLIT", handIndex: activeHandIndex });
+    s.hands.splice(s.activeHandIndex + 1, 0, newHand);
+    bus.emit({ type: "PLAYER_ACTION", action: "SPLIT", handIndex: s.activeHandIndex });
 
-    dealCardTo("player", activeHandIndex, false);
-    dealCardTo("player", activeHandIndex + 1, false);
+    dealCardTo("player", s.activeHandIndex, false);
+    dealCardTo("player", s.activeHandIndex + 1, false);
 
     if (isAces && rules.splitAcesOneCardOnly) {
-      hands[activeHandIndex]!.stood = true;
-      hands[activeHandIndex + 1]!.stood = true;
+      s.hands[s.activeHandIndex]!.stood = true;
+      s.hands[s.activeHandIndex + 1]!.stood = true;
       advanceHand();
     }
   };
 
   const surrender = (): void => {
-    const h = hands[activeHandIndex];
+    const s = seat();
+    const h = s.hands[s.activeHandIndex];
     if (!h) return;
-    if (!rules.allowSurrender || hands.length !== 1 || h.cards.length !== 2)
+    if (!rules.allowSurrender || s.hands.length !== 1 || h.cards.length !== 2)
       return err("ILLEGAL_ACTION", "Surrender not allowed");
     h.surrendered = true;
     h.stood = true;
-    bus.emit({ type: "PLAYER_ACTION", action: "SURRENDER", handIndex: activeHandIndex });
+    bus.emit({ type: "PLAYER_ACTION", action: "SURRENDER", handIndex: s.activeHandIndex });
     advanceHand();
   };
 
   const insure = (amount: number): void => {
     if (phase !== "insurance") return err("ILLEGAL_ACTION", "Not in insurance phase");
-    const max = Math.floor(hands[0]!.bet / 2);
+    const s = seat();
+    const max = Math.floor(s.hands[0]!.bet / 2);
     if (amount < 0 || amount > max) return err("BET_OUT_OF_RANGE", `0-${max}`);
-    if (amount > bankroll) return err("INSUFFICIENT_FUNDS", "Not enough bankroll");
-    insuranceBet = amount;
+    if (amount > s.player.bankroll) return err("INSUFFICIENT_FUNDS", "Not enough bankroll");
+    s.insuranceBet = amount;
     adjustBankroll(-amount);
     afterInsurance();
   };
 
   const declineInsurance = (): void => {
     if (phase !== "insurance") return err("ILLEGAL_ACTION", "Not in insurance phase");
-    insuranceBet = 0;
+    seat().insuranceBet = 0;
     afterInsurance();
   };
 
   const advanceHand = (): void => {
-    while (activeHandIndex < hands.length) {
-      const h = hands[activeHandIndex]!;
+    const s = seat();
+    while (s.activeHandIndex < s.hands.length) {
+      const h = s.hands[s.activeHandIndex]!;
       const v = evaluate(h.cards);
       if (h.stood || h.surrendered || v.isBust) {
-        activeHandIndex++;
+        s.activeHandIndex++;
         continue;
       }
       return;
@@ -443,7 +494,8 @@ export function createGame(opts: CreateGameOptions = {}): Game {
   const dealerTurn = (): void => {
     setPhase("dealerTurn");
     revealHole();
-    const anyLiveHand = hands.some((h) => !h.surrendered && !evaluate(h.cards).isBust);
+    const s = seat();
+    const anyLiveHand = s.hands.some((h) => !h.surrendered && !evaluate(h.cards).isBust);
     if (anyLiveHand) {
       while (dealerShouldHit(dealer, rules)) {
         const c = draw();
@@ -471,13 +523,14 @@ export function createGame(opts: CreateGameOptions = {}): Game {
 
   const settleAgainstDealer = (): void => {
     setPhase("settlement");
+    const s = seat();
     const dv = evaluate(dealer);
     const dealerBJ = isBlackjack(dealer);
-    const insurancePayout = dealerBJ && insuranceBet > 0 ? insuranceBet * (rules.insurancePays + 1) : 0;
+    const insurancePayout = dealerBJ && s.insuranceBet > 0 ? s.insuranceBet * (rules.insurancePays + 1) : 0;
     if (insurancePayout > 0) adjustBankroll(insurancePayout);
 
-    for (let i = 0; i < hands.length; i++) {
-      const h = hands[i]!;
+    for (let i = 0; i < s.hands.length; i++) {
+      const h = s.hands[i]!;
       const v = evaluate(h.cards);
       let outcome: Outcome = "loss";
       let payout = 0;
@@ -539,14 +592,15 @@ export function createGame(opts: CreateGameOptions = {}): Game {
   };
 
   const newRound = (): void => {
-    pendingBet = 0;
-    sideBets = { perfectPairs: 0, twentyOneP3: 0, luckyLadies: 0 };
-    insuranceBet = 0;
-    hands = [];
+    const s = seat();
+    s.pendingBet = 0;
+    s.sideBets = { perfectPairs: 0, twentyOneP3: 0, luckyLadies: 0 };
+    s.insuranceBet = 0;
+    s.hands = [];
+    s.activeHandIndex = 0;
     dealer = [];
     dealerHoleHidden = true;
     roundResults = [];
-    activeHandIndex = 0;
     setPhase("betting");
   };
 
