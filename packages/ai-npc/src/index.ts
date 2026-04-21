@@ -1,0 +1,17 @@
+/**
+ * @blackjack/ai-npc — NPC player AI for the blackjack engine.
+ *
+ * Module layout (filled in by M2b..M2e):
+ *   basicStrategy.ts — Vegas H17/S17 action lookup tables
+ *   hiLoCounter.ts   — running + true count
+ *   betPolicies.ts   — flat / Kelly / reverse-Martingale / unit-spread
+ *   personalities.ts — 7 personality configs
+ *   tells.ts         — per-NPC tell generators
+ *   tilt.ts          — tilt model
+ *   npcAgent.ts      — top-level decidePlay / decideBet
+ *
+ * Public API lives here (see exports).
+ */
+
+// Re-exports come in later milestones; M2a ships the skeleton only.
+export const __moduleScaffolded = true;

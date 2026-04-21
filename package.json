@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "workspaces": [
+    "packages/ai-npc",
+    "packages/conformance",
     "packages/engine",
-    "packages/ui-cli",
-    "packages/ui-web",
     "packages/ui-3d",
-    "packages/conformance"
+    "packages/ui-cli",
+    "packages/ui-web"
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
