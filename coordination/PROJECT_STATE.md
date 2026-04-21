@@ -42,14 +42,21 @@ via 127.0.0.1 loopback.
 Commit chain: 64433ea..1f0f988 (M2a scaffold → M2b basic strategy →
 M2c counter+bets → M2d personalities+tilt+tells → M2e npcAgent).
 
-**M3 — game-server scaffold (Node.js + WebSocket protocol)** next.
+**M3 COMPLETE** (2026-04-21) — game-server scaffold + protocol +
+session lifecycle + lobby shipped. 39 tests passing.
+Commit chain: 3122c1d..6b033d7 (M3a scaffold → M3b protocol schemas
+→ M3c WS server + session → M3d lobby + seat claiming).
+M3e (separate e2e test) merged into M4 since full round-trip
+requires the game loop.
+
+**M4 — game-server full game loop (betting → dealing → play → settlement, with NPC auto-drive)** next.
 
 ## Milestone list (v1, re-ordered after D-016..D-022)
 
 **Phase 1 — TS core (server-side brain)**
 1. **M1** — TS engine multi-seat refactor (`engine`) ✅ 2026-04-21
 2. **M2** — NPC AI core: basic strategy + Hi-Lo + bet policies + 7 personalities (`ai-npc`) ✅ 2026-04-21
-3. **M3** — `game-server` scaffolding + WebSocket protocol + schemas
+3. **M3** — `game-server` scaffolding + WebSocket protocol + schemas + lobby + sessions ✅ 2026-04-21
 4. **M4** — `game-server` full game loop: lobby, table, seat ownership, NPC driver, reconnect
 
 **Phase 2 — UE client**
