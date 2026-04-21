@@ -181,8 +181,15 @@ export function createGame(opts: CreateGameOptions = {}): Game {
       ownerSessionId: null,
     },
   ];
-  const activeSeatIndex = 0;
+  let activeSeatIndex = 0;
   let humanSeatIndex: number | null = 0;
+
+  const activeSeats = (): Seat[] => seats.filter((s) => s.player.kind !== "empty");
+
+  const allActiveBetsPlaced = (): boolean => {
+    const active = activeSeats();
+    return active.length > 0 && active.every((s) => s.pendingBet > 0);
+  };
 
   let phase: Phase = "betting";
   let dealer: Card[] = [];
@@ -274,11 +281,23 @@ export function createGame(opts: CreateGameOptions = {}): Game {
     return c;
   };
 
-  const dealCardTo = (target: "player" | "dealer", handIndex: number, faceDown: boolean): Card => {
+  const dealCardTo = (target: "player" | "dealer", seatIndex: number, faceDown: boolean): Card => {
     const c = draw();
-    if (target === "player") seat().hands[handIndex]!.cards.push(c);
-    else dealer.push(c);
-    bus.emit({ type: "CARD_DEALT", to: target, handIndex, card: c, faceDown });
+    if (target === "player") {
+      const st = seats[seatIndex]!;
+      const hand = st.hands[st.activeHandIndex]!;
+      hand.cards.push(c);
+    } else {
+      dealer.push(c);
+    }
+    // For backward compat, keep event.handIndex = activeHandIndex of that seat.
+    bus.emit({
+      type: "CARD_DEALT",
+      to: target,
+      handIndex: target === "player" ? seats[seatIndex]!.activeHandIndex : 0,
+      card: c,
+      faceDown,
+    });
     return c;
   };
 
@@ -323,7 +342,7 @@ export function createGame(opts: CreateGameOptions = {}): Game {
   const placeBet = (amount: number, sb?: Partial<SideBets>): void => {
     const target = humanSeatIndex ?? 0;
     if (!applyBetForSeat(target, amount, sb)) return;
-    deal();
+    if (allActiveBetsPlaced()) deal();
   };
 
   const placeBetForSeat = (
@@ -331,32 +350,42 @@ export function createGame(opts: CreateGameOptions = {}): Game {
     amount: number,
     sb?: Partial<SideBets>,
   ): void => {
-    applyBetForSeat(seatIndex, amount, sb);
+    if (!applyBetForSeat(seatIndex, amount, sb)) return;
+    if (allActiveBetsPlaced()) deal();
   };
 
   const deal = (): void => {
     setPhase("dealing");
-    const s = seat();
-    s.hands = [
-      {
-        cards: [],
-        bet: s.pendingBet,
-        doubled: false,
-        surrendered: false,
-        settled: false,
-        stood: false,
-        splitFromAces: false,
-      },
-    ];
     dealer = [];
     dealerHoleHidden = true;
     splitCount = 0;
-    s.activeHandIndex = 0;
 
-    dealCardTo("player", 0, false);
+    const active = activeSeats();
+    // Reset each active seat for the new round's hands.
+    for (const s of active) {
+      s.hands = [
+        {
+          cards: [],
+          bet: s.pendingBet,
+          doubled: false,
+          surrendered: false,
+          settled: false,
+          stood: false,
+          splitFromAces: false,
+        },
+      ];
+      s.activeHandIndex = 0;
+      s.insuranceBet = 0;
+    }
+
+    // First card to each active seat, then dealer up-card.
+    for (const s of active) dealCardTo("player", s.index, false);
     dealCardTo("dealer", 0, false);
-    dealCardTo("player", 0, false);
+    // Second card to each active seat, then dealer hole face-down.
+    for (const s of active) dealCardTo("player", s.index, false);
     dealCardTo("dealer", 0, true);
+
+    activeSeatIndex = active[0]!.index; // start with the lowest active seat
 
     settleSideBets();
 
@@ -368,7 +397,7 @@ export function createGame(opts: CreateGameOptions = {}): Game {
   };
 
   const settleSideBets = (): void => {
-    const s = seat();
+    const s = seats[activeSeatIndex]!;
     const p = s.hands[0]!.cards;
     if (s.sideBets.perfectPairs > 0) {
       const r = evalPerfectPairs(p);
@@ -427,7 +456,7 @@ export function createGame(opts: CreateGameOptions = {}): Game {
     const h = s.hands[s.activeHandIndex];
     if (!h) return;
     bus.emit({ type: "PLAYER_ACTION", action: "HIT", handIndex: s.activeHandIndex });
-    dealCardTo("player", s.activeHandIndex, false);
+    dealCardTo("player", activeSeatIndex, false);
     const v = evaluate(h.cards);
     if (rules.id === "PONTOON" && h.cards.length >= 5 && !v.isBust) {
       h.stood = true;
@@ -462,7 +491,7 @@ export function createGame(opts: CreateGameOptions = {}): Game {
     h.bet *= 2;
     h.doubled = true;
     bus.emit({ type: "PLAYER_ACTION", action: "DOUBLE", handIndex: s.activeHandIndex });
-    dealCardTo("player", s.activeHandIndex, false);
+    dealCardTo("player", activeSeatIndex, false);
     h.stood = true;
     const v = evaluate(h.cards);
     if (v.isBust) bus.emit({ type: "HAND_BUST", handIndex: s.activeHandIndex });
@@ -493,8 +522,21 @@ export function createGame(opts: CreateGameOptions = {}): Game {
     s.hands.splice(s.activeHandIndex + 1, 0, newHand);
     bus.emit({ type: "PLAYER_ACTION", action: "SPLIT", handIndex: s.activeHandIndex });
 
-    dealCardTo("player", s.activeHandIndex, false);
-    dealCardTo("player", s.activeHandIndex + 1, false);
+    // Deal one card to current hand via helper (targets activeHandIndex).
+    dealCardTo("player", activeSeatIndex, false);
+    // Second card goes to the newly-split hand at activeHandIndex + 1 —
+    // bypass helper and push directly, emitting the matching event.
+    {
+      const c = draw();
+      s.hands[s.activeHandIndex + 1]!.cards.push(c);
+      bus.emit({
+        type: "CARD_DEALT",
+        to: "player",
+        handIndex: s.activeHandIndex + 1,
+        card: c,
+        faceDown: false,
+      });
+    }
 
     if (isAces && rules.splitAcesOneCardOnly) {
       s.hands[s.activeHandIndex]!.stood = true;
