@@ -17,6 +17,112 @@ DEFINE_LOG_CATEGORY_STATIC(LogBlackjackNet, Log, All);
 namespace
 {
     const TCHAR* const kClientVersion = TEXT("ue-0.1.0");
+
+    // -----------------------------------------------------------------------
+    // M5b.2a — wire-literal -> enum helpers (file-local).
+    //
+    // These mirror the string enums in packages/game-server/src/protocol/*.
+    // All of them fall through to a sane default on unknown input and log at
+    // Verbose so we never crash on an unexpected/forward-compatible server.
+    // -----------------------------------------------------------------------
+
+    EBlackjackPhase PhaseFromWire(const FString& s)
+    {
+        if (s == TEXT("betting"))     return EBlackjackPhase::Betting;
+        if (s == TEXT("dealing"))     return EBlackjackPhase::Dealing;
+        if (s == TEXT("insurance"))   return EBlackjackPhase::Insurance;
+        if (s == TEXT("playerTurn"))  return EBlackjackPhase::PlayerTurn;
+        if (s == TEXT("dealerTurn"))  return EBlackjackPhase::DealerTurn;
+        if (s == TEXT("settlement"))  return EBlackjackPhase::Settlement;
+        if (s == TEXT("roundOver"))   return EBlackjackPhase::RoundOver;
+        UE_LOG(LogTemp, Verbose, TEXT("Unknown phase: %s"), *s);
+        return EBlackjackPhase::Betting;
+    }
+
+    EBlackjackAction ActionFromWire(const FString& s)
+    {
+        if (s == TEXT("hit"))                                          return EBlackjackAction::Hit;
+        if (s == TEXT("stand"))                                        return EBlackjackAction::Stand;
+        if (s == TEXT("double"))                                       return EBlackjackAction::Double;
+        if (s == TEXT("split"))                                        return EBlackjackAction::Split;
+        if (s == TEXT("surrender"))                                    return EBlackjackAction::Surrender;
+        if (s == TEXT("insure"))                                       return EBlackjackAction::Insure;
+        if (s == TEXT("decline-insurance") ||
+            s == TEXT("declineInsurance"))                             return EBlackjackAction::DeclineInsurance;
+        UE_LOG(LogTemp, Verbose, TEXT("Unknown action: %s"), *s);
+        return EBlackjackAction::Stand;
+    }
+
+    EBlackjackDealerAction DealerActionFromWire(const FString& s)
+    {
+        if (s == TEXT("hit"))   return EBlackjackDealerAction::Hit;
+        if (s == TEXT("stand")) return EBlackjackDealerAction::Stand;
+        if (s == TEXT("bust"))  return EBlackjackDealerAction::Bust;
+        UE_LOG(LogTemp, Verbose, TEXT("Unknown dealer action: %s"), *s);
+        return EBlackjackDealerAction::Stand;
+    }
+
+    EBlackjackOutcome OutcomeFromWire(const FString& s)
+    {
+        if (s == TEXT("win"))       return EBlackjackOutcome::Win;
+        if (s == TEXT("loss"))      return EBlackjackOutcome::Loss;
+        if (s == TEXT("push"))      return EBlackjackOutcome::Push;
+        if (s == TEXT("blackjack")) return EBlackjackOutcome::Blackjack;
+        if (s == TEXT("bust"))      return EBlackjackOutcome::Bust;
+        if (s == TEXT("surrender")) return EBlackjackOutcome::Surrender;
+        UE_LOG(LogTemp, Verbose, TEXT("Unknown outcome: %s"), *s);
+        return EBlackjackOutcome::Loss;
+    }
+
+    // Reuses the existing EBlackjackTarget (Player / Dealer) from BlackjackTypes.h
+    // for the DEAL_TARGET wire literal.
+    EBlackjackTarget DealTargetFromWire(const FString& s)
+    {
+        if (s == TEXT("dealer")) return EBlackjackTarget::Dealer;
+        return EBlackjackTarget::Player; // default
+    }
+
+    // Reuses the existing EBlackjackSideBet from BlackjackTypes.h for the
+    // side-bet "kind" wire literal.
+    EBlackjackSideBet SideBetKindFromWire(const FString& s)
+    {
+        if (s == TEXT("perfectPairs"))                             return EBlackjackSideBet::PerfectPairs;
+        if (s == TEXT("21+3") || s == TEXT("twentyOneP3"))         return EBlackjackSideBet::TwentyOneP3;
+        if (s == TEXT("luckyLadies"))                              return EBlackjackSideBet::LuckyLadies;
+        UE_LOG(LogTemp, Verbose, TEXT("Unknown sidebet: %s"), *s);
+        return EBlackjackSideBet::PerfectPairs;
+    }
+
+    EBlackjackRuleSet RuleSetFromWire(const FString& s)
+    {
+        if (s == TEXT("SPANISH21"))    return EBlackjackRuleSet::Spanish21;
+        if (s == TEXT("PONTOON"))      return EBlackjackRuleSet::Pontoon;
+        if (s == TEXT("SUPER_FUN_21")) return EBlackjackRuleSet::SuperFun21;
+        return EBlackjackRuleSet::Vegas; // default (covers "VEGAS" + unknown)
+    }
+
+    EBlackjackLanguage LanguageFromWire(const FString& s)
+    {
+        if (s == TEXT("en")) return EBlackjackLanguage::English;
+        return EBlackjackLanguage::Chinese;
+    }
+
+    EBlackjackSeatKind SeatKindFromWire(const FString& s)
+    {
+        if (s == TEXT("human")) return EBlackjackSeatKind::Human;
+        if (s == TEXT("npc"))   return EBlackjackSeatKind::Npc;
+        return EBlackjackSeatKind::Empty;
+    }
+
+    EBlackjackGesture GestureFromWire(const FString& s)
+    {
+        if (s == TEXT("nervous"))    return EBlackjackGesture::Nervous;
+        if (s == TEXT("poker-face")) return EBlackjackGesture::PokerFace;
+        if (s == TEXT("taunt"))      return EBlackjackGesture::Taunt;
+        if (s == TEXT("sigh"))       return EBlackjackGesture::Sigh;
+        if (s == TEXT("celebrate"))  return EBlackjackGesture::Celebrate;
+        return EBlackjackGesture::Confident;
+    }
 }
 
 void UBlackjackNetClient::Initialize(FSubsystemCollectionBase& Collection)

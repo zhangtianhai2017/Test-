@@ -54,6 +54,16 @@ enum class EBlackjackSeatKind : uint8
     Npc
 };
 
+// Dealer-turn hit/stand/bust action reported by the server over the wire
+// (distinct from EBlackjackAction, which covers player-driven actions).
+UENUM(BlueprintType)
+enum class EBlackjackDealerAction : uint8
+{
+    Hit,
+    Stand,
+    Bust
+};
+
 USTRUCT(BlueprintType)
 struct FBlackjackSeatConfig
 {
