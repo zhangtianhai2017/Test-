@@ -1,5 +1,6 @@
 // UE Automation Spec: loads shared JSON vectors produced by packages/conformance
 // and asserts that the C++ engine replays them with identical outcomes.
+// Validated against UE 5.6 — EAutomationTestFlags bitwise-or remains valid via ENUM_CLASS_FLAGS.
 #if WITH_DEV_AUTOMATION_TESTS
 
 #include "Misc/AutomationTest.h"
