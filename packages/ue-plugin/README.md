@@ -88,3 +88,34 @@ still pass.
 - Works in packaged PC / console builds (no platform-specific deps).
 - `Seed = 0` uses UTC ticks for a random shoe. Non-zero seeds give deterministic shoes
   — ideal for replays, save/load, and netcode.
+
+## UE 5.6 Compatibility
+
+This plugin is validated against **Unreal Engine 5.6** (as of M14).
+
+- `Blackjack.uplugin` declares `"EngineVersion": "5.6.0"`.
+- Both Target.cs files use `BuildSettingsVersion.V5` and
+  `EngineIncludeOrderVersion.Unreal5_6` (pinned, not `Latest`, so the plugin
+  keeps compiling when users roll to 5.7+).
+- All `*.Build.cs` files keep `bUseUnity = false` and
+  `PCHUsage = UseExplicitOrSharedPCHs` for strict IWYU.
+- The sample project's `BlackjackSample.Build.cs` adds `EnhancedInput`
+  (5.6 mandates EnhancedInput for pawn/controller input).
+- `BlackjackConformanceSpec.cpp` uses the `EAutomationTestFlags` bitwise-or
+  which remains valid through 5.6 via `ENUM_CLASS_FLAGS` in engine source.
+
+**Non-changes (validated, no code updates needed):**
+
+- `IWebSocket` API (used by `BlackjackNetClient`) is stable through 5.6.
+- `FHttpModule` / `IHttpRequest` (used by `BlackjackAudioClient`) is stable.
+- `USoundWaveProcedural::QueueAudio` — stable.
+- Dynamic multicast delegates (`DECLARE_DYNAMIC_MULTICAST_DELEGATE_*`,
+  `AddDynamic`, `RemoveDynamic`) — unchanged.
+- `UGameInstanceSubsystem` lifecycle (`Initialize` / `Deinitialize`) —
+  unchanged.
+- `UInstancedStaticMeshComponent` API — stable for chip stack use.
+
+The M5/M6/M7/M8/M11-locked class files (`BlackjackNetClient`,
+`BlackjackNetTableActor`, `BlackjackDealerCharacter`, `BlackjackPitBossActor`,
+`BlackjackDecisionTimerActor`, `BlackjackAudioClient`, etc.) required
+**zero edits** for 5.6 support.

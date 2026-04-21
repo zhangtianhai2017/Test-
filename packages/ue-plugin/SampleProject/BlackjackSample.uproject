@@ -1,6 +1,6 @@
 {
   "FileVersion": 3,
-  "EngineAssociation": "5.3",
+  "EngineAssociation": "5.6",
   "Category": "",
   "Description": "Sample UE 5.x project demonstrating the Blackjack plugin in a 3D casino scene.",
   "Modules": [
