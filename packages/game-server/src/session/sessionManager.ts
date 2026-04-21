@@ -59,6 +59,7 @@ export function createSessionManager(
 ): SessionManager {
   const graceSeconds = opts.graceSeconds ?? DEFAULT_GRACE_SECONDS;
   const sweepIntervalMs = opts.sweepIntervalMs ?? DEFAULT_SWEEP_INTERVAL_MS;
+  const onExpire = opts.onExpire;
   const sessions = new Map<string, Session>();
 
   const mgr: SessionManager = {
@@ -112,16 +113,24 @@ export function createSessionManager(
       for (const [id, s] of sessions) {
         if (s.graceDeadline !== null && s.graceDeadline < nowMs) {
           if (s.tableId !== null) {
-            // M3d: lobby/table cleanup will hook in here (remove from table,
-            // reassign or release seats, broadcast SEAT_RELEASED).
             log.info(
               { sessionId: id, tableId: s.tableId, ownedSeats: s.ownedSeats },
-              "session grace expired; table cleanup pending (M3d)",
+              "session grace expired; releasing table seats",
             );
           } else {
             log.debug({ sessionId: id }, "session grace expired");
           }
+          // Delete first so any callback that inspects `sessions` doesn't
+          // see the victim session twice (e.g. broadcastToTable iterates
+          // sessions.all() and must not try to send to us).
           sessions.delete(id);
+          if (onExpire) {
+            try {
+              onExpire(s);
+            } catch (err) {
+              log.warn({ err, sessionId: id }, "onExpire callback threw");
+            }
+          }
           dropped += 1;
         }
       }

@@ -1,25 +1,32 @@
 /**
- * WebSocket server + connection lifecycle (M3c).
+ * WebSocket server + connection lifecycle (M3c + M3d).
  *
  * Responsibilities:
  *  - Bind a `ws.WebSocketServer` on the configured host:port.
- *  - Own one `SessionManager` for the lifetime of the server.
+ *  - Own one `SessionManager` and one `Lobby` for the lifetime of the server.
  *  - For each connection, hold a tiny piece of per-socket state: the
  *    `currentSessionId` (null until HELLO). The actual parsing + routing is
  *    delegated to `dispatch.handleMessage`.
  *  - On `close`, move the session to grace so a reconnect can resume.
+ *  - On grace expiry (via the session manager's `onExpire` hook), release any
+ *    seats the dropped session owned and broadcast SEAT_RELEASED to the
+ *    remaining members of that table (M3d).
  *
- * No lobby / table logic lives here — that's M3d. This file is only the
- * transport + session plumbing.
+ * The dispatcher is handed a `broadcastToTable` helper so lobby/table
+ * dispatch logic can notify every session currently sitting at a table
+ * without reaching back into this module's per-connection state.
  */
 import { createServer, type Server as HttpServer } from "node:http";
 import { AddressInfo } from "node:net";
 
 import { WebSocket, WebSocketServer } from "ws";
 
+import { createLobby, type Lobby } from "../lobby/lobby.js";
 import { log } from "../log.js";
+import { PROTOCOL_VERSION } from "../protocol/frames.js";
+import type { SeatReleasedFrame, ServerFrame } from "../protocol/server.js";
 import { createSessionManager, type SessionManager } from "../session/sessionManager.js";
-import { handleMessage, type DispatchContext } from "./dispatch.js";
+import { handleMessage, sendFrame, type DispatchContext } from "./dispatch.js";
 
 /** Handle returned from `startGameServer`. Used by the entry point + tests. */
 export interface GameServerHandle {
@@ -40,6 +47,12 @@ export interface StartOptions {
   graceSeconds?: number;
   /** Session sweeper interval; tests override to tighten the loop. */
   sweepIntervalMs?: number;
+  /**
+   * Seed base for deterministic shoe generation in the lobby's tables.
+   * Undefined in production (tables use Date.now-style seeding); tests pass
+   * a fixed integer so the engine's RNG is reproducible.
+   */
+  seedBase?: number;
 }
 
 const DEFAULT_HOST = "127.0.0.1";
@@ -52,7 +65,48 @@ export function startGameServer(opts: StartOptions = {}): Promise<GameServerHand
   const graceSeconds = opts.graceSeconds ?? DEFAULT_GRACE_SECONDS;
   const sweepIntervalMs = opts.sweepIntervalMs; // undefined → manager default
 
-  const sessions = createSessionManager({ graceSeconds, sweepIntervalMs });
+  // Shared per-server state.
+  const lobby: Lobby = createLobby(opts.seedBase);
+
+  /**
+   * Send a frame to every session that (a) is joined on `tableId` and (b)
+   * still has an open socket. Skips grace-state sessions (socket === null)
+   * so we don't buffer broadcasts for users who may never come back.
+   */
+  const broadcastToTable = (tableId: string, frame: ServerFrame): void => {
+    for (const s of sessions.all()) {
+      if (s.tableId !== tableId) continue;
+      if (s.socket === null) continue;
+      try {
+        sendFrame(s.socket, frame);
+      } catch (err) {
+        log.warn({ err, sessionId: s.id }, "broadcastToTable: sendFrame failed");
+      }
+    }
+  };
+
+  // When a session's grace window expires, release any seats it still owns
+  // and notify the rest of the table. This lives here (rather than in the
+  // session manager) so the manager stays lobby-ignorant.
+  const sessions = createSessionManager({
+    graceSeconds,
+    sweepIntervalMs,
+    onExpire: (session) => {
+      if (session.tableId === null) return;
+      const released = lobby.releaseSeatsFor(session.id);
+      for (const { tableId, seatIndex } of released) {
+        const frame: SeatReleasedFrame = {
+          v: PROTOCOL_VERSION,
+          type: "SEAT_RELEASED",
+          seatIndex,
+        };
+        broadcastToTable(tableId, frame);
+      }
+      // Clear the session's own bookkeeping — safe even after it's deleted.
+      session.tableId = null;
+      session.ownedSeats = [];
+    },
+  });
 
   // We attach the WS server to a plain http server so callers can later add
   // `/health` or other routes without restructuring. Today, all requests are
@@ -73,11 +127,13 @@ export function startGameServer(opts: StartOptions = {}): Promise<GameServerHand
     const ctx: DispatchContext = {
       socket,
       sessions,
+      lobby,
       graceSeconds,
       currentSessionId: () => currentSessionId,
       setCurrentSessionId: (id) => {
         currentSessionId = id;
       },
+      broadcastToTable,
     };
 
     socket.on("message", (data, isBinary) => {

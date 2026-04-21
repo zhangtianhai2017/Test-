@@ -203,21 +203,22 @@ describe("game-server / WebSocket server (M3c)", () => {
   });
 
   // -------------------------------------------------------------------------
-  // 9. CREATE_TABLE → NOT_IMPLEMENTED
+  // 9. PLACE_BET → NOT_IMPLEMENTED (M4)
   // -------------------------------------------------------------------------
-
-  it("CREATE_TABLE returns NOT_IMPLEMENTED until M3d", async () => {
+  //
+  // The M3c fixture used CREATE_TABLE to verify the "still stubbed"
+  // behaviour; M3d implements CREATE_TABLE, so we swap in one of the
+  // round-action frames that is still deferred to M4.
+  it("PLACE_BET returns NOT_IMPLEMENTED until M4", async () => {
     const ws = await connectAndWait(url(handle));
     send(ws, { v: 1, type: "HELLO", displayName: "Eve", clientVersion: "test-0" });
     await recv(ws);
 
     send(ws, {
       v: 1,
-      type: "CREATE_TABLE",
-      ruleSet: "VEGAS",
-      maxSeats: 3,
-      language: "en",
-      dealerPersona: "veteran",
+      type: "PLACE_BET",
+      seatIndex: 0,
+      amount: 10,
     });
     const err = await recv(ws);
     expect(err.type).toBe("ERROR");

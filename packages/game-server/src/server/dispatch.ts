@@ -12,11 +12,11 @@
  *   4. Routes on `frame.type`:
  *        - HELLO: create or resume a session, reply WELCOME.
  *        - PING: reply PONG (echo timestamp).
- *        - LIST_TABLES: reply with an empty TABLE_LIST (M3d wires the real
- *          lobby).
- *        - anything else: requires an established session
- *          (`HELLO_REQUIRED` if not), otherwise NOT_IMPLEMENTED pointing at
- *          M3d / M4.
+ *        - LIST_TABLES / CREATE_TABLE / JOIN_TABLE / LEAVE_TABLE
+ *          / CONFIGURE_TABLE / CLAIM_SEAT / RELEASE_SEAT: M3d lobby ops.
+ *        - PLACE_BET / HIT / STAND / DOUBLE / SPLIT / SURRENDER
+ *          / INSURE / DECLINE_INSURANCE / GESTURE / NEW_ROUND:
+ *          stubbed NOT_IMPLEMENTED until M4 wires the game loop.
  *
  * `sendFrame` wraps `ServerFrame.parse` around the outbound payload as a
  * belt-and-braces check: if we ever emit a frame that violates the schema,
@@ -24,28 +24,45 @@
  */
 import type { WebSocket } from "ws";
 
+import type { Lobby } from "../lobby/lobby.js";
+import type { Table } from "../lobby/table.js";
+import { buildTableStateFrame } from "../lobby/toProtocol.js";
 import { log } from "../log.js";
 import { ClientFrame } from "../protocol/client.js";
 import { PROTOCOL_VERSION } from "../protocol/frames.js";
-import { ServerFrame, type WelcomeFrame, type ErrorFrame } from "../protocol/server.js";
+import {
+  ServerFrame,
+  type ErrorFrame,
+  type SeatAssignedFrame,
+  type SeatReleasedFrame,
+  type ServerFrame as ServerFrameType,
+  type TableCreatedFrame,
+  type TableListFrame,
+  type TableSummary,
+  type WelcomeFrame,
+} from "../protocol/server.js";
 import type { SessionManager } from "../session/sessionManager.js";
+import type { Session } from "../session/session.js";
 
 /** Server build version string; surfaced in WELCOME. */
 export const SERVER_VERSION = "0.1.0";
 
 /**
  * Context object threaded through each connection. Holds the connection's
- * socket, the shared session registry, and a tiny pair of getter/setter
- * closures over the connection's "current session id" variable. The closures
- * exist because the id is owned by the wsServer per-connection scope, not by
- * this module.
+ * socket, the shared session + lobby registries, and a tiny pair of
+ * getter/setter closures over the connection's "current session id" variable.
+ * The closures exist because the id is owned by the wsServer per-connection
+ * scope, not by this module.
  */
 export interface DispatchContext {
   socket: WebSocket;
   sessions: SessionManager;
+  lobby: Lobby;
   graceSeconds: number;
   currentSessionId: () => string | null;
   setCurrentSessionId: (id: string | null) => void;
+  /** Send a frame to every still-connected session joined on `tableId`. */
+  broadcastToTable: (tableId: string, frame: ServerFrameType) => void;
 }
 
 /**
@@ -93,6 +110,53 @@ function sendWelcome(socket: WebSocket, sessionId: string, graceSeconds: number)
   sendFrame(socket, frame);
 }
 
+/** Build the on-wire `TableSummary` for a lobby `Table`. */
+function summaryOf(table: Table): TableSummary {
+  const seatsTaken = table.seatOwners.reduce<number>(
+    (acc, owner) => acc + (owner !== null ? 1 : 0),
+    0,
+  );
+  const snap = table.game.getState();
+  return {
+    tableId: table.meta.tableId,
+    ruleSet: table.meta.ruleSet,
+    maxSeats: table.meta.maxSeats,
+    seatsTaken,
+    phase: snap.phase,
+    language: table.meta.language,
+    dealerPersona: table.meta.dealerPersona,
+  };
+}
+
+/** Send the requesting client a fresh TABLE_STATE snapshot. */
+function sendTableState(ctx: DispatchContext, table: Table): void {
+  sendFrame(ctx.socket, buildTableStateFrame(table));
+}
+
+/** Broadcast an up-to-date TABLE_STATE to every session joined on the table. */
+function broadcastTableState(ctx: DispatchContext, table: Table): void {
+  ctx.broadcastToTable(table.meta.tableId, buildTableStateFrame(table));
+}
+
+/**
+ * Resolve the session tied to the current connection, or emit an error and
+ * return null if there isn't one. Centralises the HELLO_REQUIRED guard used
+ * by every non-HELLO frame.
+ */
+function requireSession(ctx: DispatchContext): Session | null {
+  const sid = ctx.currentSessionId();
+  if (!sid) {
+    sendError(ctx.socket, "HELLO_REQUIRED", "send HELLO before any other frame");
+    return null;
+  }
+  const s = ctx.sessions.get(sid);
+  if (!s) {
+    sendError(ctx.socket, "HELLO_REQUIRED", "session no longer exists; re-HELLO");
+    return null;
+  }
+  return s;
+}
+
 /**
  * Main per-message entry point. Never throws: any unexpected error is turned
  * into an ERROR frame so one bad input doesn't kill the connection.
@@ -120,10 +184,6 @@ export function handleMessage(ctx: DispatchContext, raw: string): void {
   const frame = parsed.data;
 
   // --- 3. Protocol-version check -----------------------------------------
-  // Note: discriminated-union parsing already requires `v === PROTOCOL_VERSION`
-  // via the `z.literal(PROTOCOL_VERSION)` in each frame schema, so reaching
-  // this point implies v matches. We still check defensively so a future
-  // schema relaxation doesn't silently drop the guard.
   if (frame.v !== PROTOCOL_VERSION) {
     sendError(ctx.socket, "BAD_VERSION", `expected v=${PROTOCOL_VERSION}, got v=${frame.v}`);
     return;
@@ -149,7 +209,6 @@ export function handleMessage(ctx: DispatchContext, raw: string): void {
           );
           return;
         }
-        // Update display name / client version in case they rotated.
         resumed.displayName = frame.displayName;
         resumed.clientVersion = frame.clientVersion;
         ctx.setCurrentSessionId(resumed.id);
@@ -173,27 +232,331 @@ export function handleMessage(ctx: DispatchContext, raw: string): void {
       return;
     }
 
+    // -----------------------------------------------------------------
+    // Lobby / table management (M3d)
+    // -----------------------------------------------------------------
+
     case "LIST_TABLES": {
-      if (!currentId) {
-        sendError(ctx.socket, "HELLO_REQUIRED", "send HELLO before any other frame");
-        return;
-      }
-      // M3d will replace this with the real lobby listing.
-      sendFrame(ctx.socket, {
+      if (!requireSession(ctx)) return;
+      // The lobby summary already has every field we need; remap only to
+      // reshape `occupiedSeats` → `seatsTaken` for the wire protocol.
+      const tables: TableSummary[] = ctx.lobby.listSummaries().map((s) => ({
+        tableId: s.tableId,
+        ruleSet: s.ruleSet,
+        maxSeats: s.maxSeats,
+        seatsTaken: s.occupiedSeats,
+        phase: s.phase as TableSummary["phase"],
+        language: s.language,
+        dealerPersona: s.dealerPersona,
+      }));
+      const out: TableListFrame = {
         v: PROTOCOL_VERSION,
         type: "TABLE_LIST",
-        tables: [],
-      });
+        tables,
+      };
+      sendFrame(ctx.socket, out);
       return;
     }
 
-    // Everything below is stubbed — M3d for lobby/table, M4 for in-round.
-    case "CREATE_TABLE":
-    case "JOIN_TABLE":
-    case "LEAVE_TABLE":
-    case "CONFIGURE_TABLE":
-    case "CLAIM_SEAT":
-    case "RELEASE_SEAT":
+    case "CREATE_TABLE": {
+      if (!requireSession(ctx)) return;
+      const table = ctx.lobby.createTable({
+        ruleSet: frame.ruleSet,
+        maxSeats: frame.maxSeats,
+        dealerPersona: frame.dealerPersona,
+        language: frame.language,
+      });
+      const out: TableCreatedFrame = {
+        v: PROTOCOL_VERSION,
+        type: "TABLE_CREATED",
+        table: summaryOf(table),
+      };
+      sendFrame(ctx.socket, out);
+      return;
+    }
+
+    case "JOIN_TABLE": {
+      const session = requireSession(ctx);
+      if (!session) return;
+      const table = ctx.lobby.get(frame.tableId);
+      if (!table) {
+        sendError(ctx.socket, "NO_TABLE", `table ${frame.tableId} does not exist`);
+        return;
+      }
+      if (session.tableId !== null && session.tableId !== frame.tableId) {
+        sendError(
+          ctx.socket,
+          "ALREADY_IN_TABLE",
+          `already joined on table ${session.tableId}; LEAVE_TABLE first`,
+        );
+        return;
+      }
+      // Idempotent re-join on the same table: just resend TABLE_STATE.
+      if (session.tableId === frame.tableId) {
+        sendTableState(ctx, table);
+        return;
+      }
+
+      session.tableId = frame.tableId;
+      const claimed: number[] = [];
+      if (frame.seatRequest && frame.seatRequest.length > 0) {
+        for (const seatIndex of frame.seatRequest) {
+          if (seatIndex < 0 || seatIndex >= table.meta.maxSeats) {
+            sendError(
+              ctx.socket,
+              "BAD_SEAT_INDEX",
+              `seatIndex ${seatIndex} out of range for table ${table.meta.tableId}`,
+            );
+            continue;
+          }
+          if (table.seatOwners[seatIndex] !== null) {
+            sendError(
+              ctx.socket,
+              "SEAT_TAKEN",
+              `seat ${seatIndex} already owned`,
+            );
+            continue;
+          }
+          table.game.dispatch({
+            type: "CLAIM_SEAT",
+            seatIndex,
+            sessionId: session.id,
+            name: session.displayName,
+          });
+          table.seatOwners[seatIndex] = session.id;
+          if (!session.ownedSeats.includes(seatIndex)) {
+            session.ownedSeats.push(seatIndex);
+          }
+          claimed.push(seatIndex);
+        }
+      }
+
+      sendTableState(ctx, table);
+
+      // Announce each newly-claimed seat to the rest of the table.
+      for (const seatIndex of claimed) {
+        const seatSnap = table.game.getState().seats[seatIndex];
+        const assigned: SeatAssignedFrame = {
+          v: PROTOCOL_VERSION,
+          type: "SEAT_ASSIGNED",
+          seatIndex,
+          ownerSessionId: session.id,
+          playerName: seatSnap?.player.name ?? session.displayName,
+          bankroll: seatSnap?.player.bankroll ?? 0,
+        };
+        ctx.broadcastToTable(table.meta.tableId, assigned);
+      }
+      return;
+    }
+
+    case "LEAVE_TABLE": {
+      const session = requireSession(ctx);
+      if (!session) return;
+      if (session.tableId === null) {
+        sendError(ctx.socket, "NOT_IN_TABLE", "not currently joined on any table");
+        return;
+      }
+      const tableId = session.tableId;
+      const released = ctx.lobby.releaseSeatsFor(session.id, tableId);
+      // Clear the leaver's own state before broadcasting so the broadcast
+      // helper's "sessions joined on this table" filter excludes them.
+      session.tableId = null;
+      session.ownedSeats = [];
+      for (const { seatIndex } of released) {
+        const out: SeatReleasedFrame = {
+          v: PROTOCOL_VERSION,
+          type: "SEAT_RELEASED",
+          seatIndex,
+        };
+        ctx.broadcastToTable(tableId, out);
+      }
+      return;
+    }
+
+    case "CLAIM_SEAT": {
+      const session = requireSession(ctx);
+      if (!session) return;
+      if (session.tableId === null) {
+        sendError(
+          ctx.socket,
+          "NOT_IN_TABLE",
+          "JOIN_TABLE before CLAIM_SEAT",
+          frame.actionId,
+        );
+        return;
+      }
+      const table = ctx.lobby.get(session.tableId);
+      if (!table) {
+        sendError(ctx.socket, "NO_TABLE", "table vanished", frame.actionId);
+        return;
+      }
+      if (frame.seatIndex < 0 || frame.seatIndex >= table.meta.maxSeats) {
+        sendError(
+          ctx.socket,
+          "BAD_SEAT_INDEX",
+          `seatIndex ${frame.seatIndex} out of range`,
+          frame.actionId,
+        );
+        return;
+      }
+      if (table.seatOwners[frame.seatIndex] !== null) {
+        sendError(
+          ctx.socket,
+          "SEAT_TAKEN",
+          `seat ${frame.seatIndex} already owned`,
+          frame.actionId,
+        );
+        return;
+      }
+      const dispatchArgs: {
+        type: "CLAIM_SEAT";
+        seatIndex: number;
+        sessionId: string;
+        name: string;
+        bankroll?: number;
+      } = {
+        type: "CLAIM_SEAT",
+        seatIndex: frame.seatIndex,
+        sessionId: session.id,
+        name: frame.name,
+      };
+      if (frame.bankroll !== undefined) {
+        dispatchArgs.bankroll = frame.bankroll;
+      }
+      table.game.dispatch(dispatchArgs);
+      table.seatOwners[frame.seatIndex] = session.id;
+      if (!session.ownedSeats.includes(frame.seatIndex)) {
+        session.ownedSeats.push(frame.seatIndex);
+      }
+      const seatSnap = table.game.getState().seats[frame.seatIndex];
+      const assigned: SeatAssignedFrame = {
+        v: PROTOCOL_VERSION,
+        type: "SEAT_ASSIGNED",
+        seatIndex: frame.seatIndex,
+        ownerSessionId: session.id,
+        playerName: seatSnap?.player.name ?? frame.name,
+        bankroll: seatSnap?.player.bankroll ?? frame.bankroll ?? 0,
+      };
+      ctx.broadcastToTable(table.meta.tableId, assigned);
+      return;
+    }
+
+    case "RELEASE_SEAT": {
+      const session = requireSession(ctx);
+      if (!session) return;
+      if (session.tableId === null) {
+        sendError(
+          ctx.socket,
+          "NOT_IN_TABLE",
+          "JOIN_TABLE before RELEASE_SEAT",
+          frame.actionId,
+        );
+        return;
+      }
+      const table = ctx.lobby.get(session.tableId);
+      if (!table) {
+        sendError(ctx.socket, "NO_TABLE", "table vanished", frame.actionId);
+        return;
+      }
+      if (frame.seatIndex < 0 || frame.seatIndex >= table.meta.maxSeats) {
+        sendError(
+          ctx.socket,
+          "BAD_SEAT_INDEX",
+          `seatIndex ${frame.seatIndex} out of range`,
+          frame.actionId,
+        );
+        return;
+      }
+      if (table.seatOwners[frame.seatIndex] !== session.id) {
+        sendError(
+          ctx.socket,
+          "NOT_SEAT_OWNER",
+          `session does not own seat ${frame.seatIndex}`,
+          frame.actionId,
+        );
+        return;
+      }
+      const releaseArgs: {
+        type: "RELEASE_SEAT";
+        seatIndex: number;
+        becomeNpc?: boolean;
+        personality?: import("@blackjack/engine").NpcPersonality;
+      } = {
+        type: "RELEASE_SEAT",
+        seatIndex: frame.seatIndex,
+      };
+      if (frame.becomeNpc !== undefined) releaseArgs.becomeNpc = frame.becomeNpc;
+      if (frame.personality !== undefined) releaseArgs.personality = frame.personality;
+      table.game.dispatch(releaseArgs);
+      table.seatOwners[frame.seatIndex] = null;
+      session.ownedSeats = session.ownedSeats.filter((s) => s !== frame.seatIndex);
+      const out: SeatReleasedFrame = {
+        v: PROTOCOL_VERSION,
+        type: "SEAT_RELEASED",
+        seatIndex: frame.seatIndex,
+        ...(frame.becomeNpc !== undefined ? { becameNpc: frame.becomeNpc } : {}),
+        ...(frame.personality !== undefined ? { personality: frame.personality } : {}),
+      };
+      ctx.broadcastToTable(table.meta.tableId, out);
+      return;
+    }
+
+    case "CONFIGURE_TABLE": {
+      const session = requireSession(ctx);
+      if (!session) return;
+      if (session.tableId === null) {
+        sendError(ctx.socket, "NOT_IN_TABLE", "JOIN_TABLE before CONFIGURE_TABLE");
+        return;
+      }
+      const table = ctx.lobby.get(session.tableId);
+      if (!table) {
+        sendError(ctx.socket, "NO_TABLE", "table vanished");
+        return;
+      }
+      if (frame.seats.length > table.meta.maxSeats) {
+        sendError(
+          ctx.socket,
+          "TOO_MANY_SEATS",
+          `seats must be ≤ ${table.meta.maxSeats}`,
+        );
+        return;
+      }
+      table.game.dispatch({
+        type: "CONFIGURE_TABLE",
+        config: {
+          seats: frame.seats.map((s) => {
+            const out: {
+              kind: typeof s.kind;
+              name?: string;
+              personality?: typeof s.personality;
+              bankroll?: number;
+            } = { kind: s.kind };
+            if (s.name !== undefined) out.name = s.name;
+            if (s.personality !== undefined) out.personality = s.personality;
+            if (s.bankroll !== undefined) out.bankroll = s.bankroll;
+            return out;
+          }),
+        },
+      });
+      // CONFIGURE_TABLE is a bulk reset of seat layout; any previously-
+      // claimed ownership is invalidated because the engine rewrote the
+      // seat array. Clear server-side ownership too, and wipe every
+      // session's `ownedSeats` that references this table so the next
+      // CLAIM_SEAT starts from a clean slate.
+      table.seatOwners = new Array(table.meta.maxSeats).fill(null);
+      for (const s of ctx.sessions.all()) {
+        if (s.tableId === table.meta.tableId) {
+          s.ownedSeats = [];
+        }
+      }
+      broadcastTableState(ctx, table);
+      return;
+    }
+
+    // -----------------------------------------------------------------
+    // Round-phase actions — still stubbed until M4.
+    // -----------------------------------------------------------------
+
     case "PLACE_BET":
     case "HIT":
     case "STAND":
@@ -204,15 +567,12 @@ export function handleMessage(ctx: DispatchContext, raw: string): void {
     case "DECLINE_INSURANCE":
     case "GESTURE":
     case "NEW_ROUND": {
-      if (!currentId) {
-        sendError(ctx.socket, "HELLO_REQUIRED", "send HELLO before any other frame");
-        return;
-      }
+      if (!requireSession(ctx)) return;
       const actionIdRef = "actionId" in frame ? (frame as { actionId?: string }).actionId : undefined;
       sendError(
         ctx.socket,
         "NOT_IMPLEMENTED",
-        `${frame.type} will land in M3d (lobby/table) or M4 (game loop)`,
+        `${frame.type} will land in M4 (game loop)`,
         actionIdRef,
       );
       return;
