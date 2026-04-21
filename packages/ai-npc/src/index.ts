@@ -32,3 +32,12 @@ export type { CounterState } from "./hiLoCounter.js";
 
 export { decideBet } from "./betPolicies.js";
 export type { BetPolicyId, BetContext, BetPolicyResult } from "./betPolicies.js";
+
+export { PERSONALITIES } from "./personalities.js";
+export type { PersonalityConfig, DeviationRule } from "./personalities.js";
+
+export { updateTilt, passiveDecay, DEFAULT_TILT } from "./tilt.js";
+export type { TiltConfig } from "./tilt.js";
+
+export { PERSONALITY_TELLS, pickTell } from "./tells.js";
+export type { Tell, TellTrigger } from "./tells.js";
