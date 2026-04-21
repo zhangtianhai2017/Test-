@@ -6,6 +6,7 @@
     "packages/ai-npc",
     "packages/conformance",
     "packages/engine",
+    "packages/game-server",
     "packages/ui-3d",
     "packages/ui-cli",
     "packages/ui-web"
