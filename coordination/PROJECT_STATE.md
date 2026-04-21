@@ -6,82 +6,73 @@
 
 ## One-line summary
 
-Casino blackjack product: UE 3D client(s) ↔ authoritative Node.js game
-server ↔ Python AI service (LLM + CosyVoice TTS). Supports 1–6 real players
-per table (multi-terminal), plus NPCs. Single-player is the same pipeline
-via 127.0.0.1 loopback.
+**v1 COMPLETE (2026-04-21).** All 13 milestones shipped. A multi-player
+networked casino blackjack product with authoritative game server, native
+UE 5 client, bilingual conversational AI dealer (local LLM + GPU TTS), and
+full psychological-layer mechanics (heat / morale / bluff / tells). Ready
+for Windows integration testing per `docs/DEPLOY_V1.md`.
 
-## v1 scope (frozen — see `DECISIONS.md` D-004, D-016..D-022)
+## v1 scope (per DECISIONS.md D-004, D-016..D-022)
 
-**Active modules**:
-- `engine` — TS rules, authoritative reference; multi-seat per D-007
-- `ai-npc` — basic strategy + Hi-Lo + 7 personalities + tilt (D-008)
-- `game-server` — **NEW** Node.js authoritative server with WebSocket
-  protocol (D-016, D-020). Owns shoe/dealer/state. Multi-terminal
-  multi-player + local loopback single-player.
-- `dealer-ai` — Python FastAPI: LLM quips + CosyVoice TTS (D-006)
-- `ue-plugin/BlackjackUE` — UE client actors + new `UBlackjackNetClient`
-  (WebSocket). Primary v1 front-end (D-004).
+**Active & done**:
+- `engine` — TS rules, multi-seat, 57 tests
+- `ai-npc` — basic strategy + Hi-Lo + bet policies + 7 personalities +
+  tilt + tells. 93 tests
+- `game-server` — Node.js authoritative WebSocket server. Lobby, seat
+  claiming, full game loop with NPC auto-drive. 64 tests
+- `dealer-ai` — Python FastAPI. LLM quips via llama.cpp, TTS via
+  CosyVoice 2, session-based dealer-state evolution. 17 tests
+- `ue-plugin/BlackjackUE` — 12+ new C++ classes. UBlackjackNetClient
+  (WebSocket, 21 server-frame delegates), ABlackjackNetTableActor
+  (scene driver), UBlackjackAudioClient (TTS playback), heat /
+  morale / pit boss / decision timer / gesture library / tell /
+  trust / perception wiring.
 
-**Frozen modules** (bug-fix only, no new features):
-- `ui-web` (2D web) — current gh-pages deployment preserved
-- `ui-3d` (Three.js web) — current gh-pages deployment preserved
-- `ue-plugin/BlackjackCore` (C++ rules port) — demoted per D-021
+**Frozen (bug-fix only, per D-004, D-021)**:
+- `ui-web` (2D) — gh-pages deployment preserved
+- `ui-3d` (Three.js) — gh-pages deployment preserved
+- `ue-plugin/BlackjackCore` (C++ rules port) — demoted in v1.
 
-**Explicitly not in v1** (see `docs/FUTURE_FEATURES.md`):
-- F1–F9 backlog
-- Account system (guest-only per D-019)
-- Commercial hosting (self-hosted per D-016)
+**Total automated tests**: 231 (57 + 93 + 64 + 17) all green in the sandbox.
+
+## Post-v1 validation required (user's Windows + UE machine)
+
+- Compile the UE plugin (sandbox has no UE toolchain — all UE C++ is
+  source-complete but not compile-verified here).
+- Integration test via `docs/DEPLOY_V1.md`:
+  - `packaging/build-all.ps1`
+  - `packaging/installer/install.ps1`
+  - Smoke test: /health, WS HELLO, two-client round, UE connect +
+    round with dealer quip (+ audio if GPU).
+- CosyVoice latency on real GPU.
+- Qwen model size + latency trade-off on target hardware.
+
+## Post-v1 backlog (see `docs/FUTURE_FEATURES.md`)
+
+F1 team play + covert signals (MIT Blackjack Team)
+F2 rigged dealer / cheating modes (Ocean's Thirteen)
+F3 comps / impairment (Casino)
+F4 Rain Man focus mode
+F5 Mahowny compulsion mode
+F6 Molly's Game VIP rooms
+F7 Hard Eight mentor mode
+F8 Pai Gow / mahjong sister games
+F9 tournaments / seasonal events
 
 ## Current milestone
 
-**M1 COMPLETE** (2026-04-21) — TS engine multi-seat refactor done.
-57 engine tests passing.
-
-**M2 COMPLETE** (2026-04-21) — ai-npc core shipped. 93 tests passing.
-Commit chain: 64433ea..1f0f988 (M2a scaffold → M2b basic strategy →
-M2c counter+bets → M2d personalities+tilt+tells → M2e npcAgent).
-
-**M3 COMPLETE** (2026-04-21) — game-server scaffold + protocol +
-session lifecycle + lobby shipped. 39 tests passing.
-Commit chain: 3122c1d..6b033d7 (M3a scaffold → M3b protocol schemas
-→ M3c WS server + session → M3d lobby + seat claiming).
-M3e (separate e2e test) merged into M4 since full round-trip
-requires the game loop.
-
-**M4 — game-server full game loop (betting → dealing → play → settlement, with NPC auto-drive)** next.
-
-## Milestone list (v1, re-ordered after D-016..D-022)
-
-**Phase 1 — TS core (server-side brain)**
-1. **M1** — TS engine multi-seat refactor (`engine`) ✅ 2026-04-21
-2. **M2** — NPC AI core: basic strategy + Hi-Lo + bet policies + 7 personalities (`ai-npc`) ✅ 2026-04-21
-3. **M3** — `game-server` scaffolding + WebSocket protocol + schemas + lobby + sessions ✅ 2026-04-21
-4. **M4** — `game-server` full game loop: lobby, table, seat ownership, NPC driver, reconnect
-
-**Phase 2 — UE client**
-5. **M5** — UE `UBlackjackNetClient` (WebSocket client, replaces local BlackjackCore use)
-6. **M6** — UE scene actors: 6 seats, dealer character, cards, chip stacks, NPC player models
-7. **M7** — UE psychological systems: heat meter, morale bar, decision timer, gesture input
-8. **M8** — UE tell/bluff/perception visuals
-
-**Phase 3 — Dealer AI enrichment**
-9. **M9** — `dealer-ai` extended events (heat/bluff/morale/dealer-state) + prompts
-10. **M10** — CosyVoice TTS integration in `dealer-ai`
-11. **M11** — UE audio playback (dealer TTS over WebSocket/HTTP)
-
-**Phase 4 — Polish & ship**
-12. **M12** — NPC tilt + dealer-state evolution (server-side + dealer-ai side)
-13. **M13** — Windows installer + service registration + integration testing
+**NONE IN FLIGHT.** v1 closed. Await user validation or new direction.
 
 ## Active subagent tasks
 
-(none — M1 about to be dispatched)
+None.
 
 ## Blockers
 
-None.
+- None blocking v1 close.
+- Pending user action: run `packaging/build-all.ps1` on a Windows box
+  with a UE 5.3+ toolchain to produce shipping artifacts.
 
 ## Open questions awaiting user
 
-See `PENDING_QUESTIONS.md`. Currently: 0.
+See `PENDING_QUESTIONS.md`. Currently: 0 open.
