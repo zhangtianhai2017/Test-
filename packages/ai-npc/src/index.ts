@@ -15,3 +15,6 @@
 
 // Re-exports come in later milestones; M2a ships the skeleton only.
 export const __moduleScaffolded = true;
+
+export { decideBasicStrategy } from "./basicStrategy.js";
+export type { BSAction, BSInput } from "./basicStrategy.js";
