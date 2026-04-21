@@ -31,6 +31,16 @@ class EventType(str, Enum):
     STREAK_WIN = "STREAK_WIN"
     STREAK_LOSS = "STREAK_LOSS"
     IDLE = "IDLE"  # dealer small-talk between rounds
+    # --- Psychological layer (D-009) ---
+    PRESSURE_HESITATION = "PRESSURE_HESITATION"   # player has been deciding > 10s
+    PRESSURE_HEAT = "PRESSURE_HEAT"               # pit boss watching, heat threshold crossed
+    PRESSURE_TILT = "PRESSURE_TILT"               # player on visible tilt
+    BLUFF_CALLED = "BLUFF_CALLED"                 # NPC saw through player bluff
+    BLUFF_BELIEVED = "BLUFF_BELIEVED"             # NPC fell for player bluff
+    DEALER_STATE_CHANGED = "DEALER_STATE_CHANGED" # dealer fatigue/integrity shift
+    TELL_SPOTTED = "TELL_SPOTTED"                 # player spotted an NPC's tell
+    NPC_BIG_LOSS = "NPC_BIG_LOSS"                 # an NPC seat took a heavy loss
+    NPC_HOT_STREAK = "NPC_HOT_STREAK"             # an NPC seat on a winning streak
 
 
 class Outcome(str, Enum):
@@ -64,6 +74,14 @@ class GameState(BaseModel):
     rare_hand: str | None = None    # "5-card-21", "suited-trips", "QQ-hearts"
     player_name: str | None = None
     seat_index: int | None = None   # for multi-seat tables
+    # --- Psychological layer (D-009) optional fields ---
+    heat: int | None = None                  # 0-100, pit-boss awareness
+    morale: float | None = None              # 0.0-1.0 player mental state
+    gesture: str | None = None               # last player gesture: "confident"|"nervous"|...
+    trust_in_player: float | None = None     # 0.0-1.0 NPC trust scalar
+    dealer_state: str | None = None          # "fresh"|"seasoned"|"compromised"
+    acting_seat_name: str | None = None      # which seat triggered the event
+    bluff_kind: str | None = None            # "bet-size"|"gesture"|"post-bust"
     extra: dict[str, str | int | float | bool] = Field(default_factory=dict)
 
 

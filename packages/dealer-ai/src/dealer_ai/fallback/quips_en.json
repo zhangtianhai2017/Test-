@@ -83,5 +83,59 @@
     "Table's quiet. Take your time.",
     "Busy night.",
     "Regular? You look familiar."
+  ],
+  "PRESSURE_HESITATION": [
+    "Clock's ticking. Your call.",
+    "Still thinking? The deck won't wait.",
+    "Make your play.",
+    "Time, please."
+  ],
+  "PRESSURE_HEAT": [
+    "Pit's watching. Keep it clean.",
+    "Eyes on the table. Play it by the book.",
+    "The boss is walking this way.",
+    "Tighten up — we've got company."
+  ],
+  "PRESSURE_TILT": [
+    "Breathe. Don't chase it.",
+    "Steady hands, steady bets.",
+    "Take a beat before the next one.",
+    "Tilt only pays the house."
+  ],
+  "BLUFF_CALLED": [
+    "Nice try. I saw that coming.",
+    "Your eyes gave you away.",
+    "Not buying it.",
+    "Tell me another one."
+  ],
+  "BLUFF_BELIEVED": [
+    "The whole table bought it.",
+    "That was a clean act.",
+    "They never saw it coming.",
+    "Oscar-worthy, that one."
+  ],
+  "DEALER_STATE_CHANGED": [
+    "Something's different tonight.",
+    "I'm not quite the same dealer.",
+    "Call it a change of heart.",
+    "The game's still the same. I'm not."
+  ],
+  "TELL_SPOTTED": [
+    "Sharp eyes. You caught it.",
+    "Few people would've seen that.",
+    "Nice read.",
+    "You've done this before."
+  ],
+  "NPC_BIG_LOSS": [
+    "Rough hand for them.",
+    "That one stung.",
+    "The deck was cruel.",
+    "They'll shake it off."
+  ],
+  "NPC_HOT_STREAK": [
+    "Running hot over there.",
+    "Can't lose tonight, can they.",
+    "Someone's on fire.",
+    "Careful — streaks turn fast."
   ]
 }

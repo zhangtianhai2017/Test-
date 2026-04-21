@@ -22,6 +22,16 @@ _EVENT_HINT_ZH: dict[EventType, str] = {
     EventType.STREAK_WIN: "玩家连赢多把。",
     EventType.STREAK_LOSS: "玩家连输多把。",
     EventType.IDLE: "牌桌空档,随便聊一句。",
+    # --- Psychological layer ---
+    EventType.PRESSURE_HESITATION: "玩家犹豫良久,该催一催了。",
+    EventType.PRESSURE_HEAT: "Pit boss 在后面盯着,提高警觉。",
+    EventType.PRESSURE_TILT: "玩家情绪上头了,你可以激一下或劝一下(按人设)。",
+    EventType.BLUFF_CALLED: "你识破了玩家的虚张声势。",
+    EventType.BLUFF_BELIEVED: "玩家的表演骗过了你身边的 NPC。",
+    EventType.DEALER_STATE_CHANGED: "你的状态正在变化(新人/老江湖/被收买)。",
+    EventType.TELL_SPOTTED: "玩家看穿了某位 NPC 的小动作。",
+    EventType.NPC_BIG_LOSS: "某位 NPC 输了大一笔,说点什么。",
+    EventType.NPC_HOT_STREAK: "某位 NPC 连胜,可以调侃。",
 }
 
 _EVENT_HINT_EN: dict[EventType, str] = {
@@ -42,6 +52,16 @@ _EVENT_HINT_EN: dict[EventType, str] = {
     EventType.STREAK_WIN: "Player on a winning streak.",
     EventType.STREAK_LOSS: "Player on a losing streak.",
     EventType.IDLE: "Quiet moment at the table. Small talk.",
+    # --- Psychological layer ---
+    EventType.PRESSURE_HESITATION: "Player has stalled too long; nudge them.",
+    EventType.PRESSURE_HEAT: "Pit boss watching; stay sharp.",
+    EventType.PRESSURE_TILT: "Player is on tilt; needle or calm per persona.",
+    EventType.BLUFF_CALLED: "You saw through the player's bluff.",
+    EventType.BLUFF_BELIEVED: "The NPCs fell for the player's act.",
+    EventType.DEALER_STATE_CHANGED: "Your state is shifting (fresh/seasoned/compromised).",
+    EventType.TELL_SPOTTED: "Player just caught an NPC's tell.",
+    EventType.NPC_BIG_LOSS: "An NPC seat took a heavy loss; comment.",
+    EventType.NPC_HOT_STREAK: "An NPC seat is on a hot streak; tease a little.",
 }
 
 
@@ -67,6 +87,20 @@ def _fmt_state_zh(s: GameState) -> str:
         parts.append(f"连{'赢' if s.streak > 0 else '输'} {abs(s.streak)} 把")
     if s.rare_hand:
         parts.append(f"特殊牌型:{s.rare_hand}")
+    if s.acting_seat_name:
+        parts.append(f"当前座位:{s.acting_seat_name}")
+    if s.heat is not None:
+        parts.append(f"热度 {s.heat}")
+    if s.morale is not None:
+        parts.append(f"士气 {s.morale:.2f}")
+    if s.gesture:
+        parts.append(f"手势:{s.gesture}")
+    if s.trust_in_player is not None:
+        parts.append(f"NPC 信任度 {s.trust_in_player:.2f}")
+    if s.dealer_state:
+        parts.append(f"庄家状态:{s.dealer_state}")
+    if s.bluff_kind:
+        parts.append(f"虚张类型:{s.bluff_kind}")
     return "; ".join(parts) or "(无额外信息)"
 
 
@@ -92,6 +126,20 @@ def _fmt_state_en(s: GameState) -> str:
         parts.append(f"streak={'+' if s.streak > 0 else ''}{s.streak}")
     if s.rare_hand:
         parts.append(f"rare_hand={s.rare_hand}")
+    if s.acting_seat_name:
+        parts.append(f"acting_seat={s.acting_seat_name}")
+    if s.heat is not None:
+        parts.append(f"heat={s.heat}")
+    if s.morale is not None:
+        parts.append(f"morale={s.morale:.2f}")
+    if s.gesture:
+        parts.append(f"gesture={s.gesture}")
+    if s.trust_in_player is not None:
+        parts.append(f"trust={s.trust_in_player:.2f}")
+    if s.dealer_state:
+        parts.append(f"dealer_state={s.dealer_state}")
+    if s.bluff_kind:
+        parts.append(f"bluff_kind={s.bluff_kind}")
     return ", ".join(parts) or "(no extra info)"
 
 

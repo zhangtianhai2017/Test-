@@ -48,6 +48,15 @@ _MOCK_RESPONSES_ZH = {
     "PLAYER_SPLIT":      ["分牌分得干脆。", "拆开打,两手都有戏。"],
     "SIDEBET_JACKPOT":   ["边注爆奖了,这把今晚留名。", "这运气,我服。"],
     "ROUND_OVER":        ["结了,下一把?", "这把到这儿,续还是歇?"],
+    "PRESSURE_HESITATION": ["想好了吗,别让牌凉了。", "您这犹豫得,我都替您急。"],
+    "PRESSURE_HEAT":       ["楼上眼线多,动作规矩点。", "风声紧,收着打。"],
+    "PRESSURE_TILT":       ["深呼吸,别跟钱较劲。", "上头归上头,注别乱加。"],
+    "BLUFF_CALLED":        ["眼神露馅了,别装。", "这手虚的,我看穿了。"],
+    "BLUFF_BELIEVED":      ["这演技,全桌都信了。", "唬住了,漂亮。"],
+    "DEALER_STATE_CHANGED": ["今天我的状态,不一样了。", "规矩是规矩,人是会变的。"],
+    "TELL_SPOTTED":        ["您眼睛毒,这都看出来。", "行家一眼看穿。"],
+    "NPC_BIG_LOSS":        ["这位伤得重,缓缓。", "牌桌无情,再来过。"],
+    "NPC_HOT_STREAK":      ["这位今晚手感烫手。", "手气在他那儿,别眼红。"],
     "_default":          ["局面挺稳,您慢慢来。", "嗯,有意思。"],
 }
 _MOCK_RESPONSES_EN = {
@@ -60,6 +69,15 @@ _MOCK_RESPONSES_EN = {
     "PLAYER_SPLIT":      ["Split 'em.", "Two hands now."],
     "SIDEBET_JACKPOT":   ["Side bet hit big — nice.", "That payout's one to remember."],
     "ROUND_OVER":        ["Hand's done. Another?", "That's the round."],
+    "PRESSURE_HESITATION": ["Clock's ticking, your call.", "Make your play."],
+    "PRESSURE_HEAT":       ["Pit's watching, keep it clean.", "Eyes on us, by the book."],
+    "PRESSURE_TILT":       ["Breathe, don't chase it.", "Steady hands, steady bets."],
+    "BLUFF_CALLED":        ["Nice try, saw that coming.", "Not buying it."],
+    "BLUFF_BELIEVED":      ["The whole table bought it.", "That was a clean act."],
+    "DEALER_STATE_CHANGED": ["Something's different tonight.", "Call it a change of heart."],
+    "TELL_SPOTTED":        ["Sharp eyes, you caught it.", "Nice read."],
+    "NPC_BIG_LOSS":        ["Rough hand for them.", "That one stung."],
+    "NPC_HOT_STREAK":      ["Running hot over there.", "Someone's on fire."],
     "_default":          ["Table's steady.", "Take your time."],
 }
 # --------------------------------------------------
@@ -155,7 +173,9 @@ class LLMProvider:
         system = next((m["content"] for m in messages if m["role"] == "system"), "")
         lang_is_en = "English" in system or "English" in user
         bank = _MOCK_RESPONSES_EN if lang_is_en else _MOCK_RESPONSES_ZH
-        event_key = next((k for k in bank if k in user), "_default")
+        # Prefer the longest matching key so e.g. NPC_BIG_LOSS wins over BIG_LOSS.
+        matches = [k for k in bank if k != "_default" and k in user]
+        event_key = max(matches, key=len) if matches else "_default"
         lines = bank[event_key]
         idx = int(hashlib.md5(user.encode()).hexdigest()[:8], 16) % len(lines)
         # simulate tiny latency so front-end can see source=llm and a ms value

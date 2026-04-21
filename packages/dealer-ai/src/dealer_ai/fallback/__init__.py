@@ -21,6 +21,16 @@ _TONE_BY_EVENT: dict[EventType, Tone] = {
     EventType.PLAYER_SURRENDER: Tone.FRIENDLY,
     EventType.PLAYER_DOUBLE: Tone.TEASE,
     EventType.PLAYER_SPLIT: Tone.TEASE,
+    # --- Psychological layer ---
+    EventType.PRESSURE_HESITATION: Tone.TEASE,
+    EventType.PRESSURE_HEAT: Tone.NEUTRAL,
+    EventType.PRESSURE_TILT: Tone.NEUTRAL,
+    EventType.BLUFF_CALLED: Tone.TEASE,
+    EventType.BLUFF_BELIEVED: Tone.DRAMATIC,
+    EventType.DEALER_STATE_CHANGED: Tone.NEUTRAL,
+    EventType.TELL_SPOTTED: Tone.NEUTRAL,
+    EventType.NPC_BIG_LOSS: Tone.CONDOLE,
+    EventType.NPC_HOT_STREAK: Tone.FRIENDLY,
 }
 
 
