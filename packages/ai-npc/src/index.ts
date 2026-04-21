@@ -18,3 +18,17 @@ export const __moduleScaffolded = true;
 
 export { decideBasicStrategy } from "./basicStrategy.js";
 export type { BSAction, BSInput } from "./basicStrategy.js";
+
+export {
+  newCounter,
+  observe,
+  runningCount,
+  decksRemaining,
+  trueCount,
+  reset,
+  hiLoValue,
+} from "./hiLoCounter.js";
+export type { CounterState } from "./hiLoCounter.js";
+
+export { decideBet } from "./betPolicies.js";
+export type { BetPolicyId, BetContext, BetPolicyResult } from "./betPolicies.js";
