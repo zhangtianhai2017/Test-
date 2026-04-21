@@ -82,6 +82,7 @@ export interface HandResult {
   total: number;
   cards: readonly Card[];
   label?: string;
+  seatIndex?: number;
 }
 
 export type SeatKind = "empty" | "human" | "npc";
@@ -397,30 +398,31 @@ export function createGame(opts: CreateGameOptions = {}): Game {
   };
 
   const settleSideBets = (): void => {
-    const s = seats[activeSeatIndex]!;
-    const p = s.hands[0]!.cards;
-    if (s.sideBets.perfectPairs > 0) {
-      const r = evalPerfectPairs(p);
-      if (r.payout > 0) {
-        const payout = s.sideBets.perfectPairs * (r.payout + 1);
-        adjustBankroll(payout);
-        bus.emit({ type: "SIDEBET_WIN", kind: "perfectPairs", payout, label: r.label });
+    for (const s of activeSeats()) {
+      const p = s.hands[0]!.cards;
+      if (s.sideBets.perfectPairs > 0) {
+        const r = evalPerfectPairs(p);
+        if (r.payout > 0) {
+          const payout = s.sideBets.perfectPairs * (r.payout + 1);
+          adjustBankrollFor(s.index, payout);
+          bus.emit({ type: "SIDEBET_WIN", kind: "perfectPairs", payout, label: r.label });
+        }
       }
-    }
-    if (s.sideBets.twentyOneP3 > 0) {
-      const r = evalTwentyOnePlusThree(p, dealer[0]);
-      if (r.payout > 0) {
-        const payout = s.sideBets.twentyOneP3 * (r.payout + 1);
-        adjustBankroll(payout);
-        bus.emit({ type: "SIDEBET_WIN", kind: "21+3", payout, label: r.label });
+      if (s.sideBets.twentyOneP3 > 0) {
+        const r = evalTwentyOnePlusThree(p, dealer[0]);
+        if (r.payout > 0) {
+          const payout = s.sideBets.twentyOneP3 * (r.payout + 1);
+          adjustBankrollFor(s.index, payout);
+          bus.emit({ type: "SIDEBET_WIN", kind: "21+3", payout, label: r.label });
+        }
       }
-    }
-    if (s.sideBets.luckyLadies > 0) {
-      const r = evalLuckyLadies(p, dealer);
-      if (r.payout > 0) {
-        const payout = s.sideBets.luckyLadies * (r.payout + 1);
-        adjustBankroll(payout);
-        bus.emit({ type: "SIDEBET_WIN", kind: "luckyLadies", payout, label: r.label });
+      if (s.sideBets.luckyLadies > 0) {
+        const r = evalLuckyLadies(p, dealer);
+        if (r.payout > 0) {
+          const payout = s.sideBets.luckyLadies * (r.payout + 1);
+          adjustBankrollFor(s.index, payout);
+          bus.emit({ type: "SIDEBET_WIN", kind: "luckyLadies", payout, label: r.label });
+        }
       }
     }
   };
@@ -574,25 +576,48 @@ export function createGame(opts: CreateGameOptions = {}): Game {
     afterInsurance();
   };
 
+  const nextActiveSeatAfter = (idx: number): number | null => {
+    for (const s of seats) {
+      if (s.index > idx && s.player.kind !== "empty") return s.index;
+    }
+    return null;
+  };
+
   const advanceHand = (): void => {
-    const s = seat();
-    while (s.activeHandIndex < s.hands.length) {
-      const h = s.hands[s.activeHandIndex]!;
-      const v = evaluate(h.cards);
-      if (h.stood || h.surrendered || v.isBust) {
-        s.activeHandIndex++;
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const s = seats[activeSeatIndex]!;
+      while (s.activeHandIndex < s.hands.length) {
+        const h = s.hands[s.activeHandIndex]!;
+        const v = evaluate(h.cards);
+        if (h.stood || h.surrendered || v.isBust) {
+          s.activeHandIndex++;
+          continue;
+        }
+        return;
+      }
+      // No more playable hands on this seat; move on.
+      const n = nextActiveSeatAfter(activeSeatIndex);
+      if (n !== null) {
+        activeSeatIndex = n;
+        const next = seats[n]!;
+        if (next.activeHandIndex == null || next.activeHandIndex >= next.hands.length) {
+          next.activeHandIndex = 0;
+        }
+        // loop continues — handle any already-settled hands (e.g. split aces auto-stood)
         continue;
       }
+      dealerTurn();
       return;
     }
-    dealerTurn();
   };
 
   const dealerTurn = (): void => {
     setPhase("dealerTurn");
     revealHole();
-    const s = seat();
-    const anyLiveHand = s.hands.some((h) => !h.surrendered && !evaluate(h.cards).isBust);
+    const anyLiveHand = activeSeats().some((s) =>
+      s.hands.some((h) => !h.surrendered && !evaluate(h.cards).isBust),
+    );
     if (anyLiveHand) {
       while (dealerShouldHit(dealer, rules)) {
         const c = draw();
@@ -620,64 +645,77 @@ export function createGame(opts: CreateGameOptions = {}): Game {
 
   const settleAgainstDealer = (): void => {
     setPhase("settlement");
-    const s = seat();
     const dv = evaluate(dealer);
     const dealerBJ = isBlackjack(dealer);
-    const insurancePayout = dealerBJ && s.insuranceBet > 0 ? s.insuranceBet * (rules.insurancePays + 1) : 0;
-    if (insurancePayout > 0) adjustBankroll(insurancePayout);
 
-    for (let i = 0; i < s.hands.length; i++) {
-      const h = s.hands[i]!;
-      const v = evaluate(h.cards);
-      let outcome: Outcome = "loss";
-      let payout = 0;
-      let label: string | undefined;
+    for (const s of activeSeats()) {
+      const insurancePayout =
+        dealerBJ && s.insuranceBet > 0 ? s.insuranceBet * (rules.insurancePays + 1) : 0;
+      if (insurancePayout > 0) adjustBankrollFor(s.index, insurancePayout);
+    }
 
-      if (h.surrendered) {
-        outcome = "surrender";
-        payout = Math.floor(h.bet / 2);
-      } else if (v.isBust) {
-        outcome = "bust";
-        payout = 0;
-      } else if (isBlackjack(h.cards) && !h.splitFromAces) {
-        if (dealerBJ) {
-          outcome = "push";
-          payout = h.bet;
+    for (const s of activeSeats()) {
+      for (let i = 0; i < s.hands.length; i++) {
+        const h = s.hands[i]!;
+        const v = evaluate(h.cards);
+        let outcome: Outcome = "loss";
+        let payout = 0;
+        let label: string | undefined;
+
+        if (h.surrendered) {
+          outcome = "surrender";
+          payout = Math.floor(h.bet / 2);
+        } else if (v.isBust) {
+          outcome = "bust";
+          payout = 0;
+        } else if (isBlackjack(h.cards) && !h.splitFromAces) {
+          if (dealerBJ) {
+            outcome = "push";
+            payout = h.bet;
+          } else {
+            outcome = "blackjack";
+            payout = Math.floor(h.bet * (1 + rules.blackjackPays));
+          }
         } else {
-          outcome = "blackjack";
-          payout = Math.floor(h.bet * (1 + rules.blackjackPays));
+          const bonusMult = bonus21Multiplier(h);
+          if (dealerBJ) {
+            outcome = "loss";
+          } else if (dv.isBust) {
+            outcome = "win";
+            payout = h.bet * 2;
+          } else if (v.total > dv.total) {
+            outcome = "win";
+            payout = h.bet * 2;
+          } else if (v.total < dv.total) {
+            outcome = "loss";
+          } else {
+            outcome = "push";
+            payout = h.bet;
+          }
+          if (bonusMult > 0 && outcome === "win") {
+            const bonus = Math.floor(h.bet * bonusMult);
+            payout += bonus;
+            label = `Bonus 21 +${bonus}`;
+          }
+          if (rules.playerTotalsWinOver17 && outcome === "loss" && v.total >= 17 && v.total <= 21 && !dealerBJ && !v.isBust && v.total > dv.total) {
+            outcome = "win";
+            payout = h.bet * 2;
+          }
         }
-      } else {
-        const bonusMult = bonus21Multiplier(h);
-        if (dealerBJ) {
-          outcome = "loss";
-        } else if (dv.isBust) {
-          outcome = "win";
-          payout = h.bet * 2;
-        } else if (v.total > dv.total) {
-          outcome = "win";
-          payout = h.bet * 2;
-        } else if (v.total < dv.total) {
-          outcome = "loss";
-        } else {
-          outcome = "push";
-          payout = h.bet;
-        }
-        if (bonusMult > 0 && outcome === "win") {
-          const bonus = Math.floor(h.bet * bonusMult);
-          payout += bonus;
-          label = `Bonus 21 +${bonus}`;
-        }
-        if (rules.playerTotalsWinOver17 && outcome === "loss" && v.total >= 17 && v.total <= 21 && !dealerBJ && !v.isBust && v.total > dv.total) {
-          outcome = "win";
-          payout = h.bet * 2;
-        }
+
+        if (payout > 0) adjustBankrollFor(s.index, payout);
+        const res: HandResult = {
+          handIndex: i,
+          outcome,
+          payout,
+          total: v.total,
+          cards: h.cards.slice(),
+          label,
+          seatIndex: s.index,
+        };
+        roundResults.push(res);
+        bus.emit({ type: "BET_SETTLED", handIndex: i, outcome, payout });
       }
-
-      if (payout > 0) adjustBankroll(payout);
-      const res: HandResult = { handIndex: i, outcome, payout, total: v.total, cards: h.cards.slice(), label };
-      roundResults.push(res);
-      bus.emit({ type: "BET_SETTLED", handIndex: i, outcome, payout });
     }
 
     bus.emit({ type: "ROUND_OVER", results: roundResults.slice() });
@@ -689,15 +727,20 @@ export function createGame(opts: CreateGameOptions = {}): Game {
   };
 
   const newRound = (): void => {
-    const s = seat();
-    s.pendingBet = 0;
-    s.sideBets = { perfectPairs: 0, twentyOneP3: 0, luckyLadies: 0 };
-    s.insuranceBet = 0;
-    s.hands = [];
-    s.activeHandIndex = 0;
+    for (const s of activeSeats()) {
+      s.pendingBet = 0;
+      s.sideBets = { perfectPairs: 0, twentyOneP3: 0, luckyLadies: 0 };
+      s.insuranceBet = 0;
+      s.hands = [];
+      s.activeHandIndex = 0;
+      s.gestures = [];
+    }
     dealer = [];
     dealerHoleHidden = true;
     roundResults = [];
+    splitCount = 0;
+    const firstActive = activeSeats()[0];
+    activeSeatIndex = firstActive ? firstActive.index : 0;
     setPhase("betting");
   };
 
