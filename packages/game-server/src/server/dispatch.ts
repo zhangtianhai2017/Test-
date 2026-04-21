@@ -43,6 +43,7 @@ import {
 } from "../protocol/server.js";
 import type { SessionManager } from "../session/sessionManager.js";
 import type { Session } from "../session/session.js";
+import type { EventBridge } from "../table/eventBridge.js";
 
 /** Server build version string; surfaced in WELCOME. */
 export const SERVER_VERSION = "0.1.0";
@@ -63,6 +64,8 @@ export interface DispatchContext {
   setCurrentSessionId: (id: string | null) => void;
   /** Send a frame to every still-connected session joined on `tableId`. */
   broadcastToTable: (tableId: string, frame: ServerFrameType) => void;
+  /** Engine → wire event bridge; `attach` is called on table creation (M4a). */
+  bridge: EventBridge;
 }
 
 /**
@@ -266,6 +269,12 @@ export function handleMessage(ctx: DispatchContext, raw: string): void {
         dealerPersona: frame.dealerPersona,
         language: frame.language,
       });
+      // Attach the engine → wire event bridge so events from this table's
+      // game are broadcast to seated sessions (M4a). The unsubscribe handle
+      // is stashed on the table for future use (tables aren't explicitly
+      // deleted in v1, so a teardown call site doesn't exist yet).
+      const unsub = ctx.bridge.attach(table);
+      (table as unknown as { _bridgeUnsub?: () => void })._bridgeUnsub = unsub;
       const out: TableCreatedFrame = {
         v: PROTOCOL_VERSION,
         type: "TABLE_CREATED",
