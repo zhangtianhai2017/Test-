@@ -23,6 +23,56 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBlackjackConnectionStateChanged, 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBlackjackWelcome, const FString&, SessionId, int32, ReconnectGraceSeconds);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBlackjackServerError, const FString&, Code, const FString&, Message);
 
+// ---------------------------------------------------------------------------
+// Supporting enums / structs for client-originated frames (M5b.1).
+// `EBlackjackRuleSet` already lives in BlackjackTypes.h and is reused here.
+// ---------------------------------------------------------------------------
+
+UENUM(BlueprintType)
+enum class EBlackjackLanguage : uint8
+{
+    Chinese UMETA(DisplayName = "Chinese (zh)"),
+    English UMETA(DisplayName = "English (en)")
+};
+
+UENUM(BlueprintType)
+enum class EBlackjackGesture : uint8
+{
+    Confident,
+    Nervous,
+    PokerFace,
+    Taunt,
+    Sigh,
+    Celebrate
+};
+
+UENUM(BlueprintType)
+enum class EBlackjackSeatKind : uint8
+{
+    Empty,
+    Human,
+    Npc
+};
+
+USTRUCT(BlueprintType)
+struct FBlackjackSeatConfig
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Blackjack|Net")
+    EBlackjackSeatKind Kind = EBlackjackSeatKind::Empty;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Blackjack|Net")
+    FString Name;
+
+    /** One of the NpcPersonality wire values (e.g. "optimal", "chaser"). Only used when Kind == Npc. */
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Blackjack|Net")
+    FString Personality;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Blackjack|Net")
+    int32 Bankroll = 0;
+};
+
 /**
  * Authoritative game-server client. Always connects (single-player mode
  * connects to a locally-spawned server subprocess on 127.0.0.1). Handles
@@ -52,6 +102,68 @@ public:
 
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Blackjack|Net")
     FString GetSessionId() const { return SessionId; }
+
+    // -----------------------------------------------------------------------
+    // Client-originated frame senders (M5b.1).
+    //
+    // Every sender guards on `State == Connected` and silently drops (with a
+    // verbose log) if the socket is not ready; callers should consult
+    // `GetConnectionState()` before dispatching UI actions.
+    // -----------------------------------------------------------------------
+
+    // Lobby ------------------------------------------------------------------
+    UFUNCTION(BlueprintCallable, Category = "Blackjack|Net")
+    void ListTables();
+
+    UFUNCTION(BlueprintCallable, Category = "Blackjack|Net")
+    void CreateTable(EBlackjackRuleSet RuleSet, int32 MaxSeats, const FString& DealerPersona, EBlackjackLanguage Language);
+
+    UFUNCTION(BlueprintCallable, Category = "Blackjack|Net")
+    void JoinTable(const FString& TableId, const TArray<int32>& SeatRequest);
+
+    UFUNCTION(BlueprintCallable, Category = "Blackjack|Net")
+    void LeaveTable();
+
+    // Seat mgmt --------------------------------------------------------------
+    UFUNCTION(BlueprintCallable, Category = "Blackjack|Net")
+    void ConfigureTable(const TArray<FBlackjackSeatConfig>& Seats);
+
+    UFUNCTION(BlueprintCallable, Category = "Blackjack|Net")
+    void ClaimSeat(int32 SeatIndex, const FString& Name, int32 Bankroll);
+
+    UFUNCTION(BlueprintCallable, Category = "Blackjack|Net")
+    void ReleaseSeat(int32 SeatIndex, bool bBecomeNpc, const FString& Personality);
+
+    // Gameplay ---------------------------------------------------------------
+    UFUNCTION(BlueprintCallable, Category = "Blackjack|Net")
+    void SendPlaceBet(int32 SeatIndex, int32 Amount, int32 PerfectPairs, int32 TwentyOneP3, int32 LuckyLadies);
+
+    UFUNCTION(BlueprintCallable, Category = "Blackjack|Net")
+    void SendHit(int32 SeatIndex);
+
+    UFUNCTION(BlueprintCallable, Category = "Blackjack|Net")
+    void SendStand(int32 SeatIndex);
+
+    UFUNCTION(BlueprintCallable, Category = "Blackjack|Net")
+    void SendDouble(int32 SeatIndex);
+
+    UFUNCTION(BlueprintCallable, Category = "Blackjack|Net")
+    void SendSplit(int32 SeatIndex);
+
+    UFUNCTION(BlueprintCallable, Category = "Blackjack|Net")
+    void SendSurrender(int32 SeatIndex);
+
+    UFUNCTION(BlueprintCallable, Category = "Blackjack|Net")
+    void SendInsure(int32 SeatIndex, int32 Amount);
+
+    UFUNCTION(BlueprintCallable, Category = "Blackjack|Net")
+    void SendDeclineInsurance(int32 SeatIndex);
+
+    UFUNCTION(BlueprintCallable, Category = "Blackjack|Net")
+    void SendNewRound();
+
+    UFUNCTION(BlueprintCallable, Category = "Blackjack|Net")
+    void SendGesture(int32 SeatIndex, EBlackjackGesture Gesture);
 
     /** Fired on every state transition clients typically hook this for UI spinners. */
     UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
@@ -103,6 +215,20 @@ protected:
     // Frame helpers:
     void SendFrame(const FString& JsonStr);
     void DispatchFrame(const TSharedPtr<FJsonObject>& Frame);
+
+    // Small helper: build a base object with `v` + `type`, ready to have
+    // frame-specific fields appended before serialization.
+    TSharedRef<FJsonObject> MakeBaseFrame(const TCHAR* Type) const;
+
+    // Serialize + dispatch through SendFrame, with a Connected guard.
+    void SerializeAndSend(const TSharedRef<FJsonObject>& Obj, const TCHAR* TypeForLog);
+
+    // Wire-value converters. Must match the Zod enums in
+    // packages/game-server/src/protocol/frames.ts exactly.
+    static FString RuleSetToWire(EBlackjackRuleSet RuleSet);
+    static FString LanguageToWire(EBlackjackLanguage Lang);
+    static FString GestureToWire(EBlackjackGesture Gesture);
+    static FString SeatKindToWire(EBlackjackSeatKind Kind);
 
     // Teardown helper: unbind delegates, close socket, release TSharedPtr.
     void ReleaseSocket();

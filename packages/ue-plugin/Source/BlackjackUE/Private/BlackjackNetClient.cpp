@@ -339,3 +339,283 @@ void UBlackjackNetClient::DispatchFrame(const TSharedPtr<FJsonObject>& Frame)
     // HOLE_CARD_REVEALED, ROUND_OVER, BANKROLL_CHANGED, DEALER_QUIP, etc.
     UE_LOG(LogBlackjackNet, Verbose, TEXT("Frame not handled in M5a: %s"), *Type);
 }
+
+// ---------------------------------------------------------------------------
+// M5b.1 — client-originated frame senders.
+//
+// Each sender builds a TSharedPtr<FJsonObject>, serializes it, and routes
+// through the existing SendFrame() helper. When not Connected, we log and
+// silently drop (callers should consult GetConnectionState() first).
+// ---------------------------------------------------------------------------
+
+TSharedRef<FJsonObject> UBlackjackNetClient::MakeBaseFrame(const TCHAR* Type) const
+{
+    const TSharedRef<FJsonObject> Obj = MakeShared<FJsonObject>();
+    Obj->SetNumberField(TEXT("v"), static_cast<double>(PROTOCOL_VERSION));
+    Obj->SetStringField(TEXT("type"), Type);
+    return Obj;
+}
+
+void UBlackjackNetClient::SerializeAndSend(const TSharedRef<FJsonObject>& Obj, const TCHAR* TypeForLog)
+{
+    if (State != EBlackjackConnectionState::Connected)
+    {
+        UE_LOG(LogBlackjackNet, Verbose,
+            TEXT("Dropping outbound %s frame: connection state is %d (not Connected)."),
+            TypeForLog, static_cast<int32>(State));
+        return;
+    }
+
+    FString Out;
+    const TSharedRef<TJsonWriter<TCHAR>> Writer = TJsonWriterFactory<TCHAR>::Create(&Out);
+    FJsonSerializer::Serialize(Obj, Writer);
+    SendFrame(Out);
+}
+
+FString UBlackjackNetClient::RuleSetToWire(EBlackjackRuleSet RuleSet)
+{
+    switch (RuleSet)
+    {
+    case EBlackjackRuleSet::Vegas:      return TEXT("VEGAS");
+    case EBlackjackRuleSet::Spanish21:  return TEXT("SPANISH21");
+    case EBlackjackRuleSet::Pontoon:    return TEXT("PONTOON");
+    case EBlackjackRuleSet::SuperFun21: return TEXT("SUPER_FUN_21");
+    default:                            return TEXT("VEGAS");
+    }
+}
+
+FString UBlackjackNetClient::LanguageToWire(EBlackjackLanguage Lang)
+{
+    switch (Lang)
+    {
+    case EBlackjackLanguage::Chinese: return TEXT("zh");
+    case EBlackjackLanguage::English: return TEXT("en");
+    default:                          return TEXT("zh");
+    }
+}
+
+FString UBlackjackNetClient::GestureToWire(EBlackjackGesture Gesture)
+{
+    switch (Gesture)
+    {
+    case EBlackjackGesture::Confident: return TEXT("confident");
+    case EBlackjackGesture::Nervous:   return TEXT("nervous");
+    case EBlackjackGesture::PokerFace: return TEXT("poker-face");
+    case EBlackjackGesture::Taunt:     return TEXT("taunt");
+    case EBlackjackGesture::Sigh:      return TEXT("sigh");
+    case EBlackjackGesture::Celebrate: return TEXT("celebrate");
+    default:                           return TEXT("poker-face");
+    }
+}
+
+FString UBlackjackNetClient::SeatKindToWire(EBlackjackSeatKind Kind)
+{
+    switch (Kind)
+    {
+    case EBlackjackSeatKind::Empty: return TEXT("empty");
+    case EBlackjackSeatKind::Human: return TEXT("human");
+    case EBlackjackSeatKind::Npc:   return TEXT("npc");
+    default:                        return TEXT("empty");
+    }
+}
+
+// --- Lobby ------------------------------------------------------------------
+
+void UBlackjackNetClient::ListTables()
+{
+    const TSharedRef<FJsonObject> Obj = MakeBaseFrame(TEXT("LIST_TABLES"));
+    SerializeAndSend(Obj, TEXT("LIST_TABLES"));
+}
+
+void UBlackjackNetClient::CreateTable(EBlackjackRuleSet RuleSet, int32 MaxSeats, const FString& DealerPersona, EBlackjackLanguage Language)
+{
+    const TSharedRef<FJsonObject> Obj = MakeBaseFrame(TEXT("CREATE_TABLE"));
+    Obj->SetStringField(TEXT("ruleSet"), RuleSetToWire(RuleSet));
+    Obj->SetNumberField(TEXT("maxSeats"), static_cast<double>(MaxSeats));
+    Obj->SetStringField(TEXT("dealerPersona"), DealerPersona);
+    Obj->SetStringField(TEXT("language"), LanguageToWire(Language));
+    SerializeAndSend(Obj, TEXT("CREATE_TABLE"));
+}
+
+void UBlackjackNetClient::JoinTable(const FString& TableId, const TArray<int32>& SeatRequest)
+{
+    const TSharedRef<FJsonObject> Obj = MakeBaseFrame(TEXT("JOIN_TABLE"));
+    Obj->SetStringField(TEXT("tableId"), TableId);
+
+    // seatRequest is schema-optional but we always include it for the caller's
+    // benefit (explicit empty = "no preference").
+    TArray<TSharedPtr<FJsonValue>> SeatArray;
+    SeatArray.Reserve(SeatRequest.Num());
+    for (const int32 Seat : SeatRequest)
+    {
+        SeatArray.Add(MakeShared<FJsonValueNumber>(static_cast<double>(Seat)));
+    }
+    Obj->SetArrayField(TEXT("seatRequest"), SeatArray);
+
+    SerializeAndSend(Obj, TEXT("JOIN_TABLE"));
+}
+
+void UBlackjackNetClient::LeaveTable()
+{
+    const TSharedRef<FJsonObject> Obj = MakeBaseFrame(TEXT("LEAVE_TABLE"));
+    SerializeAndSend(Obj, TEXT("LEAVE_TABLE"));
+}
+
+// --- Seat management --------------------------------------------------------
+
+void UBlackjackNetClient::ConfigureTable(const TArray<FBlackjackSeatConfig>& Seats)
+{
+    const TSharedRef<FJsonObject> Obj = MakeBaseFrame(TEXT("CONFIGURE_TABLE"));
+
+    TArray<TSharedPtr<FJsonValue>> SeatArray;
+    SeatArray.Reserve(Seats.Num());
+    for (const FBlackjackSeatConfig& Seat : Seats)
+    {
+        const TSharedRef<FJsonObject> SeatObj = MakeShared<FJsonObject>();
+        SeatObj->SetStringField(TEXT("kind"), SeatKindToWire(Seat.Kind));
+
+        // Omit default / empty optional fields to minimize wire size and to
+        // avoid confusing the server with `""` / `0` defaults.
+        if (!Seat.Name.IsEmpty())
+        {
+            SeatObj->SetStringField(TEXT("name"), Seat.Name);
+        }
+        if (!Seat.Personality.IsEmpty())
+        {
+            SeatObj->SetStringField(TEXT("personality"), Seat.Personality);
+        }
+        if (Seat.Bankroll > 0)
+        {
+            SeatObj->SetNumberField(TEXT("bankroll"), static_cast<double>(Seat.Bankroll));
+        }
+
+        SeatArray.Add(MakeShared<FJsonValueObject>(SeatObj));
+    }
+    Obj->SetArrayField(TEXT("seats"), SeatArray);
+
+    SerializeAndSend(Obj, TEXT("CONFIGURE_TABLE"));
+}
+
+void UBlackjackNetClient::ClaimSeat(int32 SeatIndex, const FString& Name, int32 Bankroll)
+{
+    const TSharedRef<FJsonObject> Obj = MakeBaseFrame(TEXT("CLAIM_SEAT"));
+    Obj->SetNumberField(TEXT("seatIndex"), static_cast<double>(SeatIndex));
+    Obj->SetStringField(TEXT("name"), Name);
+    // `bankroll` is optional in the schema; only emit when the caller
+    // explicitly overrides (> 0).
+    if (Bankroll > 0)
+    {
+        Obj->SetNumberField(TEXT("bankroll"), static_cast<double>(Bankroll));
+    }
+    SerializeAndSend(Obj, TEXT("CLAIM_SEAT"));
+}
+
+void UBlackjackNetClient::ReleaseSeat(int32 SeatIndex, bool bBecomeNpc, const FString& Personality)
+{
+    const TSharedRef<FJsonObject> Obj = MakeBaseFrame(TEXT("RELEASE_SEAT"));
+    Obj->SetNumberField(TEXT("seatIndex"), static_cast<double>(SeatIndex));
+    if (bBecomeNpc)
+    {
+        Obj->SetBoolField(TEXT("becomeNpc"), true);
+        if (!Personality.IsEmpty())
+        {
+            Obj->SetStringField(TEXT("personality"), Personality);
+        }
+    }
+    SerializeAndSend(Obj, TEXT("RELEASE_SEAT"));
+}
+
+// --- Gameplay ---------------------------------------------------------------
+
+void UBlackjackNetClient::SendPlaceBet(int32 SeatIndex, int32 Amount, int32 PerfectPairs, int32 TwentyOneP3, int32 LuckyLadies)
+{
+    const TSharedRef<FJsonObject> Obj = MakeBaseFrame(TEXT("PLACE_BET"));
+    Obj->SetNumberField(TEXT("seatIndex"), static_cast<double>(SeatIndex));
+    Obj->SetNumberField(TEXT("amount"), static_cast<double>(Amount));
+
+    // Only include sideBets if at least one component is set — saves wire
+    // bandwidth and keeps the frame minimal for the common no-side-bet path.
+    if (PerfectPairs > 0 || TwentyOneP3 > 0 || LuckyLadies > 0)
+    {
+        const TSharedRef<FJsonObject> Side = MakeShared<FJsonObject>();
+        if (PerfectPairs > 0)
+        {
+            Side->SetNumberField(TEXT("perfectPairs"), static_cast<double>(PerfectPairs));
+        }
+        if (TwentyOneP3 > 0)
+        {
+            Side->SetNumberField(TEXT("twentyOneP3"), static_cast<double>(TwentyOneP3));
+        }
+        if (LuckyLadies > 0)
+        {
+            Side->SetNumberField(TEXT("luckyLadies"), static_cast<double>(LuckyLadies));
+        }
+        Obj->SetObjectField(TEXT("sideBets"), Side);
+    }
+
+    SerializeAndSend(Obj, TEXT("PLACE_BET"));
+}
+
+void UBlackjackNetClient::SendHit(int32 SeatIndex)
+{
+    const TSharedRef<FJsonObject> Obj = MakeBaseFrame(TEXT("HIT"));
+    Obj->SetNumberField(TEXT("seatIndex"), static_cast<double>(SeatIndex));
+    SerializeAndSend(Obj, TEXT("HIT"));
+}
+
+void UBlackjackNetClient::SendStand(int32 SeatIndex)
+{
+    const TSharedRef<FJsonObject> Obj = MakeBaseFrame(TEXT("STAND"));
+    Obj->SetNumberField(TEXT("seatIndex"), static_cast<double>(SeatIndex));
+    SerializeAndSend(Obj, TEXT("STAND"));
+}
+
+void UBlackjackNetClient::SendDouble(int32 SeatIndex)
+{
+    const TSharedRef<FJsonObject> Obj = MakeBaseFrame(TEXT("DOUBLE"));
+    Obj->SetNumberField(TEXT("seatIndex"), static_cast<double>(SeatIndex));
+    SerializeAndSend(Obj, TEXT("DOUBLE"));
+}
+
+void UBlackjackNetClient::SendSplit(int32 SeatIndex)
+{
+    const TSharedRef<FJsonObject> Obj = MakeBaseFrame(TEXT("SPLIT"));
+    Obj->SetNumberField(TEXT("seatIndex"), static_cast<double>(SeatIndex));
+    SerializeAndSend(Obj, TEXT("SPLIT"));
+}
+
+void UBlackjackNetClient::SendSurrender(int32 SeatIndex)
+{
+    const TSharedRef<FJsonObject> Obj = MakeBaseFrame(TEXT("SURRENDER"));
+    Obj->SetNumberField(TEXT("seatIndex"), static_cast<double>(SeatIndex));
+    SerializeAndSend(Obj, TEXT("SURRENDER"));
+}
+
+void UBlackjackNetClient::SendInsure(int32 SeatIndex, int32 Amount)
+{
+    const TSharedRef<FJsonObject> Obj = MakeBaseFrame(TEXT("INSURE"));
+    Obj->SetNumberField(TEXT("seatIndex"), static_cast<double>(SeatIndex));
+    Obj->SetNumberField(TEXT("amount"), static_cast<double>(Amount));
+    SerializeAndSend(Obj, TEXT("INSURE"));
+}
+
+void UBlackjackNetClient::SendDeclineInsurance(int32 SeatIndex)
+{
+    const TSharedRef<FJsonObject> Obj = MakeBaseFrame(TEXT("DECLINE_INSURANCE"));
+    Obj->SetNumberField(TEXT("seatIndex"), static_cast<double>(SeatIndex));
+    SerializeAndSend(Obj, TEXT("DECLINE_INSURANCE"));
+}
+
+void UBlackjackNetClient::SendNewRound()
+{
+    const TSharedRef<FJsonObject> Obj = MakeBaseFrame(TEXT("NEW_ROUND"));
+    SerializeAndSend(Obj, TEXT("NEW_ROUND"));
+}
+
+void UBlackjackNetClient::SendGesture(int32 SeatIndex, EBlackjackGesture Gesture)
+{
+    const TSharedRef<FJsonObject> Obj = MakeBaseFrame(TEXT("GESTURE"));
+    Obj->SetNumberField(TEXT("seatIndex"), static_cast<double>(SeatIndex));
+    Obj->SetStringField(TEXT("gesture"), GestureToWire(Gesture));
+    SerializeAndSend(Obj, TEXT("GESTURE"));
+}
