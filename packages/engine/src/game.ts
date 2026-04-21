@@ -630,6 +630,87 @@ export function createGame(opts: CreateGameOptions = {}): Game {
     newRound();
   };
 
+  const makeEmptySeat = (index: number): Seat => ({
+    index,
+    player: { id: `seat-${index}`, name: `Seat ${index + 1}`, kind: "empty", bankroll: 0 },
+    hands: [],
+    activeHandIndex: 0,
+    pendingBet: 0,
+    sideBets: { perfectPairs: 0, twentyOneP3: 0, luckyLadies: 0 },
+    insuranceBet: 0,
+    gestures: [],
+    tilt: 0,
+    ownerSessionId: null,
+  });
+
+  const claimSeat = (
+    seatIndex: number,
+    sessionId: string,
+    name: string,
+    bankroll?: number,
+  ): void => {
+    if (phase !== "betting") return err("ILLEGAL_ACTION", "Not in betting phase");
+    if (seatIndex < 0 || seatIndex >= maxSeats)
+      return err("BAD_SEAT_INDEX", `seatIndex must be 0-${maxSeats - 1}`);
+    while (seats.length <= seatIndex) {
+      seats.push(makeEmptySeat(seats.length));
+    }
+    const st = seats[seatIndex]!;
+    st.player = {
+      id: sessionId,
+      name,
+      kind: "human",
+      bankroll: bankroll ?? rules.startingBankroll,
+    };
+    st.ownerSessionId = sessionId;
+    st.hands = [];
+    st.activeHandIndex = 0;
+    st.pendingBet = 0;
+    st.sideBets = { perfectPairs: 0, twentyOneP3: 0, luckyLadies: 0 };
+    st.insuranceBet = 0;
+    st.gestures = [];
+    st.tilt = 0;
+    bus.emit({ type: "SEAT_CLAIMED", seatIndex, sessionId, playerName: name });
+  };
+
+  const releaseSeat = (
+    seatIndex: number,
+    becomeNpc?: boolean,
+    personality?: NpcPersonality,
+  ): void => {
+    if (phase !== "betting") return err("ILLEGAL_ACTION", "Not in betting phase");
+    if (seatIndex < 0 || seatIndex >= maxSeats)
+      return err("BAD_SEAT_INDEX", `seatIndex must be 0-${maxSeats - 1}`);
+    const st = seats[seatIndex];
+    if (!st) return err("BAD_SEAT_INDEX", `seatIndex ${seatIndex} not initialized`);
+    st.ownerSessionId = null;
+    if (becomeNpc) {
+      st.player.kind = "npc";
+      st.player.personality = personality ?? "optimal";
+    } else {
+      st.player.kind = "empty";
+      delete st.player.personality;
+    }
+    st.pendingBet = 0;
+    st.sideBets = { perfectPairs: 0, twentyOneP3: 0, luckyLadies: 0 };
+    st.insuranceBet = 0;
+    st.hands = [];
+    st.activeHandIndex = 0;
+    st.gestures = [];
+    st.tilt = 0;
+    bus.emit({ type: "SEAT_RELEASED", seatIndex });
+  };
+
+  const gestureAt = (seatIndex: number, gesture: Gesture): void => {
+    if (seatIndex < 0 || seatIndex >= maxSeats)
+      return err("BAD_SEAT_INDEX", `seatIndex must be 0-${maxSeats - 1}`);
+    const st = seats[seatIndex];
+    if (!st) return err("BAD_SEAT_INDEX", `seatIndex ${seatIndex} not initialized`);
+    st.gestures.push(gesture);
+    if (st.gestures.length > 10) st.gestures.shift();
+    bus.emit({ type: "GESTURE_MADE", seatIndex, gesture });
+  };
+
   return {
     getState: snapshot,
     on: (l) => bus.on(l),
@@ -655,12 +736,15 @@ export function createGame(opts: CreateGameOptions = {}): Game {
           return declineInsurance();
         case "NEW_ROUND":
           return phase === "roundOver" ? newRound() : err("ILLEGAL_ACTION", action.type);
-        case "CONFIGURE_TABLE":
         case "CLAIM_SEAT":
+          return claimSeat(action.seatIndex, action.sessionId, action.name, action.bankroll);
         case "RELEASE_SEAT":
-        case "PLACE_BET_FOR_SEAT":
+          return releaseSeat(action.seatIndex, action.becomeNpc, action.personality);
         case "GESTURE":
-          return err("UNIMPLEMENTED", `${action.type} pending M1c.2-4`);
+          return gestureAt(action.seatIndex, action.gesture);
+        case "CONFIGURE_TABLE":
+        case "PLACE_BET_FOR_SEAT":
+          return err("UNIMPLEMENTED", `${action.type} pending M1c.3`);
         case "SET_RULESET":
           return setRuleSet(action.preset);
         case "DEAL":
