@@ -252,3 +252,17 @@ resumes its seats. If not, seats revert to the table's configured fallback
 cancelled and replayed if the seat becomes NPC — NPC makes a new decision
 using ai-npc; if empty, round continues with that seat inactive.
 Affects: `game-server`
+
+## D-023 — Player actions target the active seat, not seat 0
+Date: 2026-04-21
+Status: confirmed (resolves Q-001)
+Context: M1d tests revealed that the `seat()` helper in game.ts was left
+pointing at `seats[0]` rather than `seats[activeSeatIndex]`. In the
+single-seat legacy case they are equal, so no existing test caught it;
+but in multi-seat play, HIT/STAND/DOUBLE/SPLIT/SURRENDER only ever
+mutate seat 0, so advancing past seat 0 stalls forever.
+Decision: Change the `seat()` helper to return `seats[activeSeatIndex]!`.
+This makes HIT/STAND/... route to whichever seat currently holds the
+turn. Preserves single-seat legacy semantics (activeSeatIndex = 0 in
+that mode). Supersedes nothing, just a bug fix.
+Affects: `engine`. Scheduled as M1c.5. Un-skips multiSeat.test.ts #12/#13.

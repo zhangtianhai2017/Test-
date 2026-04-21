@@ -198,7 +198,7 @@ export function createGame(opts: CreateGameOptions = {}): Game {
   let roundResults: HandResult[] = [];
   let splitCount = 0;
 
-  const seat = (): Seat => seats[0]!;
+  const seat = (): Seat => seats[activeSeatIndex]!;
 
   const setPhase = (p: Phase): void => {
     if (phase !== p) {

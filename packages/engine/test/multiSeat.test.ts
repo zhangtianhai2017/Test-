@@ -250,7 +250,7 @@ describe("multi-seat: deal + play", () => {
   // stand()/hit()/etc. are hardcoded to seats[0], so a multi-seat round
   // cannot be driven to "roundOver" via the legacy STAND action once
   // more than one seat is active.
-  it.skip("three-seat round: claim 3 seats, bet each, STAND everyone, settle with 3 roundResults", () => {
+  it("three-seat round: claim 3 seats, bet each, STAND everyone, settle with 3 roundResults", () => {
     // Start fresh: CONFIGURE_TABLE with 3 humans so we can drive STAND for each via legacy HIT/STAND
     // (HIT/STAND act on seat(0); advanceHand progresses through seats).
     // But HIT/STAND target seat 0 — confirm by reading game.ts:
@@ -312,7 +312,7 @@ describe("multi-seat: deal + play", () => {
   // cannot be driven to "roundOver" via the legacy STAND action once
   // more than one seat is active — per-seat bankroll outcomes cannot be
   // observed until Q-001 is resolved.
-  it.skip("each seat's bankroll changes independently based on outcome", () => {
+  it("each seat's bankroll changes independently based on outcome", () => {
     const g = createGame({ seed: 42 });
     // Use CLAIM_SEAT so we control per-seat bankroll.
     // seat 0 default human already exists — overwrite via CLAIM_SEAT.
