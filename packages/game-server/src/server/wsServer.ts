@@ -27,6 +27,7 @@ import { PROTOCOL_VERSION } from "../protocol/frames.js";
 import type { SeatReleasedFrame, ServerFrame } from "../protocol/server.js";
 import { createSessionManager, type SessionManager } from "../session/sessionManager.js";
 import { createEventBridge, type EventBridge } from "../table/eventBridge.js";
+import { createNpcDriver, type NpcDriver } from "../table/npcDriver.js";
 import { handleMessage, sendFrame, type DispatchContext } from "./dispatch.js";
 
 /** Handle returned from `startGameServer`. Used by the entry point + tests. */
@@ -89,6 +90,9 @@ export function startGameServer(opts: StartOptions = {}): Promise<GameServerHand
   // Engine → wire event bridge. Attached per-table on CREATE_TABLE (M4a).
   const bridge: EventBridge = createEventBridge(broadcastToTable);
 
+  // NPC auto-driver. Also attached per-table on CREATE_TABLE (M4c).
+  const npcDriver: NpcDriver = createNpcDriver();
+
   // When a session's grace window expires, release any seats it still owns
   // and notify the rest of the table. This lives here (rather than in the
   // session manager) so the manager stays lobby-ignorant.
@@ -139,6 +143,7 @@ export function startGameServer(opts: StartOptions = {}): Promise<GameServerHand
       },
       broadcastToTable,
       bridge,
+      npcDriver,
     };
 
     socket.on("message", (data, isBinary) => {

@@ -44,6 +44,7 @@ import {
 import type { SessionManager } from "../session/sessionManager.js";
 import type { Session } from "../session/session.js";
 import type { EventBridge } from "../table/eventBridge.js";
+import type { NpcDriver } from "../table/npcDriver.js";
 
 /** Server build version string; surfaced in WELCOME. */
 export const SERVER_VERSION = "0.1.0";
@@ -66,6 +67,8 @@ export interface DispatchContext {
   broadcastToTable: (tableId: string, frame: ServerFrameType) => void;
   /** Engine → wire event bridge; `attach` is called on table creation (M4a). */
   bridge: EventBridge;
+  /** NPC auto-driver; `attach` is called on table creation (M4c). */
+  npcDriver: NpcDriver;
 }
 
 /**
@@ -329,6 +332,11 @@ export function handleMessage(ctx: DispatchContext, raw: string): void {
       // deleted in v1, so a teardown call site doesn't exist yet).
       const unsub = ctx.bridge.attach(table);
       (table as unknown as { _bridgeUnsub?: () => void })._bridgeUnsub = unsub;
+      // Also attach the NPC auto-driver (M4c). Stash its unsubscribe on the
+      // same table handle; tables aren't explicitly deleted in v1, so a
+      // teardown call site doesn't exist yet.
+      const npcUnsub = ctx.npcDriver.attach(table);
+      (table as unknown as { _npcDriverUnsub?: () => void })._npcDriverUnsub = npcUnsub;
       const out: TableCreatedFrame = {
         v: PROTOCOL_VERSION,
         type: "TABLE_CREATED",
@@ -612,6 +620,9 @@ export function handleMessage(ctx: DispatchContext, raw: string): void {
           s.ownedSeats = [];
         }
       }
+      // CONFIGURE_TABLE doesn't emit an engine event, so nudge the NPC
+      // driver so it re-scans the now-replaced seat layout (M4c).
+      ctx.npcDriver.notifyTableConfigured(table);
       broadcastTableState(ctx, table);
       return;
     }
