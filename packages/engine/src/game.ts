@@ -182,7 +182,7 @@ export function createGame(opts: CreateGameOptions = {}): Game {
     },
   ];
   const activeSeatIndex = 0;
-  const humanSeatIndex: number | null = 0;
+  let humanSeatIndex: number | null = 0;
 
   let phase: Phase = "betting";
   let dealer: Card[] = [];
@@ -199,9 +199,15 @@ export function createGame(opts: CreateGameOptions = {}): Game {
     }
   };
 
+  const adjustBankrollFor = (seatIndex: number, delta: number): void => {
+    const st = seats[seatIndex];
+    if (!st) return;
+    st.player.bankroll += delta;
+    bus.emit({ type: "BANKROLL_CHANGED", bankroll: st.player.bankroll, delta });
+  };
+
   const adjustBankroll = (delta: number): void => {
-    seats[0]!.player.bankroll += delta;
-    bus.emit({ type: "BANKROLL_CHANGED", bankroll: seats[0]!.player.bankroll, delta });
+    adjustBankrollFor(0, delta);
   };
 
   const legalActions = (): ActionType[] => {
@@ -276,22 +282,56 @@ export function createGame(opts: CreateGameOptions = {}): Game {
     return c;
   };
 
-  const placeBet = (amount: number, sb?: Partial<SideBets>): void => {
-    if (phase !== "betting") return err("ILLEGAL_ACTION", "Not in betting phase");
-    if (amount < rules.minBet || amount > rules.maxBet)
-      return err("BET_OUT_OF_RANGE", `bet must be ${rules.minBet}-${rules.maxBet}`);
+  const applyBetForSeat = (
+    seatIndex: number,
+    amount: number,
+    sb?: Partial<SideBets>,
+  ): boolean => {
+    if (phase !== "betting") {
+      err("ILLEGAL_ACTION", "Not in betting phase");
+      return false;
+    }
+    if (seatIndex < 0 || seatIndex >= seats.length) {
+      err("BAD_SEAT_INDEX", `seatIndex must be 0-${seats.length - 1}`);
+      return false;
+    }
+    const st = seats[seatIndex]!;
+    if (st.player.kind === "empty") {
+      err("SEAT_EMPTY", `seat ${seatIndex} is empty`);
+      return false;
+    }
+    if (amount < rules.minBet || amount > rules.maxBet) {
+      err("BET_OUT_OF_RANGE", `bet must be ${rules.minBet}-${rules.maxBet}`);
+      return false;
+    }
     const sbAmt = (sb?.perfectPairs ?? 0) + (sb?.twentyOneP3 ?? 0) + (sb?.luckyLadies ?? 0);
-    const s = seat();
-    if (amount + sbAmt > s.player.bankroll) return err("INSUFFICIENT_FUNDS", "Not enough bankroll");
-    s.pendingBet = amount;
-    s.sideBets = {
+    if (amount + sbAmt > st.player.bankroll) {
+      err("INSUFFICIENT_FUNDS", "Not enough bankroll");
+      return false;
+    }
+    st.pendingBet = amount;
+    st.sideBets = {
       perfectPairs: sb?.perfectPairs ?? 0,
       twentyOneP3: sb?.twentyOneP3 ?? 0,
       luckyLadies: sb?.luckyLadies ?? 0,
     };
-    adjustBankroll(-(amount + sbAmt));
-    bus.emit({ type: "BET_PLACED", amount, sideBets: s.sideBets });
+    adjustBankrollFor(seatIndex, -(amount + sbAmt));
+    bus.emit({ type: "BET_PLACED", amount, sideBets: st.sideBets });
+    return true;
+  };
+
+  const placeBet = (amount: number, sb?: Partial<SideBets>): void => {
+    const target = humanSeatIndex ?? 0;
+    if (!applyBetForSeat(target, amount, sb)) return;
     deal();
+  };
+
+  const placeBetForSeat = (
+    seatIndex: number,
+    amount: number,
+    sb?: Partial<SideBets>,
+  ): void => {
+    applyBetForSeat(seatIndex, amount, sb);
   };
 
   const deal = (): void => {
@@ -701,6 +741,31 @@ export function createGame(opts: CreateGameOptions = {}): Game {
     bus.emit({ type: "SEAT_RELEASED", seatIndex });
   };
 
+  const configureTable = (config: TableConfig): void => {
+    if (phase !== "betting") return err("ILLEGAL_ACTION", "Not in betting phase");
+    if (config.seats.length > maxSeats)
+      return err("TOO_MANY_SEATS", `seats must be ≤ ${maxSeats}`);
+
+    seats.length = 0;
+    let firstHuman: number | null = null;
+    for (let i = 0; i < config.seats.length; i++) {
+      const cfg = config.seats[i]!;
+      const st = makeEmptySeat(i);
+      st.player.kind = cfg.kind;
+      st.player.name = cfg.name ?? `Seat ${i + 1}`;
+      if (cfg.personality !== undefined) {
+        st.player.personality = cfg.personality;
+      }
+      st.player.bankroll = cfg.bankroll ?? rules.startingBankroll;
+      st.ownerSessionId = cfg.ownerSessionId ?? null;
+      seats.push(st);
+      if (cfg.kind === "human" && firstHuman === null) {
+        firstHuman = i;
+      }
+    }
+    humanSeatIndex = firstHuman;
+  };
+
   const gestureAt = (seatIndex: number, gesture: Gesture): void => {
     if (seatIndex < 0 || seatIndex >= maxSeats)
       return err("BAD_SEAT_INDEX", `seatIndex must be 0-${maxSeats - 1}`);
@@ -743,8 +808,9 @@ export function createGame(opts: CreateGameOptions = {}): Game {
         case "GESTURE":
           return gestureAt(action.seatIndex, action.gesture);
         case "CONFIGURE_TABLE":
+          return configureTable(action.config);
         case "PLACE_BET_FOR_SEAT":
-          return err("UNIMPLEMENTED", `${action.type} pending M1c.3`);
+          return placeBetForSeat(action.seatIndex, action.amount, action.sideBets);
         case "SET_RULESET":
           return setRuleSet(action.preset);
         case "DEAL":
