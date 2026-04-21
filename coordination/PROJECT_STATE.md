@@ -36,15 +36,19 @@ via 127.0.0.1 loopback.
 ## Current milestone
 
 **M1 COMPLETE** (2026-04-21) — TS engine multi-seat refactor done.
-See sessions/2026-04-21-session-1.md for commit chain. 57 tests passing.
+57 engine tests passing.
 
-**M2 — NPC AI core** next.
+**M2 COMPLETE** (2026-04-21) — ai-npc core shipped. 93 tests passing.
+Commit chain: 64433ea..1f0f988 (M2a scaffold → M2b basic strategy →
+M2c counter+bets → M2d personalities+tilt+tells → M2e npcAgent).
+
+**M3 — game-server scaffold (Node.js + WebSocket protocol)** next.
 
 ## Milestone list (v1, re-ordered after D-016..D-022)
 
 **Phase 1 — TS core (server-side brain)**
 1. **M1** — TS engine multi-seat refactor (`engine`) ✅ 2026-04-21
-2. **M2** — NPC AI core: basic strategy + Hi-Lo + bet policies + 7 personalities (`ai-npc`)
+2. **M2** — NPC AI core: basic strategy + Hi-Lo + bet policies + 7 personalities (`ai-npc`) ✅ 2026-04-21
 3. **M3** — `game-server` scaffolding + WebSocket protocol + schemas
 4. **M4** — `game-server` full game loop: lobby, table, seat ownership, NPC driver, reconnect
 
