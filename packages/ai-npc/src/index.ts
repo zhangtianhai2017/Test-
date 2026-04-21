@@ -41,3 +41,6 @@ export type { TiltConfig } from "./tilt.js";
 
 export { PERSONALITY_TELLS, pickTell } from "./tells.js";
 export type { Tell, TellTrigger } from "./tells.js";
+
+export { npcDecidePlay, npcDecideBet } from "./npcAgent.js";
+export type { NpcPlayInput, NpcBetInput } from "./npcAgent.js";
