@@ -709,9 +709,328 @@ void UBlackjackNetClient::DispatchFrame(const TSharedPtr<FJsonObject>& Frame)
         return;
     }
 
-    // M5b will route: TABLE_STATE, CARD_DEALT, PHASE_CHANGED, SEAT_ASSIGNED,
-    // HOLE_CARD_REVEALED, ROUND_OVER, BANKROLL_CHANGED, DEALER_QUIP, etc.
-    UE_LOG(LogBlackjackNet, Verbose, TEXT("Frame not handled in M5a: %s"), *Type);
+    // -----------------------------------------------------------------------
+    // M5b.2c — server-originated frame routing. Each branch parses the JSON
+    // via the M5b.2b helpers (or inline TryGet* for trivially flat frames)
+    // and broadcasts the matching delegate. Unknown frames fall through to
+    // the verbose catch-all at the bottom.
+    // -----------------------------------------------------------------------
+
+    if (Type == TEXT("TABLE_LIST"))
+    {
+        TArray<FBlackjackTableSummary> Tables;
+        const TArray<TSharedPtr<FJsonValue>>* TablesArray = nullptr;
+        if (Frame->TryGetArrayField(TEXT("tables"), TablesArray) && TablesArray)
+        {
+            Tables.Reserve(TablesArray->Num());
+            for (const TSharedPtr<FJsonValue>& V : *TablesArray)
+            {
+                if (V.IsValid())
+                {
+                    Tables.Add(ParseTableSummary(V->AsObject()));
+                }
+            }
+        }
+        OnTableList.Broadcast(Tables);
+        return;
+    }
+
+    if (Type == TEXT("TABLE_CREATED"))
+    {
+        const TSharedPtr<FJsonObject>* TableObj = nullptr;
+        FBlackjackTableSummary Summary;
+        if (Frame->TryGetObjectField(TEXT("table"), TableObj) && TableObj && TableObj->IsValid())
+        {
+            Summary = ParseTableSummary(*TableObj);
+        }
+        OnTableCreated.Broadcast(Summary);
+        return;
+    }
+
+    if (Type == TEXT("TABLE_STATE"))
+    {
+        const FBlackjackTableStateSnapshot Snapshot = ParseTableStateSnapshot(Frame);
+        OnTableState.Broadcast(Snapshot);
+        return;
+    }
+
+    if (Type == TEXT("TABLE_DELTA"))
+    {
+        int32 Seq = 0;
+        Frame->TryGetNumberField(TEXT("seq"), Seq);
+
+        // `patch` is intentionally opaque (shallow merge against last TABLE_STATE).
+        // Re-serialize it so Blueprints can hand it off to UI/diagnostic layers.
+        FString PatchJson;
+        const TSharedPtr<FJsonObject>* PatchObj = nullptr;
+        if (Frame->TryGetObjectField(TEXT("patch"), PatchObj) && PatchObj && PatchObj->IsValid())
+        {
+            const TSharedRef<TJsonWriter<TCHAR>> Writer =
+                TJsonWriterFactory<TCHAR>::Create(&PatchJson);
+            FJsonSerializer::Serialize(PatchObj->ToSharedRef(), Writer);
+        }
+        OnTableDelta.Broadcast(Seq, PatchJson);
+        return;
+    }
+
+    if (Type == TEXT("SEAT_ASSIGNED"))
+    {
+        int32 SeatIndex = -1;
+        Frame->TryGetNumberField(TEXT("seatIndex"), SeatIndex);
+
+        // Wire field is `ownerSessionId`; delegate surfaces it as OwnerClientId
+        // for the game-side naming. Same value semantically.
+        FString OwnerClientId;
+        Frame->TryGetStringField(TEXT("ownerSessionId"), OwnerClientId);
+
+        OnSeatAssigned.Broadcast(SeatIndex, OwnerClientId);
+        return;
+    }
+
+    if (Type == TEXT("SEAT_RELEASED"))
+    {
+        int32 SeatIndex = -1;
+        Frame->TryGetNumberField(TEXT("seatIndex"), SeatIndex);
+
+        bool bBecameNpc = false;
+        Frame->TryGetBoolField(TEXT("becameNpc"), bBecameNpc);
+
+        FString Personality;
+        Frame->TryGetStringField(TEXT("personality"), Personality);
+
+        OnSeatReleased.Broadcast(SeatIndex, bBecameNpc, Personality);
+        return;
+    }
+
+    if (Type == TEXT("PHASE_CHANGED"))
+    {
+        FString PhaseStr;
+        Frame->TryGetStringField(TEXT("phase"), PhaseStr);
+        OnPhaseChanged.Broadcast(PhaseFromWire(PhaseStr));
+        return;
+    }
+
+    if (Type == TEXT("CARD_DEALT"))
+    {
+        FString ToStr;
+        Frame->TryGetStringField(TEXT("to"), ToStr);
+        const EBlackjackTarget Target = DealTargetFromWire(ToStr);
+
+        // `seatIndex` is absent for dealer deals; default to -1 (BP-friendly
+        // sentinel meaning "not applicable").
+        int32 SeatIndex = -1;
+        Frame->TryGetNumberField(TEXT("seatIndex"), SeatIndex);
+
+        int32 HandIndex = 0;
+        Frame->TryGetNumberField(TEXT("handIndex"), HandIndex);
+
+        bool bFaceDown = false;
+        Frame->TryGetBoolField(TEXT("faceDown"), bFaceDown);
+
+        // `card` is stripped from the wire when faceDown==true (see
+        // CardDealtFrame.superRefine). Synthesize a placeholder payload so
+        // downstream consumers never see an uninitialized struct.
+        FBlackjackCardPayload Card;
+        const TSharedPtr<FJsonObject>* CardObj = nullptr;
+        if (Frame->TryGetObjectField(TEXT("card"), CardObj) && CardObj && CardObj->IsValid())
+        {
+            Card = ParseCardPayload(*CardObj);
+        }
+        else
+        {
+            Card.bFaceDown = true;
+        }
+
+        OnCardDealt.Broadcast(Target, SeatIndex, HandIndex, Card, bFaceDown);
+        return;
+    }
+
+    if (Type == TEXT("HOLE_CARD_REVEALED"))
+    {
+        FBlackjackCardPayload Card;
+        const TSharedPtr<FJsonObject>* CardObj = nullptr;
+        if (Frame->TryGetObjectField(TEXT("card"), CardObj) && CardObj && CardObj->IsValid())
+        {
+            Card = ParseCardPayload(*CardObj);
+        }
+        OnHoleCardRevealed.Broadcast(Card);
+        return;
+    }
+
+    if (Type == TEXT("PLAYER_ACTION"))
+    {
+        int32 SeatIndex = -1;
+        Frame->TryGetNumberField(TEXT("seatIndex"), SeatIndex);
+
+        int32 HandIndex = 0;
+        Frame->TryGetNumberField(TEXT("handIndex"), HandIndex);
+
+        // Server sends action as an UPPERCASE enum literal ("HIT", "STAND", ...);
+        // `ActionFromWire` expects lowercase, so normalize first.
+        FString ActionStr;
+        Frame->TryGetStringField(TEXT("action"), ActionStr);
+        const EBlackjackAction Action = ActionFromWire(ActionStr.ToLower());
+
+        OnPlayerAction.Broadcast(SeatIndex, Action, HandIndex);
+        return;
+    }
+
+    if (Type == TEXT("HAND_BUST"))
+    {
+        int32 SeatIndex = -1;
+        int32 HandIndex = 0;
+        Frame->TryGetNumberField(TEXT("seatIndex"), SeatIndex);
+        Frame->TryGetNumberField(TEXT("handIndex"), HandIndex);
+        OnHandBust.Broadcast(SeatIndex, HandIndex);
+        return;
+    }
+
+    if (Type == TEXT("NATURAL_BLACKJACK"))
+    {
+        int32 SeatIndex = -1;
+        int32 HandIndex = 0;
+        Frame->TryGetNumberField(TEXT("seatIndex"), SeatIndex);
+        Frame->TryGetNumberField(TEXT("handIndex"), HandIndex);
+        OnNaturalBlackjack.Broadcast(SeatIndex, HandIndex);
+        return;
+    }
+
+    if (Type == TEXT("DEALER_ACTION"))
+    {
+        // Like PLAYER_ACTION, server-side literal is uppercase ("HIT"/"STAND").
+        FString ActionStr;
+        Frame->TryGetStringField(TEXT("action"), ActionStr);
+        const EBlackjackDealerAction Action = DealerActionFromWire(ActionStr.ToLower());
+
+        int32 Total = 0;
+        Frame->TryGetNumberField(TEXT("total"), Total);
+
+        bool bSoft = false;
+        Frame->TryGetBoolField(TEXT("soft"), bSoft);
+
+        OnDealerAction.Broadcast(Action, Total, bSoft);
+        return;
+    }
+
+    if (Type == TEXT("BET_SETTLED"))
+    {
+        int32 SeatIndex = -1;
+        int32 HandIndex = 0;
+        Frame->TryGetNumberField(TEXT("seatIndex"), SeatIndex);
+        Frame->TryGetNumberField(TEXT("handIndex"), HandIndex);
+
+        FString OutcomeStr;
+        Frame->TryGetStringField(TEXT("outcome"), OutcomeStr);
+        const EBlackjackOutcome Outcome = OutcomeFromWire(OutcomeStr);
+
+        int32 Payout = 0;
+        Frame->TryGetNumberField(TEXT("payout"), Payout);
+
+        OnBetSettled.Broadcast(SeatIndex, HandIndex, Outcome, Payout);
+        return;
+    }
+
+    if (Type == TEXT("ROUND_OVER"))
+    {
+        TArray<FBlackjackTableHandResult> Results;
+        const TArray<TSharedPtr<FJsonValue>>* ResultsArray = nullptr;
+        if (Frame->TryGetArrayField(TEXT("results"), ResultsArray) && ResultsArray)
+        {
+            Results.Reserve(ResultsArray->Num());
+            for (const TSharedPtr<FJsonValue>& V : *ResultsArray)
+            {
+                if (V.IsValid())
+                {
+                    Results.Add(ParseHandResult(V->AsObject()));
+                }
+            }
+        }
+        OnRoundOver.Broadcast(Results);
+        return;
+    }
+
+    if (Type == TEXT("BANKROLL_CHANGED"))
+    {
+        int32 SeatIndex = -1;
+        Frame->TryGetNumberField(TEXT("seatIndex"), SeatIndex);
+
+        // Wire name is `bankroll` (the new absolute balance); delegate surfaces
+        // it as `NewBalance` to distinguish from the historical pre-change value.
+        int32 NewBalance = 0;
+        Frame->TryGetNumberField(TEXT("bankroll"), NewBalance);
+
+        int32 Delta = 0;
+        Frame->TryGetNumberField(TEXT("delta"), Delta);
+
+        OnBankrollChanged.Broadcast(SeatIndex, NewBalance, Delta);
+        return;
+    }
+
+    if (Type == TEXT("SIDEBET_WIN"))
+    {
+        int32 SeatIndex = -1;
+        Frame->TryGetNumberField(TEXT("seatIndex"), SeatIndex);
+
+        FString KindStr;
+        Frame->TryGetStringField(TEXT("kind"), KindStr);
+        const EBlackjackSideBet Kind = SideBetKindFromWire(KindStr);
+
+        int32 Payout = 0;
+        Frame->TryGetNumberField(TEXT("payout"), Payout);
+
+        FString Label;
+        Frame->TryGetStringField(TEXT("label"), Label);
+
+        OnSideBetWin.Broadcast(SeatIndex, Kind, Payout, Label);
+        return;
+    }
+
+    if (Type == TEXT("SHOE_SHUFFLED"))
+    {
+        OnShoeShuffled.Broadcast();
+        return;
+    }
+
+    if (Type == TEXT("GESTURE_MADE"))
+    {
+        int32 SeatIndex = -1;
+        Frame->TryGetNumberField(TEXT("seatIndex"), SeatIndex);
+
+        FString GestureStr;
+        Frame->TryGetStringField(TEXT("gesture"), GestureStr);
+        const EBlackjackGesture Gesture = GestureFromWire(GestureStr);
+
+        OnGestureMade.Broadcast(SeatIndex, Gesture);
+        return;
+    }
+
+    if (Type == TEXT("DEALER_QUIP"))
+    {
+        FString Text;
+        FString Tone;
+        FString Language;
+        FString AudioUrl;  // optional; empty when TTS is off (D-011)
+
+        Frame->TryGetStringField(TEXT("text"), Text);
+        Frame->TryGetStringField(TEXT("tone"), Tone);
+        Frame->TryGetStringField(TEXT("language"), Language);
+        Frame->TryGetStringField(TEXT("audioUrl"), AudioUrl);
+
+        OnDealerQuip.Broadcast(Text, Tone, Language, AudioUrl);
+        return;
+    }
+
+    if (Type == TEXT("SESSION_LOST"))
+    {
+        FString Reason;
+        Frame->TryGetStringField(TEXT("reason"), Reason);
+        OnSessionLost.Broadcast(Reason);
+        return;
+    }
+
+    // DEALER_AUDIO is defined on the server schema but has no UE delegate yet;
+    // intentionally fall through to the verbose log until visuals wire it (M6).
+    UE_LOG(LogBlackjackNet, Verbose, TEXT("Unhandled server frame: %s"), *Type);
 }
 
 // ---------------------------------------------------------------------------

@@ -189,6 +189,37 @@ struct FBlackjackTableStateSnapshot
     UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net") TArray<FBlackjackTableHandResult> RoundResults;
 };
 
+// ---------------------------------------------------------------------------
+// M5b.2c — server-originated frame delegate signatures.
+//
+// Declared after the supporting USTRUCTs/UENUMs above so UHT sees the full
+// types. Every delegate is BlueprintAssignable on UBlackjackNetClient below.
+// UE's DYNAMIC_MULTICAST delegates cap at 9 params but the BP editor tooling
+// gets unwieldy past ~6; the largest signature here is 5.
+// ---------------------------------------------------------------------------
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBlackjackTableList,        const TArray<FBlackjackTableSummary>&, Tables);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBlackjackTableCreated,     const FBlackjackTableSummary&, Table);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBlackjackTableState,       const FBlackjackTableStateSnapshot&, Snapshot);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBlackjackTableDelta,      int32, Seq, const FString&, PatchJson);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBlackjackSeatAssigned,    int32, SeatIndex, const FString&, OwnerClientId);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnBlackjackSeatReleased,  int32, SeatIndex, bool, bBecameNpc, const FString&, Personality);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBlackjackPhaseChanged,     EBlackjackPhase, NewPhase);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FOnBlackjackCardDealt,      EBlackjackTarget, Target, int32, SeatIndex, int32, HandIndex, FBlackjackCardPayload, Card, bool, bFaceDown);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBlackjackHoleCardRevealed, FBlackjackCardPayload, Card);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnBlackjackPlayerAction,  int32, SeatIndex, EBlackjackAction, Action, int32, HandIndex);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBlackjackHandBust,        int32, SeatIndex, int32, HandIndex);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBlackjackNaturalBJ,       int32, SeatIndex, int32, HandIndex);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnBlackjackDealerAction,  EBlackjackDealerAction, Action, int32, Total, bool, bSoft);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnBlackjackBetSettled,     int32, SeatIndex, int32, HandIndex, EBlackjackOutcome, Outcome, int32, Payout);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBlackjackRoundOver,        const TArray<FBlackjackTableHandResult>&, Results);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnBlackjackBankrollChanged, int32, SeatIndex, int32, NewBalance, int32, Delta);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnBlackjackSideBetWin,     int32, SeatIndex, EBlackjackSideBet, Kind, int32, Payout, const FString&, Label);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBlackjackShoeShuffled);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBlackjackGestureMade,     int32, SeatIndex, EBlackjackGesture, Gesture);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnBlackjackDealerQuip,     const FString&, Text, const FString&, Tone, const FString&, Language, const FString&, AudioUrl);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBlackjackSessionLost,      const FString&, Reason);
+
 /**
  * Authoritative game-server client. Always connects (single-player mode
  * connects to a locally-spawned server subprocess on 127.0.0.1). Handles
@@ -292,6 +323,95 @@ public:
     /** Fired for any server-side ERROR frame (before M5b wires specialized error routing). */
     UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
     FOnBlackjackServerError OnServerError;
+
+    // -----------------------------------------------------------------------
+    // M5b.2c — server frame delegates. One per routed frame below; fired from
+    // DispatchFrame after JSON parsing into the relevant USTRUCT.
+    // -----------------------------------------------------------------------
+
+    /** Lobby `TABLE_LIST` — array of table summaries. */
+    UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
+    FOnBlackjackTableList OnTableList;
+
+    /** `TABLE_CREATED` — a single new table summary. */
+    UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
+    FOnBlackjackTableCreated OnTableCreated;
+
+    /** `TABLE_STATE` — authoritative snapshot of the currently joined table. */
+    UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
+    FOnBlackjackTableState OnTableState;
+
+    /** `TABLE_DELTA` — incremental patch (opaque JSON blob) + monotonic sequence. */
+    UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
+    FOnBlackjackTableDelta OnTableDelta;
+
+    /** `SEAT_ASSIGNED` — a seat was claimed by a client. */
+    UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
+    FOnBlackjackSeatAssigned OnSeatAssigned;
+
+    /** `SEAT_RELEASED` — a seat was released (optionally replaced by an NPC). */
+    UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
+    FOnBlackjackSeatReleased OnSeatReleased;
+
+    /** `PHASE_CHANGED` — betting / dealing / playerTurn / etc. */
+    UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
+    FOnBlackjackPhaseChanged OnPhaseChanged;
+
+    /** `CARD_DEALT` — a card was dealt to a player seat or dealer. */
+    UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
+    FOnBlackjackCardDealt OnCardDealt;
+
+    /** `HOLE_CARD_REVEALED` — previously hidden dealer hole card is now visible. */
+    UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
+    FOnBlackjackHoleCardRevealed OnHoleCardRevealed;
+
+    /** `PLAYER_ACTION` — a seat performed hit/stand/double/split/surrender. */
+    UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
+    FOnBlackjackPlayerAction OnPlayerAction;
+
+    /** `HAND_BUST` — the named seat/hand busted. */
+    UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
+    FOnBlackjackHandBust OnHandBust;
+
+    /** `NATURAL_BLACKJACK` — seat/hand caught a two-card 21. */
+    UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
+    FOnBlackjackNaturalBJ OnNaturalBlackjack;
+
+    /** `DEALER_ACTION` — dealer-turn hit/stand/bust report. */
+    UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
+    FOnBlackjackDealerAction OnDealerAction;
+
+    /** `BET_SETTLED` — single hand's main-bet outcome + payout. */
+    UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
+    FOnBlackjackBetSettled OnBetSettled;
+
+    /** `ROUND_OVER` — full array of hand settlements for the round. */
+    UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
+    FOnBlackjackRoundOver OnRoundOver;
+
+    /** `BANKROLL_CHANGED` — seat bankroll transitioned to `NewBalance` by `Delta`. */
+    UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
+    FOnBlackjackBankrollChanged OnBankrollChanged;
+
+    /** `SIDEBET_WIN` — a side bet paid out. */
+    UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
+    FOnBlackjackSideBetWin OnSideBetWin;
+
+    /** `SHOE_SHUFFLED` — shoe was reshuffled; clients may swap visuals/SFX. */
+    UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
+    FOnBlackjackShoeShuffled OnShoeShuffled;
+
+    /** `GESTURE_MADE` — seat emoted; drives avatar animation. */
+    UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
+    FOnBlackjackGestureMade OnGestureMade;
+
+    /** `DEALER_QUIP` — dealer line (optional audio URL from CosyVoice). */
+    UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
+    FOnBlackjackDealerQuip OnDealerQuip;
+
+    /** `SESSION_LOST` — server terminated the session (grace-expired, kicked, etc.). */
+    UPROPERTY(BlueprintAssignable, Category = "Blackjack|Net")
+    FOnBlackjackSessionLost OnSessionLost;
 
     /** Reconnect grace window advertised by the server. Populated on WELCOME. */
     UPROPERTY(BlueprintReadOnly, Category = "Blackjack|Net")
