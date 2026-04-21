@@ -6,50 +6,64 @@
 
 ## One-line summary
 
-Casino blackjack product with a C++/Unreal-Engine front-end as the primary
-experience, driven by a TS reference rules engine, a Python AI dealer service
-(LLM + TTS), and a suite of psychological / NPC mechanics inspired by real
-casino play and classic gambling films.
+Casino blackjack product: UE 3D client(s) ↔ authoritative Node.js game
+server ↔ Python AI service (LLM + CosyVoice TTS). Supports 1–6 real players
+per table (multi-terminal), plus NPCs. Single-player is the same pipeline
+via 127.0.0.1 loopback.
 
-## v1 scope (frozen 2026-04-21 — see `DECISIONS.md` D-004)
+## v1 scope (frozen — see `DECISIONS.md` D-004, D-016..D-022)
 
-**Active**:
-- `engine` — TS rules, authoritative reference
-- `ai-npc` — basic strategy + Hi-Lo + 7 personalities + tilt
-- `dealer-ai` — Python FastAPI service (LLM + CosyVoice TTS)
-- `ue-plugin` — **primary front-end**. C++ BlackjackCore + BlackjackUE
-  (actors, components, gestures, heat, morale, tells, bluff)
+**Active modules**:
+- `engine` — TS rules, authoritative reference; multi-seat per D-007
+- `ai-npc` — basic strategy + Hi-Lo + 7 personalities + tilt (D-008)
+- `game-server` — **NEW** Node.js authoritative server with WebSocket
+  protocol (D-016, D-020). Owns shoe/dealer/state. Multi-terminal
+  multi-player + local loopback single-player.
+- `dealer-ai` — Python FastAPI: LLM quips + CosyVoice TTS (D-006)
+- `ue-plugin/BlackjackUE` — UE client actors + new `UBlackjackNetClient`
+  (WebSocket). Primary v1 front-end (D-004).
 
-**Frozen until v1.5** (no new features, bug-fix only):
-- `ui-web` (2D) — current gh-pages deployment preserved
-- `ui-3d` (Three.js) — current gh-pages deployment preserved
+**Frozen modules** (bug-fix only, no new features):
+- `ui-web` (2D web) — current gh-pages deployment preserved
+- `ui-3d` (Three.js web) — current gh-pages deployment preserved
+- `ue-plugin/BlackjackCore` (C++ rules port) — demoted per D-021
 
 **Explicitly not in v1** (see `docs/FUTURE_FEATURES.md`):
-- F1–F9 backlog (team play, rigged dealer, comps, focus mode, etc.)
+- F1–F9 backlog
+- Account system (guest-only per D-019)
+- Commercial hosting (self-hosted per D-016)
 
 ## Current milestone
 
-**M1 — engine multi-seat refactor (TS side, reference)**
-Status: Not started. Being dispatched to a subagent this session.
+**M1 — TS engine multi-seat refactor (reference)**
+Status: Ready to dispatch. Will be dispatched to a subagent this session.
 
-## Milestone list (order)
+## Milestone list (v1, re-ordered after D-016..D-022)
 
-1. M1 — TS engine multi-seat refactor (`engine`)
-2. M2 — NPC AI core: basic strategy + Hi-Lo + bet policies (`ai-npc`) — TS first
-3. M3 — C++ BlackjackCore sync to multi-seat + NPC AI (`ue-plugin/BlackjackCore`)
-4. M4 — UE scene: seats, pit boss, CCTV, dealer character (`ue-plugin/BlackjackUE`)
-5. M5 — UE psychological systems: heat, morale, timer, gestures (`ue-plugin/BlackjackUE`)
-6. M6 — UE perception/tell/bluff (`ue-plugin/BlackjackUE` + `ai-npc`)
-7. M7 — dealer-ai service extended events (`dealer-ai`)
-8. M8 — CosyVoice TTS integration (`dealer-ai`)
-9. M9 — UE dealer-ai HTTP client + audio playback (`ue-plugin/BlackjackUE`)
-10. M10 — NPC tilt + dealer-state evolution (`ai-npc` + `dealer-ai`)
-11. M11 — Conformance vectors extended (`engine` + `ue-plugin`)
-12. M12 — Windows installer + integration testing (`dealer-ai` + `ue-plugin`)
+**Phase 1 — TS core (server-side brain)**
+1. **M1** — TS engine multi-seat refactor (`engine`)
+2. **M2** — NPC AI core: basic strategy + Hi-Lo + bet policies + 7 personalities (`ai-npc`)
+3. **M3** — `game-server` scaffolding + WebSocket protocol + schemas
+4. **M4** — `game-server` full game loop: lobby, table, seat ownership, NPC driver, reconnect
+
+**Phase 2 — UE client**
+5. **M5** — UE `UBlackjackNetClient` (WebSocket client, replaces local BlackjackCore use)
+6. **M6** — UE scene actors: 6 seats, dealer character, cards, chip stacks, NPC player models
+7. **M7** — UE psychological systems: heat meter, morale bar, decision timer, gesture input
+8. **M8** — UE tell/bluff/perception visuals
+
+**Phase 3 — Dealer AI enrichment**
+9. **M9** — `dealer-ai` extended events (heat/bluff/morale/dealer-state) + prompts
+10. **M10** — CosyVoice TTS integration in `dealer-ai`
+11. **M11** — UE audio playback (dealer TTS over WebSocket/HTTP)
+
+**Phase 4 — Polish & ship**
+12. **M12** — NPC tilt + dealer-state evolution (server-side + dealer-ai side)
+13. **M13** — Windows installer + service registration + integration testing
 
 ## Active subagent tasks
 
-(none right now — will be filled in when M1 is dispatched)
+(none — M1 about to be dispatched)
 
 ## Blockers
 

@@ -89,12 +89,13 @@ coordination/
 ├── sessions/                    ← one markdown per working session
 │   └── YYYY-MM-DD-session-N.md
 └── modules/                     ← one subdir per logical module
-    ├── engine/       AGENT.md + STATE.md
-    ├── ai-npc/       AGENT.md + STATE.md
-    ├── dealer-ai/    AGENT.md + STATE.md
+    ├── engine/       AGENT.md + STATE.md   (TS rules, reference)
+    ├── ai-npc/       AGENT.md + STATE.md   (NPC AI lib, TS)
+    ├── game-server/  AGENT.md + STATE.md   (Node.js authoritative server)
+    ├── dealer-ai/    AGENT.md + STATE.md   (Python LLM + TTS service)
+    ├── ue-plugin/    AGENT.md + STATE.md   (UE client — v1 front-end)
     ├── ui-web/       AGENT.md + STATE.md   (FROZEN per v1 scope)
-    ├── ui-3d/        AGENT.md + STATE.md   (FROZEN per v1 scope)
-    └── ue-plugin/    AGENT.md + STATE.md   (PRIMARY v1 focus)
+    └── ui-3d/        AGENT.md + STATE.md   (FROZEN per v1 scope)
 ```
 
 ---

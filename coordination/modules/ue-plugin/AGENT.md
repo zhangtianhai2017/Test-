@@ -10,11 +10,16 @@ Native UE plugin that delivers the full casino experience:
 
 - 3D scene: 6-seat blackjack table with dealer character, NPC player
   characters, chip stacks, card actors, pit boss, CCTV cutaway camera.
-- Game logic: C++ port of TS engine (`BlackjackCore`).
+- **Network client** (not standalone): connects to `game-server` over
+  WebSocket per D-016. Server is authoritative; UE renders state.
 - Blueprint-facing API: component + actor classes + Blueprint Library.
 - Integration with `dealer-ai` HTTP service for quips and TTS audio.
 - Psychological layer: heat meter, morale bar, decision timer, gestures,
   NPC tells, bluff.
+
+Note: per D-021, the legacy `BlackjackCore` (C++ rules engine) is frozen.
+Do not update it. All rules now live server-side. The UE plugin's new
+heart is `UBlackjackNetClient`.
 
 ## Scope — what you own
 
@@ -56,22 +61,30 @@ packages/ue-plugin/
 ## Blueprint-facing API (contract)
 
 Established classes (already exist, do not rename):
-- `UBlackjackGameComponent` — the per-actor game brain
-- `ABlackjackTableActor`    — level-placed table with game component
+- `UBlackjackGameComponent` — the per-actor game brain (will be demoted to
+   a thin wrapper around `UBlackjackNetClient` in v1)
+- `ABlackjackTableActor`    — level-placed table
 - `ABlackjackCardActor`     — single card with deal animation
 - `ABlackjackChipStackActor`— chip instance stack
 - `ABlackjackDealerCharacter` — dealer skeletal mesh + montage slots
 - `UBlackjackBlueprintLibrary` — pure helpers
 
-Upcoming (M4-M6):
-- `ABlackjackPitBossActor`     — surveillance NPC
-- `ABlackjackCCTVCameraActor`  — cutaway camera rig
-- `UBlackjackDealerAIClient`   — HTTP client subsystem (singleton-ish)
-- `UBlackjackHeatSubsystem`    — heat meter state (game instance subsystem)
-- `UBlackjackMoraleSubsystem`  — player morale state
-- Events on `UBlackjackGameComponent`: `OnHeatChanged`, `OnMoraleChanged`,
-  `OnPitBossArrived`, `OnCCTVCutaway`, `OnGestureBroadcast`, `OnTellSpotted`,
-  `OnBluffCalled`, `OnBluffBelieved`, `OnDealerStateChanged`
+Upcoming (M5-M11):
+- `UBlackjackNetClient`     — **NEW (M5)** WebSocket subsystem connecting to
+   `game-server`; exposes all gameplay events as Blueprint delegates
+- `ABlackjackPitBossActor`  — surveillance NPC
+- `ABlackjackCCTVCameraActor` — cutaway camera rig
+- `UBlackjackDealerAIClient` — HTTP client subsystem for `dealer-ai`
+  (quips + TTS audio URLs)
+- `UBlackjackHeatSubsystem`  — heat meter (driven by server broadcasts)
+- `UBlackjackMoraleSubsystem` — player morale (server-authoritative)
+- Events on `UBlackjackGameComponent` / `UBlackjackNetClient`:
+  `OnConnected`, `OnTableStateReceived`, `OnCardDealt`, `OnPhaseChanged`,
+  `OnDealerQuip`, `OnDealerAudio`, `OnHeatChanged`, `OnMoraleChanged`,
+  `OnPitBossArrived`, `OnCCTVCutaway`, `OnGestureBroadcast`,
+  `OnTellSpotted`, `OnBluffCalled`, `OnBluffBelieved`,
+  `OnDealerStateChanged`, `OnSeatAssigned`, `OnSessionLost`,
+  `OnReconnecting`
 
 ## C++ coding conventions
 

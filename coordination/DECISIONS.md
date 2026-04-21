@@ -159,8 +159,96 @@ Date: 2026-04-21
 Status: confirmed
 Context: Commercial product, end-user can't run scripts.
 Decision: Final installer bundles (1) `dealer-ai.exe` built via PyInstaller,
-(2) a default Qwen GGUF model, (3) the UE game binary. Installer registers
-dealer-ai as a Windows Service (via NSSM or similar). UE launcher ensures
-the service is up before connecting. Model download can be deferred to first
-run for installer size.
-Affects: `dealer-ai`, `ue-plugin`, installer (future)
+(2) a default Qwen GGUF model, (3) the UE game binary, (4) the
+`game-server.exe` (added in D-016). Installer registers both services under
+Windows Service. UE launcher ensures both services are up before connecting.
+Model download can be deferred to first run for installer size.
+Affects: `dealer-ai`, `game-server`, `ue-plugin`, installer (future)
+
+## D-016 — Networked multi-player is a v1 feature via authoritative server
+Date: 2026-04-21
+Status: confirmed
+Context: User clarified that 1–6 real players can join a table from
+separate terminals. Local single-player and multi-player must share the
+same code path — single-player just connects the UE client to a local
+loopback server (127.0.0.1).
+Decision: Introduce a new module `packages/game-server` — the authoritative
+game server. UE client is always a network client, even in single-player
+(where it connects to a locally-spawned server subprocess). The server
+owns shoe/dealer/state; clients send intent; server validates + broadcasts.
+Supersedes the prior implicit "single-player only" v1 assumption from
+earlier in planning.
+Affects: all modules; UE plugin's `BlackjackCore` becomes optional (see D-020)
+
+## D-017 — A session may claim 1..6 seats on a single table
+Date: 2026-04-21
+Status: confirmed
+Context: In UE single-player, the human user drives multiple avatars; in
+multi-player, a user may buy in at multiple spots (standard casino play).
+Decision: Each client session (= one UE terminal connection) can claim any
+number of available seats, 1 through 6. Seat ownership is enforced by the
+server: actions must come from the owning session. Unclaimed seats are
+NPC or empty per table config.
+Affects: `game-server`, `ue-plugin`, `engine` (Seat type gains `ownerSessionId`)
+
+## D-018 — Protocol: WebSocket + JSON, versioned frames
+Date: 2026-04-21
+Status: confirmed
+Context: Alternatives were msgpack (unneeded, bandwidth not a concern for
+card games) and UE built-in networking (not cross-language friendly since
+server is Node.js).
+Decision: WebSocket transport, JSON message envelope, every frame carries
+`{v: 1, type, ...}` so a v2 can be introduced without breaking v1 clients.
+Schemas defined in `packages/game-server/src/protocol/` and mirrored in
+the UE client.
+Affects: `game-server`, `ue-plugin`
+
+## D-019 — Identity is guest-nickname only in v1
+Date: 2026-04-21
+Status: confirmed
+Context: Full account system is a v2 concern. v1 must let someone play
+in under a minute.
+Decision: No login. Client sends a `displayName` on HELLO; server assigns
+a `sessionId` (UUID). No persistence between launches. Bankroll is
+per-session — resets on disconnect.
+Affects: `game-server`, `ue-plugin`
+
+## D-020 — Game server language is Node.js + TypeScript
+Date: 2026-04-21
+Status: confirmed
+Context: Alternatives were Python (would require porting TS engine to
+Python), Go, C#. User briefly considered Python because of AI ecosystem.
+Decision: Node.js. Rationale: (1) reuses `@blackjack/engine` directly with
+zero code porting; (2) AI needs live in `dealer-ai` Python service and
+future AI services, not in game-server — standard microservice pattern;
+(3) Node's event loop suits low-frequency WebSocket game state; (4) mature
+packaging via `pkg` / `bun --compile` to Windows exe. Not chosen: Python
+(engine port cost, GIL), Go (engine port cost), C++ (unrelated to AI,
+high friction). See also D-005: TS engine stays authoritative.
+Affects: `game-server`
+
+## D-021 — UE `BlackjackCore` C++ port demoted to v2 offline mode
+Date: 2026-04-21
+Status: confirmed (supersedes parts of D-005)
+Context: Once the authoritative server exists, the UE client doesn't need
+its own rules engine — it just renders server state. The C++ port's only
+remaining value is an offline-without-server mode.
+Decision: `packages/ue-plugin/Source/BlackjackCore/` stays in the repo but
+is **frozen** alongside ui-web/ui-3d. No new features. Conformance tests
+still run. The UE client in v1 connects to `game-server` via WebSocket,
+using a new `UBlackjackNetClient` that replaces direct engine use. This
+saves one full C++ refactor cycle. If a "pure offline" mode is desired in
+v2, the port is re-unfrozen.
+Affects: `ue-plugin/BlackjackCore` (frozen), `ue-plugin/BlackjackUE` (new net client)
+
+## D-022 — Reconnect policy
+Date: 2026-04-21
+Status: confirmed
+Context: Network hiccups are normal; we need a rule.
+Decision: A disconnected session retains its seat ownership for 45 seconds.
+If the session reconnects within the grace window (same sessionId), it
+resumes its seats. If not, seats revert to the table's configured fallback
+(NPC or empty). In-flight decisions on that seat (e.g. mid-action) are
+cancelled and replayed if the seat becomes NPC — NPC makes a new decision
+using ai-npc; if empty, round continues with that seat inactive.
+Affects: `game-server`

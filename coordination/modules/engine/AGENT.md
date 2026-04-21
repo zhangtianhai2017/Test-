@@ -61,8 +61,9 @@ interface Seat {
   pendingBet: number;
   sideBets: SideBets;
   insuranceBet: number;
-  gestures: Gesture[];             // recent gestures; for bluff system (M2d)
-  tilt: number;                    // 0-1, emotional state; for NPC (M2b)
+  gestures: Gesture[];             // recent gestures; for bluff system
+  tilt: number;                    // 0-1, emotional state; for NPC
+  ownerSessionId: string | null;   // which client owns this seat (D-017). null = NPC or empty.
 }
 
 interface Player {
