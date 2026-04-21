@@ -266,3 +266,19 @@ This makes HIT/STAND/... route to whichever seat currently holds the
 turn. Preserves single-seat legacy semantics (activeSeatIndex = 0 in
 that mode). Supersedes nothing, just a bug fix.
 Affects: `engine`. Scheduled as M1c.5. Un-skips multiSeat.test.ts #12/#13.
+
+## D-024 — PM may dispatch up to 3 subagents in parallel
+Date: 2026-04-21
+Status: confirmed
+Context: Serial dispatching is safe but slow. User granted parallel
+authority with a cap.
+Decision: PM may run up to 3 subagents concurrently if and only if:
+ 1. Each operates on a distinct module (different packages/ dir).
+ 2. No two edit the same file.
+ 3. None depends on another's in-flight output.
+ 4. Each task ships with its own independent success check.
+On return, each is verified + committed independently in the order it
+lands. The 3rd slot is reserved for emergency insertions (bug fix,
+user-requested change) to avoid all 3 being committed to long-running
+milestones at once.
+Affects: working method.
