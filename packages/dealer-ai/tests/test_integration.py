@@ -259,6 +259,74 @@ def test_quip_plus_tts_endpoint_no_audio(server):
     assert j["audio_sample_rate"] is None
 
 
+def test_dealer_state_fresh_on_open(server):
+    """A brand-new session exposes dealer_state=='fresh' and rounds_played==0."""
+    r = httpx.post(f"{server}/session", json={"language": "en", "persona": "veteran"})
+    sid = r.json()["session_id"]
+    resp = httpx.get(f"{server}/session/{sid}/state")
+    assert resp.status_code == 200, resp.text
+    j = resp.json()
+    assert j["dealer_state"] == "fresh"
+    assert j["rounds_played"] == 0
+    assert j["persona"] == "veteran"
+    assert j["language"] == "en"
+
+
+def test_dealer_state_tick_round_evolution(server):
+    """Ticking 10 rounds transitions dealer_state from 'fresh' → 'seasoned'."""
+    r = httpx.post(f"{server}/session", json={"language": "en", "persona": "veteran"})
+    sid = r.json()["session_id"]
+    # First nine ticks keep us in 'fresh' (0..9 rounds_played).
+    for i in range(9):
+        tick = httpx.post(f"{server}/session/{sid}/tick-round").json()
+        assert tick["rounds_played"] == i + 1
+        assert tick["dealer_state"] == "fresh"
+    # Tenth tick crosses the threshold.
+    tick = httpx.post(f"{server}/session/{sid}/tick-round").json()
+    assert tick["rounds_played"] == 10
+    assert tick["dealer_state"] == "seasoned"
+    # Subsequent ticks stay 'seasoned'.
+    tick = httpx.post(f"{server}/session/{sid}/tick-round").json()
+    assert tick["dealer_state"] == "seasoned"
+
+
+def test_dealer_state_compromise_endpoint(server):
+    """POST /compromise flips to 'compromised' and sticks across further ticks."""
+    r = httpx.post(f"{server}/session", json={"language": "en", "persona": "veteran"})
+    sid = r.json()["session_id"]
+    resp = httpx.post(f"{server}/session/{sid}/compromise")
+    assert resp.status_code == 200, resp.text
+    assert resp.json()["dealer_state"] == "compromised"
+    # Further ticks do not revert the dealer state.
+    for _ in range(3):
+        tick = httpx.post(f"{server}/session/{sid}/tick-round").json()
+        assert tick["dealer_state"] == "compromised"
+    # GET /state confirms persistence.
+    got = httpx.get(f"{server}/session/{sid}/state").json()
+    assert got["dealer_state"] == "compromised"
+
+
+def test_quip_injects_dealer_state(server):
+    """After 10 ticks, a quip call succeeds and the session reports 'seasoned'."""
+    r = httpx.post(f"{server}/session", json={"language": "en", "persona": "veteran"})
+    sid = r.json()["session_id"]
+    for _ in range(10):
+        httpx.post(f"{server}/session/{sid}/tick-round")
+    # The client does NOT pass dealer_state in state — the server should
+    # inject the evolved value before invoking the prompt builder.
+    resp = httpx.post(
+        f"{server}/session/{sid}/quip",
+        json={"event": "ROUND_OVER", "state": {"outcome": "win", "net": 50}},
+        timeout=5,
+    )
+    assert resp.status_code == 200, resp.text
+    q = resp.json()
+    assert len(q["text"]) > 0
+    # Internal state should report seasoned.
+    got = httpx.get(f"{server}/session/{sid}/state").json()
+    assert got["dealer_state"] == "seasoned"
+
+
 def test_quip_plus_tts_schema_shape(server):
     """Response JSON must carry the full QuipWithAudioResponse field set."""
     r = httpx.post(f"{server}/session", json={"language": "en", "persona": "hostess"})

@@ -35,13 +35,16 @@
  *  - Dealer-ai / TTS hooks (later milestone).
  *  - Per-seat insurance routing for multi-NPC tables (engine-side D-023).
  */
-import type { Card, EngineEvent, Seat } from "@blackjack/engine";
+import type { Card, EngineEvent, Seat, HandResult } from "@blackjack/engine";
 import { isPair } from "@blackjack/engine";
 import {
   npcDecideBet,
   npcDecidePlay,
   newCounter,
   observe,
+  updateTilt,
+  passiveDecay,
+  PERSONALITIES,
   type CounterState,
 } from "@blackjack/ai-npc";
 
@@ -58,6 +61,12 @@ export interface NpcDriver {
    * auto-plays as appropriate. No-op if no attach is active for this table.
    */
   notifyTableConfigured(table: Table): void;
+  /**
+   * Test-inspection helper: read the tracked tilt for an NPC seat on a table.
+   * Returns `undefined` if the driver isn't attached to the table or the seat
+   * has no tracked tilt entry.
+   */
+  getSeatTilt(table: Table, seatIndex: number): number | undefined;
 }
 
 export interface NpcDriverOptions {
@@ -79,6 +88,7 @@ export const DEFAULT_PLAY_DELAY_MS = 700;
 interface TableDriver {
   rescanAndSchedule: () => void;
   detach: () => void;
+  tilts: Map<number, number>;
 }
 
 export function createNpcDriver(opts: NpcDriverOptions = {}): NpcDriver {
@@ -124,6 +134,95 @@ export function createNpcDriver(opts: NpcDriverOptions = {}): NpcDriver {
 
     // Insurance: fire at most once per insurance phase.
     let insuranceScheduled = false;
+
+    // --------------------------------------------------------------
+    // Tilt tracking (M12, Part A).
+    //
+    // The engine's getState() returns deep-copied seat snapshots, so
+    // mutating `seat.tilt` on a snapshot has no effect on subsequent
+    // reads. Instead we maintain an in-driver tilt map keyed by seat
+    // index. Decision calls should consult this map (falling back to 0)
+    // rather than the seat snapshot's `tilt` field.
+    //
+    // Lifecycle:
+    //   - BET_SETTLED: buffer per-seat aggregate for this round
+    //   - ROUND_OVER:  apply updateTilt() per NPC seat, clear buffer
+    //   - PHASE_CHANGED → betting: apply passiveDecay() per NPC seat
+    //   - SEAT_RELEASED / RULESET_CHANGED: clear the affected entries
+    // --------------------------------------------------------------
+    const tilts = new Map<number, number>();
+
+    interface SeatRoundBuffer {
+      outcome: HandResult["outcome"];
+      netDelta: number; // aggregated payout - bet across all hands
+      bigLoss: boolean; // retained the worst single-hand netDelta magnitude
+    }
+    // seatIndex -> accumulated hand settlement summary for the current round
+    const roundBuffer = new Map<number, SeatRoundBuffer>();
+    // Outcome priority for aggregation across split hands — pick the most
+    // emotionally "loud" outcome when one seat settles multiple hands.
+    const outcomePriority: Record<HandResult["outcome"], number> = {
+      bust: 5,
+      surrender: 4,
+      loss: 3,
+      push: 2,
+      win: 1,
+      blackjack: 0,
+    };
+    const recordSettlement = (
+      seatIndex: number,
+      outcome: HandResult["outcome"],
+      bet: number,
+      payout: number,
+    ): void => {
+      const netDelta = payout - bet;
+      const existing = roundBuffer.get(seatIndex);
+      if (!existing) {
+        roundBuffer.set(seatIndex, {
+          outcome,
+          netDelta,
+          bigLoss: netDelta < 0,
+        });
+        return;
+      }
+      existing.netDelta += netDelta;
+      if (outcomePriority[outcome] > outcomePriority[existing.outcome]) {
+        existing.outcome = outcome;
+      }
+    };
+
+    const applyTiltsForRound = (): void => {
+      const snap = table.game.getState();
+      for (const s of snap.seats) {
+        if (s.player.kind !== "npc") continue;
+        const buf = roundBuffer.get(s.index);
+        if (!buf) continue;
+        const personalityId = s.player.personality ?? "optimal";
+        const cfg = PERSONALITIES[personalityId];
+        const unit = snap.ruleSet.minBet * cfg.betUnitMultiplier;
+        const current = tilts.get(s.index) ?? 0;
+        const next = updateTilt(current, buf.outcome, buf.netDelta, unit, {
+          sensitivity: cfg.tiltSensitivity,
+        });
+        tilts.set(s.index, next);
+      }
+      roundBuffer.clear();
+    };
+
+    const applyPassiveDecayForBetting = (): void => {
+      const snap = table.game.getState();
+      for (const s of snap.seats) {
+        if (s.player.kind !== "npc") continue;
+        const current = tilts.get(s.index);
+        if (current === undefined) continue;
+        const personalityId = s.player.personality ?? "optimal";
+        const cfg = PERSONALITIES[personalityId];
+        tilts.set(
+          s.index,
+          passiveDecay(current, { sensitivity: cfg.tiltSensitivity }),
+        );
+      }
+    };
 
     // ------------------------------------------------------------------
     // Timer helpers
@@ -386,6 +485,8 @@ export function createNpcDriver(opts: NpcDriverOptions = {}): NpcDriver {
             betRoundToken++;
             betsScheduledThisRound.clear();
             clearAllPending();
+            // Passive tilt decay while the table was idle between rounds.
+            applyPassiveDecayForBetting();
             scheduleNpcBetsForBetting();
             return;
           }
@@ -404,6 +505,71 @@ export function createNpcDriver(opts: NpcDriverOptions = {}): NpcDriver {
           clearAllPending();
           playScheduled = false;
           insuranceScheduled = false;
+          return;
+        }
+
+        case "BET_SETTLED": {
+          // Find the seatIndex + per-hand bet from the live engine state.
+          // BET_SETTLED fires during settlement; the hand's `bet` field is
+          // still readable from the snapshot because the engine writes the
+          // HandResult before advancing (see game.ts settlement loop).
+          const snap = table.game.getState();
+          let matched = false;
+          for (const s of snap.seats) {
+            if (s.player.kind !== "npc") continue;
+            const hand = s.hands[ev.handIndex];
+            if (!hand) continue;
+            // Multiple seats can share a handIndex; prefer the one whose
+            // roundResults already lists this handIndex as its own.
+            const result = snap.roundResults.find(
+              (r) => r.handIndex === ev.handIndex && r.seatIndex === s.index,
+            );
+            if (!result) continue;
+            recordSettlement(s.index, ev.outcome, hand.bet, ev.payout);
+            matched = true;
+            break;
+          }
+          // Fallback: if no HandResult mapping exists yet (ordering edge
+          // case), just attribute to any NPC seat holding this handIndex.
+          if (!matched) {
+            for (const s of snap.seats) {
+              if (s.player.kind !== "npc") continue;
+              const hand = s.hands[ev.handIndex];
+              if (!hand) continue;
+              recordSettlement(s.index, ev.outcome, hand.bet, ev.payout);
+              break;
+            }
+          }
+          return;
+        }
+
+        case "ROUND_OVER": {
+          // Use the engine's own HandResult list as the source of truth —
+          // it carries seatIndex directly and survives snapshot copying.
+          for (const r of ev.results) {
+            if (r.seatIndex === undefined) continue;
+            const snap = table.game.getState();
+            const seat = snap.seats[r.seatIndex];
+            if (!seat || seat.player.kind !== "npc") continue;
+            const hand = seat.hands[r.handIndex];
+            const bet = hand?.bet ?? 0;
+            recordSettlement(r.seatIndex, r.outcome, bet, r.payout);
+          }
+          applyTiltsForRound();
+          return;
+        }
+
+        case "SEAT_RELEASED": {
+          tilts.delete(ev.seatIndex);
+          roundBuffer.delete(ev.seatIndex);
+          return;
+        }
+
+        case "SEAT_CLAIMED": {
+          // Starting a seat from a clean slate. If an NPC was previously at
+          // this seat, its tilt bookkeeping shouldn't follow a new occupant.
+          tilts.delete(ev.seatIndex);
+          roundBuffer.delete(ev.seatIndex);
           return;
         }
 
@@ -435,9 +601,11 @@ export function createNpcDriver(opts: NpcDriverOptions = {}): NpcDriver {
     const detach = (): void => {
       clearAllPending();
       unsubscribe();
+      tilts.clear();
+      roundBuffer.clear();
     };
 
-    return { rescanAndSchedule, detach };
+    return { rescanAndSchedule, detach, tilts };
   }
 
   return {
@@ -458,6 +626,12 @@ export function createNpcDriver(opts: NpcDriverOptions = {}): NpcDriver {
       const driver = drivers.get(table.meta.tableId);
       if (!driver) return;
       driver.rescanAndSchedule();
+    },
+
+    getSeatTilt(table: Table, seatIndex: number): number | undefined {
+      const driver = drivers.get(table.meta.tableId);
+      if (!driver) return undefined;
+      return driver.tilts.get(seatIndex);
     },
   };
 }

@@ -246,6 +246,199 @@ describe("NpcDriver (M4c)", () => {
     }
   });
 
+  it("tracks tilt after round settlement for an NPC seat", () => {
+    // Chaser personality has non-zero tiltSensitivity so losses do bump.
+    const lobby = createLobby(7);
+    const table = lobby.createTable({
+      ruleSet: "VEGAS",
+      maxSeats: 3,
+      dealerPersona: "veteran",
+      language: "en",
+    });
+    const driver = createNpcDriver({ betDelayMs: 20, playDelayMs: 20 });
+    const detach = driver.attach(table);
+    try {
+      table.game.dispatch({
+        type: "CONFIGURE_TABLE",
+        config: {
+          seats: [
+            { kind: "human", name: "Alice", bankroll: 1000 },
+            { kind: "npc", name: "Bot-1", personality: "chaser", bankroll: 1000 },
+          ],
+        },
+      });
+      driver.notifyTableConfigured(table);
+
+      // Before any round has settled, tilt tracking has no entry.
+      expect(driver.getSeatTilt(table, 1)).toBeUndefined();
+
+      // Run rounds until we observe either a loss or a win — chaser has
+      // nonzero tilt sensitivity, so any non-push outcome moves tilt.
+      let rounds = 0;
+      let tiltChanged = false;
+      while (rounds < 10 && !tiltChanged) {
+        rounds++;
+        // Advance bets.
+        vi.advanceTimersByTime(300);
+        table.game.dispatch({
+          type: "PLACE_BET_FOR_SEAT",
+          seatIndex: 0,
+          amount: 25,
+        });
+        for (let tick = 0; tick < 300; tick++) {
+          const snap = table.game.getState();
+          if (snap.phase === "roundOver") break;
+          if (
+            snap.phase === "playerTurn" &&
+            snap.activeSeatIndex === 0 &&
+            snap.seats[0]!.player.kind === "human"
+          ) {
+            table.game.dispatch({ type: "STAND" });
+            continue;
+          }
+          vi.advanceTimersByTime(30);
+        }
+        // After ROUND_OVER, tilt should be recorded (even at 0 after a win).
+        const tilt = driver.getSeatTilt(table, 1);
+        expect(tilt).toBeDefined();
+        if (tilt !== undefined && tilt > 0) {
+          tiltChanged = true;
+        }
+        table.game.dispatch({ type: "NEW_ROUND" });
+      }
+      expect(tiltChanged).toBe(true);
+    } finally {
+      detach();
+    }
+  });
+
+  it("decays tilt on idle between rounds via passiveDecay at betting phase", () => {
+    // Drive to a state where a chaser seat has tilt > 0, then verify the
+    // next betting-phase entry applies passiveDecay.
+    const lobby = createLobby(7);
+    const table = lobby.createTable({
+      ruleSet: "VEGAS",
+      maxSeats: 3,
+      dealerPersona: "veteran",
+      language: "en",
+    });
+    const driver = createNpcDriver({ betDelayMs: 20, playDelayMs: 20 });
+    const detach = driver.attach(table);
+    try {
+      table.game.dispatch({
+        type: "CONFIGURE_TABLE",
+        config: {
+          seats: [
+            { kind: "human", name: "Alice", bankroll: 1000 },
+            { kind: "npc", name: "Bot-1", personality: "chaser", bankroll: 1000 },
+          ],
+        },
+      });
+      driver.notifyTableConfigured(table);
+
+      // Build up tilt by running rounds until seat 1 has tilt > 0.05.
+      let guard = 0;
+      while ((driver.getSeatTilt(table, 1) ?? 0) < 0.05 && guard < 20) {
+        guard++;
+        vi.advanceTimersByTime(300);
+        table.game.dispatch({
+          type: "PLACE_BET_FOR_SEAT",
+          seatIndex: 0,
+          amount: 25,
+        });
+        for (let tick = 0; tick < 300; tick++) {
+          const snap = table.game.getState();
+          if (snap.phase === "roundOver") break;
+          if (
+            snap.phase === "playerTurn" &&
+            snap.activeSeatIndex === 0 &&
+            snap.seats[0]!.player.kind === "human"
+          ) {
+            table.game.dispatch({ type: "STAND" });
+            continue;
+          }
+          vi.advanceTimersByTime(30);
+        }
+        if (table.game.getState().phase === "roundOver") {
+          // Don't dispatch NEW_ROUND on the very last iteration so we can
+          // assert the pre-decay value; if we need more tilt, keep looping.
+          if ((driver.getSeatTilt(table, 1) ?? 0) < 0.05) {
+            table.game.dispatch({ type: "NEW_ROUND" });
+          }
+        }
+      }
+
+      const before = driver.getSeatTilt(table, 1) ?? 0;
+      expect(before).toBeGreaterThan(0);
+
+      // Starting a new round emits PHASE_CHANGED→betting, which applies decay.
+      table.game.dispatch({ type: "NEW_ROUND" });
+      const after = driver.getSeatTilt(table, 1) ?? 0;
+      expect(after).toBeLessThan(before);
+    } finally {
+      detach();
+    }
+  });
+
+  it("drops tilt tracking on SEAT_RELEASED", () => {
+    const lobby = createLobby(7);
+    const table = lobby.createTable({
+      ruleSet: "VEGAS",
+      maxSeats: 3,
+      dealerPersona: "veteran",
+      language: "en",
+    });
+    const driver = createNpcDriver({ betDelayMs: 20, playDelayMs: 20 });
+    const detach = driver.attach(table);
+    try {
+      table.game.dispatch({
+        type: "CONFIGURE_TABLE",
+        config: {
+          seats: [
+            { kind: "human", name: "Alice", bankroll: 1000 },
+            { kind: "npc", name: "Bot-1", personality: "chaser", bankroll: 1000 },
+          ],
+        },
+      });
+      driver.notifyTableConfigured(table);
+
+      // Run one round to populate the tilt entry.
+      vi.advanceTimersByTime(300);
+      table.game.dispatch({
+        type: "PLACE_BET_FOR_SEAT",
+        seatIndex: 0,
+        amount: 25,
+      });
+      for (let tick = 0; tick < 300; tick++) {
+        const snap = table.game.getState();
+        if (snap.phase === "roundOver") break;
+        if (
+          snap.phase === "playerTurn" &&
+          snap.activeSeatIndex === 0 &&
+          snap.seats[0]!.player.kind === "human"
+        ) {
+          table.game.dispatch({ type: "STAND" });
+          continue;
+        }
+        vi.advanceTimersByTime(30);
+      }
+      expect(driver.getSeatTilt(table, 1)).toBeDefined();
+
+      // RELEASE_SEAT is only legal during the betting phase — return there
+      // first by starting a new round.
+      if (table.game.getState().phase === "roundOver") {
+        table.game.dispatch({ type: "NEW_ROUND" });
+      }
+      expect(table.game.getState().phase).toBe("betting");
+
+      // Release the seat (becomeNpc: false empties it → SEAT_RELEASED).
+      table.game.dispatch({ type: "RELEASE_SEAT", seatIndex: 1 });
+      expect(driver.getSeatTilt(table, 1)).toBeUndefined();
+    } finally {
+      detach();
+    }
+  });
+
   it("unsubscribe clears pending NPC bet timers", () => {
     const lobby = createLobby(7);
     const table = lobby.createTable({

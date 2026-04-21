@@ -119,9 +119,15 @@ def open_session(req: OpenSessionRequest) -> OpenSessionResponse:
 
 def _generate_quip(s: Session, req: QuipRequest) -> QuipResponse:
     """Shared quip pipeline: LLM first, fallback to canned quip bank on any failure."""
+    # M12 Part B: if the caller didn't supply dealer_state on the request,
+    # inject the session's evolved value so prompts reflect fatigue/integrity
+    # shifts without every client needing to manage it.
+    effective_state = req.state
+    if effective_state.dealer_state is None and s.dealer_state:
+        effective_state = effective_state.model_copy(update={"dealer_state": s.dealer_state})
     if state.llm.ready:
         try:
-            messages = build_messages(s.persona, req.event, req.state, s.language)
+            messages = build_messages(s.persona, req.event, effective_state, s.language)
             text, ms = state.llm.generate(messages)
             text = _postprocess(text, s.language)
             s.recent_texts.append(text)
@@ -137,7 +143,7 @@ def _generate_quip(s: Session, req: QuipRequest) -> QuipResponse:
         except Exception as e:
             log.warning("LLM generate failed, falling back: %s", e)
     return state.fallback.quip(
-        req.event, req.state, s.language, seed=s.seed + len(s.recent_texts)
+        req.event, effective_state, s.language, seed=s.seed + len(s.recent_texts)
     )
 
 
@@ -220,6 +226,45 @@ def voices() -> VoicesResponse:
 def close_session(sid: str) -> dict[str, bool]:
     state.sessions.close(sid)
     return {"closed": True}
+
+
+# --- Dealer-state evolution endpoints (M12, Part B) ---
+@app.post("/session/{sid}/tick-round")
+def tick_round(sid: str) -> dict[str, object]:
+    """Bump the round counter and evolve dealer_state.
+
+    Returns the current dealer_state and rounds_played so the caller can
+    render UI / fetch a matching quip.
+    """
+    try:
+        s = state.sessions.tick_round(sid)
+    except KeyError:
+        raise HTTPException(404, "session not found")
+    return {"dealer_state": s.dealer_state, "rounds_played": s.rounds_played}
+
+
+@app.post("/session/{sid}/compromise")
+def compromise(sid: str) -> dict[str, str]:
+    """Mark the dealer as compromised (sticky; story-mode hook)."""
+    try:
+        s = state.sessions.mark_compromised(sid)
+    except KeyError:
+        raise HTTPException(404, "session not found")
+    return {"dealer_state": s.dealer_state}
+
+
+@app.get("/session/{sid}/state")
+def session_state(sid: str) -> dict[str, object]:
+    """Expose the public session fields — dealer_state, rounds_played, persona, language."""
+    s = state.sessions.get(sid)
+    if s is None:
+        raise HTTPException(404, "session not found")
+    return {
+        "rounds_played": s.rounds_played,
+        "dealer_state": s.dealer_state,
+        "persona": s.persona.id,
+        "language": s.language.value,
+    }
 
 
 def _postprocess(text: str, language: Language) -> str:

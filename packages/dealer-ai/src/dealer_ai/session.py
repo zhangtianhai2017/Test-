@@ -43,6 +43,26 @@ class Session:
     seed: int
     # rolling window of last N exchanges to avoid repetition
     recent_texts: list[str] = field(default_factory=list)
+    # --- Dealer-state evolution (M12, Part B) ---
+    rounds_played: int = 0
+    # "fresh" | "seasoned" | "compromised"
+    dealer_state: str = "fresh"
+    # Set explicitly via POST /session/{id}/compromise; once true, overrides
+    # the rounds-played thresholds and keeps dealer_state == "compromised".
+    compromised_flag: bool = False
+
+
+# Rounds-played thresholds for dealer_state evolution.
+# 0..9 → "fresh", 10+ → "seasoned"; compromised overrides everything.
+DEALER_SEASONED_AT_ROUNDS = 10
+
+
+def _derive_dealer_state(rounds_played: int, compromised: bool) -> str:
+    if compromised:
+        return "compromised"
+    if rounds_played >= DEALER_SEASONED_AT_ROUNDS:
+        return "seasoned"
+    return "fresh"
 
 
 class SessionManager:
@@ -75,3 +95,32 @@ class SessionManager:
         for sid in stale:
             del self._sessions[sid]
         return len(stale)
+
+    # --- Dealer-state evolution helpers (M12, Part B) ---
+    def tick_round(self, sid: str) -> Session:
+        """Bump the round counter and evolve dealer_state accordingly.
+
+        Raises KeyError if the session doesn't exist — callers (HTTP handlers)
+        translate this to 404.
+        """
+        s = self._sessions.get(sid)
+        if s is None:
+            raise KeyError(sid)
+        s.rounds_played += 1
+        s.dealer_state = _derive_dealer_state(s.rounds_played, s.compromised_flag)
+        return s
+
+    def mark_compromised(self, sid: str) -> Session:
+        """Story-mode hook: mark the dealer as compromised (sticky)."""
+        s = self._sessions.get(sid)
+        if s is None:
+            raise KeyError(sid)
+        s.compromised_flag = True
+        s.dealer_state = "compromised"
+        return s
+
+    def dealer_state_of(self, sid: str) -> str:
+        s = self._sessions.get(sid)
+        if s is None:
+            raise KeyError(sid)
+        return s.dealer_state
