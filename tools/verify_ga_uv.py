@@ -43,6 +43,18 @@ LANDMARKS_V = {
 }
 PATTERNS = ["solid", "stripe", "polka", "checker"]
 
+# Privacy seeds: minimum-coverage rectangles in UV space. Every Genome's
+# polygons must CONTAIN these — `_enforce_constraints` clamps the Genome
+# parameters so the trapezoidal cups and front panel grow to at least
+# this size. They are not overlays painted on top; they're a lower bound
+# baked into the parameter ranges, so the bikini smoothly grows from them.
+#   (u_lo, u_hi, v_lo, v_hi)
+PRIVACY_SEEDS = {
+    "right_nipple": (0.10, 0.18, 0.74, 0.82),
+    "left_nipple":  (-0.18, -0.10, 0.74, 0.82),
+    "pelvic_front": (-0.08, 0.08, 0.06, 0.14),
+}
+
 # Continuous Genome fields. Kept flat so GA operators are uniform.
 CONT_FIELDS = [
     # TOP
@@ -135,21 +147,71 @@ def mutate(g: Genome, rng: random.Random) -> Genome:
 
 
 def _enforce_constraints(g: Genome) -> Genome:
-    """Soft rules to keep polygons non-degenerate."""
+    """Hard rules: keep polygons non-degenerate AND guarantee they contain
+    the PRIVACY_SEEDS. Each clamp below is derived analytically from the
+    polygon shape — never paints over the result, just constrains parameters
+    so the trapezoidal cups / front panel grow at least to the seed extent.
+    """
     d = g.as_dict()
-    # a cup must have a minimum area
+
+    # --- privacy seeds for the cup (right nipple drives both due to symmetry)
+    s_u_lo, s_u_hi, s_v_lo, s_v_hi = PRIVACY_SEEDS["right_nipple"]
+
+    # cup must straddle the seed vertically: cv+hv >= s_v_hi, cv-hv <= s_v_lo
+    # so cv ∈ [s_v_hi - hv_min, s_v_lo + hv_min] and hv >= max(s_v_hi-cv, cv-s_v_lo)
+    # we anchor cv into a band centered on the seed midline first, then enlarge hv.
+    seed_mid_v = (s_v_lo + s_v_hi) / 2
+    seed_half_v = (s_v_hi - s_v_lo) / 2
+    d["top_center_v"] = float(np.clip(d["top_center_v"],
+                                       seed_mid_v - 0.04,
+                                       seed_mid_v + 0.04))
+    needed_hv = max(seed_half_v + 0.01,
+                    abs(d["top_center_v"] - s_v_hi),
+                    abs(d["top_center_v"] - s_v_lo))
+    d["top_half_v"] = max(d["top_half_v"], needed_hv)
+
+    # cup must cover the seed in u: inner edge <= s_u_lo, outer edge >= s_u_hi
+    d["top_inner_u"] = min(d["top_inner_u"], s_u_lo - 0.005)
+    d["top_inner_u"] = max(d["top_inner_u"], 0.0)
+    needed_hu = max(0.05, (s_u_hi - d["top_inner_u"] + 0.01) / 2.0)
+    d["top_half_u"] = max(d["top_half_u"], needed_hu)
+
+    # apex_lift drops the inner-top edge by apex*0.6 — cap so it stays
+    # above the seed top: cv + hv - apex*0.6 >= s_v_hi
+    apex_max = (d["top_center_v"] + d["top_half_v"] - s_v_hi) / 0.6
+    d["top_apex_lift"] = min(d["top_apex_lift"], max(0.0, apex_max))
+
+    # underband_dip raises the inner-bottom edge by dip*0.3 — cap so it stays
+    # below the seed bottom: cv - hv + dip*0.3 <= s_v_lo
+    dip_max = (s_v_lo - d["top_center_v"] + d["top_half_v"]) / 0.3
+    d["top_underband_dip"] = min(d["top_underband_dip"], max(0.0, dip_max))
+
+    # --- privacy seed for the front panel (pelvic_front)
+    p_u_lo, p_u_hi, p_v_lo, p_v_hi = PRIVACY_SEEDS["pelvic_front"]
+    # panel top must be at or above the seed top
+    d["bot_front_top_v"] = max(d["bot_front_top_v"], p_v_hi + 0.04)
+    # at the polygon's narrowest point (midline) width = hu*(1 - leg/2);
+    # require this to cover the seed half-width comfortably
+    needed_front_hu = max((p_u_hi + 0.01) / max(1e-3, 1 - 0.5 * d["bot_front_leg_curve"]),
+                          p_u_hi + 0.01)
+    d["bot_front_half_u"] = max(d["bot_front_half_u"], needed_front_hu)
+    # if leg curve is too aggressive given hu, reduce it
+    max_leg = 2 * (1 - (p_u_hi + 0.01) / d["bot_front_half_u"])
+    d["bot_front_leg_curve"] = min(d["bot_front_leg_curve"], max(0.0, max_leg))
+
+    # --- minimum back coverage so back panels never collapse to nothing
+    d["bot_back_half_u"] = max(d["bot_back_half_u"], 0.04)
+
+    # --- non-degeneracy guards (kept from before)
     d["top_half_v"] = max(d["top_half_v"], 0.05)
     d["top_half_u"] = max(d["top_half_u"], 0.05)
-    # bottom panels must be wider than zero
     d["bot_front_half_u"] = max(d["bot_front_half_u"], 0.05)
-    d["bot_back_half_u"]  = max(d["bot_back_half_u"],  0.02)
-    # top cannot dip so hard that the two edges cross
-    max_lift = 0.9 * d["top_half_v"]
-    d["top_apex_lift"] = min(d["top_apex_lift"], max_lift)
-    # front panel top must sit below the cup
+
+    # front panel top must sit below the cup bottom
     cup_bottom_v = d["top_center_v"] - d["top_half_v"]
     if d["bot_front_top_v"] > cup_bottom_v - 0.02:
-        d["bot_front_top_v"] = max(0.15, cup_bottom_v - 0.05)
+        d["bot_front_top_v"] = max(p_v_hi + 0.04, cup_bottom_v - 0.05)
+
     return Genome(**d)
 
 
@@ -285,6 +347,11 @@ def _draw_uv_canvas(ax):
     for u, name in [(-1.0, "back"), (-0.5, "side"), (0.0, "front"), (0.5, "side"), (1.0, "back")]:
         ax.axvline(u, color="#b38c6e", linewidth=0.5, linestyle=":", zorder=1.5, alpha=0.6)
         ax.text(u, 1.04, name, fontsize=6, color="#8a6a50", ha="center")
+    # privacy seeds: dashed outlines that all genome polygons must enclose
+    for name, (u0, u1, v0, v1) in PRIVACY_SEEDS.items():
+        ax.add_patch(Rectangle((u0, v0), u1 - u0, v1 - v0,
+                               fill=False, edgecolor="#c0392b", linewidth=0.7,
+                               linestyle="--", zorder=2.0))
     ax.set_xticks([])
     ax.set_yticks([])
     for side in ("left", "right", "top", "bottom"):
