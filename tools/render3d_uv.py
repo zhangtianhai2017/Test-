@@ -421,8 +421,72 @@ def build_strap_meshes(body_mesh: o3d.geometry.TriangleMesh, g,
     return straps
 
 
-# --------------------------------------------------------------------------
-# Offscreen rendering
+def build_fabric_shell(body_mesh: o3d.geometry.TriangleMesh, body_uvs: np.ndarray,
+                       polys_uv: list[list[tuple[float, float]]],
+                       offset: float = 0.3) -> o3d.geometry.TriangleMesh:
+    """Build a thin fabric shell from the body's triangles that fall inside
+    any Genome UV polygon.
+
+    Each such triangle gets offset outward along its vertex normals by
+    `offset` (cm) so the shell reads as a physical layer of fabric sitting
+    above the skin rather than paint on the skin. The shell mesh carries
+    the same triangle-UV layout as the body, so it can reuse the bikini
+    texture directly.
+
+    Args:
+        body_mesh: original body TriangleMesh (with vertex_normals).
+        body_uvs:  (3*NT, 2) cylindrical UVs already in [0, 1] range, same
+                   order as body.triangle_uvs.
+        polys_uv:  list of closed polygons in Genome UV coords (u in [-1, 1],
+                   v in [0, 1]).
+        offset:    outward displacement in the same units as the mesh (cm).
+    """
+    from matplotlib.path import Path
+
+    V = np.asarray(body_mesh.vertices)
+    T = np.asarray(body_mesh.triangles)
+    if not body_mesh.has_vertex_normals():
+        body_mesh.compute_vertex_normals()
+    N = np.asarray(body_mesh.vertex_normals)
+
+    # Convert body UVs from the texture-space [0,1] back to Genome [-1,1]
+    # for point-in-polygon tests.
+    pts_g = body_uvs.copy()
+    pts_g[:, 0] = pts_g[:, 0] * 2.0 - 1.0
+
+    # A triangle is "fabric" if ALL THREE of its per-vertex UVs are inside
+    # at least one polygon. We union the results across polygons.
+    inside_any = np.zeros(len(pts_g), dtype=bool)
+    for poly in polys_uv:
+        if len(poly) < 3:
+            continue
+        path = Path(np.asarray(poly, dtype=np.float32))
+        inside_any |= path.contains_points(pts_g)
+
+    tri_inside = inside_any.reshape(-1, 3).all(axis=1)
+    if not tri_inside.any():
+        return o3d.geometry.TriangleMesh()
+
+    sel_tris = T[tri_inside]
+    used_verts = np.unique(sel_tris)
+    remap = np.full(V.shape[0], -1, dtype=np.int64)
+    remap[used_verts] = np.arange(used_verts.shape[0])
+    new_tris = remap[sel_tris]
+
+    new_verts = V[used_verts] + N[used_verts] * offset
+
+    shell = o3d.geometry.TriangleMesh()
+    shell.vertices = o3d.utility.Vector3dVector(new_verts.astype(np.float64))
+    shell.triangles = o3d.utility.Vector3iVector(new_tris.astype(np.int32))
+    shell.compute_vertex_normals()
+
+    # Per-triangle UVs for the kept triangles, in body-texture coords.
+    sel_flat = np.where(tri_inside.repeat(3))[0]
+    shell_uvs = body_uvs[sel_flat]
+    shell.triangle_uvs = o3d.utility.Vector2dVector(shell_uvs)
+    return shell
+
+
 # --------------------------------------------------------------------------
 
 def _color_from_genome(g) -> tuple[float, float, float, float]:
@@ -431,41 +495,71 @@ def _color_from_genome(g) -> tuple[float, float, float, float]:
     return (r, gg, b, 1.0)
 
 
+def _skin_only_texture() -> Image.Image:
+    """Uniform skin-tone texture for the body layer, with no bikini polygons
+    painted on. The bikini is drawn as a separate 3D shell on top."""
+    return Image.new("RGB", (TEX_W, TEX_H), SKIN_RGB)
+
+
 def render_mesh(renderer, mesh: o3d.geometry.TriangleMesh,
                 texture_pil: Image.Image, genome=None,
-                y_crotch: float | None = None, y_neck: float | None = None
+                y_crotch: float | None = None, y_neck: float | None = None,
+                body_uvs: np.ndarray | None = None,
+                polys_uv: list | None = None,
                 ) -> np.ndarray:
-    """Apply the texture and render a single frame. Returns HxWx3 uint8.
+    """Render the body + bikini as layered 3D geometry.
 
-    If `genome, y_crotch, y_neck` are given, 3D strap meshes are added so
-    each bikini has visible closed-loop straps (back band, waist band,
-    side ties) that hold it on the body.
+    When `body_uvs` and `polys_uv` are supplied we build a fabric shell
+    out of the body triangles that fall inside the Genome's UV polygons,
+    offset 3 mm outward. The body itself is rendered in plain skin tone
+    so the bikini reads as an actual garment layer rather than paint on
+    skin. The straps (back band, waist string, side ties) add closed-loop
+    geometry holding the shell on.
+
+    If `body_uvs, polys_uv` are None, falls back to the old UV-decal
+    approach (full texture painted on the body) for backward compat.
     """
-    tex_np = np.array(texture_pil.convert("RGB"))
-    o3d_tex = o3d.geometry.Image(tex_np)
-
-    mat = o3d.visualization.rendering.MaterialRecord()
-    mat.shader = "defaultLit"
-    mat.albedo_img = o3d_tex
-    mat.base_roughness = 0.7
-    mat.base_metallic = 0.0
-
     scene = renderer.scene
     scene.clear_geometry()
-    scene.add_geometry("body", mesh, mat)
 
+    use_shell = body_uvs is not None and polys_uv is not None
+
+    # ---- body layer ----
+    body_tex_np = np.array(
+        (_skin_only_texture() if use_shell else texture_pil).convert("RGB")
+    )
+    body_mat = o3d.visualization.rendering.MaterialRecord()
+    body_mat.shader = "defaultLit"
+    body_mat.albedo_img = o3d.geometry.Image(body_tex_np)
+    body_mat.base_roughness = 0.65
+    body_mat.base_metallic = 0.0
+    scene.add_geometry("body", mesh, body_mat)
+
+    # ---- bikini fabric shell ----
+    if use_shell:
+        shell = build_fabric_shell(mesh, body_uvs, polys_uv, offset=0.3)
+        if len(shell.vertices) > 0:
+            shell_tex_np = np.array(texture_pil.convert("RGB"))
+            shell_mat = o3d.visualization.rendering.MaterialRecord()
+            shell_mat.shader = "defaultLit"
+            shell_mat.albedo_img = o3d.geometry.Image(shell_tex_np)
+            # matte fabric: a bit rougher than skin, no metallic
+            shell_mat.base_roughness = 0.85
+            shell_mat.base_metallic = 0.0
+            scene.add_geometry("fabric_shell", shell, shell_mat)
+
+    # ---- straps (closed-loop geometry) ----
     if genome is not None and y_crotch is not None and y_neck is not None:
         strap_mat = o3d.visualization.rendering.MaterialRecord()
         strap_mat.shader = "defaultLit"
         strap_mat.base_color = _color_from_genome(genome)
-        strap_mat.base_roughness = 0.55
+        strap_mat.base_roughness = 0.85
         strap_mat.base_metallic = 0.0
         for name, strap in build_strap_meshes(mesh, genome, y_crotch, y_neck):
             if len(strap.vertices) > 0:
                 scene.add_geometry(f"strap_{name}", strap, strap_mat)
 
     fit_camera(renderer, mesh)
-
     img = renderer.render_to_image()
     return np.asarray(img)
 
@@ -527,8 +621,11 @@ def main():
         tex = genome_to_texture(g)
         tag = label.lower().replace(" ", "_")
         tex.save(os.path.join(TEX_DIR, f"genome_{tag}.png"))
+        from verify_ga_uv import genome_polygons
+        polys = genome_polygons(g)
         img = render_mesh(renderer, mesh, tex, genome=g,
-                          y_crotch=y_crotch, y_neck=y_neck)
+                          y_crotch=y_crotch, y_neck=y_neck,
+                          body_uvs=uvs, polys_uv=polys)
         renders.append((label, img, g))
         print(f"  rendered {label} in {time.time() - t0:.1f}s")
 

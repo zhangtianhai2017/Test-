@@ -337,10 +337,38 @@ def _side_tie_polygons(g: Genome) -> list[list[tuple[float, float]]]:
     ]
 
 
+def _center_gore_polygon(g: Genome) -> list[tuple[float, float]] | None:
+    """Small bridge polygon between the two cups at the sternum. Without
+    this a triangle-style top with top_inner_u > 0 leaves a visible gap
+    between the cups that no real bikini has — real tops have either a
+    center panel (gore), a ring, or a knot there.
+    """
+    if g.top_inner_u < 0.01:
+        return None  # bandeau — cups already touch
+    cv = g.top_center_v
+    hv = g.top_half_v
+    dip = g.top_underband_dip * 0.3
+    apex = g.top_apex_lift * 0.6
+    # gore is a rectangle mirroring the cups' inner edges: spans u=+/-inner_u
+    # and vertically from the cup's inner-bottom up to the cup's inner-top
+    u_w = g.top_inner_u
+    v_bot = cv - hv + dip
+    v_top = cv + hv - apex
+    # pull the top of the gore down a bit so it reads as a narrow bridge,
+    # not as a solid center panel spanning the full cup height
+    v_top = max(v_bot + 0.02, v_top - 0.6 * (v_top - v_bot))
+    return [
+        (-u_w, v_bot), (u_w, v_bot), (u_w, v_top), (-u_w, v_top), (-u_w, v_bot),
+    ]
+
+
 def genome_polygons(g: Genome) -> list[list[tuple[float, float]]]:
     polys: list[list[tuple[float, float]]] = []
     polys.append(_cup_polygon(g,  1))
     polys.append(_cup_polygon(g, -1))
+    gore = _center_gore_polygon(g)
+    if gore is not None:
+        polys.append(gore)
     polys.extend(_back_top_polygons(g))
     polys.append(_bottom_front_polygon(g))
     polys.extend(_bottom_back_polygons(g))
