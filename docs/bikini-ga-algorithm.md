@@ -44,7 +44,17 @@
 | | `phys.damping` | 连续 `[0, 0.5]` | 阻尼 | `ClothConfig.Damping` |
 | | `phys.density` | 连续 `[0.1, 2.0]` | 单位面积质量倍率 | `ClothConfig.MassScale` |
 
-**Genome 向量长度**：4 个离散字段 + 15 个连续字段 = **19 维**（物理字段内部会按范围再映射）。
+**Genome 向量长度**：4 个离散字段 + 17 个连续字段 = **21 维**（物理字段内部会按范围再映射）。
+
+21 维的完整枚举（便于程序对齐 `CONT_FIELDS` / `DISCRETE_FIELDS` 常量）：
+
+- **离散 (4)**：`top.style_id`、`bottom.style_id`、`acc.tie_type`、`look.pattern_id`
+- **连续 (17)**：
+  - Top 结构 (3)：`top.cup_coverage`、`top.strap_width`、`top.neckline_depth`
+  - Bottom 结构 (3)：`bottom.rise_height`、`bottom.side_width`、`bottom.coverage_back`
+  - 配件 (1)：`acc.ruffle`
+  - 外观 (6)：`look.hue`、`look.saturation`、`look.lightness`、`look.pattern_scale`、`look.metallic`、`look.roughness`
+  - 物理 (4)：`phys.stretch`、`phys.bending`、`phys.damping`、`phys.density`
 
 ### 2.1 Genome JSON Schema（节选）
 
