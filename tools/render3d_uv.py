@@ -168,6 +168,11 @@ def load_body_mesh() -> o3d.geometry.TriangleMesh:
     # are intentionally discarded.
     mesh.triangle_uvs = o3d.utility.Vector2dVector(np.zeros((0, 2)))
     mesh.textures = []
+    # UE exports split vertices at every UV/material seam (132k vertices
+    # for 95k triangles) — every triangle ends up an island with no shared
+    # edges. Merge near-coincident vertices so the shell extraction and
+    # boundary-edge detection in build_binding_mesh work properly.
+    mesh.merge_close_vertices(eps=1e-3)
     mesh.compute_vertex_normals()
     return mesh
 
@@ -432,21 +437,9 @@ def build_fabric_shell(body_mesh: o3d.geometry.TriangleMesh, body_uvs: np.ndarra
                        polys_uv: list[list[tuple[float, float]]],
                        offset: float = 0.3) -> o3d.geometry.TriangleMesh:
     """Build a thin fabric shell from the body's triangles that fall inside
-    any Genome UV polygon.
-
-    Each such triangle gets offset outward along its vertex normals by
-    `offset` (cm) so the shell reads as a physical layer of fabric sitting
-    above the skin rather than paint on the skin. The shell mesh carries
-    the same triangle-UV layout as the body, so it can reuse the bikini
-    texture directly.
-
-    Args:
-        body_mesh: original body TriangleMesh (with vertex_normals).
-        body_uvs:  (3*NT, 2) cylindrical UVs already in [0, 1] range, same
-                   order as body.triangle_uvs.
-        polys_uv:  list of closed polygons in Genome UV coords (u in [-1, 1],
-                   v in [0, 1]).
-        offset:    outward displacement in the same units as the mesh (cm).
+    any Genome UV polygon. Each such triangle gets offset outward along its
+    vertex normals by `offset` (cm). Carries the body's triangle-UV layout
+    so it can reuse the bikini texture.
     """
     from matplotlib.path import Path
 
@@ -485,6 +478,13 @@ def build_fabric_shell(body_mesh: o3d.geometry.TriangleMesh, body_uvs: np.ndarra
     shell = o3d.geometry.TriangleMesh()
     shell.vertices = o3d.utility.Vector3dVector(new_verts.astype(np.float64))
     shell.triangles = o3d.utility.Vector3iVector(new_tris.astype(np.int32))
+
+    # UE-exported OBJs duplicate vertices at UV / material seams, so after
+    # remapping every triangle is an isolated island (no shared edges).
+    # Merge near-coincident vertices so interior edges actually get shared,
+    # otherwise the boundary-edge detection used by build_binding_mesh
+    # would pick up every triangle-edge and render as pebbled fins.
+    shell.merge_close_vertices(eps=1e-3)
     shell.compute_vertex_normals()
 
     # Per-triangle UVs for the kept triangles, in body-texture coords.
@@ -492,6 +492,93 @@ def build_fabric_shell(body_mesh: o3d.geometry.TriangleMesh, body_uvs: np.ndarra
     shell_uvs = body_uvs[sel_flat]
     shell.triangle_uvs = o3d.utility.Vector2dVector(shell_uvs)
     return shell
+
+
+def _pseudo_noise_3d(pts: np.ndarray, octaves: int = 2, seed: int = 0
+                     ) -> np.ndarray:
+    """Cheap trig-based pseudo-noise for wrinkle displacement — no need
+    for a Perlin library. Returns values in approximately [-1, 1]."""
+    rng = np.random.default_rng(seed)
+    total = np.zeros(len(pts), dtype=np.float64)
+    norm = 0.0
+    for i in range(octaves):
+        # ~0.20, 0.40 rad/cm -> wavelengths ~31cm and ~16cm (few wrinkles)
+        freq = 0.20 * (2.0 ** i)
+        amp = 1.0 / (2 ** i)
+        phase = rng.uniform(0, 2 * np.pi, 3)
+        total += amp * (np.sin(pts[:, 0] * freq + phase[0])
+                        * np.cos(pts[:, 1] * freq * 1.1 + phase[1])
+                        * np.sin(pts[:, 2] * freq * 0.9 + phase[2]))
+        norm += amp
+    return total / norm
+
+
+def apply_wrinkles(shell: o3d.geometry.TriangleMesh, amplitude: float = 0.06
+                   ) -> None:
+    """Displace shell vertices along their normals by low-frequency noise
+    so the fabric has subtle drape/wrinkles. Amplitude in cm (~0.6 mm)."""
+    if len(shell.vertices) == 0:
+        return
+    if not shell.has_vertex_normals():
+        shell.compute_vertex_normals()
+    V = np.asarray(shell.vertices)
+    N = np.asarray(shell.vertex_normals)
+    noise = _pseudo_noise_3d(V)
+    V_new = V + N * noise[:, None] * amplitude
+    shell.vertices = o3d.utility.Vector3dVector(V_new)
+    shell.compute_vertex_normals()
+
+
+def build_binding_mesh(shell: o3d.geometry.TriangleMesh,
+                        offset: float = 0.08, thickness: float = 0.25,
+                        width_along_normal: bool = True
+                        ) -> o3d.geometry.TriangleMesh:
+    """Small raised rim along the shell's boundary edges — reads as the
+    binding/piping stitched onto the edge of a real bikini. Each boundary
+    edge becomes a thin vertical ribbon rising by `thickness` cm above the
+    shell surface.
+    """
+    from collections import Counter
+
+    if len(shell.vertices) == 0:
+        return o3d.geometry.TriangleMesh()
+    if not shell.has_vertex_normals():
+        shell.compute_vertex_normals()
+
+    V = np.asarray(shell.vertices)
+    N = np.asarray(shell.vertex_normals)
+    T = np.asarray(shell.triangles)
+
+    # Boundary edges: appear in exactly one triangle
+    all_edges = np.concatenate([
+        T[:, [0, 1]], T[:, [1, 2]], T[:, [2, 0]],
+    ], axis=0)
+    sorted_edges = np.sort(all_edges, axis=1)
+    counter = Counter(map(tuple, sorted_edges))
+    boundary = [e for e, c in counter.items() if c == 1]
+    if not boundary:
+        return o3d.geometry.TriangleMesh()
+
+    verts = []
+    faces = []
+    for (i0, i1) in boundary:
+        p0 = V[i0] + N[i0] * offset
+        p1 = V[i1] + N[i1] * offset
+        u0 = V[i0] + N[i0] * (offset + thickness)
+        u1 = V[i1] + N[i1] * (offset + thickness)
+        base = len(verts)
+        verts.extend([p0, p1, u1, u0])
+        # two triangles per quad, both winding orders to avoid backface cull
+        faces.append([base, base + 1, base + 2])
+        faces.append([base, base + 2, base + 3])
+        faces.append([base, base + 2, base + 1])
+        faces.append([base, base + 3, base + 2])
+
+    mesh = o3d.geometry.TriangleMesh()
+    mesh.vertices = o3d.utility.Vector3dVector(np.asarray(verts))
+    mesh.triangles = o3d.utility.Vector3iVector(np.asarray(faces, dtype=np.int32))
+    mesh.compute_vertex_normals()
+    return mesh
 
 
 # --------------------------------------------------------------------------
@@ -645,6 +732,8 @@ def render_mesh(renderer, mesh: o3d.geometry.TriangleMesh,
     if use_shell:
         shell = build_fabric_shell(mesh, body_uvs, polys_uv, offset=0.3)
         if len(shell.vertices) > 0:
+            apply_wrinkles(shell, amplitude=0.06)
+
             # bake the weave shade into the albedo so the thread pattern
             # shows even if the renderer ignores the normal map
             shaded_tex = _apply_weave_shade_to_texture(texture_pil)
@@ -652,15 +741,26 @@ def render_mesh(renderer, mesh: o3d.geometry.TriangleMesh,
             shell_mat = o3d.visualization.rendering.MaterialRecord()
             shell_mat.shader = "defaultLit"
             shell_mat.albedo_img = o3d.geometry.Image(shell_tex_np)
-            # tangent-space normal map for real-lit weave bumps
             try:
                 shell_mat.normal_img = o3d.geometry.Image(_get_fabric_normal())
             except AttributeError:
-                pass  # older Open3D without normal_img — albedo shading still reads
-            # matte fabric: rougher than skin, no metallic
+                pass
             shell_mat.base_roughness = 0.85
             shell_mat.base_metallic = 0.0
             scene.add_geometry("fabric_shell", shell, shell_mat)
+
+            # edge binding — small raised rim around the shell border
+            binding = build_binding_mesh(shell, offset=0.05, thickness=0.15)
+            if len(binding.vertices) > 0:
+                from verify_ga_uv import _color as _color_fn
+                r, g, b = _color_fn(genome) if genome is not None else (0.3, 0.3, 0.3)
+                # darker, slightly saturated version of the fabric color
+                bind_mat = o3d.visualization.rendering.MaterialRecord()
+                bind_mat.shader = "defaultLit"
+                bind_mat.base_color = (r * 0.55, g * 0.55, b * 0.55, 1.0)
+                bind_mat.base_roughness = 0.6
+                bind_mat.base_metallic = 0.0
+                scene.add_geometry("fabric_binding", binding, bind_mat)
 
     # ---- straps (closed-loop geometry) ----
     if genome is not None and y_crotch is not None and y_neck is not None:
