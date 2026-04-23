@@ -248,9 +248,12 @@ def _body_ring(body_vertices: np.ndarray, y_level: float, y_halfband: float,
                ) -> np.ndarray:
     """Sample the body's cross-section at y=y_level as a ring of points.
 
-    Filters out limb vertices (T-pose arms reach x=+-45 on this NPC) by
-    only keeping vertices within `max_torso_radius` of the body's vertical
-    axis in XZ.
+    At bust level the T-pose arm-root sits at the same Y and nearly the
+    same theta as the torso side, so a naive "vertex with closest angle"
+    pick may land on the arm root and push the back band onto the arm.
+    To avoid that: among vertices within an angular tolerance of each
+    target, pick the one with the SMALLEST XZ-plane radius — guaranteed
+    to be the torso surface, not an arm.
     """
     near = body_vertices[(body_vertices[:, 1] > y_level - y_halfband) &
                           (body_vertices[:, 1] < y_level + y_halfband)]
@@ -258,17 +261,21 @@ def _body_ring(body_vertices: np.ndarray, y_level: float, y_halfband: float,
         r = np.sqrt(near[:, 0] ** 2 + near[:, 2] ** 2)
         near = near[r < max_torso_radius]
     if len(near) < n_samples // 4:
-        # Not enough torso vertices in this band: fall back to anything in
-        # the y window so we still get a ring (will be approximate).
         near = body_vertices[(body_vertices[:, 1] > y_level - y_halfband) &
                               (body_vertices[:, 1] < y_level + y_halfband)]
 
     theta = np.arctan2(near[:, 0], near[:, 2])
+    r_xz = np.sqrt(near[:, 0] ** 2 + near[:, 2] ** 2)
     targets = np.linspace(-np.pi, np.pi, n_samples, endpoint=False)
+    angle_tol = 0.12  # rad; ~7 deg window around each target
     ring = []
     for t in targets:
         d = np.abs(np.mod(theta - t + np.pi, 2 * np.pi) - np.pi)
-        idx = int(np.argmin(d))
+        close = np.where(d < angle_tol)[0]
+        if len(close) > 0:
+            idx = close[np.argmin(r_xz[close])]
+        else:
+            idx = int(np.argmin(d))
         ring.append([near[idx, 0], y_level, near[idx, 2]])
     return np.array(ring, dtype=np.float32)
 
@@ -400,11 +407,13 @@ def build_strap_meshes(body_mesh: o3d.geometry.TriangleMesh, g,
 
     # 1) Top back band — horizontal ring at bust level, reaching from the
     #    right cup's outer edge, around the back, to the left cup's outer
-    #    edge (the arc that does NOT pass through the front).
+    #    edge (the arc that does NOT pass through the front). Tighter
+    #    torso-radius filter (20cm) so the arm-root at x~21 is excluded.
     cup_outer_u = g.top_inner_u + 2 * g.top_half_u
     band_y = v_to_y(g.top_center_v)
     band_h = max(1.2, 1.5 + 2.0 * g.top_back_coverage)   # thin: 1.5-3.5 cm
-    ring = _body_ring(V, band_y, y_halfband=3.0, n_samples=96)
+    ring = _body_ring(V, band_y, y_halfband=3.0, n_samples=96,
+                      max_torso_radius=20.0)
     back_band = _build_band_mesh(ring, band_h, offset=0.5,
                                   u_from=cup_outer_u, u_to=-cup_outer_u)
     straps.append(("top_back_band", back_band))
@@ -435,11 +444,17 @@ def build_strap_meshes(body_mesh: o3d.geometry.TriangleMesh, g,
 
 def build_fabric_shell(body_mesh: o3d.geometry.TriangleMesh, body_uvs: np.ndarray,
                        polys_uv: list[list[tuple[float, float]]],
-                       offset: float = 0.3) -> o3d.geometry.TriangleMesh:
+                       offset: float = 0.3,
+                       max_torso_radius: float = 20.0,
+                       ) -> o3d.geometry.TriangleMesh:
     """Build a thin fabric shell from the body's triangles that fall inside
     any Genome UV polygon. Each such triangle gets offset outward along its
     vertex normals by `offset` (cm). Carries the body's triangle-UV layout
     so it can reuse the bikini texture.
+
+    Triangles on the T-pose arms are excluded by a torso-radius filter —
+    arm and torso side vertices share the same cylindrical u so without
+    this filter a wide bandeau's shell extends onto the forearms.
     """
     from matplotlib.path import Path
 
@@ -464,6 +479,15 @@ def build_fabric_shell(body_mesh: o3d.geometry.TriangleMesh, body_uvs: np.ndarra
         inside_any |= path.contains_points(pts_g)
 
     tri_inside = inside_any.reshape(-1, 3).all(axis=1)
+
+    # Also require the triangle's centroid to be on the torso, not on an
+    # arm. On this T-pose mesh torso stays under r_xz ~18 cm; arms run out
+    # to ~45 cm at identical Y and cylindrical u, so without this filter a
+    # bandeau's shell would paint onto the forearms.
+    tri_xz = V[T][:, :, [0, 2]].mean(axis=1)
+    tri_r = np.sqrt(tri_xz[:, 0] ** 2 + tri_xz[:, 1] ** 2)
+    tri_inside &= tri_r < max_torso_radius
+
     if not tri_inside.any():
         return o3d.geometry.TriangleMesh()
 
