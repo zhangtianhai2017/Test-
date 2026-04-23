@@ -54,6 +54,13 @@ SEED = 42
 N_OFFSPRING = 8
 SKIN_RGB = (243, 217, 192)      # fallback skin tone for the uncovered area
 
+# Fabric weave: number of thread cycles across the U and V texture axes.
+# Chosen so cells read as fabric but aren't so fine they alias to noise at
+# the render resolution. U wraps ~90cm (body circumference) so 64 threads
+# -> ~1.4cm each; V spans ~90cm so 32 threads keeps cells square-ish.
+WEAVE_U_THREADS = 140
+WEAVE_V_THREADS = 70
+
 
 # --------------------------------------------------------------------------
 # Texture rasterization — Genome -> PIL.Image
@@ -501,6 +508,105 @@ def _skin_only_texture() -> Image.Image:
     return Image.new("RGB", (TEX_W, TEX_H), SKIN_RGB)
 
 
+def _fabric_normal_map(w: int = TEX_W, h: int = TEX_H,
+                       u_threads: int = WEAVE_U_THREADS,
+                       v_threads: int = WEAVE_V_THREADS) -> np.ndarray:
+    """Plain-weave tangent-space normal map.
+
+    Simulates threads going over/under on a checkerboard pattern: in each
+    cell, either the horizontal thread crosses over the vertical (so the
+    bump is horizontal) or vice versa. The normal is derived from a small
+    height map via numpy gradients. Returns uint8 HxWx3 in XYZ -> RGB
+    tangent-space convention (x right, y up, z out).
+    """
+    us = np.linspace(0, 2 * np.pi * u_threads, w, endpoint=False)
+    vs = np.linspace(0, 2 * np.pi * v_threads, h, endpoint=False)
+    U, V = np.meshgrid(us, vs)
+
+    # Which cell we're in (checkerboard of warp vs. weft)
+    cell_u = (us / np.pi).astype(int)
+    cell_v = (vs / np.pi).astype(int)
+    CU, CV = np.meshgrid(cell_u, cell_v)
+    over_weft = ((CU + CV) % 2) == 0          # True => horizontal thread on top
+
+    # Height map: smooth bump along the "on-top" thread's length
+    h_horiz = 0.5 + 0.5 * np.cos(V)           # ridges run along U (horizontal)
+    h_vert  = 0.5 + 0.5 * np.cos(U)           # ridges run along V (vertical)
+    height = np.where(over_weft, h_horiz, h_vert) * 0.9
+    # small overall dip between the two threads to read as a weave gap
+    height += 0.1 * (np.sin(U * 0.5) * np.sin(V * 0.5))
+
+    # Gradients -> normal (x=u axis, y=v axis, z out)
+    dv, du = np.gradient(height)               # np.gradient on (H, W) -> (dy, dx)
+    strength = 3.0                              # scales bump intensity
+    nx = -du * strength
+    ny = -dv * strength
+    nz = np.ones_like(height)
+    length = np.sqrt(nx * nx + ny * ny + nz * nz)
+    nx /= length
+    ny /= length
+    nz /= length
+
+    # Tangent-space encoding: store (x, y, z) -> [0, 1] -> [0, 255]
+    normal = np.stack([
+        (nx * 0.5 + 0.5),
+        (ny * 0.5 + 0.5),
+        (nz * 0.5 + 0.5),
+    ], axis=-1)
+    return (normal * 255).clip(0, 255).astype(np.uint8)
+
+
+def _weave_shade_overlay(w: int = TEX_W, h: int = TEX_H,
+                         u_threads: int = WEAVE_U_THREADS,
+                         v_threads: int = WEAVE_V_THREADS) -> np.ndarray:
+    """Grayscale multiplicative overlay baked into the albedo so the weave
+    reads even if the renderer ignores the normal map.
+
+    Darkens cells where one thread dips, brightens cells where it rises.
+    Values in [0.80, 1.10] so the base color stays dominant.
+    """
+    us = np.linspace(0, 2 * np.pi * u_threads, w, endpoint=False)
+    vs = np.linspace(0, 2 * np.pi * v_threads, h, endpoint=False)
+    U, V = np.meshgrid(us, vs)
+    cell_u = (us / np.pi).astype(int)
+    cell_v = (vs / np.pi).astype(int)
+    CU, CV = np.meshgrid(cell_u, cell_v)
+    over_weft = ((CU + CV) % 2) == 0
+    h_horiz = 0.5 + 0.5 * np.cos(V)
+    h_vert  = 0.5 + 0.5 * np.cos(U)
+    height = np.where(over_weft, h_horiz, h_vert)
+    # Subtle shade multiplier in [0.90, 1.05] — readable as fabric weave
+    # without dominating the base pattern (stripe/polka/checker).
+    return (0.90 + 0.15 * height).astype(np.float32)
+
+
+# Cache once — same weave for every genome.
+_FABRIC_NORMAL_CACHE = None
+_WEAVE_SHADE_CACHE = None
+
+def _get_fabric_normal() -> np.ndarray:
+    global _FABRIC_NORMAL_CACHE
+    if _FABRIC_NORMAL_CACHE is None:
+        _FABRIC_NORMAL_CACHE = _fabric_normal_map()
+    return _FABRIC_NORMAL_CACHE
+
+def _get_weave_shade() -> np.ndarray:
+    global _WEAVE_SHADE_CACHE
+    if _WEAVE_SHADE_CACHE is None:
+        _WEAVE_SHADE_CACHE = _weave_shade_overlay()
+    return _WEAVE_SHADE_CACHE
+
+
+def _apply_weave_shade_to_texture(tex: Image.Image) -> Image.Image:
+    """Multiply the Genome's albedo texture by the weave shade overlay so
+    the fabric carries a visible thread pattern even without a working
+    normal map."""
+    arr = np.asarray(tex.convert("RGB"), dtype=np.float32)
+    shade = _get_weave_shade()[..., None]
+    out = np.clip(arr * shade, 0, 255).astype(np.uint8)
+    return Image.fromarray(out)
+
+
 def render_mesh(renderer, mesh: o3d.geometry.TriangleMesh,
                 texture_pil: Image.Image, genome=None,
                 y_crotch: float | None = None, y_neck: float | None = None,
@@ -539,11 +645,19 @@ def render_mesh(renderer, mesh: o3d.geometry.TriangleMesh,
     if use_shell:
         shell = build_fabric_shell(mesh, body_uvs, polys_uv, offset=0.3)
         if len(shell.vertices) > 0:
-            shell_tex_np = np.array(texture_pil.convert("RGB"))
+            # bake the weave shade into the albedo so the thread pattern
+            # shows even if the renderer ignores the normal map
+            shaded_tex = _apply_weave_shade_to_texture(texture_pil)
+            shell_tex_np = np.array(shaded_tex.convert("RGB"))
             shell_mat = o3d.visualization.rendering.MaterialRecord()
             shell_mat.shader = "defaultLit"
             shell_mat.albedo_img = o3d.geometry.Image(shell_tex_np)
-            # matte fabric: a bit rougher than skin, no metallic
+            # tangent-space normal map for real-lit weave bumps
+            try:
+                shell_mat.normal_img = o3d.geometry.Image(_get_fabric_normal())
+            except AttributeError:
+                pass  # older Open3D without normal_img — albedo shading still reads
+            # matte fabric: rougher than skin, no metallic
             shell_mat.base_roughness = 0.85
             shell_mat.base_metallic = 0.0
             scene.add_geometry("fabric_shell", shell, shell_mat)
