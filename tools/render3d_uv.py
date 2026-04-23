@@ -391,6 +391,78 @@ def _build_tie_mesh(body_vertices: np.ndarray, y_lo_world: float, y_hi_world: fl
     return tri
 
 
+def _body_point_at(body_vertices: np.ndarray, u: float, y_level: float,
+                    y_tol: float = 3.0, angle_tol: float = 0.12,
+                    max_torso_radius: float = 22.0) -> np.ndarray:
+    """Find a point on the torso surface at (u, y_level). Same idea as
+    _body_ring but returns a single XYZ."""
+    near = body_vertices[(body_vertices[:, 1] > y_level - y_tol) &
+                          (body_vertices[:, 1] < y_level + y_tol)]
+    if len(near) > 0:
+        r = np.sqrt(near[:, 0] ** 2 + near[:, 2] ** 2)
+        near = near[r < max_torso_radius]
+    if len(near) < 3:
+        near = body_vertices[(body_vertices[:, 1] > y_level - y_tol) &
+                              (body_vertices[:, 1] < y_level + y_tol)]
+    theta = np.arctan2(near[:, 0], near[:, 2])
+    r_xz = np.sqrt(near[:, 0] ** 2 + near[:, 2] ** 2)
+    target = u * np.pi
+    d = np.abs(np.mod(theta - target + np.pi, 2 * np.pi) - np.pi)
+    close = np.where(d < angle_tol)[0]
+    if len(close) > 0:
+        idx = close[np.argmin(r_xz[close])]
+    else:
+        idx = int(np.argmin(d))
+    return near[idx].astype(np.float64)
+
+
+def _tube_between(p0: np.ndarray, p1: np.ndarray, radius: float = 0.25,
+                   sides: int = 6) -> o3d.geometry.TriangleMesh:
+    """Build a narrow N-sided prism from p0 to p1."""
+    p0 = np.asarray(p0, dtype=np.float64)
+    p1 = np.asarray(p1, dtype=np.float64)
+    axis = p1 - p0
+    length = float(np.linalg.norm(axis))
+    if length < 1e-4:
+        return o3d.geometry.TriangleMesh()
+    axis_u = axis / length
+    # pick a reference vector not parallel to axis
+    ref = np.array([0.0, 1.0, 0.0]) if abs(axis_u[1]) < 0.9 else np.array([1.0, 0.0, 0.0])
+    n1 = np.cross(axis_u, ref); n1 /= np.linalg.norm(n1)
+    n2 = np.cross(axis_u, n1)
+
+    verts, faces = [], []
+    for i in range(sides):
+        a = 2 * np.pi * i / sides
+        dir = np.cos(a) * n1 + np.sin(a) * n2
+        verts.append(p0 + dir * radius)
+        verts.append(p1 + dir * radius)
+    for i in range(sides):
+        a0, b0 = 2 * i, 2 * i + 1
+        a1, b1 = 2 * ((i + 1) % sides), 2 * ((i + 1) % sides) + 1
+        faces.append([a0, b0, b1])
+        faces.append([a0, b1, a1])
+    mesh = o3d.geometry.TriangleMesh()
+    mesh.vertices = o3d.utility.Vector3dVector(np.array(verts))
+    mesh.triangles = o3d.utility.Vector3iVector(np.array(faces, dtype=np.int32))
+    mesh.compute_vertex_normals()
+    return mesh
+
+
+def _arc_tube(points: np.ndarray, radius: float = 0.25, sides: int = 6
+              ) -> o3d.geometry.TriangleMesh:
+    """A swept tube through a sequence of points (polyline)."""
+    pts = np.asarray(points, dtype=np.float64)
+    if len(pts) < 2:
+        return o3d.geometry.TriangleMesh()
+    mesh = o3d.geometry.TriangleMesh()
+    for i in range(len(pts) - 1):
+        seg = _tube_between(pts[i], pts[i + 1], radius=radius, sides=sides)
+        mesh += seg
+    mesh.compute_vertex_normals()
+    return mesh
+
+
 def build_strap_meshes(body_mesh: o3d.geometry.TriangleMesh, g,
                        y_crotch: float, y_neck: float
                        ) -> list[tuple[str, o3d.geometry.TriangleMesh]]:
@@ -438,6 +510,59 @@ def build_strap_meshes(body_mesh: o3d.geometry.TriangleMesh, g,
     for u_side, name in [(0.5, "side_tie_R"), (-0.5, "side_tie_L")]:
         tie = _build_tie_mesh(V, y_side_lo, y_side_hi, u_side)
         straps.append((name, tie))
+
+    # 4) Tie dangles — hanging "tail" tubes off the side ties. Length
+    #    scales with g.bot_tie_dangle. Drawn as a thin tube going straight
+    #    down from the hip.
+    if g.bot_tie_dangle > 0.15:
+        dangle_len = 2.0 + 14.0 * g.bot_tie_dangle   # cm, up to ~16cm
+        for u_side, name in [(0.5, "dangle_R"), (-0.5, "dangle_L")]:
+            anchor = _body_point_at(V, u_side, (y_side_lo + y_side_hi) / 2)
+            rxz = np.array([anchor[0], 0.0, anchor[2]])
+            rxz /= max(np.linalg.norm(rxz), 1e-6)
+            p0 = anchor + rxz * 0.6
+            p1 = p0 - np.array([0.0, dangle_len, 0.0])
+            dangle = _tube_between(p0, p1, radius=0.15, sides=5)
+            straps.append((name, dangle))
+
+    # 5) Halter neck strap — a curved tube from the inner-top of each cup
+    #    up over the BACK of the neck. Controlled by g.top_neck_strap.
+    if g.top_neck_strap > 0.15:
+        strap_r = 0.15 + 0.25 * g.top_neck_strap     # ~1.5 to 4 mm radius
+        cup_top_v = g.top_center_v + g.top_half_v
+        u_inner_halter = 0.03 + 0.05 * g.top_inner_u
+        y_start = v_to_y(cup_top_v)
+        anchor_R = _body_point_at(V, u_inner_halter, y_start)
+        anchor_L = _body_point_at(V, -u_inner_halter, y_start)
+        # go up to the neck area and around to the back
+        y_neck_top = y_neck + 12.0
+        # midpoint behind the neck (z < 0)
+        neck_mid = np.array([0.0, y_neck_top, -8.0])
+        # simple 3-segment polyline per side: anchor -> forward-upper point
+        # -> neck back midpoint, for each cup. They meet at neck_mid.
+        up_R = anchor_R + np.array([0.0, 6.0, 0.0]) + np.array([anchor_R[0] * 0.1, 0, 0])
+        up_L = anchor_L + np.array([0.0, 6.0, 0.0]) + np.array([anchor_L[0] * 0.1, 0, 0])
+        halter_R = _arc_tube(np.array([anchor_R, up_R, neck_mid]), radius=strap_r)
+        halter_L = _arc_tube(np.array([anchor_L, up_L, neck_mid]), radius=strap_r)
+        straps.append(("halter_R", halter_R))
+        straps.append(("halter_L", halter_L))
+
+    # 6) Shoulder straps — two tubes from outer-top of each cup up to the
+    #    shoulder (where they'd meet the back band in reality). Controlled
+    #    by g.top_shoulder_strap.
+    if g.top_shoulder_strap > 0.15:
+        strap_r = 0.15 + 0.22 * g.top_shoulder_strap
+        cup_top_v = g.top_center_v + g.top_half_v
+        u_outer = g.top_inner_u + 2 * g.top_half_u
+        y_start = v_to_y(cup_top_v)
+        y_shoulder = y_neck + 8.0                    # just below shoulder cap
+        for u_s, name in [(u_outer, "shoulder_R"), (-u_outer, "shoulder_L")]:
+            anchor = _body_point_at(V, u_s, y_start)
+            # shoulder end: slightly outward of anchor, up at shoulder height,
+            # and on the TOP of the shoulder (y slightly forward in z)
+            shoulder_end = _body_point_at(V, u_s * 0.6, y_shoulder)
+            strap = _arc_tube(np.array([anchor, shoulder_end]), radius=strap_r)
+            straps.append((name, strap))
 
     return straps
 

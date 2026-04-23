@@ -72,12 +72,15 @@ CONT_FIELDS = [
     "top_apex_lift",       # concave top edge: +ve = V at center (triangle), -ve = bandeau flat
     "top_underband_dip",   # concave bottom edge: +ve pushes bottom inward under bust
     "top_back_coverage",   # 0 = back strap only, 1 = full back panel
+    "top_neck_strap",      # 0 = none, 1 = prominent halter across the back of the neck
+    "top_shoulder_strap",  # 0 = none, 1 = prominent shoulder straps (triangle-style)
     # BOTTOM
     "bot_front_top_v",     # waistline height at front
     "bot_front_half_u",    # half-width of front panel around u=0
     "bot_front_leg_curve", # concavity of front leg opening
     "bot_back_top_v",      # waistline height at back
     "bot_back_half_u",     # half-width of back panel around u=±1 (small -> thong)
+    "bot_tie_dangle",      # 0 = no knot tails, 1 = long dangling strings past the hip
     # COLOR
     "hue",
     "saturation",
@@ -94,11 +97,14 @@ class Genome:
     top_apex_lift: float
     top_underband_dip: float
     top_back_coverage: float
+    top_neck_strap: float
+    top_shoulder_strap: float
     bot_front_top_v: float
     bot_front_half_u: float
     bot_front_leg_curve: float
     bot_back_top_v: float
     bot_back_half_u: float
+    bot_tie_dangle: float
     hue: float
     saturation: float
 
@@ -467,24 +473,28 @@ def render_one(ax, g: Genome, title: str):
 # --------------------------------------------------------------------------
 
 def make_parents() -> tuple[Genome, Genome]:
-    # Parent A: triangle-ish top + thong + solid red
+    # Parent A: triangle top + thong + shoulder straps + long hip dangles
     a = Genome(
         pattern="solid",
         top_center_v=0.76, top_half_v=0.09, top_half_u=0.18,
         top_inner_u=0.12, top_apex_lift=0.10, top_underband_dip=0.08,
         top_back_coverage=0.12,
+        top_neck_strap=0.0, top_shoulder_strap=0.85,
         bot_front_top_v=0.22, bot_front_half_u=0.25, bot_front_leg_curve=0.60,
         bot_back_top_v=0.20, bot_back_half_u=0.12,
+        bot_tie_dangle=0.75,
         hue=0.97, saturation=0.75,
     )
-    # Parent B: bandeau top + high-waist + striped blue
+    # Parent B: halter bandeau + high-waist + no dangles + striped blue
     b = Genome(
         pattern="stripe",
         top_center_v=0.74, top_half_v=0.08, top_half_u=0.45,
         top_inner_u=0.0,  top_apex_lift=-0.03, top_underband_dip=0.02,
         top_back_coverage=0.55,
+        top_neck_strap=0.80, top_shoulder_strap=0.0,
         bot_front_top_v=0.42, bot_front_half_u=0.55, bot_front_leg_curve=0.20,
         bot_back_top_v=0.42, bot_back_half_u=0.55,
+        bot_tie_dangle=0.05,
         hue=0.57, saturation=0.85,
     )
     return _enforce_constraints(a.clipped()), _enforce_constraints(b.clipped())
