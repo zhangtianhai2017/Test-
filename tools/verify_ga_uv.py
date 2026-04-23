@@ -209,6 +209,21 @@ def _enforce_constraints(g: Genome) -> Genome:
     # --- minimum back coverage so back panels never collapse to nothing
     d["bot_back_half_u"] = max(d["bot_back_half_u"], 0.04)
 
+    # --- TOPOLOGY: a bikini that stays on the body needs closed loops.
+    # The top needs at least one band connecting the front cups to the back
+    # (otherwise the cups dangle forward and fall). The bottom needs the
+    # front and back panels to close into a single waist loop via the side
+    # ties — that only works if front and back waist-lines are close enough
+    # in v that the side tie can span them.
+    d["top_back_coverage"] = max(d["top_back_coverage"], 0.05)
+    # clamp front/back waist-v difference so the side tie can bridge them
+    MAX_WAIST_DIFF = 0.10
+    diff = d["bot_front_top_v"] - d["bot_back_top_v"]
+    if diff > MAX_WAIST_DIFF:
+        d["bot_back_top_v"] = d["bot_front_top_v"] - MAX_WAIST_DIFF
+    elif diff < -MAX_WAIST_DIFF:
+        d["bot_front_top_v"] = d["bot_back_top_v"] - MAX_WAIST_DIFF
+
     # --- non-degeneracy guards (kept from before)
     d["top_half_v"] = max(d["top_half_v"], 0.05)
     d["top_half_u"] = max(d["top_half_u"], 0.05)
@@ -306,15 +321,19 @@ def _bottom_back_polygons(g: Genome) -> list[list[tuple[float, float]]]:
 
 
 def _side_tie_polygons(g: Genome) -> list[list[tuple[float, float]]]:
-    """Thin side connectors between front and back bottom panels at u = ±0.5."""
-    top_v = min(g.bot_front_top_v, g.bot_back_top_v)
-    strap_h = 0.015 + 0.05 * g.top_back_coverage
-    v_center = top_v - 0.02
-    v0, v1 = v_center - strap_h / 2, v_center + strap_h / 2
+    """Side connectors bridging front and back bottom panels at u = ±0.5.
+
+    They must span the vertical range [min(front, back), max(front, back)] +
+    a small safety margin so the two panels are actually joined into one
+    waist loop (otherwise the bikini bottom is two disconnected flaps and
+    can't physically stay on).
+    """
+    v_lo = min(g.bot_front_top_v, g.bot_back_top_v) - 0.03
+    v_hi = max(g.bot_front_top_v, g.bot_back_top_v) + 0.01
     w = 0.06
     return [
-        [(-0.5 - w, v0), (-0.5 + w, v0), (-0.5 + w, v1), (-0.5 - w, v1), (-0.5 - w, v0)],
-        [( 0.5 - w, v0), ( 0.5 + w, v0), ( 0.5 + w, v1), ( 0.5 - w, v1), ( 0.5 - w, v0)],
+        [(-0.5 - w, v_lo), (-0.5 + w, v_lo), (-0.5 + w, v_hi), (-0.5 - w, v_hi), (-0.5 - w, v_lo)],
+        [( 0.5 - w, v_lo), ( 0.5 + w, v_lo), ( 0.5 + w, v_hi), ( 0.5 - w, v_hi), ( 0.5 - w, v_lo)],
     ]
 
 
