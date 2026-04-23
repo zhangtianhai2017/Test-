@@ -48,11 +48,18 @@ PATTERNS = ["solid", "stripe", "polka", "checker"]
 # parameters so the trapezoidal cups and front panel grow to at least
 # this size. They are not overlays painted on top; they're a lower bound
 # baked into the parameter ranges, so the bikini smoothly grows from them.
+#
+# Coordinate notes for the bundled UE NPC body: the cylindrical UV map
+# in render3d_uv.py places the breast peak at Genome v~=0.74 and the
+# crotch line at v~=0.18 (not 0.06 — that's the Genome's LANDMARKS_V
+# convention, which sits below the body's crotch on this mesh). Seeds
+# are therefore placed in the Genome v range that actually overlaps the
+# anatomy, not where LANDMARKS_V would put them.
 #   (u_lo, u_hi, v_lo, v_hi)
 PRIVACY_SEEDS = {
-    "right_nipple": (0.10, 0.18, 0.74, 0.82),
-    "left_nipple":  (-0.18, -0.10, 0.74, 0.82),
-    "pelvic_front": (-0.08, 0.08, 0.06, 0.14),
+    "right_nipple": (0.10, 0.22, 0.70, 0.80),
+    "left_nipple":  (-0.22, -0.10, 0.70, 0.80),
+    "pelvic_front": (-0.08, 0.08, 0.30, 0.42),
 }
 
 # Continuous Genome fields. Kept flat so GA operators are uniform.
@@ -433,7 +440,7 @@ def make_parents() -> tuple[Genome, Genome]:
         bot_back_top_v=0.42, bot_back_half_u=0.55,
         hue=0.57, saturation=0.85,
     )
-    return a.clipped(), b.clipped()
+    return _enforce_constraints(a.clipped()), _enforce_constraints(b.clipped())
 
 
 def run_ga(a: Genome, b: Genome, n: int, rng: random.Random) -> list[Genome]:
