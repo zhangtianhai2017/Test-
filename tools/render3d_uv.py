@@ -518,6 +518,15 @@ def _body_point_at(body_vertices: np.ndarray, u: float, y_level: float,
     if len(near) < 3:
         near = body_vertices[(body_vertices[:, 1] > y_level - y_tol) &
                               (body_vertices[:, 1] < y_level + y_tol)]
+    if len(near) == 0:
+        # y_level fell outside the mesh entirely — clamp to nearest available
+        # row so callers always get a valid anchor back.
+        y_min, y_max = float(body_vertices[:, 1].min()), float(body_vertices[:, 1].max())
+        y_clamped = float(np.clip(y_level, y_min + 0.5, y_max - 0.5))
+        near = body_vertices[np.abs(body_vertices[:, 1] - y_clamped) < y_tol * 2]
+        if len(near) == 0:
+            # last-resort: return the single closest vertex by absolute y distance
+            return body_vertices[int(np.argmin(np.abs(body_vertices[:, 1] - y_level)))].astype(np.float64)
     theta = np.arctan2(near[:, 0], near[:, 2])
     r_xz = np.sqrt(near[:, 0] ** 2 + near[:, 2] ** 2)
     target = u * np.pi

@@ -44,7 +44,7 @@ import fitness as fitness_mod
 from seed_loader import load_seed, seed_to_genome
 
 
-OUT_DIR = os.path.join(os.path.dirname(__file__), "output")
+DEFAULT_OUT_DIR = os.path.join(os.path.dirname(__file__), "output")
 
 
 def evolve(parent_a, parent_b, pop_size: int, gens: int,
@@ -89,8 +89,10 @@ def render_evolution_grid(seed_name: str, parent_a, parent_b,
                           ranked, mean_traj, max_traj,
                           n_top: int = 8,
                           cell_w: int = 320, cell_h: int = 480,
-                          label_b: str = "Parent B (synthetic)"
+                          label_b: str = "Parent B (synthetic)",
+                          out_dir: str = DEFAULT_OUT_DIR,
                           ) -> tuple[str, str]:
+    os.makedirs(out_dir, exist_ok=True)
     """Save two PNGs: (a) the 2×5 grid parents+top-N, (b) fitness trajectory."""
     mesh = load_body_mesh()
     uvs = cylindrical_uvs(mesh)
@@ -107,7 +109,7 @@ def render_evolution_grid(seed_name: str, parent_a, parent_b,
     for i, (g, s) in enumerate(ranked[:n_top]):
         cells.append((f"Top {i+1}  fit={s:.3f}", g))
 
-    cols = 5
+    cols = 6 if len(cells) >= 18 else 5
     rows = (len(cells) + cols - 1) // cols
     fig, axes = plt.subplots(rows, cols, figsize=(cols * 3.0, rows * 4.2),
                              facecolor="white")
@@ -132,7 +134,7 @@ def render_evolution_grid(seed_name: str, parent_a, parent_b,
         fontsize=11, y=0.995,
     )
     fig.tight_layout()
-    grid_path = os.path.join(OUT_DIR, f"evolve_{seed_name}_grid.png")
+    grid_path = os.path.join(out_dir, f"evolve_{seed_name}_grid.png")
     fig.savefig(grid_path, dpi=140, bbox_inches="tight")
     plt.close(fig)
 
@@ -146,7 +148,7 @@ def render_evolution_grid(seed_name: str, parent_a, parent_b,
     ax.legend()
     ax.set_title(f"Fitness trajectory — seed '{seed_name}'")
     ax.set_ylim(min(min(mean_traj), min(max_traj)) - 0.05, 1.0)
-    traj_path = os.path.join(OUT_DIR, f"evolve_{seed_name}_traj.png")
+    traj_path = os.path.join(out_dir, f"evolve_{seed_name}_traj.png")
     fig.tight_layout()
     fig.savefig(traj_path, dpi=120)
     plt.close(fig)
@@ -163,6 +165,10 @@ def main():
     ap.add_argument("--pop", type=int, default=30)
     ap.add_argument("--gens", type=int, default=8)
     ap.add_argument("--rng", type=int, default=42)
+    ap.add_argument("--top", type=int, default=8,
+                    help="how many top-ranked offspring to render in the grid")
+    ap.add_argument("--outdir", default=DEFAULT_OUT_DIR,
+                    help="directory to write evolve_<seed>_{grid,traj}.png")
     args = ap.parse_args()
 
     seed = load_seed(args.seed)
@@ -194,7 +200,7 @@ def main():
     tag = args.seed if not args.seed2 else f"{args.seed}_x_{args.seed2}"
     grid, traj = render_evolution_grid(
         tag, parent_a, parent_b, ranked, mean_t, max_t,
-        label_b=label_b)
+        n_top=args.top, label_b=label_b, out_dir=args.outdir)
     print(f"rendered grid in {time.time() - t0:.1f}s")
     print(f"  {grid}")
     print(f"  {traj}")
