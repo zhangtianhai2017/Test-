@@ -1,0 +1,70 @@
+{
+  "meta": {
+    "name": "composite_red",
+    "source_views": {
+      "all": "assets/2-swimsuits-2row.png  (row 0, three views)"
+    },
+    "analysis_notes": "Top row of the 2x3 composite — deep wine-red Brazilian halter string bikini. Triangle cups with V-shape sternum, halter ties around the neck, thong-cut bottom with side-tie bows. Solid color, slight satin sheen, no hardware. Probe: dominant fabric RGB (0.41, 0.09, 0.16) -> HSL ~(0.97, 0.625, 0.25).",
+    "confidence": {
+      "shape": 0.85,
+      "color": 0.95,
+      "pattern": 1.0,
+      "fabric": 0.55,
+      "hardware": 0.95,
+      "style_archetype": 0.85
+    }
+  },
+  "genome": {
+    "pattern": "solid",
+
+    "top_center_v": 0.76,
+    "top_half_v": 0.07,
+    "top_half_u": 0.16,
+    "top_inner_u": 0.12,
+    "top_apex_lift": 0.15,
+    "top_underband_dip": 0.05,
+    "top_back_coverage": 0.06,
+    "top_neck_strap": 0.75,
+    "top_shoulder_strap": 0.0,
+
+    "bot_front_top_v": 0.25,
+    "bot_front_half_u": 0.18,
+    "bot_front_leg_curve": 0.70,
+    "bot_back_top_v": 0.25,
+    "bot_back_half_u": 0.10,
+    "bot_tie_dangle": 0.40,
+
+    "hue": 0.97,
+    "saturation": 0.65,
+    "lightness": 0.25,
+    "secondary_hue": 0.95,
+    "secondary_saturation": 0.40,
+    "secondary_lightness": 0.18,
+    "pattern_scale": 0.5,
+    "pattern_angle": 0.0,
+    "trim_color_mode": 0.2,
+
+    "fabric_sheen": 0.45,
+    "fabric_metallic": 0.0,
+    "fabric_opacity": 1.0,
+    "fabric_weight": 0.4,
+    "fabric_weave": "plain",
+
+    "palette_preset": "free",
+    "fabric_source": "econyl",
+    "biodegradable": 0.0,
+    "single_material": 1.0,
+
+    "has_oring": 0.0,
+    "oring_size": 0.3,
+    "has_bow": 0.0,
+    "bow_size": 0.3,
+    "has_fringe": 0.0,
+    "fringe_length": 0.2,
+    "has_beads": 0.0,
+    "has_shell": 0.0,
+
+    "style_archetype": "brazilian",
+    "hardware_metal": "none"
+  }
+}
