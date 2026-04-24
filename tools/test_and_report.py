@@ -37,15 +37,14 @@ import traceback
 os.environ.setdefault("OPEN3D_CPU_RENDERING", "true")
 
 import numpy as np
-from PIL import Image
 import matplotlib.pyplot as plt
 import open3d as o3d
 
 sys.path.insert(0, os.path.dirname(__file__))
 from verify_ga_uv import (
-    CONT_FIELDS, PATTERNS, STYLE_ARCHETYPES, PALETTE_PRESETS,
+    CONT_FIELDS, STYLE_ARCHETYPES, PALETTE_PRESETS,
     FABRIC_SOURCES, FABRIC_WEAVES, HARDWARE_METALS,
-    Genome, make_parents, run_ga, crossover, mutate, _enforce_constraints,
+    Genome, make_parents, crossover, mutate, _enforce_constraints,
     genome_polygons, PRIVACY_SEEDS,
 )
 from render3d_uv import (

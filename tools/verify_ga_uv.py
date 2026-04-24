@@ -23,7 +23,6 @@ from dataclasses import dataclass, asdict
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon, Rectangle
-from matplotlib.colors import hsv_to_rgb
 
 SEED = 42
 N_OFFSPRING = 8

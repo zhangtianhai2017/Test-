@@ -24,8 +24,6 @@ to NSGA-II.
 
 from __future__ import annotations
 
-import colorsys
-from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 import numpy as np
