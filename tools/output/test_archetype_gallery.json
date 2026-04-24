@@ -1,6 +1,6 @@
 {
   "free": {
-    "pattern": "chevron",
+    "pattern": "solid",
     "top_center_v": 0.71,
     "top_half_v": 0.13199928754957002,
     "top_half_u": 0.37829837765361163,
@@ -92,7 +92,7 @@
     "hardware_metal": "pearl"
   },
   "italian_luxe": {
-    "pattern": "stripe",
+    "pattern": "chevron",
     "top_center_v": 0.7334899473968418,
     "top_half_v": 0.06651005260315823,
     "top_half_u": 0.6342990320463271,
@@ -135,7 +135,7 @@
     "has_beads": 1.0,
     "has_shell": 0.0,
     "style_archetype": "italian_luxe",
-    "hardware_metal": "chrome"
+    "hardware_metal": "gold"
   },
   "japanese_minimal": {
     "pattern": "gingham",
@@ -184,7 +184,7 @@
     "hardware_metal": "none"
   },
   "korean_feminine": {
-    "pattern": "polka",
+    "pattern": "chevron",
     "top_center_v": 0.71,
     "top_half_v": 0.2123481014039695,
     "top_half_u": 0.47188620677018595,
@@ -200,9 +200,9 @@
     "bot_back_top_v": 0.4764345422016096,
     "bot_back_half_u": 0.15415174985090618,
     "bot_tie_dangle": 0.049769624632072254,
-    "hue": 0.9988638269947362,
-    "saturation": 0.3169340104435602,
-    "lightness": 0.7875506382309925,
+    "hue": 0.04686382699473618,
+    "saturation": 0.5869340104435602,
+    "lightness": 0.7095506382309925,
     "secondary_hue": 0.2879068949247768,
     "secondary_saturation": 0.6438040260539637,
     "secondary_lightness": 0.7101426408550321,
@@ -214,7 +214,7 @@
     "fabric_opacity": 1.0,
     "fabric_weight": 0.2753909499177459,
     "fabric_weave": "crinkle",
-    "palette_preset": "transcendent_pink",
+    "palette_preset": "sunset_peach",
     "fabric_source": "amni_soul",
     "biodegradable": 1.0,
     "single_material": 1.0,
@@ -230,7 +230,7 @@
     "hardware_metal": "pearl"
   },
   "scandi_minimal": {
-    "pattern": "stripe",
+    "pattern": "chevron",
     "top_center_v": 0.79,
     "top_half_v": 0.3528301339949906,
     "top_half_u": 0.2693288712819563,
@@ -276,7 +276,7 @@
     "hardware_metal": "pearl"
   },
   "spanish_mediterranean": {
-    "pattern": "leopard",
+    "pattern": "solid",
     "top_center_v": 0.7508346494061059,
     "top_half_v": 0.1450133272589186,
     "top_half_u": 0.6094097072772795,
@@ -322,7 +322,7 @@
     "hardware_metal": "pearl"
   },
   "american_sporty": {
-    "pattern": "tropical",
+    "pattern": "solid",
     "top_center_v": 0.71,
     "top_half_v": 0.1445189819965146,
     "top_half_u": 0.15702181624718192,
@@ -368,7 +368,7 @@
     "hardware_metal": "pearl"
   },
   "boho_cultgaia": {
-    "pattern": "chevron",
+    "pattern": "floral",
     "top_center_v": 0.71,
     "top_half_v": 0.17661594987373208,
     "top_half_u": 0.33096703021093815,
@@ -414,7 +414,7 @@
     "hardware_metal": "none"
   },
   "retro_missoni": {
-    "pattern": "stripe",
+    "pattern": "chevron",
     "top_center_v": 0.7204310217442919,
     "top_half_v": 0.14132636690077993,
     "top_half_u": 0.25195140637172353,
@@ -552,7 +552,7 @@
     "hardware_metal": "none"
   },
   "sporty_chromat": {
-    "pattern": "tropical",
+    "pattern": "solid",
     "top_center_v": 0.7311936267693,
     "top_half_v": 0.22098946541251346,
     "top_half_u": 0.3907529315875969,

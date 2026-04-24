@@ -1,6 +1,6 @@
 # Bikini GA — Test + Report
 
-Generated at 2026-04-24 01:42:03
+Generated at 2026-04-24 01:50:16
 
 
 ## 1. Sanity — construction, constraints, privacy seeds, patterns
@@ -31,7 +31,7 @@ Generated at 2026-04-24 01:42:03
 
 - ✅ **PASS** — All 200 offspring pass privacy-seed containment
 - ✅ **PASS** — All offspring respect stay-on topology (back coverage, waist span)
-- 📊 Offspring spans **10/12 patterns**, **12/14 archetypes**, **5/6 hardware metals**.
+- 📊 Offspring spans **7/12 patterns**, **12/14 archetypes**, **5/6 hardware metals**.
 
 - ✅ **PASS** — Offspring show multiple patterns
 - ✅ **PASS** — Offspring show multiple archetypes
@@ -46,12 +46,12 @@ Generated at 2026-04-24 01:42:03
 |---|---|---|---|---|
 | balance | 1.000 | 0.000 | 1.000 | 1.000 |
 | proportion | 0.708 | 0.210 | 0.067 | 0.998 |
-| harmony | 0.734 | 0.181 | 0.345 | 0.999 |
+| harmony | 0.735 | 0.180 | 0.345 | 0.999 |
 | emphasis | 0.784 | 0.218 | 0.550 | 1.000 |
-| rhythm | 0.720 | 0.194 | 0.300 | 1.000 |
-| unity | 0.906 | 0.068 | 0.800 | 0.950 |
-| contrast | 0.683 | 0.207 | 0.154 | 0.998 |
-| overall | 0.791 | 0.067 | 0.623 | 0.959 |
+| rhythm | 0.668 | 0.198 | 0.300 | 1.000 |
+| unity | 0.881 | 0.075 | 0.800 | 0.950 |
+| contrast | 0.682 | 0.206 | 0.154 | 0.998 |
+| overall | 0.780 | 0.069 | 0.600 | 0.933 |
 
 
 ![Fitness histograms](test_fitness_histogram.png)
@@ -63,22 +63,22 @@ Generated at 2026-04-24 01:42:03
 
 | gen | mean_fitness | max_fitness |
 |---|---|---|
-| 0 | 0.786 | 0.904 |
-| 1 | 0.819 | 0.940 |
-| 2 | 0.879 | 0.951 |
-| 3 | 0.870 | 0.966 |
-| 4 | 0.876 | 0.966 |
-| 5 | 0.876 | 0.966 |
-| 6 | 0.906 | 0.968 |
-| 7 | 0.898 | 0.968 |
-| 8 | 0.892 | 0.968 |
+| 0 | 0.776 | 0.904 |
+| 1 | 0.816 | 0.940 |
+| 2 | 0.875 | 0.951 |
+| 3 | 0.873 | 0.968 |
+| 4 | 0.887 | 0.968 |
+| 5 | 0.876 | 0.970 |
+| 6 | 0.900 | 0.970 |
+| 7 | 0.897 | 0.975 |
+| 8 | 0.887 | 0.975 |
 
 
 ![Fitness trajectory](test_fitness_trajectory.png)
 
 
-- ✅ **PASS** — Mean fitness improved: 0.786 -> 0.892
-- ✅ **PASS** — Max fitness non-decreasing: 0.904 -> 0.968
+- ✅ **PASS** — Mean fitness improved: 0.776 -> 0.887
+- ✅ **PASS** — Max fitness non-decreasing: 0.904 -> 0.975
 
 ## 5. Style archetype gallery — one 3D render per style_archetype
 

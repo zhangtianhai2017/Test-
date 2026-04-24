@@ -814,8 +814,13 @@ def build_strap_meshes(body_mesh: o3d.geometry.TriangleMesh, g,
             dangle = _tube_between(p0, p1, radius=0.15, sides=5)
             straps.append((name, dangle))
 
-    # 5) Halter neck strap — a curved tube from the inner-top of each cup
-    #    up over the BACK of the neck. Controlled by g.top_neck_strap.
+    # 5) Halter neck strap — two short tubes rising from the cup inner-top
+    #    and converging at the sternal notch / base of the neck in FRONT
+    #    of the body. The "wrap behind the neck" part is implied — we
+    #    don't render past the neck base because any arc over the top
+    #    would have to cross the head/chin from a front camera view
+    #    (straight-line tube between front-chest and behind-neck passes
+    #    through the jaw around y = neck_top - 3).
     if g.top_neck_strap > 0.15:
         strap_r = 0.15 + 0.25 * g.top_neck_strap     # ~1.5 to 4 mm radius
         cup_top_v = g.top_center_v + g.top_half_v
@@ -823,16 +828,20 @@ def build_strap_meshes(body_mesh: o3d.geometry.TriangleMesh, g,
         y_start = v_to_y(cup_top_v)
         anchor_R = _body_point_at(V, u_inner_halter, y_start)
         anchor_L = _body_point_at(V, -u_inner_halter, y_start)
-        # go up to the neck area and around to the back
-        y_neck_top = y_neck + 12.0
-        # midpoint behind the neck (z < 0)
-        neck_mid = np.array([0.0, y_neck_top, -8.0])
-        # simple 3-segment polyline per side: anchor -> forward-upper point
-        # -> neck back midpoint, for each cup. They meet at neck_mid.
-        up_R = anchor_R + np.array([0.0, 6.0, 0.0]) + np.array([anchor_R[0] * 0.1, 0, 0])
-        up_L = anchor_L + np.array([0.0, 6.0, 0.0]) + np.array([anchor_L[0] * 0.1, 0, 0])
-        halter_R = _arc_tube(np.array([anchor_R, up_R, neck_mid]), radius=strap_r)
-        halter_L = _arc_tube(np.array([anchor_L, up_L, neck_mid]), radius=strap_r)
+        # Meeting point: at the base of the neck, slightly in front so
+        # the tube stays above the body surface and never crosses the
+        # chin / jaw. y_neck is our "v=1 anchor" (upper chest height);
+        # the actual neck base sits just below it.
+        meeting = _body_point_at(V, 0.0, y_neck - 4.0) \
+                  + np.array([0.0, 0.0, 0.4])
+        # Optional mid-control point to bend the tube gracefully toward
+        # the sternal notch instead of a straight line from cup to neck.
+        mid_R = 0.5 * (anchor_R + meeting) + np.array([0.0, 1.0, 0.5])
+        mid_L = 0.5 * (anchor_L + meeting) + np.array([0.0, 1.0, 0.5])
+        halter_R = _arc_tube(np.array([anchor_R, mid_R, meeting]),
+                              radius=strap_r)
+        halter_L = _arc_tube(np.array([anchor_L, mid_L, meeting]),
+                              radius=strap_r)
         straps.append(("halter_R", halter_R))
         straps.append(("halter_L", halter_L))
 
