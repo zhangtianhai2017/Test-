@@ -88,7 +88,8 @@ def evolve(parent_a, parent_b, pop_size: int, gens: int,
 def render_evolution_grid(seed_name: str, parent_a, parent_b,
                           ranked, mean_traj, max_traj,
                           n_top: int = 8,
-                          cell_w: int = 320, cell_h: int = 480
+                          cell_w: int = 320, cell_h: int = 480,
+                          label_b: str = "Parent B (synthetic)"
                           ) -> tuple[str, str]:
     """Save two PNGs: (a) the 2×5 grid parents+top-N, (b) fitness trajectory."""
     mesh = load_body_mesh()
@@ -102,7 +103,7 @@ def render_evolution_grid(seed_name: str, parent_a, parent_b,
                            uvs, genome_polygons(g))
 
     cells = [("Parent A (seed)", parent_a),
-             ("Parent B (synthetic)", parent_b)]
+             (label_b, parent_b)]
     for i, (g, s) in enumerate(ranked[:n_top]):
         cells.append((f"Top {i+1}  fit={s:.3f}", g))
 
@@ -156,6 +157,9 @@ def render_evolution_grid(seed_name: str, parent_a, parent_b,
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("seed", help="seed name under assets/seeds/")
+    ap.add_argument("--seed2", default=None,
+                    help="optional second seed for the other parent. "
+                         "Omit for single-seed evolution (both parents = seed).")
     ap.add_argument("--pop", type=int, default=30)
     ap.add_argument("--gens", type=int, default=8)
     ap.add_argument("--rng", type=int, default=42)
@@ -163,11 +167,17 @@ def main():
 
     seed = load_seed(args.seed)
     parent_a = seed_to_genome(seed)
-    parent_b = make_parents()[1]      # use the synthetic Parent B for contrast
+
+    if args.seed2:
+        parent_b = seed_to_genome(load_seed(args.seed2))
+        label_b = f"Parent B (seed '{args.seed2}')"
+    else:
+        parent_b = parent_a
+        label_b = f"Parent B (same seed — mutation-driven)"
 
     print(f"seeded from '{args.seed}': archetype={parent_a.style_archetype} "
           f"pattern={parent_a.pattern} hue={parent_a.hue:.2f}")
-    print(f"parent B: archetype={parent_b.style_archetype} "
+    print(f"{label_b}: archetype={parent_b.style_archetype} "
           f"pattern={parent_b.pattern} hue={parent_b.hue:.2f}")
     print(f"running GA: pop={args.pop}, gens={args.gens}")
 
@@ -181,8 +191,10 @@ def main():
     print(f"top individual: overall={ranked[0][1]:.3f}")
 
     t0 = time.time()
+    tag = args.seed if not args.seed2 else f"{args.seed}_x_{args.seed2}"
     grid, traj = render_evolution_grid(
-        args.seed, parent_a, parent_b, ranked, mean_t, max_t)
+        tag, parent_a, parent_b, ranked, mean_t, max_t,
+        label_b=label_b)
     print(f"rendered grid in {time.time() - t0:.1f}s")
     print(f"  {grid}")
     print(f"  {traj}")
