@@ -49,7 +49,38 @@ PATTERNS = [
 ]
 
 # Batch 1 discrete enumerations
-FABRIC_WEAVES = ["plain", "mesh", "crochet", "ribbed", "velvet"]
+FABRIC_WEAVES = [
+    "plain",        # default flat weave
+    "mesh",         # open grid, see-through
+    "crochet",      # handmade texture, chunky
+    "ribbed",       # strong vertical ribs
+    "velvet",       # pile surface, matte
+    "crinkle",      # Hunza G signature — high-freq crinkle
+    "shiny_knit",   # Missoni-ish shiny knit
+]
+
+# 2025 hardware / trim palette
+HARDWARE_METALS = ["none", "gold", "silver", "rose_gold", "pearl", "chrome"]
+
+# Style archetypes (Batch 2 §4). Each one pulls several Genome fields
+# toward a designer / regional signature. See _STYLE_TARGETS below.
+STYLE_ARCHETYPES = [
+    "free",                  # no bias
+    "brazilian",             # low rise, tiny sides, cheeky, vivid
+    "italian_luxe",          # big prints, heavy metal, baroque
+    "japanese_minimal",      # clean lines, muted, tiny hardware
+    "korean_feminine",       # pastel, bows, ribbons
+    "scandi_minimal",        # black/white, matte, no print
+    "spanish_mediterranean", # crochet, earth tones, ruffles
+    "american_sporty",       # rash-guard inspired, bold blocks
+    "boho_cultgaia",         # crochet + shells + fringe
+    "retro_missoni",         # chevron / zigzag, striped
+    "hunzag_crinkle",        # Hunza G — crinkle fabric
+    "avantgarde_cutout",     # editorial, high contrast, cutouts
+    "sporty_chromat",        # strap-heavy, athletic
+    "eres_architect",        # molded cups, no hardware
+]
+
 PALETTE_PRESETS = [
     "free",                 # unconstrained — GA can pick any hue/sat/light
     "future_dusk",          # WGSN 2025 color of the year — dark blue-purple
@@ -105,6 +136,15 @@ CONT_FIELDS = [
     # SUSTAINABILITY (Batch 1 new)
     "biodegradable",       # continuous in [0,1] but thresholded to 0/1 by constraints
     "single_material",     # ditto — recyclability by design
+    # HARDWARE / TRIM (Batch 2 new)
+    "has_oring",           # 0/1 threshold: metal rings at strap junctions
+    "oring_size",          # 0..1 -> diameter 0.8..2.6 cm
+    "has_bow",             # 0/1: decorative bow at front center gore
+    "bow_size",            # 0..1 -> bow wingspan 1..5 cm
+    "has_fringe",          # 0/1: fringes hanging from bottom-panel leg cut
+    "fringe_length",       # 0..1 -> 1..10 cm
+    "has_beads",           # 0/1: small beads along the top-band edge
+    "has_shell",           # 0/1: shell-like charm hanging at front center
 ]
 
 
@@ -148,6 +188,18 @@ class Genome:
     fabric_source: str
     biodegradable: float
     single_material: float
+    # hardware (Batch 2 new)
+    has_oring: float
+    oring_size: float
+    has_bow: float
+    bow_size: float
+    has_fringe: float
+    fringe_length: float
+    has_beads: float
+    has_shell: float
+    # style (Batch 2 new)
+    style_archetype: str
+    hardware_metal: str
 
     def as_dict(self) -> dict:
         return asdict(self)
@@ -203,6 +255,8 @@ _DISCRETE_ENUMS = {
     "fabric_weave": FABRIC_WEAVES,
     "palette_preset": PALETTE_PRESETS,
     "fabric_source": FABRIC_SOURCES,
+    "style_archetype": STYLE_ARCHETYPES,
+    "hardware_metal": HARDWARE_METALS,
 }
 
 
@@ -315,9 +369,32 @@ def _enforce_constraints(g: Genome) -> Genome:
     if d["bot_front_top_v"] > cup_bottom_v - 0.02:
         d["bot_front_top_v"] = max(p_v_hi + 0.04, cup_bottom_v - 0.05)
 
-    # --- Batch 1: threshold booleans ------------------------------------
-    d["biodegradable"] = 1.0 if d["biodegradable"] >= 0.5 else 0.0
-    d["single_material"] = 1.0 if d["single_material"] >= 0.5 else 0.0
+    # --- Batch 1 + 2: threshold booleans --------------------------------
+    for k in ("biodegradable", "single_material",
+              "has_oring", "has_bow", "has_fringe",
+              "has_beads", "has_shell"):
+        d[k] = 1.0 if d[k] >= 0.5 else 0.0
+
+    # --- Batch 2: style archetype soft-anchors many fields --------------
+    arch = d.get("style_archetype", "free")
+    arch_targets = _STYLE_TARGETS.get(arch)
+    if arch_targets is not None:
+        blend = 0.55  # pull 55% toward the archetype
+        for k, tv in arch_targets.items():
+            if k in _DISCRETE_ENUMS:
+                # single-point snap for discrete fields with some probability
+                if rng_coin(k, d, blend):
+                    d[k] = tv
+            elif k in CONT_FIELDS:
+                if k in _CIRCULAR_CONT:
+                    # circular blend (shortest arc)
+                    cur = d[k]
+                    diff = (tv - cur) % 1.0
+                    if diff > 0.5:
+                        diff -= 1.0
+                    d[k] = (cur + blend * diff) % 1.0
+                else:
+                    d[k] = (1 - blend) * d[k] + blend * tv
 
     # --- Batch 1: palette preset soft-anchors colour fields ------------
     # When a WGSN preset is picked, bias hue/sat/light toward a target
@@ -328,7 +405,12 @@ def _enforce_constraints(g: Genome) -> Genome:
     if targets is not None:
         blend = 0.6  # pull 60% toward the target
         th, ts, tl = targets
-        d["hue"] = ((1 - blend) * d["hue"] + blend * th) % 1.0
+        # Hue is circular — take shortest arc, not linear.
+        cur_h = d["hue"]
+        diff = (th - cur_h) % 1.0
+        if diff > 0.5:
+            diff -= 1.0
+        d["hue"] = (cur_h + blend * diff) % 1.0
         d["saturation"] = float(np.clip(
             (1 - blend) * d["saturation"] + blend * ts, 0.0, 1.0))
         d["lightness"] = float(np.clip(
@@ -339,6 +421,88 @@ def _enforce_constraints(g: Genome) -> Genome:
     # (No-op here; used downstream in render_mesh for wrinkle amplitude.)
 
     return Genome(**d)
+
+
+# Deterministic coin based on a hashed field key + current value so the
+# style-archetype discrete snaps are reproducible per-Genome without
+# needing an RNG argument. Returns True with probability `p`.
+def rng_coin(key: str, d: dict, p: float) -> bool:
+    val = d.get(key, "")
+    h = hash(f"{key}:{val}") & 0xffff
+    return (h / 0xffff) < p
+
+
+# Style archetype targets — each value is a (field -> target) dict. The
+# constraint blender pulls the Genome 55% toward these values, so the
+# archetype acts as an "attractor" without hard-overriding the GA. Only
+# the most distinctive fields for each style are listed; everything else
+# floats freely.
+_STYLE_TARGETS: dict[str, dict] = {
+    "brazilian": {            # low-rise, tiny sides, cheeky, vivid
+        "bot_front_top_v": 0.25, "bot_back_half_u": 0.08,
+        "bot_front_half_u": 0.16, "bot_front_leg_curve": 0.75,
+        "saturation": 0.85, "lightness": 0.55,
+        "top_back_coverage": 0.10, "fabric_sheen": 0.55,
+    },
+    "italian_luxe": {         # big prints + heavy metal
+        "pattern": "floral", "pattern_scale": 0.75,
+        "has_oring": 1.0, "oring_size": 0.75, "hardware_metal": "gold",
+        "fabric_metallic": 0.25, "saturation": 0.78,
+    },
+    "japanese_minimal": {     # clean lines, muted, tiny hardware
+        "pattern": "solid", "saturation": 0.25, "lightness": 0.70,
+        "fabric_sheen": 0.35, "has_oring": 0.0, "has_bow": 0.0,
+        "top_back_coverage": 0.30, "bot_front_leg_curve": 0.30,
+    },
+    "korean_feminine": {      # pastel + bows
+        "pattern": "polka", "has_bow": 1.0, "bow_size": 0.55,
+        "saturation": 0.35, "lightness": 0.82,
+        "palette_preset": "transcendent_pink",
+    },
+    "scandi_minimal": {       # black-or-white matte
+        "pattern": "solid", "saturation": 0.05, "lightness": 0.25,
+        "fabric_sheen": 0.10, "fabric_source": "econyl",
+        "has_oring": 0.0, "has_bow": 0.0, "has_fringe": 0.0,
+    },
+    "spanish_mediterranean": {  # crochet + earth + ruffle
+        "fabric_weave": "crochet", "pattern": "solid",
+        "hue": 0.08, "saturation": 0.55, "lightness": 0.55,
+        "has_fringe": 1.0, "fringe_length": 0.55,
+    },
+    "american_sporty": {      # bold blocks, rash-guard
+        "pattern": "solid", "top_back_coverage": 0.85,
+        "top_shoulder_strap": 0.75, "bot_front_top_v": 0.55,
+        "fabric_sheen": 0.20,
+    },
+    "boho_cultgaia": {        # crochet + shell + fringe
+        "fabric_weave": "crochet", "has_shell": 1.0,
+        "has_fringe": 1.0, "fringe_length": 0.75,
+        "hue": 0.09, "saturation": 0.50, "lightness": 0.55,
+        "has_beads": 1.0,
+    },
+    "retro_missoni": {        # chevron / zigzag
+        "pattern": "chevron", "pattern_scale": 0.45,
+        "fabric_weave": "shiny_knit", "fabric_sheen": 0.55,
+    },
+    "hunzag_crinkle": {       # Hunza G signature
+        "fabric_weave": "crinkle", "fabric_weight": 0.35,
+        "pattern": "solid", "saturation": 0.70,
+    },
+    "avantgarde_cutout": {    # editorial, high contrast
+        "trim_color_mode": 0.95, "top_back_coverage": 0.25,
+        "top_shoulder_strap": 0.05, "fabric_sheen": 0.85,
+    },
+    "sporty_chromat": {       # strap-heavy athletic
+        "top_shoulder_strap": 0.90, "top_back_coverage": 0.70,
+        "top_neck_strap": 0.60, "pattern": "solid",
+    },
+    "eres_architect": {       # molded cups, no hardware
+        "has_oring": 0.0, "has_bow": 0.0, "has_fringe": 0.0,
+        "has_beads": 0.0, "has_shell": 0.0,
+        "pattern": "solid", "fabric_sheen": 0.35,
+        "top_back_coverage": 0.55,
+    },
+}
 
 
 # WGSN 2025 palette targets in HSL (each in [0,1]).
@@ -647,6 +811,12 @@ def make_parents() -> tuple[Genome, Genome]:
         palette_preset="sunset_peach",
         fabric_source="econyl",
         biodegradable=0.0, single_material=1.0,
+        has_oring=1.0, oring_size=0.6,
+        has_bow=0.0, bow_size=0.3,
+        has_fringe=1.0, fringe_length=0.45,
+        has_beads=0.0, has_shell=0.0,
+        style_archetype="brazilian",
+        hardware_metal="gold",
     )
     # Parent B: halter bandeau + high-waist + no dangles + classic blue
     # stripe, satin-y recycled nylon, "aquatic awe" WGSN palette.
@@ -668,6 +838,12 @@ def make_parents() -> tuple[Genome, Genome]:
         palette_preset="aquatic_awe",
         fabric_source="qnova",
         biodegradable=1.0, single_material=1.0,
+        has_oring=0.0, oring_size=0.4,
+        has_bow=1.0, bow_size=0.55,
+        has_fringe=0.0, fringe_length=0.2,
+        has_beads=1.0, has_shell=0.0,
+        style_archetype="retro_missoni",
+        hardware_metal="pearl",
     )
     return _enforce_constraints(a.clipped()), _enforce_constraints(b.clipped())
 

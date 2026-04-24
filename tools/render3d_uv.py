@@ -239,11 +239,16 @@ def genome_to_texture(g: Genome) -> Image.Image:
         if g.pattern != "solid":
             mask = Image.new("L", (TEX_W, TEX_H), 0)
             ImageDraw.Draw(mask).polygon(poly_px, fill=255)
-            ovl = Image.new("RGBA", (TEX_W, TEX_H), (0, 0, 0, 0))
-            _draw_pattern_into(ovl, poly_px, g.pattern,
+            # Build the pattern on top of a solid-primary base so the
+            # accent alpha blends over the primary color instead of
+            # wiping it out when mask-composited.
+            base = Image.new("RGBA", (TEX_W, TEX_H), primary_rgba)
+            accent = Image.new("RGBA", (TEX_W, TEX_H), (0, 0, 0, 0))
+            _draw_pattern_into(accent, poly_px, g.pattern,
                                 primary_rgba, secondary_rgba,
                                 scale=g.pattern_scale, angle=g.pattern_angle)
-            img = Image.composite(ovl, img, mask).convert("RGBA")
+            combined = Image.alpha_composite(base, accent)
+            img = Image.composite(combined, img, mask).convert("RGBA")
             draw = ImageDraw.Draw(img, "RGBA")
     # Paint a skin-tone safe band at the top and bottom of the texture.
     # Body vertices whose genome v clamps to 0 (legs) or 1 (head) end up
@@ -567,6 +572,181 @@ def _arc_tube(points: np.ndarray, radius: float = 0.25, sides: int = 6
     return mesh
 
 
+def _build_torus(major_r: float, minor_r: float, major_seg: int = 24,
+                  minor_seg: int = 10) -> o3d.geometry.TriangleMesh:
+    try:
+        return o3d.geometry.TriangleMesh.create_torus(
+            torus_radius=major_r, tube_radius=minor_r,
+            radial_resolution=major_seg, tubular_resolution=minor_seg,
+        )
+    except Exception:
+        verts, faces = [], []
+        for i in range(major_seg):
+            a = 2 * np.pi * i / major_seg
+            for j in range(minor_seg):
+                b = 2 * np.pi * j / minor_seg
+                x = (major_r + minor_r * np.cos(b)) * np.cos(a)
+                y = minor_r * np.sin(b)
+                z = (major_r + minor_r * np.cos(b)) * np.sin(a)
+                verts.append([x, y, z])
+        for i in range(major_seg):
+            for j in range(minor_seg):
+                ni = (i + 1) % major_seg
+                nj = (j + 1) % minor_seg
+                a = i * minor_seg + j
+                b = ni * minor_seg + j
+                c = ni * minor_seg + nj
+                d = i * minor_seg + nj
+                faces += [[a, b, c], [a, c, d]]
+        m = o3d.geometry.TriangleMesh()
+        m.vertices = o3d.utility.Vector3dVector(np.array(verts))
+        m.triangles = o3d.utility.Vector3iVector(np.array(faces, dtype=np.int32))
+        return m
+
+
+def _place_at(mesh: o3d.geometry.TriangleMesh, center: np.ndarray,
+               normal: np.ndarray) -> o3d.geometry.TriangleMesh:
+    """Translate mesh so it sits at `center` with its Y axis aligned to
+    `normal` (used for orienting torus / bow flat against the body)."""
+    out = o3d.geometry.TriangleMesh(mesh)
+    # rotate Y-axis to align with normal
+    y = np.array([0.0, 1.0, 0.0])
+    n = normal / max(np.linalg.norm(normal), 1e-6)
+    axis = np.cross(y, n)
+    s = np.linalg.norm(axis)
+    if s > 1e-6:
+        axis /= s
+        angle = np.arccos(np.clip(np.dot(y, n), -1, 1))
+        R = o3d.geometry.get_rotation_matrix_from_axis_angle(axis * angle)
+        out.rotate(R, center=(0, 0, 0))
+    out.translate(center)
+    return out
+
+
+def _build_oring_meshes(g, body_vertices, y_crotch, y_neck, v_to_y):
+    """One torus per strap junction: at the center-gore, at each hip."""
+    if g.has_oring < 0.5:
+        return []
+    size = 0.25 + 0.8 * g.oring_size  # cm major radius 0.25..1.05
+    minor = 0.12 * size
+    anchors = []
+    # center front gore
+    y = v_to_y(g.top_center_v)
+    anchors.append(("front_gore", 0.0, y))
+    # hips at the side ties
+    y_front = v_to_y(g.bot_front_top_v)
+    y_back = v_to_y(g.bot_back_top_v)
+    hip_y = (y_front + y_back) / 2
+    for u in (0.5, -0.5):
+        anchors.append(("hip", u, hip_y))
+    out = []
+    for name, u, yy in anchors:
+        p = _body_point_at(body_vertices, u, yy)
+        rxz = np.array([p[0], 0.0, p[2]])
+        rxz /= max(np.linalg.norm(rxz), 1e-6)
+        # torus sits on surface, facing outward
+        torus = _build_torus(size, minor)
+        mesh = _place_at(torus, p + rxz * (minor + 0.3), rxz)
+        mesh.compute_vertex_normals()
+        out.append((f"oring_{name}_{u:.1f}", mesh))
+    return out
+
+
+def _build_bow_mesh(g, body_vertices, v_to_y):
+    """A small bow at the center front. Two triangles + a center knot."""
+    if g.has_bow < 0.5:
+        return []
+    size = 0.8 + 3.2 * g.bow_size   # wingspan 0.8..4.0 cm
+    y = v_to_y(g.top_center_v)
+    p = _body_point_at(body_vertices, 0.0, y)
+    rxz = np.array([p[0], 0.0, p[2]]); rxz /= max(np.linalg.norm(rxz), 1e-6)
+    tangent = np.array([-rxz[2], 0, rxz[0]])  # horizontal
+    up = np.array([0.0, 1.0, 0.0])
+    out = p + rxz * 0.4
+    h = size * 0.45
+
+    def wing(dir_sign: int):
+        outer = out + tangent * dir_sign * size
+        verts = np.array([
+            out, outer + up * h, outer - up * h,
+            out + tangent * dir_sign * size * 0.3 + up * h * 0.15,
+        ])
+        faces = np.array([[0, 1, 2], [0, 1, 3], [0, 3, 2]], dtype=np.int32)
+        m = o3d.geometry.TriangleMesh()
+        m.vertices = o3d.utility.Vector3dVector(verts)
+        m.triangles = o3d.utility.Vector3iVector(faces)
+        m.compute_vertex_normals()
+        return m
+
+    knot = o3d.geometry.TriangleMesh.create_sphere(size * 0.22)
+    knot.translate(out)
+    knot.compute_vertex_normals()
+    return [("bow_R", wing(+1)), ("bow_L", wing(-1)), ("bow_knot", knot)]
+
+
+def _build_fringe_meshes(g, body_vertices, v_to_y):
+    """Hanging thin tubes along the bottom panel's leg opening."""
+    if g.has_fringe < 0.5:
+        return []
+    length = 1.0 + 10.0 * g.fringe_length
+    # sample anchor points along the waistline/leg-opening from front panel
+    # Here we drop fringes from the waist-ties down
+    y_front = v_to_y(g.bot_front_top_v)
+    y_back = v_to_y(g.bot_back_top_v)
+    band_y = (y_front + y_back) / 2
+    us = np.linspace(-0.35, 0.35, 11)    # 11 fringes spread along front
+    out = o3d.geometry.TriangleMesh()
+    for u in us:
+        anchor = _body_point_at(body_vertices, float(u), band_y)
+        rxz = np.array([anchor[0], 0.0, anchor[2]])
+        rxz /= max(np.linalg.norm(rxz), 1e-6)
+        p0 = anchor + rxz * 0.4
+        p1 = p0 - np.array([0.0, length, 0.0])
+        seg = _tube_between(p0, p1, radius=0.12, sides=5)
+        out += seg
+    out.compute_vertex_normals()
+    return [("fringes", out)]
+
+
+def _build_beads_meshes(g, body_vertices, v_to_y):
+    """Small beads along the top band."""
+    if g.has_beads < 0.5:
+        return []
+    y = v_to_y(g.top_center_v)
+    cup_outer_u = g.top_inner_u + 2 * g.top_half_u
+    us = np.linspace(cup_outer_u + 0.02, 1.0, 6)
+    us = np.concatenate([us, -us])
+    out = o3d.geometry.TriangleMesh()
+    for u in us:
+        p = _body_point_at(body_vertices, float(u), y)
+        rxz = np.array([p[0], 0.0, p[2]])
+        rxz /= max(np.linalg.norm(rxz), 1e-6)
+        bead = o3d.geometry.TriangleMesh.create_sphere(0.28)
+        bead.translate(p + rxz * 0.35)
+        out += bead
+    out.compute_vertex_normals()
+    return [("beads", out)]
+
+
+def _build_shell_mesh(g, body_vertices, v_to_y):
+    """A shell-like charm hanging from the center gore."""
+    if g.has_shell < 0.5:
+        return []
+    y = v_to_y(g.top_center_v) - 2.5
+    p = _body_point_at(body_vertices, 0.0, y)
+    rxz = np.array([p[0], 0.0, p[2]])
+    rxz /= max(np.linalg.norm(rxz), 1e-6)
+    # a flattened sphere cap as a quick shell approximation
+    shell = o3d.geometry.TriangleMesh.create_sphere(0.85)
+    shell.scale(1.0, center=(0, 0, 0))
+    verts = np.asarray(shell.vertices)
+    verts[:, 2] *= 0.3          # flatten along world-z ~ anchor normal
+    shell.vertices = o3d.utility.Vector3dVector(verts)
+    shell = _place_at(shell, p + rxz * 0.8, rxz)
+    shell.compute_vertex_normals()
+    return [("shell", shell)]
+
+
 def build_strap_meshes(body_mesh: o3d.geometry.TriangleMesh, g,
                        y_crotch: float, y_neck: float
                        ) -> list[tuple[str, o3d.geometry.TriangleMesh]]:
@@ -650,6 +830,13 @@ def build_strap_meshes(body_mesh: o3d.geometry.TriangleMesh, g,
         halter_L = _arc_tube(np.array([anchor_L, up_L, neck_mid]), radius=strap_r)
         straps.append(("halter_R", halter_R))
         straps.append(("halter_L", halter_L))
+
+    # Hardware / trim (Batch 2) — torus O-rings, bow, fringes, beads, shell.
+    straps.extend(_build_oring_meshes(g, V, y_crotch, y_neck, v_to_y))
+    straps.extend(_build_bow_mesh(g, V, v_to_y))
+    straps.extend(_build_fringe_meshes(g, V, v_to_y))
+    straps.extend(_build_beads_meshes(g, V, v_to_y))
+    straps.extend(_build_shell_mesh(g, V, v_to_y))
 
     # 6) Shoulder straps — two tubes from outer-top of each cup up to the
     #    shoulder (where they'd meet the back band in reality). Controlled
@@ -920,15 +1107,75 @@ def _weave_shade_overlay(w: int = TEX_W, h: int = TEX_H,
     return (0.90 + 0.15 * height).astype(np.float32)
 
 
+def _crinkle_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
+    """Hunza G signature crinkle — densely crumpled fabric. Builds a height
+    map from 5-octave pseudo-noise and converts to a tangent-space normal.
+    """
+    rng = np.random.default_rng(7)
+    yy, xx = np.indices((h, w)).astype(np.float32)
+    height = np.zeros_like(xx)
+    norm = 0.0
+    for i in range(5):
+        fx = 0.06 * (2.0 ** i)
+        fy = 0.04 * (2.0 ** i)
+        phx, phy = rng.uniform(0, 2 * np.pi, 2)
+        amp = 1.0 / (1.7 ** i)
+        height += amp * np.sin(xx * fx + phx) * np.cos(yy * fy + phy)
+        norm += amp
+    height /= norm
+    dv, du = np.gradient(height)
+    s = 8.0
+    nx = -du * s; ny = -dv * s; nz = np.ones_like(height)
+    length = np.sqrt(nx * nx + ny * ny + nz * nz)
+    nx /= length; ny /= length; nz /= length
+    normal = np.stack([(nx * 0.5 + 0.5), (ny * 0.5 + 0.5), (nz * 0.5 + 0.5)], axis=-1)
+    return (normal * 255).clip(0, 255).astype(np.uint8)
+
+
+def _ribbed_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
+    """Strong vertical ribs (rib-knit look)."""
+    xs = np.linspace(0, 2 * np.pi * 80, w)
+    height = 0.5 + 0.5 * np.cos(xs)[None, :] * np.ones((h, 1))
+    du, dv = np.gradient(height, axis=1), np.gradient(height, axis=0)
+    s = 6.0
+    nx = -du * s; ny = -dv * s; nz = np.ones_like(height)
+    length = np.sqrt(nx * nx + ny * ny + nz * nz)
+    nx /= length; ny /= length; nz /= length
+    normal = np.stack([(nx * 0.5 + 0.5), (ny * 0.5 + 0.5), (nz * 0.5 + 0.5)], axis=-1)
+    return (normal * 255).clip(0, 255).astype(np.uint8)
+
+
+def _mesh_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
+    """Open grid, like sports mesh / fishnet (coarser lattice, sharper)."""
+    xs = np.linspace(0, 2 * np.pi * 90, w)
+    ys = np.linspace(0, 2 * np.pi * 45, h)
+    U, V = np.meshgrid(xs, ys)
+    height = (np.cos(U) + np.cos(V)) * 0.5
+    dv, du = np.gradient(height)
+    s = 7.0
+    nx = -du * s; ny = -dv * s; nz = np.ones_like(height)
+    length = np.sqrt(nx * nx + ny * ny + nz * nz)
+    nx /= length; ny /= length; nz /= length
+    normal = np.stack([(nx * 0.5 + 0.5), (ny * 0.5 + 0.5), (nz * 0.5 + 0.5)], axis=-1)
+    return (normal * 255).clip(0, 255).astype(np.uint8)
+
+
 # Cache once — same weave for every genome.
-_FABRIC_NORMAL_CACHE = None
+_NORMAL_CACHE: dict[str, np.ndarray] = {}
 _WEAVE_SHADE_CACHE = None
 
-def _get_fabric_normal() -> np.ndarray:
-    global _FABRIC_NORMAL_CACHE
-    if _FABRIC_NORMAL_CACHE is None:
-        _FABRIC_NORMAL_CACHE = _fabric_normal_map()
-    return _FABRIC_NORMAL_CACHE
+
+def _get_fabric_normal(weave: str = "plain") -> np.ndarray:
+    if weave not in _NORMAL_CACHE:
+        if weave == "crinkle":
+            _NORMAL_CACHE[weave] = _crinkle_normal_map()
+        elif weave == "ribbed":
+            _NORMAL_CACHE[weave] = _ribbed_normal_map()
+        elif weave == "mesh":
+            _NORMAL_CACHE[weave] = _mesh_normal_map()
+        else:
+            _NORMAL_CACHE[weave] = _fabric_normal_map()
+    return _NORMAL_CACHE[weave]
 
 def _get_weave_shade() -> np.ndarray:
     global _WEAVE_SHADE_CACHE
@@ -997,7 +1244,8 @@ def render_mesh(renderer, mesh: o3d.geometry.TriangleMesh,
             shell_mat.shader = "defaultLit"
             shell_mat.albedo_img = o3d.geometry.Image(shell_tex_np)
             try:
-                shell_mat.normal_img = o3d.geometry.Image(_get_fabric_normal())
+                weave = getattr(genome, "fabric_weave", "plain") if genome else "plain"
+                shell_mat.normal_img = o3d.geometry.Image(_get_fabric_normal(weave))
             except AttributeError:
                 pass
             # sheen -> roughness: matte (0.95) ... satin (0.30)
@@ -1019,16 +1267,37 @@ def render_mesh(renderer, mesh: o3d.geometry.TriangleMesh,
                 bind_mat.base_metallic = shell_mat.base_metallic * 0.6
                 scene.add_geometry("fabric_binding", binding, bind_mat)
 
-    # ---- straps (closed-loop geometry) ----
+    # ---- straps + hardware ----
     if genome is not None and y_crotch is not None and y_neck is not None:
         strap_mat = o3d.visualization.rendering.MaterialRecord()
         strap_mat.shader = "defaultLit"
         strap_mat.base_color = _color_from_genome(genome)
         strap_mat.base_roughness = 0.85
         strap_mat.base_metallic = 0.0
+
+        # Metallic hardware material — used for O-rings, bow knot, beads,
+        # shell. Color / metallic_factor come from the hardware_metal gene.
+        hw_color = {
+            "none":      (0.75, 0.75, 0.75, 1.0),
+            "gold":      (1.00, 0.83, 0.28, 1.0),
+            "silver":    (0.92, 0.92, 0.95, 1.0),
+            "rose_gold": (0.92, 0.72, 0.66, 1.0),
+            "pearl":     (0.96, 0.94, 0.88, 1.0),
+            "chrome":    (0.85, 0.85, 0.90, 1.0),
+        }.get(getattr(genome, "hardware_metal", "gold"), (0.9, 0.9, 0.9, 1.0))
+        hw_mat = o3d.visualization.rendering.MaterialRecord()
+        hw_mat.shader = "defaultLit"
+        hw_mat.base_color = hw_color
+        hw_mat.base_roughness = 0.25 if genome.hardware_metal != "pearl" else 0.45
+        hw_mat.base_metallic = 0.9 if genome.hardware_metal not in ("pearl", "none") else 0.15
+
+        metal_prefixes = ("oring_", "bow_knot", "beads", "shell")
         for name, strap in build_strap_meshes(mesh, genome, y_crotch, y_neck):
-            if len(strap.vertices) > 0:
-                scene.add_geometry(f"strap_{name}", strap, strap_mat)
+            if len(strap.vertices) == 0:
+                continue
+            is_metal = any(name.startswith(p) for p in metal_prefixes)
+            scene.add_geometry(f"strap_{name}", strap,
+                               hw_mat if is_metal else strap_mat)
 
     fit_camera(renderer, mesh)
     img = renderer.render_to_image()
@@ -1109,13 +1378,24 @@ def main():
     for i, (label, img, g) in enumerate(renders):
         ax = axes[i]
         ax.imshow(img)
+        from fitness import evaluate as _evaluate_fit
+        fit = _evaluate_fit(g)
+        hw_bits = []
+        if g.has_oring >= 0.5: hw_bits.append(f"O-ring({g.hardware_metal})")
+        if g.has_bow >= 0.5: hw_bits.append("bow")
+        if g.has_fringe >= 0.5: hw_bits.append("fringe")
+        if g.has_beads >= 0.5: hw_bits.append("beads")
+        if g.has_shell >= 0.5: hw_bits.append("shell")
+        hw_str = ", ".join(hw_bits) if hw_bits else "no hardware"
         ax.set_title(
-            f"{label}  pat={g.pattern}  palette={g.palette_preset}\n"
-            f"fabric={g.fabric_source} weave={g.fabric_weave} "
-            f"sheen={g.fabric_sheen:.2f} met={g.fabric_metallic:.2f}\n"
-            f"bio={'Y' if g.biodegradable >= 0.5 else 'N'} "
-            f"single-mat={'Y' if g.single_material >= 0.5 else 'N'}",
-            fontsize=6,
+            f"{label}  {g.style_archetype}  pat={g.pattern}\n"
+            f"{hw_str}\n"
+            f"weave={g.fabric_weave} sheen={g.fabric_sheen:.2f} "
+            f"met={g.fabric_metallic:.2f}\n"
+            f"fit: P={fit['proportion']:.2f} H={fit['harmony']:.2f} "
+            f"E={fit['emphasis']:.2f} R={fit['rhythm']:.2f}  "
+            f"overall={fit['overall']:.2f}",
+            fontsize=5.5,
         )
         ax.axis("off")
     for j in range(len(renders), len(axes)):
