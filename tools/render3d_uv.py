@@ -852,20 +852,28 @@ def build_strap_meshes(body_mesh: o3d.geometry.TriangleMesh, g,
     straps.extend(_build_beads_meshes(g, V, v_to_y))
     straps.extend(_build_shell_mesh(g, V, v_to_y))
 
-    # 6) Shoulder straps — two tubes from outer-top of each cup up to the
-    #    shoulder (where they'd meet the back band in reality). Controlled
-    #    by g.top_shoulder_strap.
+    # 6) Shoulder straps — two short tubes from the outer-top of each cup
+    #    up to the clavicle / top of the shoulder. End position is derived
+    #    from the cup anchor + a fixed up-and-in offset rather than
+    #    sampling the body mesh high above y_neck — a _body_point_at()
+    #    lookup at y_neck+8 lands on the head (ears / jaw) on this
+    #    T-pose mesh because the neck constriction makes the nearest
+    #    torso-radius vertex the skull.
     if g.top_shoulder_strap > 0.15:
         strap_r = 0.15 + 0.22 * g.top_shoulder_strap
         cup_top_v = g.top_center_v + g.top_half_v
         u_outer = g.top_inner_u + 2 * g.top_half_u
         y_start = v_to_y(cup_top_v)
-        y_shoulder = y_neck + 8.0                    # just below shoulder cap
         for u_s, name in [(u_outer, "shoulder_R"), (-u_outer, "shoulder_L")]:
             anchor = _body_point_at(V, u_s, y_start)
-            # shoulder end: slightly outward of anchor, up at shoulder height,
-            # and on the TOP of the shoulder (y slightly forward in z)
-            shoulder_end = _body_point_at(V, u_s * 0.6, y_shoulder)
+            # end point: up 4cm (just to shoulder top / clavicle level),
+            # pulled 30% inward in X (toward neck) and +1cm in Z (front
+            # of shoulder). Stays safely below the head.
+            shoulder_end = anchor + np.array([
+                -0.30 * anchor[0],   # pull toward center
+                4.0,                 # up
+                1.0,                 # forward
+            ])
             strap = _arc_tube(np.array([anchor, shoulder_end]), radius=strap_r)
             straps.append((name, strap))
 

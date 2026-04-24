@@ -1,6 +1,6 @@
 {
   "free": {
-    "pattern": "solid",
+    "pattern": "chevron",
     "top_center_v": 0.71,
     "top_half_v": 0.13199928754957002,
     "top_half_u": 0.37829837765361163,
@@ -92,7 +92,7 @@
     "hardware_metal": "pearl"
   },
   "italian_luxe": {
-    "pattern": "chevron",
+    "pattern": "floral",
     "top_center_v": 0.7334899473968418,
     "top_half_v": 0.06651005260315823,
     "top_half_u": 0.6342990320463271,
@@ -184,7 +184,7 @@
     "hardware_metal": "none"
   },
   "korean_feminine": {
-    "pattern": "chevron",
+    "pattern": "polka",
     "top_center_v": 0.71,
     "top_half_v": 0.2123481014039695,
     "top_half_u": 0.47188620677018595,
@@ -230,7 +230,7 @@
     "hardware_metal": "pearl"
   },
   "scandi_minimal": {
-    "pattern": "chevron",
+    "pattern": "solid",
     "top_center_v": 0.79,
     "top_half_v": 0.3528301339949906,
     "top_half_u": 0.2693288712819563,
@@ -305,7 +305,7 @@
     "fabric_metallic": 0.2355119938643721,
     "fabric_opacity": 1.0,
     "fabric_weight": 0.6206094194444851,
-    "fabric_weave": "ribbed",
+    "fabric_weave": "crochet",
     "palette_preset": "sunset_peach",
     "fabric_source": "econyl",
     "biodegradable": 1.0,
@@ -322,7 +322,7 @@
     "hardware_metal": "pearl"
   },
   "american_sporty": {
-    "pattern": "solid",
+    "pattern": "tropical",
     "top_center_v": 0.71,
     "top_half_v": 0.1445189819965146,
     "top_half_u": 0.15702181624718192,
@@ -552,7 +552,7 @@
     "hardware_metal": "none"
   },
   "sporty_chromat": {
-    "pattern": "solid",
+    "pattern": "tropical",
     "top_center_v": 0.7311936267693,
     "top_half_v": 0.22098946541251346,
     "top_half_u": 0.3907529315875969,
