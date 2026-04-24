@@ -1,6 +1,6 @@
 # Bikini GA — Test + Report
 
-Generated at 2026-04-24 01:31:34
+Generated at 2026-04-24 01:42:03
 
 
 ## 1. Sanity — construction, constraints, privacy seeds, patterns
@@ -31,7 +31,7 @@ Generated at 2026-04-24 01:31:34
 
 - ✅ **PASS** — All 200 offspring pass privacy-seed containment
 - ✅ **PASS** — All offspring respect stay-on topology (back coverage, waist span)
-- 📊 Offspring spans **7/12 patterns**, **12/14 archetypes**, **5/6 hardware metals**.
+- 📊 Offspring spans **10/12 patterns**, **12/14 archetypes**, **5/6 hardware metals**.
 
 - ✅ **PASS** — Offspring show multiple patterns
 - ✅ **PASS** — Offspring show multiple archetypes
@@ -48,10 +48,10 @@ Generated at 2026-04-24 01:31:34
 | proportion | 0.708 | 0.210 | 0.067 | 0.998 |
 | harmony | 0.734 | 0.181 | 0.345 | 0.999 |
 | emphasis | 0.784 | 0.218 | 0.550 | 1.000 |
-| rhythm | 0.729 | 0.190 | 0.300 | 1.000 |
-| unity | 0.907 | 0.068 | 0.800 | 0.950 |
+| rhythm | 0.720 | 0.194 | 0.300 | 1.000 |
+| unity | 0.906 | 0.068 | 0.800 | 0.950 |
 | contrast | 0.683 | 0.207 | 0.154 | 0.998 |
-| overall | 0.792 | 0.068 | 0.623 | 0.959 |
+| overall | 0.791 | 0.067 | 0.623 | 0.959 |
 
 
 ![Fitness histograms](test_fitness_histogram.png)
@@ -63,22 +63,22 @@ Generated at 2026-04-24 01:31:34
 
 | gen | mean_fitness | max_fitness |
 |---|---|---|
-| 0 | 0.788 | 0.904 |
-| 1 | 0.825 | 0.940 |
-| 2 | 0.885 | 0.960 |
-| 3 | 0.884 | 0.977 |
-| 4 | 0.886 | 0.977 |
-| 5 | 0.889 | 0.977 |
-| 6 | 0.894 | 0.977 |
-| 7 | 0.884 | 0.977 |
-| 8 | 0.883 | 0.985 |
+| 0 | 0.786 | 0.904 |
+| 1 | 0.819 | 0.940 |
+| 2 | 0.879 | 0.951 |
+| 3 | 0.870 | 0.966 |
+| 4 | 0.876 | 0.966 |
+| 5 | 0.876 | 0.966 |
+| 6 | 0.906 | 0.968 |
+| 7 | 0.898 | 0.968 |
+| 8 | 0.892 | 0.968 |
 
 
 ![Fitness trajectory](test_fitness_trajectory.png)
 
 
-- ✅ **PASS** — Mean fitness improved: 0.788 -> 0.883
-- ✅ **PASS** — Max fitness non-decreasing: 0.904 -> 0.985
+- ✅ **PASS** — Mean fitness improved: 0.786 -> 0.892
+- ✅ **PASS** — Max fitness non-decreasing: 0.904 -> 0.968
 
 ## 5. Style archetype gallery — one 3D render per style_archetype
 

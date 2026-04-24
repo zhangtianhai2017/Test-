@@ -29,7 +29,7 @@
     "fabric_metallic": 0.08948940651435544,
     "fabric_opacity": 0.9487361188057315,
     "fabric_weight": 0.4383404946320027,
-    "fabric_weave": "shiny_knit",
+    "fabric_weave": "plain",
     "palette_preset": "sunset_peach",
     "fabric_source": "econyl",
     "biodegradable": 1.0,
@@ -75,7 +75,7 @@
     "fabric_metallic": 0.0,
     "fabric_opacity": 0.701601749783193,
     "fabric_weight": 0.3504906311126065,
-    "fabric_weave": "shiny_knit",
+    "fabric_weave": "plain",
     "palette_preset": "sunset_peach",
     "fabric_source": "econyl",
     "biodegradable": 0.0,
@@ -92,7 +92,7 @@
     "hardware_metal": "pearl"
   },
   "italian_luxe": {
-    "pattern": "chevron",
+    "pattern": "stripe",
     "top_center_v": 0.7334899473968418,
     "top_half_v": 0.06651005260315823,
     "top_half_u": 0.6342990320463271,
@@ -135,10 +135,10 @@
     "has_beads": 1.0,
     "has_shell": 0.0,
     "style_archetype": "italian_luxe",
-    "hardware_metal": "gold"
+    "hardware_metal": "chrome"
   },
   "japanese_minimal": {
-    "pattern": "solid",
+    "pattern": "gingham",
     "top_center_v": 0.7292605862419445,
     "top_half_v": 0.16563491678535683,
     "top_half_u": 0.6098667721419657,
@@ -167,7 +167,7 @@
     "fabric_metallic": 0.03550039457720533,
     "fabric_opacity": 1.0,
     "fabric_weight": 0.5303056123267231,
-    "fabric_weave": "shiny_knit",
+    "fabric_weave": "plain",
     "palette_preset": "sunset_peach",
     "fabric_source": "econyl",
     "biodegradable": 0.0,
@@ -184,7 +184,7 @@
     "hardware_metal": "none"
   },
   "korean_feminine": {
-    "pattern": "chevron",
+    "pattern": "polka",
     "top_center_v": 0.71,
     "top_half_v": 0.2123481014039695,
     "top_half_u": 0.47188620677018595,
@@ -230,7 +230,7 @@
     "hardware_metal": "pearl"
   },
   "scandi_minimal": {
-    "pattern": "chevron",
+    "pattern": "stripe",
     "top_center_v": 0.79,
     "top_half_v": 0.3528301339949906,
     "top_half_u": 0.2693288712819563,
@@ -259,7 +259,7 @@
     "fabric_metallic": 0.15599969846845424,
     "fabric_opacity": 1.0,
     "fabric_weight": 0.4920873605821722,
-    "fabric_weave": "shiny_knit",
+    "fabric_weave": "plain",
     "palette_preset": "future_dusk",
     "fabric_source": "qnova",
     "biodegradable": 1.0,
@@ -276,7 +276,7 @@
     "hardware_metal": "pearl"
   },
   "spanish_mediterranean": {
-    "pattern": "solid",
+    "pattern": "leopard",
     "top_center_v": 0.7508346494061059,
     "top_half_v": 0.1450133272589186,
     "top_half_u": 0.6094097072772795,
@@ -322,7 +322,7 @@
     "hardware_metal": "pearl"
   },
   "american_sporty": {
-    "pattern": "solid",
+    "pattern": "tropical",
     "top_center_v": 0.71,
     "top_half_v": 0.1445189819965146,
     "top_half_u": 0.15702181624718192,
@@ -351,7 +351,7 @@
     "fabric_metallic": 0.0,
     "fabric_opacity": 0.9610995670754761,
     "fabric_weight": 0.6048433045508849,
-    "fabric_weave": "shiny_knit",
+    "fabric_weave": "plain",
     "palette_preset": "aquatic_awe",
     "fabric_source": "qnova",
     "biodegradable": 0.0,
@@ -397,7 +397,7 @@
     "fabric_metallic": 0.0,
     "fabric_opacity": 1.0,
     "fabric_weight": 0.43398351052143647,
-    "fabric_weave": "crochet",
+    "fabric_weave": "plain",
     "palette_preset": "aquatic_awe",
     "fabric_source": "econyl",
     "biodegradable": 0.0,
@@ -414,7 +414,7 @@
     "hardware_metal": "none"
   },
   "retro_missoni": {
-    "pattern": "chevron",
+    "pattern": "stripe",
     "top_center_v": 0.7204310217442919,
     "top_half_v": 0.14132636690077993,
     "top_half_u": 0.25195140637172353,
@@ -443,7 +443,7 @@
     "fabric_metallic": 0.22150096351389212,
     "fabric_opacity": 0.9564920180524406,
     "fabric_weight": 0.3387404129853859,
-    "fabric_weave": "shiny_knit",
+    "fabric_weave": "plain",
     "palette_preset": "galactic_cobalt",
     "fabric_source": "qnova",
     "biodegradable": 1.0,
@@ -460,7 +460,7 @@
     "hardware_metal": "none"
   },
   "hunzag_crinkle": {
-    "pattern": "chevron",
+    "pattern": "solid",
     "top_center_v": 0.79,
     "top_half_v": 0.09000000000000008,
     "top_half_u": 0.3025277343013462,
@@ -489,7 +489,7 @@
     "fabric_metallic": 0.0,
     "fabric_opacity": 0.7349129892968805,
     "fabric_weight": 0.35420564070320665,
-    "fabric_weave": "crinkle",
+    "fabric_weave": "plain",
     "palette_preset": "ethereal_highlight",
     "fabric_source": "econyl",
     "biodegradable": 1.0,
@@ -535,7 +535,7 @@
     "fabric_metallic": 0.02287412781858067,
     "fabric_opacity": 0.9503976938486922,
     "fabric_weight": 0.7509247531977946,
-    "fabric_weave": "shiny_knit",
+    "fabric_weave": "plain",
     "palette_preset": "sunset_peach",
     "fabric_source": "qnova",
     "biodegradable": 0.0,
@@ -552,7 +552,7 @@
     "hardware_metal": "none"
   },
   "sporty_chromat": {
-    "pattern": "solid",
+    "pattern": "tropical",
     "top_center_v": 0.7311936267693,
     "top_half_v": 0.22098946541251346,
     "top_half_u": 0.3907529315875969,
@@ -581,7 +581,7 @@
     "fabric_metallic": 0.0999760854891245,
     "fabric_opacity": 0.965312038794792,
     "fabric_weight": 0.6863620747343402,
-    "fabric_weave": "shiny_knit",
+    "fabric_weave": "plain",
     "palette_preset": "aquatic_awe",
     "fabric_source": "econyl",
     "biodegradable": 1.0,
@@ -598,7 +598,7 @@
     "hardware_metal": "gold"
   },
   "eres_architect": {
-    "pattern": "checker",
+    "pattern": "solid",
     "top_center_v": 0.79,
     "top_half_v": 0.09000000000000008,
     "top_half_u": 0.2806296698154225,
