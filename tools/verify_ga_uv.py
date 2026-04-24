@@ -293,8 +293,65 @@ def _enforce_constraints(g: Genome) -> Genome:
     the PRIVACY_SEEDS. Each clamp below is derived analytically from the
     polygon shape — never paints over the result, just constrains parameters
     so the trapezoidal cups / front panel grow at least to the seed extent.
+
+    Ordering matters: archetype + palette biases are applied FIRST (they're
+    soft attractors), then the privacy / topology clamps have the last word
+    so they can't be overridden by an aggressive archetype.
     """
     d = g.as_dict()
+
+    # --- Batch 1 + 2: threshold booleans (do up-front so downstream
+    # archetype targets for these fields snap cleanly)
+    for k in ("biodegradable", "single_material",
+              "has_oring", "has_bow", "has_fringe",
+              "has_beads", "has_shell"):
+        d[k] = 1.0 if d[k] >= 0.5 else 0.0
+
+    # --- Style archetype soft-anchors many fields (Batch 2) -------------
+    arch = d.get("style_archetype", "free")
+    arch_targets = _STYLE_TARGETS.get(arch)
+    if arch_targets is not None:
+        blend = 0.55
+        for k, tv in arch_targets.items():
+            if k in _DISCRETE_ENUMS:
+                if rng_coin(k, d, blend):
+                    d[k] = tv
+            elif k in CONT_FIELDS:
+                if k in _CIRCULAR_CONT:
+                    cur = d[k]
+                    diff = (tv - cur) % 1.0
+                    if diff > 0.5:
+                        diff -= 1.0
+                    d[k] = (cur + blend * diff) % 1.0
+                else:
+                    d[k] = (1 - blend) * d[k] + blend * tv
+
+    # --- WGSN palette preset soft-anchors hue/saturation/lightness ------
+    preset = d.get("palette_preset", "free")
+    targets = _PALETTE_TARGETS.get(preset)
+    if targets is not None:
+        blend = 0.6
+        th, ts, tl = targets
+        cur_h = d["hue"]
+        diff = (th - cur_h) % 1.0
+        if diff > 0.5:
+            diff -= 1.0
+        d["hue"] = (cur_h + blend * diff) % 1.0
+        d["saturation"] = float(np.clip(
+            (1 - blend) * d["saturation"] + blend * ts, 0.0, 1.0))
+        d["lightness"] = float(np.clip(
+            (1 - blend) * d["lightness"] + blend * tl, 0.0, 1.0))
+
+    # --- Re-threshold booleans after archetype blend (some archetypes
+    # set e.g. has_oring=1.0, some set 0.0; blend can leave mid-values)
+    for k in ("biodegradable", "single_material",
+              "has_oring", "has_bow", "has_fringe",
+              "has_beads", "has_shell"):
+        d[k] = 1.0 if d[k] >= 0.5 else 0.0
+
+    # ====================================================================
+    # Privacy-seed containment (final authority — can override archetype)
+    # ====================================================================
 
     # --- privacy seeds for the cup (right nipple drives both due to symmetry)
     s_u_lo, s_u_hi, s_v_lo, s_v_hi = PRIVACY_SEEDS["right_nipple"]
@@ -368,53 +425,6 @@ def _enforce_constraints(g: Genome) -> Genome:
     cup_bottom_v = d["top_center_v"] - d["top_half_v"]
     if d["bot_front_top_v"] > cup_bottom_v - 0.02:
         d["bot_front_top_v"] = max(p_v_hi + 0.04, cup_bottom_v - 0.05)
-
-    # --- Batch 1 + 2: threshold booleans --------------------------------
-    for k in ("biodegradable", "single_material",
-              "has_oring", "has_bow", "has_fringe",
-              "has_beads", "has_shell"):
-        d[k] = 1.0 if d[k] >= 0.5 else 0.0
-
-    # --- Batch 2: style archetype soft-anchors many fields --------------
-    arch = d.get("style_archetype", "free")
-    arch_targets = _STYLE_TARGETS.get(arch)
-    if arch_targets is not None:
-        blend = 0.55  # pull 55% toward the archetype
-        for k, tv in arch_targets.items():
-            if k in _DISCRETE_ENUMS:
-                # single-point snap for discrete fields with some probability
-                if rng_coin(k, d, blend):
-                    d[k] = tv
-            elif k in CONT_FIELDS:
-                if k in _CIRCULAR_CONT:
-                    # circular blend (shortest arc)
-                    cur = d[k]
-                    diff = (tv - cur) % 1.0
-                    if diff > 0.5:
-                        diff -= 1.0
-                    d[k] = (cur + blend * diff) % 1.0
-                else:
-                    d[k] = (1 - blend) * d[k] + blend * tv
-
-    # --- Batch 1: palette preset soft-anchors colour fields ------------
-    # When a WGSN preset is picked, bias hue/sat/light toward a target
-    # color so offspring with the same palette read as part of that palette
-    # while still allowing some GA drift.
-    preset = d.get("palette_preset", "free")
-    targets = _PALETTE_TARGETS.get(preset)
-    if targets is not None:
-        blend = 0.6  # pull 60% toward the target
-        th, ts, tl = targets
-        # Hue is circular — take shortest arc, not linear.
-        cur_h = d["hue"]
-        diff = (th - cur_h) % 1.0
-        if diff > 0.5:
-            diff -= 1.0
-        d["hue"] = (cur_h + blend * diff) % 1.0
-        d["saturation"] = float(np.clip(
-            (1 - blend) * d["saturation"] + blend * ts, 0.0, 1.0))
-        d["lightness"] = float(np.clip(
-            (1 - blend) * d["lightness"] + blend * tl, 0.0, 1.0))
 
     # --- Batch 1: fabric_weight affects drape ---------------------------
     # heavier fabric -> less stretch -> panels stay more structured.

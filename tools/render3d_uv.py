@@ -158,12 +158,17 @@ def _draw_pattern_into(layer: Image.Image, poly_px, pattern: str,
                     ], fill=acc)
     elif pattern == "floral":
         rng = np.random.default_rng(0)
-        r_big = max(3, motif // 3)
+        # clamp motif size to fit the bbox so rng.uniform's low<high always
+        r_big = max(2, min(motif // 3, (min(w, h) - 2) // 3))
         r_small = max(1, r_big // 3)
-        count = max(6, (w * h) // (motif * motif * 3))
+        count = max(6, (w * h) // max(1, motif * motif * 3))
         for _ in range(count):
-            cx = rng.uniform(x0 + r_big, x1 - r_big)
-            cy = rng.uniform(y0 + r_big, y1 - r_big)
+            lo_x, hi_x = x0 + r_big, x1 - r_big
+            lo_y, hi_y = y0 + r_big, y1 - r_big
+            if hi_x <= lo_x or hi_y <= lo_y:
+                break
+            cx = rng.uniform(lo_x, hi_x)
+            cy = rng.uniform(lo_y, hi_y)
             for k in range(5):
                 a = 2 * np.pi * k / 5
                 px = cx + r_big * np.cos(a)
