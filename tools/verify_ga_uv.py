@@ -41,26 +41,32 @@ LANDMARKS_V = {
     "hip":       0.22,
     "crotch":    0.06,
 }
-PATTERNS = ["solid", "stripe", "polka", "checker"]
+PATTERNS = [
+    "solid", "stripe", "polka", "checker",
+    # Batch 1 additions — more print varieties.
+    "gingham", "chevron", "floral", "tropical", "leopard",
+    "tie_dye", "ombre", "herringbone",
+]
 
-# Privacy seeds: minimum-coverage rectangles in UV space. Every Genome's
-# polygons must CONTAIN these — `_enforce_constraints` clamps the Genome
-# parameters so the trapezoidal cups and front panel grow to at least
-# this size. They are not overlays painted on top; they're a lower bound
-# baked into the parameter ranges, so the bikini smoothly grows from them.
-#
-# Coordinate notes for the bundled UE NPC body: the cylindrical UV map
-# in render3d_uv.py places the breast peak at Genome v~=0.74 and the
-# crotch line at v~=0.18 (not 0.06 — that's the Genome's LANDMARKS_V
-# convention, which sits below the body's crotch on this mesh). Seeds
-# are therefore placed in the Genome v range that actually overlaps the
-# anatomy, not where LANDMARKS_V would put them.
-#   (u_lo, u_hi, v_lo, v_hi)
-PRIVACY_SEEDS = {
-    "right_nipple": (0.10, 0.22, 0.70, 0.80),
-    "left_nipple":  (-0.22, -0.10, 0.70, 0.80),
-    "pelvic_front": (-0.08, 0.08, 0.30, 0.42),
-}
+# Batch 1 discrete enumerations
+FABRIC_WEAVES = ["plain", "mesh", "crochet", "ribbed", "velvet"]
+PALETTE_PRESETS = [
+    "free",                 # unconstrained — GA can pick any hue/sat/light
+    "future_dusk",          # WGSN 2025 color of the year — dark blue-purple
+    "transcendent_pink",    # WGSN 2025 — near-neutral pale pink
+    "aquatic_awe",          # WGSN 2025 — deep ocean teal
+    "ethereal_highlight",   # WGSN 2025 — moonlit warm white
+    "galactic_cobalt",      # WGSN 2025 — saturated deep blue
+    "sunset_peach",         # common 2025 summer accent
+]
+FABRIC_SOURCES = [
+    "econyl",               # regenerated nylon from ocean / fishing net waste
+    "biopolymer",           # bio-based polyamide (>=80% renewable: sugarcane, etc)
+    "qnova",                # Fulgar Q-NOVA, recycled pre-consumer nylon
+    "amni_soul",            # biodegradable polyamide (~5 yr in landfill)
+    "virgin",               # conventional virgin nylon/elastane — the baseline
+    "cotton_blend",         # organic cotton + spandex (bio-based, less stretch)
+]
 
 # Continuous Genome fields. Kept flat so GA operators are uniform.
 CONT_FIELDS = [
@@ -81,14 +87,30 @@ CONT_FIELDS = [
     "bot_back_top_v",      # waistline height at back
     "bot_back_half_u",     # half-width of back panel around u=±1 (small -> thong)
     "bot_tie_dangle",      # 0 = no knot tails, 1 = long dangling strings past the hip
-    # COLOR
-    "hue",
-    "saturation",
+    # COLOR (Batch 1 expanded)
+    "hue",                 # primary HSL hue
+    "saturation",          # primary HSL saturation
+    "lightness",           # primary HSL lightness (was fixed 0.90, now a gene)
+    "secondary_hue",       # secondary color (used by gingham / chevron / ombre / tie-dye)
+    "secondary_saturation",
+    "secondary_lightness",
+    "pattern_scale",       # size multiplier for pattern motifs (0 small -> 1 huge)
+    "pattern_angle",       # 0..1 mapped to 0..180 deg rotation
+    "trim_color_mode",     # 0 = binding matches body, 1 = strong contrast (dark/white)
+    # FABRIC (Batch 1 new)
+    "fabric_sheen",        # 0 matte -> 1 satin/wet-look. Drives material roughness.
+    "fabric_metallic",     # 0 non-metal -> 1 lurex / metallic foil shine.
+    "fabric_opacity",      # 0.5 sheer -> 1.0 fully opaque. Drives material alpha.
+    "fabric_weight",       # 0 light/drapey -> 1 heavy/structured. Tweaks wrinkles.
+    # SUSTAINABILITY (Batch 1 new)
+    "biodegradable",       # continuous in [0,1] but thresholded to 0/1 by constraints
+    "single_material",     # ditto — recyclability by design
 ]
 
 
 @dataclass
 class Genome:
+    # shape
     pattern: str
     top_center_v: float
     top_half_v: float
@@ -105,8 +127,27 @@ class Genome:
     bot_back_top_v: float
     bot_back_half_u: float
     bot_tie_dangle: float
+    # color (Batch 1 expanded)
     hue: float
     saturation: float
+    lightness: float
+    secondary_hue: float
+    secondary_saturation: float
+    secondary_lightness: float
+    pattern_scale: float
+    pattern_angle: float
+    trim_color_mode: float
+    # fabric (Batch 1 new)
+    fabric_sheen: float
+    fabric_metallic: float
+    fabric_opacity: float
+    fabric_weight: float
+    fabric_weave: str
+    # palette + sustainability (Batch 1 new)
+    palette_preset: str
+    fabric_source: str
+    biodegradable: float
+    single_material: float
 
     def as_dict(self) -> dict:
         return asdict(self)
@@ -114,12 +155,30 @@ class Genome:
     def clipped(self) -> "Genome":
         d = self.as_dict()
         for k in CONT_FIELDS:
-            if k == "hue":
+            if k in ("hue", "secondary_hue", "pattern_angle"):
                 d[k] = d[k] % 1.0
             else:
                 d[k] = float(np.clip(d[k], 0.0, 1.0))
         return Genome(**d)
 
+# Privacy seeds: minimum-coverage rectangles in UV space. Every Genome's
+# polygons must CONTAIN these — `_enforce_constraints` clamps the Genome
+# parameters so the trapezoidal cups and front panel grow to at least
+# this size. They are not overlays painted on top; they're a lower bound
+# baked into the parameter ranges, so the bikini smoothly grows from them.
+#
+# Coordinate notes for the bundled UE NPC body: the cylindrical UV map
+# in render3d_uv.py places the breast peak at Genome v~=0.74 and the
+# crotch line at v~=0.18 (not 0.06 — that's the Genome's LANDMARKS_V
+# convention, which sits below the body's crotch on this mesh). Seeds
+# are therefore placed in the Genome v range that actually overlaps the
+# anatomy, not where LANDMARKS_V would put them.
+#   (u_lo, u_hi, v_lo, v_hi)
+PRIVACY_SEEDS = {
+    "right_nipple": (0.10, 0.22, 0.70, 0.80),
+    "left_nipple":  (-0.22, -0.10, 0.70, 0.80),
+    "pelvic_front": (-0.08, 0.08, 0.30, 0.42),
+}
 
 # --------------------------------------------------------------------------
 # GA operators — same flavour as the front-view version but much simpler
@@ -138,21 +197,37 @@ def _blx_circular(a: float, b: float, rng: random.Random) -> float:
     return _blx(a, b_adj, rng) % 1.0
 
 
+_CIRCULAR_CONT = {"hue", "secondary_hue", "pattern_angle"}
+_DISCRETE_ENUMS = {
+    "pattern": PATTERNS,
+    "fabric_weave": FABRIC_WEAVES,
+    "palette_preset": PALETTE_PRESETS,
+    "fabric_source": FABRIC_SOURCES,
+}
+
+
 def crossover(a: Genome, b: Genome, rng: random.Random) -> Genome:
-    d = {"pattern": rng.choice([a.pattern, b.pattern])}
+    d = {}
+    # Discrete fields: single-point inheritance from one of the parents.
+    for k in _DISCRETE_ENUMS:
+        d[k] = rng.choice([getattr(a, k), getattr(b, k)])
+    # Continuous fields: BLX-alpha (circular-aware for angle/hue fields).
     for k in CONT_FIELDS:
         va, vb = getattr(a, k), getattr(b, k)
-        d[k] = _blx_circular(va, vb, rng) if k == "hue" else _blx(va, vb, rng)
+        d[k] = _blx_circular(va, vb, rng) if k in _CIRCULAR_CONT else _blx(va, vb, rng)
     return Genome(**d).clipped()
 
 
 def mutate(g: Genome, rng: random.Random) -> Genome:
     d = g.as_dict()
-    if rng.random() < MUT_PROB_CAT:
-        d["pattern"] = rng.choice(PATTERNS)
+    # Discrete resample with per-field probability
+    for k, enum in _DISCRETE_ENUMS.items():
+        if rng.random() < MUT_PROB_CAT:
+            d[k] = rng.choice(enum)
+    # Continuous gaussian perturbation
     for k in CONT_FIELDS:
         noise = rng.gauss(0, MUT_SIGMA)
-        if k == "hue":
+        if k in _CIRCULAR_CONT:
             d[k] = (d[k] + noise) % 1.0
         else:
             d[k] = d[k] + noise
@@ -240,7 +315,41 @@ def _enforce_constraints(g: Genome) -> Genome:
     if d["bot_front_top_v"] > cup_bottom_v - 0.02:
         d["bot_front_top_v"] = max(p_v_hi + 0.04, cup_bottom_v - 0.05)
 
+    # --- Batch 1: threshold booleans ------------------------------------
+    d["biodegradable"] = 1.0 if d["biodegradable"] >= 0.5 else 0.0
+    d["single_material"] = 1.0 if d["single_material"] >= 0.5 else 0.0
+
+    # --- Batch 1: palette preset soft-anchors colour fields ------------
+    # When a WGSN preset is picked, bias hue/sat/light toward a target
+    # color so offspring with the same palette read as part of that palette
+    # while still allowing some GA drift.
+    preset = d.get("palette_preset", "free")
+    targets = _PALETTE_TARGETS.get(preset)
+    if targets is not None:
+        blend = 0.6  # pull 60% toward the target
+        th, ts, tl = targets
+        d["hue"] = ((1 - blend) * d["hue"] + blend * th) % 1.0
+        d["saturation"] = float(np.clip(
+            (1 - blend) * d["saturation"] + blend * ts, 0.0, 1.0))
+        d["lightness"] = float(np.clip(
+            (1 - blend) * d["lightness"] + blend * tl, 0.0, 1.0))
+
+    # --- Batch 1: fabric_weight affects drape ---------------------------
+    # heavier fabric -> less stretch -> panels stay more structured.
+    # (No-op here; used downstream in render_mesh for wrinkle amplitude.)
+
     return Genome(**d)
+
+
+# WGSN 2025 palette targets in HSL (each in [0,1]).
+_PALETTE_TARGETS = {
+    "future_dusk":          (0.69, 0.45, 0.32),  # dark blue-purple
+    "transcendent_pink":    (0.97, 0.20, 0.85),  # near-neutral pale pink
+    "aquatic_awe":          (0.53, 0.72, 0.42),  # deep ocean teal
+    "ethereal_highlight":   (0.15, 0.22, 0.90),  # moonlit warm white
+    "galactic_cobalt":      (0.62, 0.92, 0.32),  # saturated deep blue
+    "sunset_peach":         (0.05, 0.65, 0.72),  # warm peach
+}
 
 
 # --------------------------------------------------------------------------
@@ -387,8 +496,39 @@ def genome_polygons(g: Genome) -> list[list[tuple[float, float]]]:
 # --------------------------------------------------------------------------
 
 def _color(g: Genome) -> tuple[float, float, float]:
-    s = 0.3 + 0.6 * g.saturation
-    return tuple(hsv_to_rgb([g.hue, s, 0.90]).tolist())
+    """Primary fabric color as an RGB tuple in [0,1]."""
+    import colorsys
+    l = 0.25 + 0.55 * g.lightness
+    s = 0.25 + 0.65 * g.saturation
+    return colorsys.hls_to_rgb(g.hue, l, s)
+
+
+def _secondary_color(g: Genome) -> tuple[float, float, float]:
+    """Secondary fabric color (for patterns needing two colors)."""
+    import colorsys
+    l = 0.20 + 0.60 * g.secondary_lightness
+    s = 0.10 + 0.80 * g.secondary_saturation
+    return colorsys.hls_to_rgb(g.secondary_hue, l, s)
+
+
+def _trim_color(g: Genome) -> tuple[float, float, float]:
+    """Binding color: from 'same as body darker' (trim_color_mode=0) to
+    'strong contrast' (trim_color_mode=1), i.e., near black or near white
+    depending on primary lightness."""
+    import colorsys
+    r, gg, b = _color(g)
+    t = g.trim_color_mode
+    if t < 0.5:
+        k = 0.6 - 0.3 * (t / 0.5)  # 0.6..0.3, darker matching trim
+        return (r * k, gg * k, b * k)
+    else:
+        # contrasting: pick near-white if primary is dark, near-black otherwise
+        primary_l = (r + gg + b) / 3
+        target = 0.05 if primary_l > 0.5 else 0.95
+        mix = (t - 0.5) / 0.5
+        return (r * (1 - mix) + target * mix,
+                gg * (1 - mix) + target * mix,
+                b * (1 - mix) + target * mix)
 
 
 def _draw_uv_canvas(ax):
@@ -458,6 +598,20 @@ def _fill_polygon(ax, verts, color, pattern, zorder=3):
                                   facecolor=overlay, edgecolor=None, zorder=zorder + 0.1)
                     r.set_clip_path(patch)
                     ax.add_patch(r)
+    else:
+        # Batch 1 new patterns (gingham/chevron/floral/tropical/leopard/
+        # tie_dye/ombre/herringbone): the 2D verifier shows just a subtle
+        # crosshatch so the patch is distinguishable from solid. The full
+        # pattern art is rendered in the 3D texture path.
+        n = 10
+        for i in range(n):
+            y = y0 + (i + 0.5) * (y1 - y0) / n
+            h = (y1 - y0) / (n * 3)
+            r = Rectangle((x0, y - h / 2), x1 - x0, h,
+                          facecolor=(1, 1, 1, 0.30),
+                          edgecolor=None, zorder=zorder + 0.1)
+            r.set_clip_path(patch)
+            ax.add_patch(r)
 
 
 def render_one(ax, g: Genome, title: str):
@@ -473,7 +627,8 @@ def render_one(ax, g: Genome, title: str):
 # --------------------------------------------------------------------------
 
 def make_parents() -> tuple[Genome, Genome]:
-    # Parent A: triangle top + thong + shoulder straps + long hip dangles
+    # Parent A: triangle top + thong + shoulder straps + long hip dangles,
+    # matte rayon-ish virgin fabric, solid scarlet with sunset_peach palette.
     a = Genome(
         pattern="solid",
         top_center_v=0.76, top_half_v=0.09, top_half_u=0.18,
@@ -483,9 +638,18 @@ def make_parents() -> tuple[Genome, Genome]:
         bot_front_top_v=0.22, bot_front_half_u=0.25, bot_front_leg_curve=0.60,
         bot_back_top_v=0.20, bot_back_half_u=0.12,
         bot_tie_dangle=0.75,
-        hue=0.97, saturation=0.75,
+        hue=0.97, saturation=0.75, lightness=0.55,
+        secondary_hue=0.12, secondary_saturation=0.5, secondary_lightness=0.85,
+        pattern_scale=0.5, pattern_angle=0.0, trim_color_mode=0.2,
+        fabric_sheen=0.25, fabric_metallic=0.0,
+        fabric_opacity=1.0, fabric_weight=0.45,
+        fabric_weave="plain",
+        palette_preset="sunset_peach",
+        fabric_source="econyl",
+        biodegradable=0.0, single_material=1.0,
     )
-    # Parent B: halter bandeau + high-waist + no dangles + striped blue
+    # Parent B: halter bandeau + high-waist + no dangles + classic blue
+    # stripe, satin-y recycled nylon, "aquatic awe" WGSN palette.
     b = Genome(
         pattern="stripe",
         top_center_v=0.74, top_half_v=0.08, top_half_u=0.45,
@@ -495,7 +659,15 @@ def make_parents() -> tuple[Genome, Genome]:
         bot_front_top_v=0.42, bot_front_half_u=0.55, bot_front_leg_curve=0.20,
         bot_back_top_v=0.42, bot_back_half_u=0.55,
         bot_tie_dangle=0.05,
-        hue=0.57, saturation=0.85,
+        hue=0.57, saturation=0.85, lightness=0.50,
+        secondary_hue=0.15, secondary_saturation=0.05, secondary_lightness=0.95,
+        pattern_scale=0.4, pattern_angle=0.0, trim_color_mode=0.8,
+        fabric_sheen=0.7, fabric_metallic=0.05,
+        fabric_opacity=1.0, fabric_weight=0.55,
+        fabric_weave="plain",
+        palette_preset="aquatic_awe",
+        fabric_source="qnova",
+        biodegradable=1.0, single_material=1.0,
     )
     return _enforce_constraints(a.clipped()), _enforce_constraints(b.clipped())
 

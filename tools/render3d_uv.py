@@ -86,59 +86,163 @@ def _poly_bbox_px(poly_px: list[tuple[int, int]]) -> tuple[int, int, int, int]:
     return min(xs), min(ys), max(xs), max(ys)
 
 
-def _draw_pattern_into(layer: Image.Image, poly_px, pattern: str):
-    """Draw a semi-transparent white pattern across the polygon's bbox.
-    Caller composites the layer against the polygon mask afterwards."""
+def _draw_pattern_into(layer: Image.Image, poly_px, pattern: str,
+                       primary_rgba: tuple[int, int, int, int],
+                       secondary_rgba: tuple[int, int, int, int],
+                       scale: float = 0.5,
+                       angle: float = 0.0):
+    """Draw an overlay pattern into `layer`, clipped later by the polygon
+    mask. `primary_rgba` is the fabric base color (already painted under);
+    `secondary_rgba` is the accent color for two-colour prints. `scale` in
+    [0,1] scales motif size; `angle` in [0,1] maps to 0..180 deg rotation.
+    """
     draw = ImageDraw.Draw(layer)
     x0, y0, x1, y1 = _poly_bbox_px(poly_px)
-    overlay = (255, 255, 255, 140)  # 55% alpha
+    w, h = x1 - x0, y1 - y0
+    if w <= 0 or h <= 0:
+        return
+    # motif size scales from ~10px at 0 to ~60px at 1
+    motif = max(6, int(10 + 50 * scale))
+    acc = secondary_rgba[:3] + (170,)
+    acc_dim = (max(0, acc[0] - 50), max(0, acc[1] - 50),
+                max(0, acc[2] - 50), 200)
+    white = (255, 255, 255, 130)
 
     if pattern == "stripe":
-        n = 10
-        stripe_h = max(1, (y1 - y0) // (n * 2))
+        n = max(4, int(20 / (0.4 + scale)))
+        sh = max(1, h // (n * 2))
         for i in range(n):
-            cy = y0 + (i + 0.5) * (y1 - y0) / n
-            draw.rectangle([x0, cy - stripe_h / 2, x1, cy + stripe_h / 2],
-                           fill=overlay)
+            cy = y0 + (i + 0.5) * h / n
+            draw.rectangle([x0, cy - sh, x1, cy + sh], fill=acc)
     elif pattern == "polka":
         rng = np.random.default_rng(0)
-        r = max(3, (x1 - x0) // 40)
-        for _ in range(40):
+        r = max(2, motif // 5)
+        count = max(10, (w * h) // (motif * motif * 3))
+        for _ in range(count):
             cx = rng.uniform(x0, x1)
             cy = rng.uniform(y0, y1)
-            draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=overlay)
+            draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=white)
     elif pattern == "checker":
-        n = 10
-        dx = max(2, (x1 - x0) // n)
-        dy = max(2, (y1 - y0) // n)
+        n = max(4, int(14 / (0.3 + scale)))
+        dx = max(2, w // n); dy = max(2, h // n)
         for i in range(n):
             for j in range(n):
                 if (i + j) % 2 == 0:
                     draw.rectangle(
                         [x0 + i * dx, y0 + j * dy,
-                         x0 + (i + 1) * dx, y0 + (j + 1) * dy],
-                        fill=overlay,
-                    )
+                         x0 + (i + 1) * dx, y0 + (j + 1) * dy], fill=acc)
+    elif pattern == "gingham":
+        n = max(5, int(12 / (0.3 + scale)))
+        dx = max(2, w // n); dy = max(2, h // n)
+        light = acc[:3] + (90,)
+        dark = acc[:3] + (170,)
+        for i in range(n):
+            for j in range(n):
+                xx = x0 + i * dx; yy = y0 + j * dy
+                if i % 2 == 1 and j % 2 == 1:
+                    draw.rectangle([xx, yy, xx + dx, yy + dy], fill=dark)
+                elif i % 2 == 1 or j % 2 == 1:
+                    draw.rectangle([xx, yy, xx + dx, yy + dy], fill=light)
+    elif pattern == "chevron":
+        n = max(4, int(10 / (0.3 + scale)))
+        band_h = h / n
+        zig_w = max(6, motif)
+        for i in range(n):
+            if i % 2 == 0:
+                y = y0 + i * band_h
+                for xx in range(int(x0), int(x1) + zig_w, zig_w):
+                    draw.polygon([
+                        (xx, y + band_h),
+                        (xx + zig_w / 2, y),
+                        (xx + zig_w, y + band_h),
+                    ], fill=acc)
+    elif pattern == "floral":
+        rng = np.random.default_rng(0)
+        r_big = max(3, motif // 3)
+        r_small = max(1, r_big // 3)
+        count = max(6, (w * h) // (motif * motif * 3))
+        for _ in range(count):
+            cx = rng.uniform(x0 + r_big, x1 - r_big)
+            cy = rng.uniform(y0 + r_big, y1 - r_big)
+            for k in range(5):
+                a = 2 * np.pi * k / 5
+                px = cx + r_big * np.cos(a)
+                py = cy + r_big * np.sin(a)
+                draw.ellipse([px - r_small, py - r_small,
+                               px + r_small, py + r_small], fill=acc)
+            draw.ellipse([cx - r_small, cy - r_small,
+                           cx + r_small, cy + r_small], fill=acc_dim)
+    elif pattern == "tropical":
+        rng = np.random.default_rng(0)
+        r = max(6, motif // 2)
+        count = max(3, (w * h) // (motif * motif * 6))
+        for _ in range(count):
+            cx = rng.uniform(x0, x1); cy = rng.uniform(y0, y1)
+            # palm-leaf-like ellipse
+            angle_deg = rng.uniform(0, 180)
+            bbox = [cx - r, cy - r * 0.5, cx + r, cy + r * 0.5]
+            draw.ellipse(bbox, fill=acc)
+    elif pattern == "leopard":
+        rng = np.random.default_rng(0)
+        r = max(2, motif // 5)
+        count = max(25, (w * h) // (motif * motif))
+        for _ in range(count):
+            cx = rng.uniform(x0, x1); cy = rng.uniform(y0, y1)
+            rr = r * rng.uniform(0.7, 1.3)
+            draw.ellipse([cx - rr, cy - rr * 0.8,
+                           cx + rr, cy + rr * 0.8], fill=acc)
+            if rng.random() < 0.6:
+                draw.ellipse([cx - rr * 0.4, cy - rr * 0.3,
+                               cx + rr * 0.4, cy + rr * 0.3], fill=acc_dim)
+    elif pattern == "tie_dye":
+        # radial blend of acc toward the polygon center
+        tile = np.zeros((h, w, 4), dtype=np.uint8)
+        yy, xx = np.indices((h, w))
+        d = np.sqrt((xx - w / 2) ** 2 + (yy - h / 2) ** 2)
+        d /= max(d.max(), 1)
+        mix = np.clip(1 - d, 0, 1) ** 1.5
+        tile[..., 0] = acc[0]; tile[..., 1] = acc[1]; tile[..., 2] = acc[2]
+        tile[..., 3] = (mix * 200).astype(np.uint8)
+        layer.paste(Image.fromarray(tile), (x0, y0), Image.fromarray(tile))
+    elif pattern == "ombre":
+        # vertical gradient: top = 0 alpha, bottom = strong secondary
+        tile = np.zeros((h, w, 4), dtype=np.uint8)
+        tile[..., 0] = acc[0]; tile[..., 1] = acc[1]; tile[..., 2] = acc[2]
+        tile[..., 3] = np.linspace(0, 220, h, dtype=np.uint8)[:, None]
+        layer.paste(Image.fromarray(tile), (x0, y0), Image.fromarray(tile))
+    elif pattern == "herringbone":
+        bh = max(4, motif // 3); bw = bh * 3
+        for j, y in enumerate(range(int(y0), int(y1), bh)):
+            tilt = bh // 2 if j % 2 == 0 else -bh // 2
+            for x in range(int(x0), int(x1), bw):
+                draw.polygon([(x, y), (x + bw, y + tilt),
+                               (x + bw, y + tilt + bh), (x, y + bh)],
+                              fill=acc)
 
 
 def genome_to_texture(g: Genome) -> Image.Image:
     """Rasterize a Genome's UV polygons into a texture PNG (1024x512 RGBA)."""
+    from verify_ga_uv import _secondary_color
     img = Image.new("RGBA", (TEX_W, TEX_H), SKIN_RGB + (255,))
     draw = ImageDraw.Draw(img, "RGBA")
 
     r, gr, b = _color(g)
-    color_rgba = (int(r * 255), int(gr * 255), int(b * 255), 255)
+    primary_rgba = (int(r * 255), int(gr * 255), int(b * 255), 255)
+    r2, g2, b2 = _secondary_color(g)
+    secondary_rgba = (int(r2 * 255), int(g2 * 255), int(b2 * 255), 255)
 
     for poly_uv in genome_polygons(g):
         poly_px = _uv_to_px(poly_uv)
         if len(set(poly_px)) < 3:
             continue
-        draw.polygon(poly_px, fill=color_rgba, outline=(35, 35, 35, 255))
+        draw.polygon(poly_px, fill=primary_rgba, outline=(35, 35, 35, 255))
         if g.pattern != "solid":
             mask = Image.new("L", (TEX_W, TEX_H), 0)
             ImageDraw.Draw(mask).polygon(poly_px, fill=255)
             ovl = Image.new("RGBA", (TEX_W, TEX_H), (0, 0, 0, 0))
-            _draw_pattern_into(ovl, poly_px, g.pattern)
+            _draw_pattern_into(ovl, poly_px, g.pattern,
+                                primary_rgba, secondary_rgba,
+                                scale=g.pattern_scale, angle=g.pattern_angle)
             img = Image.composite(ovl, img, mask).convert("RGBA")
             draw = ImageDraw.Draw(img, "RGBA")
     # Paint a skin-tone safe band at the top and bottom of the texture.
@@ -881,7 +985,9 @@ def render_mesh(renderer, mesh: o3d.geometry.TriangleMesh,
     if use_shell:
         shell = build_fabric_shell(mesh, body_uvs, polys_uv, offset=0.3)
         if len(shell.vertices) > 0:
-            apply_wrinkles(shell, amplitude=0.06)
+            # heavier fabric -> stiffer, less wiggle; lighter -> more drape
+            wr_amp = 0.04 + 0.10 * (1.0 - getattr(genome, "fabric_weight", 0.5))
+            apply_wrinkles(shell, amplitude=wr_amp)
 
             # bake the weave shade into the albedo so the thread pattern
             # shows even if the renderer ignores the normal map
@@ -894,21 +1000,23 @@ def render_mesh(renderer, mesh: o3d.geometry.TriangleMesh,
                 shell_mat.normal_img = o3d.geometry.Image(_get_fabric_normal())
             except AttributeError:
                 pass
-            shell_mat.base_roughness = 0.85
-            shell_mat.base_metallic = 0.0
+            # sheen -> roughness: matte (0.95) ... satin (0.30)
+            sheen = getattr(genome, "fabric_sheen", 0.3) if genome else 0.3
+            shell_mat.base_roughness = 0.95 - 0.65 * sheen
+            # lurex / foil shine
+            shell_mat.base_metallic = getattr(genome, "fabric_metallic", 0.0)
             scene.add_geometry("fabric_shell", shell, shell_mat)
 
             # edge binding — small raised rim around the shell border
             binding = build_binding_mesh(shell, offset=0.05, thickness=0.15)
             if len(binding.vertices) > 0:
-                from verify_ga_uv import _color as _color_fn
-                r, g, b = _color_fn(genome) if genome is not None else (0.3, 0.3, 0.3)
-                # darker, slightly saturated version of the fabric color
+                from verify_ga_uv import _trim_color
+                r, g, b = _trim_color(genome) if genome is not None else (0.3, 0.3, 0.3)
                 bind_mat = o3d.visualization.rendering.MaterialRecord()
                 bind_mat.shader = "defaultLit"
-                bind_mat.base_color = (r * 0.55, g * 0.55, b * 0.55, 1.0)
-                bind_mat.base_roughness = 0.6
-                bind_mat.base_metallic = 0.0
+                bind_mat.base_color = (r, g, b, 1.0)
+                bind_mat.base_roughness = 0.55
+                bind_mat.base_metallic = shell_mat.base_metallic * 0.6
                 scene.add_geometry("fabric_binding", binding, bind_mat)
 
     # ---- straps (closed-loop geometry) ----
@@ -1002,9 +1110,12 @@ def main():
         ax = axes[i]
         ax.imshow(img)
         ax.set_title(
-            f"{label}\npat={g.pattern} inner_u={g.top_inner_u:.2f} "
-            f"back={g.top_back_coverage:.2f}\nrise={g.bot_front_top_v:.2f}",
-            fontsize=8,
+            f"{label}  pat={g.pattern}  palette={g.palette_preset}\n"
+            f"fabric={g.fabric_source} weave={g.fabric_weave} "
+            f"sheen={g.fabric_sheen:.2f} met={g.fabric_metallic:.2f}\n"
+            f"bio={'Y' if g.biodegradable >= 0.5 else 'N'} "
+            f"single-mat={'Y' if g.single_material >= 0.5 else 'N'}",
+            fontsize=6,
         )
         ax.axis("off")
     for j in range(len(renders), len(axes)):
