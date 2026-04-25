@@ -953,48 +953,67 @@ def build_strap_meshes(body_mesh: o3d.geometry.TriangleMesh, g,
             except Exception:
                 pass
 
-    # 6) Shoulder straps — full route from front cup top, OVER the shoulder
-    #    ridge, DOWN the back, to the top of the back panel.
-    #
-    #    Real one-piece / camisole / structured-bikini straps must visibly
-    #    continue front-to-back; otherwise the garment looks like adhesive
-    #    tape stuck on the body (no anchor point that holds it up).
-    #    We sample three control points along the route and bend the tube
-    #    through them with _arc_tube:
-    #        P0 = cup-top outer (front)
-    #        P1 = shoulder ridge apex (top of shoulder, slightly inward)
-    #        P2 = back panel top (mirror of P0 across body, on the back)
-    #    Generic across archetypes — same parametrization works for halter,
-    #    triangle, or one-piece geometries provided top_shoulder_strap > 0.
+    # 6) Shoulder straps — anatomically routed from cup top (front) over
+    #    the actual ACROMION (shoulder peak detected from the mesh) to
+    #    the SCAPULA (back of shoulder). Anchors come from anatomy.detect
+    #    so the strap respects real human shoulder topology instead of
+    #    relying on a constant "+4 cm up" guess that pushed straps into
+    #    the chin / ear region. Generic across body meshes.
     if g.top_shoulder_strap > 0.15:
+        try:
+            from anatomy import (detect as _detect_anatomy,
+                                  front_clavicle_point as _front_clav,
+                                  back_scapula_point as _back_scap)
+            _L = _detect_anatomy(body_mesh)
+        except Exception:
+            _L = None
+
         strap_r = 0.15 + 0.22 * g.top_shoulder_strap
         cup_top_v = g.top_center_v + g.top_half_v
         u_outer = g.top_inner_u + 2 * g.top_half_u
         y_front = v_to_y(cup_top_v)
-        y_back  = v_to_y(g.top_center_v)   # mid-back, slightly lower than the cup top
-        for u_s, name in [(u_outer, "shoulder_R"), (-u_outer, "shoulder_L")]:
+        for u_s, side, name in [(u_outer, "R", "shoulder_R"),
+                                   (-u_outer, "L", "shoulder_L")]:
             P0 = _body_point_at(V, u_s, y_front)            # front cup top
-            # Shoulder ridge apex: at the body's local maximum Y above
-            # the cup, pulled 30% toward center, slightly forward.
-            ridge = P0 + np.array([
-                -0.25 * P0[0],
-                4.0,
-                0.4,
-            ])
-            # Back endpoint: same |u| but flipped to the back hemisphere.
-            # u_back is the back equivalent of u_s. We sample the body at
-            # back azimuth to land on the back surface.
-            u_back = (u_s + 1.0) if u_s < 0 else (u_s - 1.0)  # mirror through u=+/-1
-            P2 = _body_point_at(V, u_back, y_back)
-            # If the back point ended up on the wrong side (theta numerics),
-            # flip its Z-sign — the back surface should have negative Z.
-            if P2[2] > 0:
-                P2 = P2 * np.array([1.0, 1.0, -1.0])
-            # Mid-control just past the ridge, sloping back-and-down so the
-            # arc curves cleanly over the shoulder.
-            mid_back = ridge + np.array([0.0, -1.0, -3.0])
-            strap = _arc_tube(np.array([P0, ridge, mid_back, P2]),
-                                radius=strap_r)
+            if _L is not None:
+                # Clamp the cup-top start point's Y so it doesn't push
+                # above acromion. If the cup polygon extended into the
+                # neck region (one-piece) the front anchor still
+                # belongs at chest height where a real shoulder strap
+                # is sewn to the cup.
+                P0 = P0.copy()
+                if P0[1] > _L.y_acromion - 2.0:
+                    P0[1] = _L.y_acromion - 2.0
+                P_clav = _front_clav(body_mesh, _L, side)
+                # Shoulder ridge apex = directly above acromion at the
+                # acromion lateral position, pulled IN toward neck so
+                # the strap can't fly out onto the deltoid.
+                P_ridge = np.array([
+                    P_clav[0] * 0.65,           # 35% inward toward neck
+                    min(_L.y_acromion + 1.5,
+                         _L.y_neck_base - 1.0),  # never breach neck base
+                    P_clav[2] * 0.4,            # nudged forward
+                ], dtype=np.float64)
+                P_scap = _back_scap(body_mesh, _L, side)
+                # Back endpoint: inboard of scapula, at chest band level
+                P_back_anchor = np.array([
+                    P_scap[0] * 0.7,
+                    v_to_y(g.top_center_v),
+                    P_scap[2] * 0.7,
+                ], dtype=np.float64)
+                strap = _arc_tube(
+                    np.array([P0, P_clav, P_ridge, P_scap, P_back_anchor]),
+                    radius=strap_r)
+            else:
+                # Fallback: original constant-offset behavior
+                ridge = P0 + np.array([-0.25 * P0[0], 4.0, 0.4])
+                u_back = (u_s + 1.0) if u_s < 0 else (u_s - 1.0)
+                P2 = _body_point_at(V, u_back, v_to_y(g.top_center_v))
+                if P2[2] > 0:
+                    P2 = P2 * np.array([1.0, 1.0, -1.0])
+                mid_back = ridge + np.array([0.0, -1.0, -3.0])
+                strap = _arc_tube(np.array([P0, ridge, mid_back, P2]),
+                                    radius=strap_r)
             straps.append((name, strap))
 
     return straps
@@ -1044,7 +1063,28 @@ def build_fabric_shell(body_mesh: o3d.geometry.TriangleMesh, body_uvs: np.ndarra
     # bandeau's shell would paint onto the forearms.
     tri_xz = V[T][:, :, [0, 2]].mean(axis=1)
     tri_r = np.sqrt(tri_xz[:, 0] ** 2 + tri_xz[:, 1] ** 2)
-    tri_inside &= tri_r < max_torso_radius
+    tri_y = V[T][:, :, 1].mean(axis=1)
+
+    # Anatomy-aware filtering: never include head/upper-neck verts and
+    # use a per-Y radius cap so the shell stays off the deltoid / arm.
+    try:
+        from anatomy import detect as _detect_anatomy
+        _L = _detect_anatomy(body_mesh)
+        # Hard Y ceiling at neck_base + 1 cm — anything above this is
+        # the neck or head, never garment-covered for swimwear.
+        tri_inside &= tri_y < (_L.y_neck_base + 1.0)
+        # Per-Y radius cap. Below axilla: torso ~16-17 cm wide.
+        # Between axilla and acromion: that's the upper chest / shoulder
+        # cap region — radius ~ deltoid (19.9). Between acromion and neck:
+        # narrows toward the neck — use deltoid as upper bound but the
+        # body's own radius will be smaller anyway.
+        cap = np.where(tri_y < _L.y_axilla,
+                        max(_L.waist_radius_xz, _L.axilla_radius_xz) + 0.5,
+                        _L.deltoid_radius_xz + 0.4)
+        tri_inside &= tri_r < cap
+    except Exception:
+        # Fallback to constant max_torso_radius
+        tri_inside &= tri_r < max_torso_radius
 
     if not tri_inside.any():
         return o3d.geometry.TriangleMesh()

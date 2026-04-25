@@ -632,6 +632,30 @@ def safe_offset_from_body(shell: o3d.geometry.TriangleMesh,
 # Public entry point
 # ---------------------------------------------------------------------------
 
+def _clamp_to_anatomy(shell: o3d.geometry.TriangleMesh,
+                       body_mesh: o3d.geometry.TriangleMesh,
+                       ) -> o3d.geometry.TriangleMesh:
+    """After polish migrates vertices, snap any vertex above the body's
+    neck_base back down to neck_base. Prevents cup_dome_replace and
+    safe_offset from drifting shell verts onto the head/neck."""
+    try:
+        from anatomy import detect as _detect_anatomy
+        L = _detect_anatomy(body_mesh)
+    except Exception:
+        return shell
+    V = np.asarray(shell.vertices, dtype=np.float64).copy()
+    too_high = V[:, 1] > L.y_neck_base + 1.0
+    if too_high.any():
+        V[too_high, 1] = L.y_neck_base + 1.0
+    out = o3d.geometry.TriangleMesh()
+    out.vertices = o3d.utility.Vector3dVector(V)
+    out.triangles = o3d.utility.Vector3iVector(np.asarray(shell.triangles).astype(np.int32))
+    if shell.has_triangle_uvs():
+        out.triangle_uvs = o3d.utility.Vector2dVector(np.asarray(shell.triangle_uvs))
+    out.compute_vertex_normals()
+    return out
+
+
 def polish_shell(shell: o3d.geometry.TriangleMesh,
                   body_mesh: o3d.geometry.TriangleMesh,
                   polys_uv_genome: list[list[tuple[float, float]]],
@@ -672,4 +696,7 @@ def polish_shell(shell: o3d.geometry.TriangleMesh,
                                 cup_extra=cup_extra_offset,
                                 polys_uv_genome=polys_uv_genome,
                                 y_crotch=y_crotch, y_neck=y_neck)
+    # Anatomical hard cap — no vertex may end up above the neck base
+    # regardless of where smoothing/offset migrated it.
+    s = _clamp_to_anatomy(s, body_mesh)
     return s
