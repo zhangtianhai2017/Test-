@@ -266,12 +266,23 @@ def _project_uv_to_polygons(uv: np.ndarray,
 
 def _uv_to_xyz_cylindrical(uvs: np.ndarray, body_mesh: o3d.geometry.TriangleMesh,
                            y_crotch: float, y_neck: float,
+                           max_torso_radius: float = 20.0,
                            ) -> np.ndarray:
     """Inverse of cylindrical_uvs: (u_atlas, v) -> 3D point on the body's
     cylinder at that azimuth/height. Uses the body's actual radial profile
     via nearest-neighbor on (theta, y) so points snap to the surface.
+
+    BUG FIX: filter to torso-only body verts (XZ radius < max_torso_radius).
+    Without this, boundary verts at u=+/-0.5 (left/right side of body) get
+    projected onto the arms — the arms stretch laterally to ~45 cm at the
+    same theta as the torso side and the (theta, y)-nearest body vert is
+    on the arm, not the torso. That dragged the polished shell boundary
+    out as visible "wings" past the body silhouette in the front view.
     """
     V = np.asarray(body_mesh.vertices)
+    r_xz = np.sqrt(V[:, 0] ** 2 + V[:, 2] ** 2)
+    keep = r_xz < max_torso_radius
+    V = V[keep]
     theta = np.arctan2(V[:, 0], V[:, 2])      # [-pi, pi]
     y = V[:, 1]
     target_theta = (uvs[:, 0] * 2.0 - 1.0) * np.pi
@@ -282,7 +293,6 @@ def _uv_to_xyz_cylindrical(uvs: np.ndarray, body_mesh: o3d.geometry.TriangleMesh
     bv = np.stack([np.sin(theta), np.cos(theta), y / yh], axis=-1)
     tv = np.stack([np.sin(target_theta), np.cos(target_theta), target_y / yh], axis=-1)
 
-    # Brute-force nearest (mesh ~50k verts, points ~hundreds — OK)
     out = np.empty((len(uvs), 3), dtype=np.float64)
     for i in range(len(uvs)):
         d2 = ((bv - tv[i]) ** 2).sum(axis=-1)
@@ -334,6 +344,7 @@ def safe_offset_from_body(shell: o3d.geometry.TriangleMesh,
                            cup_v_range: tuple[float, float] = (0.66, 0.92),
                            polys_uv_genome: list[list[tuple[float, float]]] | None = None,
                            y_crotch: float = 0.0, y_neck: float = 100.0,
+                           max_torso_radius: float = 20.0,
                            ) -> o3d.geometry.TriangleMesh:
     """Push every shell vertex outward along the body normal until it's
     at least `min_offset` cm away from the nearest body vertex.
@@ -343,6 +354,13 @@ def safe_offset_from_body(shell: o3d.geometry.TriangleMesh,
     off the body. This is what real foam-cup or structured bikini tops do
     — the cup keeps its convex shape regardless of the breast topology
     underneath.
+
+    BUG FIX: when looking up the nearest body vertex, we restrict the
+    search to TORSO vertices only (XZ radius < max_torso_radius). On the
+    T-pose mesh the arms run out at the same Y as the chest, and a shell
+    vertex on the side of the torso has its nearest body vertex on the
+    arm — pushing along the arm's normal then drags the shell laterally
+    onto the arm, producing visible "wings" on the chest.
     """
     V = np.asarray(shell.vertices, dtype=np.float64).copy()
     BV = np.asarray(body_mesh.vertices)
@@ -350,19 +368,26 @@ def safe_offset_from_body(shell: o3d.geometry.TriangleMesh,
         body_mesh.compute_vertex_normals()
     BN = np.asarray(body_mesh.vertex_normals)
 
+    # Restrict body verts used for nearest-neighbor lookup to the torso
+    # (XZ radius < max_torso_radius). Arms in T-pose stretch laterally
+    # to ~45 cm and would otherwise capture nearby shell verts.
+    body_r_xz = np.sqrt(BV[:, 0] ** 2 + BV[:, 2] ** 2)
+    torso_mask = body_r_xz < max_torso_radius
+    BV_t = BV[torso_mask]
+    BN_t = BN[torso_mask]
+
     # Approximate per-shell-vertex v in cylindrical UV
     shell_y = V[:, 1]
     shell_v = (shell_y - y_crotch) / max(y_neck - y_crotch, 1e-3)
 
     new_V = V.copy()
     for i, p in enumerate(V):
-        # Nearest body vertex
-        d2 = ((BV - p) ** 2).sum(axis=-1)
+        # Nearest TORSO vertex (skip arms)
+        d2 = ((BV_t - p) ** 2).sum(axis=-1)
         j = int(np.argmin(d2))
-        d = float(np.sqrt(d2[j]))
-        n = BN[j]
+        n = BN_t[j]
         # signed distance along body normal (positive = outside body)
-        signed = float(np.dot(p - BV[j], n))
+        signed = float(np.dot(p - BV_t[j], n))
         target = min_offset
         if cup_v_range[0] <= shell_v[i] <= cup_v_range[1]:
             target += cup_extra

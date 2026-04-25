@@ -375,8 +375,18 @@ def _body_ring(body_vertices: np.ndarray, y_level: float, y_halfband: float,
         r = np.sqrt(near[:, 0] ** 2 + near[:, 2] ** 2)
         near = near[r < max_torso_radius]
     if len(near) < n_samples // 4:
-        near = body_vertices[(body_vertices[:, 1] > y_level - y_halfband) &
-                              (body_vertices[:, 1] < y_level + y_halfband)]
+        # Bug fix: the previous fallback dropped the radius filter, which
+        # let arm vertices into the ring at chest/bust level (T-pose arms
+        # share Y with the upper chest). That dragged the back band onto
+        # the arms. Instead, widen the Y window — keeping the radius
+        # filter — until we have enough torso samples.
+        for grow in (1.5, 2.0, 3.0):
+            near = body_vertices[(body_vertices[:, 1] > y_level - y_halfband * grow) &
+                                  (body_vertices[:, 1] < y_level + y_halfband * grow)]
+            r = np.sqrt(near[:, 0] ** 2 + near[:, 2] ** 2)
+            near = near[r < max_torso_radius]
+            if len(near) >= n_samples // 4:
+                break
 
     theta = np.arctan2(near[:, 0], near[:, 2])
     r_xz = np.sqrt(near[:, 0] ** 2 + near[:, 2] ** 2)
