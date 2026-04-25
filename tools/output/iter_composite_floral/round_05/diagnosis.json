@@ -1,0 +1,21 @@
+{
+  "delta": {
+    "shell_offset_cm": 0.1,
+    "binding_thickness_cm": 0.05,
+    "strap_radius_scale": 0.1,
+    "genome_patch": {
+      "top_back_coverage": -0.1
+    }
+  },
+  "unresolved": [
+    {
+      "id": "I5",
+      "view": "05_chest_close",
+      "region": "front_panel_pattern",
+      "category": "pattern_size",
+      "severity": "low",
+      "evidence": "Pattern at near-max scale \u2014 accept as is.",
+      "fix_hint": "other"
+    }
+  ]
+}

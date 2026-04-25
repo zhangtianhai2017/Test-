@@ -1,0 +1,13 @@
+{
+  "delta": {
+    "cup_extra_cm": 0.30000000000000004,
+    "wrinkle_amp_scale": -0.6000000000000001,
+    "binding_thickness_cm": 0.1,
+    "boundary_snap": 0.1,
+    "smooth_iters": 6.0,
+    "genome_patch": {
+      "pattern_scale": 0.1
+    }
+  },
+  "unresolved": []
+}

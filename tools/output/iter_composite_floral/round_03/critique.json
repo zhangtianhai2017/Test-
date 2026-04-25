@@ -1,0 +1,52 @@
+{
+  "iteration": 3,
+  "seed": "composite_floral",
+  "global_quality": 0.68,
+  "issues": [
+    {
+      "id": "I1",
+      "view": "05_chest_close",
+      "region": "fabric_grain",
+      "category": "fabric_artifact",
+      "severity": "med",
+      "evidence": "Texture is calmer but the fabric still reads as too dense. Push weave_intensity further down so the floral pattern dominates.",
+      "fix_hint": "less_weave_grain"
+    },
+    {
+      "id": "I2",
+      "view": "05_chest_close",
+      "region": "both_cups",
+      "category": "cup_too_voluminous",
+      "severity": "med",
+      "evidence": "Cup dome still over-pronounced for a one-piece. Step back further.",
+      "fix_hint": "decrease_cup_dome"
+    },
+    {
+      "id": "I3",
+      "view": "01_front",
+      "region": "front_panel_pattern",
+      "category": "pattern_unrecognizable",
+      "severity": "med",
+      "evidence": "Big leaves are starting to appear but still small. Push scale up more.",
+      "fix_hint": "scale_pattern_up"
+    },
+    {
+      "id": "I4",
+      "view": "02_three_quarter",
+      "region": "right_hip",
+      "category": "hip_bulge",
+      "severity": "low",
+      "evidence": "Hip ridge less pronounced after the back_coverage trim, but still slight.",
+      "fix_hint": "narrow_back_coverage"
+    },
+    {
+      "id": "I5",
+      "view": "01_front",
+      "region": "shoulder_strap",
+      "category": "strap_issue",
+      "severity": "low",
+      "evidence": "Shoulder straps are barely visible — for a composite_floral with top_shoulder_strap=1.0 the straps should read as proper finished bands.",
+      "fix_hint": "thicken_strap"
+    }
+  ]
+}

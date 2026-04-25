@@ -1,0 +1,43 @@
+{
+  "iteration": 8,
+  "seed": "composite_floral",
+  "global_quality": 0.80,
+  "issues": [
+    {
+      "id": "I1",
+      "view": "05_chest_close",
+      "region": "binding",
+      "category": "binding_visibility",
+      "severity": "med",
+      "evidence": "Binding ring at neckline visible but not as thick as the FOE on the source reference. Push to upper bound.",
+      "fix_hint": "thicken_binding"
+    },
+    {
+      "id": "I2",
+      "view": "01_front",
+      "region": "torso_full",
+      "category": "fabric_feel",
+      "severity": "low",
+      "evidence": "Fabric stand-off still slightly painted-on; small additional global offset.",
+      "fix_hint": "increase_min_offset"
+    },
+    {
+      "id": "I3",
+      "view": "06_hip_close",
+      "region": "leg_opening",
+      "category": "leg_opening_curve",
+      "severity": "low",
+      "evidence": "Leg opening reads well.",
+      "fix_hint": "other"
+    },
+    {
+      "id": "I4",
+      "view": "05_chest_close",
+      "region": "both_cups",
+      "category": "cup_body_coupling",
+      "severity": "med",
+      "evidence": "Cups still mirror breast topology — this is fundamental to the offset-shell approach. Can't fix with params alone; would need analytic cup template that REPLACES breast surface (note for v2 of polish module).",
+      "fix_hint": "other"
+    }
+  ]
+}

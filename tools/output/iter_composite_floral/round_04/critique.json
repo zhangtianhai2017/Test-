@@ -1,0 +1,43 @@
+{
+  "iteration": 4,
+  "seed": "composite_floral",
+  "global_quality": 0.72,
+  "issues": [
+    {
+      "id": "I1",
+      "view": "05_chest_close",
+      "region": "both_cups",
+      "category": "cup_too_voluminous",
+      "severity": "high",
+      "evidence": "Despite four rounds of decreases, cups still read as pronounced pillow domes. Need to zero out cup_extra entirely — the body's breast curvature alone provides plenty of cup shape; we should only be flattening it, not adding offset.",
+      "fix_hint": "decrease_cup_dome"
+    },
+    {
+      "id": "I2",
+      "view": "03_side_left",
+      "region": "chest_silhouette",
+      "category": "cup_not_smooth",
+      "severity": "high",
+      "evidence": "Side view shows the breast topology is still visible through the fabric. Push smooth_iters much higher to flatten the breast bumps inside the polygon.",
+      "fix_hint": "more_smooth_iters"
+    },
+    {
+      "id": "I3",
+      "view": "01_front",
+      "region": "front_panel_pattern",
+      "category": "pattern_size",
+      "severity": "low",
+      "evidence": "Pattern reads as leaves now but motifs still small. Last bit of upscale.",
+      "fix_hint": "scale_pattern_up"
+    },
+    {
+      "id": "I4",
+      "view": "08_shoulder_top",
+      "region": "shoulder_strap",
+      "category": "strap_too_thin",
+      "severity": "low",
+      "evidence": "Shoulder straps look slightly thicker but still understated for a structured one-piece.",
+      "fix_hint": "thicken_strap"
+    }
+  ]
+}

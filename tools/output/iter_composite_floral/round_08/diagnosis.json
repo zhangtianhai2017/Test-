@@ -1,0 +1,26 @@
+{
+  "delta": {
+    "binding_thickness_cm": 0.1,
+    "min_offset_cm": 0.05
+  },
+  "unresolved": [
+    {
+      "id": "I3",
+      "view": "06_hip_close",
+      "region": "leg_opening",
+      "category": "leg_opening_curve",
+      "severity": "low",
+      "evidence": "Leg opening reads well.",
+      "fix_hint": "other"
+    },
+    {
+      "id": "I4",
+      "view": "05_chest_close",
+      "region": "both_cups",
+      "category": "cup_body_coupling",
+      "severity": "med",
+      "evidence": "Cups still mirror breast topology \u2014 this is fundamental to the offset-shell approach. Can't fix with params alone; would need analytic cup template that REPLACES breast surface (note for v2 of polish module).",
+      "fix_hint": "other"
+    }
+  ]
+}

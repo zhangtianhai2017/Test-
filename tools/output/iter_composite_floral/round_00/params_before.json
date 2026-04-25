@@ -1,0 +1,12 @@
+{
+  "smooth_iters": 12,
+  "boundary_snap": 0.85,
+  "min_offset_cm": 0.3,
+  "cup_extra_cm": 0.45,
+  "shell_offset_cm": 0.3,
+  "binding_thickness_cm": 0.4,
+  "binding_offset_cm": 0.05,
+  "wrinkle_amp_scale": 1.0,
+  "strap_radius_scale": 1.0,
+  "genome_patch": {}
+}

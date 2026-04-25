@@ -1,0 +1,43 @@
+{
+  "iteration": 7,
+  "seed": "composite_floral",
+  "global_quality": 0.79,
+  "issues": [
+    {
+      "id": "I1",
+      "view": "01_front",
+      "region": "whole_garment",
+      "category": "skin_tight_feel",
+      "severity": "med",
+      "evidence": "Garment still reads as painted onto the body rather than as fabric draped over it. Increase the global stand-off (min_offset) so we get a slight air gap that real fabric has.",
+      "fix_hint": "increase_min_offset"
+    },
+    {
+      "id": "I2",
+      "view": "05_chest_close",
+      "region": "front_panel",
+      "category": "pattern_size",
+      "severity": "low",
+      "evidence": "Pattern is fully readable. Done with scale.",
+      "fix_hint": "other"
+    },
+    {
+      "id": "I3",
+      "view": "05_chest_close",
+      "region": "fabric_grain",
+      "category": "fabric_feel",
+      "severity": "low",
+      "evidence": "Weave near zero — last small reduction.",
+      "fix_hint": "less_weave_grain"
+    },
+    {
+      "id": "I4",
+      "view": "08_shoulder_top",
+      "region": "shoulder_strap",
+      "category": "strap_thickness",
+      "severity": "low",
+      "evidence": "Straps reading well, hold.",
+      "fix_hint": "other"
+    }
+  ]
+}

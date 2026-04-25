@@ -1,0 +1,17 @@
+{
+  "smooth_iters": 27,
+  "boundary_snap": 0.95,
+  "min_offset_cm": 0.3,
+  "cup_extra_cm": 0.029999999999999916,
+  "shell_offset_cm": 0.45,
+  "binding_thickness_cm": 0.7500000000000001,
+  "binding_offset_cm": 0.05,
+  "wrinkle_amp_scale": 0.0,
+  "strap_radius_scale": 1.3000000000000003,
+  "weave_intensity": 0.0,
+  "genome_patch": {
+    "pattern_scale": 0.1,
+    "top_back_coverage": -0.1,
+    "bot_front_half_u": 0.02
+  }
+}

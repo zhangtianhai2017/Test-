@@ -1,0 +1,11 @@
+{
+  "delta": {
+    "cup_extra_cm": -0.24,
+    "smooth_iters": 9.0,
+    "strap_radius_scale": 0.1,
+    "genome_patch": {
+      "pattern_scale": 0.1
+    }
+  },
+  "unresolved": []
+}
