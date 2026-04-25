@@ -300,26 +300,98 @@ def _uv_to_xyz_cylindrical(uvs: np.ndarray, body_mesh: o3d.geometry.TriangleMesh
     return out
 
 
+def _fit_closed_spline(poly_xy: np.ndarray, n_samples: int = 400,
+                        smoothing: float = 0.0) -> np.ndarray:
+    """Fit a closed parametric cubic B-spline through the polygon vertices
+    and return `n_samples` densely-sampled points along the curve.
+
+    The Genome polygons are themselves analytic but stored as a finite
+    point list. Fitting a closed B-spline gives us a C2-continuous curve
+    that we can use as the *target* boundary, completely replacing the
+    piecewise-linear polygon — that's the geometric-curve replacement
+    we want for the jagged shell boundary, not a tiny local smoothing.
+    """
+    from scipy.interpolate import splprep, splev
+    pts = np.asarray(poly_xy, dtype=np.float64)
+    if len(pts) < 4:
+        return pts.copy()
+    # splprep with per=1 fits a periodic spline (closed curve)
+    tck, _u = splprep([pts[:, 0], pts[:, 1]], s=smoothing, k=3, per=True)
+    u = np.linspace(0.0, 1.0, n_samples, endpoint=False)
+    out = splev(u, tck)
+    return np.stack([out[0], out[1]], axis=-1)
+
+
+def _build_polygon_curves(polys_uv_genome: list[list[tuple[float, float]]],
+                            n_samples: int = 400
+                            ) -> list[np.ndarray]:
+    """Fit a closed cubic B-spline through each Genome polygon. Returns
+    a list of dense (n_samples, 2) arrays in Genome-UV [-1,1] x [0,1].
+    """
+    out = []
+    for poly in polys_uv_genome:
+        if len(poly) < 4:
+            continue
+        try:
+            curve = _fit_closed_spline(np.asarray(poly), n_samples=n_samples)
+            out.append(curve)
+        except Exception:
+            # Fall back to raw polygon if the fit fails (degenerate)
+            out.append(np.asarray(poly))
+    return out
+
+
+def _project_uv_to_curves(uv_atlas: np.ndarray,
+                            curves_genome: list[np.ndarray]
+                            ) -> np.ndarray:
+    """For each (u,v) in atlas-space [0,1] x [0,1], snap to the closest
+    point on any of the dense Genome-UV curves. Curves are in [-1,1] Genome u.
+    """
+    if not curves_genome:
+        return uv_atlas.copy()
+    pts = np.stack([uv_atlas[:, 0] * 2.0 - 1.0, uv_atlas[:, 1]], axis=-1)
+    all_curve = np.concatenate(curves_genome, axis=0)  # (sum_n, 2)
+    out = np.empty_like(uv_atlas)
+    for i, p in enumerate(pts):
+        d2 = ((all_curve - p) ** 2).sum(axis=-1)
+        q = all_curve[int(np.argmin(d2))]
+        out[i] = [(q[0] + 1.0) * 0.5, q[1]]
+    return out
+
+
 def project_boundary_to_polygons(shell: o3d.geometry.TriangleMesh,
                                   polys_uv_genome: list[list[tuple[float, float]]],
                                   body_mesh: o3d.geometry.TriangleMesh,
                                   y_crotch: float, y_neck: float,
                                   blend: float = 0.85,
+                                  use_spline: bool = True,
                                   ) -> o3d.geometry.TriangleMesh:
-    """Move every boundary vertex toward the closest point on the Genome
-    polygon, in cylindrical UV space, then back-project to 3D.
+    """Move every boundary vertex onto a smooth target curve.
 
-    blend: 0.0 = keep raw boundary, 1.0 = fully snap to polygon.
+    Two-stage geometric-curve replacement:
+      1. Fit a closed cubic B-spline through each Genome polygon (200+
+         dense samples) — gives a C2-continuous target curve, not the
+         piecewise-linear polygon.
+      2. For every shell boundary vertex, find its UV, snap UV to the
+         densely-sampled spline, back-project to 3D via cylindrical map.
+
+    The result is an aggressive boundary replacement — entire jagged
+    boundary is overwritten with curve-sampled positions, not nudged
+    toward polygon edges. blend=1.0 gives full replacement.
     """
     V = np.asarray(shell.vertices, dtype=np.float64).copy()
     F = np.asarray(shell.triangles, dtype=np.int64)
-    is_bd, _ = _boundary_loops(F, len(V))
+    is_bd, loops = _boundary_loops(F, len(V))
     bd_idx = np.where(is_bd)[0]
     if len(bd_idx) == 0:
         return shell
 
     uv_per_vertex = _per_vertex_uv(shell)
-    target_uv = _project_uv_to_polygons(uv_per_vertex[bd_idx], polys_uv_genome)
+    if use_spline:
+        curves = _build_polygon_curves(polys_uv_genome, n_samples=400)
+        target_uv = _project_uv_to_curves(uv_per_vertex[bd_idx], curves)
+    else:
+        target_uv = _project_uv_to_polygons(uv_per_vertex[bd_idx], polys_uv_genome)
     target_xyz = _uv_to_xyz_cylindrical(target_uv, body_mesh, y_crotch, y_neck)
 
     V[bd_idx] = (1.0 - blend) * V[bd_idx] + blend * target_xyz
@@ -336,6 +408,150 @@ def project_boundary_to_polygons(shell: o3d.geometry.TriangleMesh,
 # ---------------------------------------------------------------------------
 # Safe offset — ensure no body penetration after smoothing
 # ---------------------------------------------------------------------------
+
+def cup_dome_replace(shell: o3d.geometry.TriangleMesh,
+                      body_mesh: o3d.geometry.TriangleMesh,
+                      genome,
+                      y_crotch: float, y_neck: float,
+                      cup_depth_cm: float = 1.8,
+                      ) -> o3d.geometry.TriangleMesh:
+    """Replace cup-region vertex positions with an analytic half-ellipsoid
+    surface whose shape DOES NOT depend on breast topology.
+
+    A real molded swim cup is a *foam cup* — a structured surface that
+    bridges over the breast keeping its own convex shape. We replicate
+    by computing each cup-region vertex's offset *along the body normal*
+    as the dome height of an axis-aligned ellipsoid centered on the cup,
+    keyed to the vertex's local (u, v) inside the cup polygon (NOT to
+    the body's local breast curvature).
+
+    cup_depth_cm: dome height at apex (4-5 mm for thin-shell padded; up
+    to 1.5-2 cm for full molded foam cup).
+
+    The mapping for each cup, c in {left, right}:
+        u_local = (vertex_u - cup_center_u) / cup_half_u  ∈ [-1, 1]
+        v_local = (vertex_v - cup_center_v) / cup_half_v
+        r2 = u_local^2 + v_local^2
+        if r2 < 1: dome = cup_depth * sqrt(1 - r2)   (half-ellipsoid)
+                  else dome = 0
+    Then set vertex = body_surface_pt + body_normal * dome.
+
+    Result: cup is a smooth dome regardless of breast shape — solves
+    the cup body-coupling that all of round 0..9 could not fix with
+    parameter tuning.
+    """
+    if genome is None:
+        return shell
+
+    half_u = float(getattr(genome, "top_half_u", 0.16))
+    half_v = float(getattr(genome, "top_half_v", 0.07))
+    inner_u = float(getattr(genome, "top_inner_u", 0.12))
+    center_v = float(getattr(genome, "top_center_v", 0.76))
+    if half_u <= 0.0 or half_v <= 0.0:
+        return shell
+
+    V = np.asarray(shell.vertices, dtype=np.float64).copy()
+    if not body_mesh.has_vertex_normals():
+        body_mesh.compute_vertex_normals()
+    BV = np.asarray(body_mesh.vertices)
+    BN = np.asarray(body_mesh.vertex_normals)
+    body_r_xz = np.sqrt(BV[:, 0] ** 2 + BV[:, 2] ** 2)
+    torso = body_r_xz < 20.0
+    BV_t, BN_t = BV[torso], BN[torso]
+
+    yh = max(y_neck - y_crotch, 1e-3)
+    cup_center_y = y_crotch + center_v * yh
+    cup_half_y = half_v * yh
+
+    # Cup u-centers in Genome [-1,1]: each cup centered at +/-(inner_u + half_u)
+    cup_center_u_R = inner_u + half_u
+    cup_center_u_L = -(inner_u + half_u)
+
+    new_V = V.copy()
+    for i, p in enumerate(V):
+        # Find cylindrical (u, y) for this vertex
+        theta = np.arctan2(p[0], p[2])
+        u_genome = theta / np.pi      # [-1, 1]
+        y = p[1]
+
+        # In which cup? (Or neither.)
+        for cu in (cup_center_u_R, cup_center_u_L):
+            u_local = (u_genome - cu) / max(half_u, 1e-3)
+            v_local = (y - cup_center_y) / max(cup_half_y, 1e-3)
+            r2 = u_local * u_local + v_local * v_local
+            if r2 >= 1.0:
+                continue
+            # Find body surface at this (theta, y) (torso only)
+            tv_y = y / yh
+            bv_normalized = np.stack([
+                np.sin(np.arctan2(BV_t[:, 0], BV_t[:, 2])),
+                np.cos(np.arctan2(BV_t[:, 0], BV_t[:, 2])),
+                BV_t[:, 1] / yh
+            ], axis=-1)
+            target = np.array([np.sin(theta), np.cos(theta), tv_y])
+            d2 = ((bv_normalized - target) ** 2).sum(axis=-1)
+            j = int(np.argmin(d2))
+            base_pt = BV_t[j]
+            normal = BN_t[j]
+            dome_h = cup_depth_cm * float(np.sqrt(1.0 - r2))
+            # The dome height is added on top of a small base offset
+            # so the cup never touches the body even at its rim.
+            base_offset = 0.30
+            new_V[i] = base_pt + normal * (base_offset + dome_h)
+            break
+
+    out = o3d.geometry.TriangleMesh()
+    out.vertices = o3d.utility.Vector3dVector(new_V)
+    out.triangles = o3d.utility.Vector3iVector(np.asarray(shell.triangles).astype(np.int32))
+    if shell.has_triangle_uvs():
+        out.triangle_uvs = o3d.utility.Vector2dVector(np.asarray(shell.triangle_uvs))
+    out.compute_vertex_normals()
+    return out
+
+
+def smooth_boundary_loops_3d(shell: o3d.geometry.TriangleMesh,
+                              n_harmonics: int = 8,
+                              ) -> o3d.geometry.TriangleMesh:
+    """Aggressive arc-length low-pass of every closed boundary loop in 3D.
+
+    For each boundary loop we treat the (X,Y,Z) coordinates as three
+    periodic 1-D signals indexed by loop position, take the FFT, keep
+    only the lowest `n_harmonics` frequencies (zero everything else),
+    and inverse-FFT. This is the global-scale smoothing the user asked
+    for — it kills high-frequency wiggle along the boundary regardless
+    of where the verts came from. n_harmonics ~6-10 keeps the overall
+    shape (the polygon's 'roundness') but flattens triangle-edge zigzags.
+    """
+    V = np.asarray(shell.vertices, dtype=np.float64).copy()
+    F = np.asarray(shell.triangles, dtype=np.int64)
+    _is_bd, loops = _boundary_loops(F, len(V))
+    if not loops:
+        return shell
+
+    for loop in loops:
+        n = len(loop)
+        if n < max(8, 2 * n_harmonics + 1):
+            continue
+        idx = np.array(loop, dtype=np.int64)
+        coords = V[idx]                        # (n, 3)
+        smoothed = np.empty_like(coords)
+        for axis in range(3):
+            sig = coords[:, axis]
+            spec = np.fft.fft(sig)
+            mask = np.zeros(n, dtype=complex)
+            mask[: n_harmonics + 1] = 1
+            mask[-n_harmonics:] = 1
+            smoothed[:, axis] = np.real(np.fft.ifft(spec * mask))
+        V[idx] = smoothed
+
+    out = o3d.geometry.TriangleMesh()
+    out.vertices = o3d.utility.Vector3dVector(V)
+    out.triangles = o3d.utility.Vector3iVector(F.astype(np.int32))
+    if shell.has_triangle_uvs():
+        out.triangle_uvs = o3d.utility.Vector2dVector(np.asarray(shell.triangle_uvs))
+    out.compute_vertex_normals()
+    return out
+
 
 def safe_offset_from_body(shell: o3d.geometry.TriangleMesh,
                            body_mesh: o3d.geometry.TriangleMesh,
@@ -415,6 +631,8 @@ def polish_shell(shell: o3d.geometry.TriangleMesh,
                   boundary_snap: float = 0.85,
                   min_offset: float = SKIN_OFFSET_CM,
                   cup_extra_offset: float = FOAM_CUP_EXTRA_CM,
+                  genome=None,
+                  cup_dome_depth_cm: float = 0.0,
                   ) -> o3d.geometry.TriangleMesh:
     """Run the full polish pipeline. See module docstring for stage list.
 
@@ -425,8 +643,21 @@ def polish_shell(shell: o3d.geometry.TriangleMesh,
     if len(np.asarray(shell.triangles)) == 0:
         return shell
     s = taubin_smooth_interior(shell, iterations=smooth_iters)
+    # Geometric-curve replacement of boundary: fit closed cubic B-spline
+    # through each Genome polygon, snap boundary verts onto the dense
+    # spline samples in UV, back-project to 3D.
     s = project_boundary_to_polygons(s, polys_uv_genome, body_mesh,
-                                       y_crotch, y_neck, blend=boundary_snap)
+                                       y_crotch, y_neck, blend=boundary_snap,
+                                       use_spline=True)
+    # Then a global arc-length low-pass on each boundary loop in 3D —
+    # kills any residual zigzag that the cylindrical back-projection
+    # introduced (body surface is locally non-smooth).
+    s = smooth_boundary_loops_3d(s, n_harmonics=8)
+    # Optional analytic cup dome — replaces breast-following cup geometry
+    # with a half-ellipsoid (round 12). cup_dome_depth_cm > 0 enables.
+    if cup_dome_depth_cm > 0.001 and genome is not None:
+        s = cup_dome_replace(s, body_mesh, genome, y_crotch, y_neck,
+                              cup_depth_cm=cup_dome_depth_cm)
     s = safe_offset_from_body(s, body_mesh,
                                 min_offset=min_offset,
                                 cup_extra=cup_extra_offset,

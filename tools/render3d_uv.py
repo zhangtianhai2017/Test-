@@ -798,6 +798,39 @@ def build_strap_meshes(body_mesh: o3d.geometry.TriangleMesh, g,
                                   u_from=cup_outer_u, u_to=-cup_outer_u)
     straps.append(("top_back_band", back_band))
 
+    # 1b) Underbust band — the support elastic running the FULL ring at
+    #     the bottom of the cup. This is what mechanically holds a
+    #     real bra/bikini top up; without it the garment looks like
+    #     adhesive tape on the chest. Generic: any genome with cup_v
+    #     above a basic bust line gets one. Continuous around the body.
+    underbust_v = max(0.05, g.top_center_v - g.top_half_v - 0.02)
+    underbust_y = v_to_y(underbust_v)
+    underbust_ring = _body_ring(V, underbust_y, y_halfband=2.5, n_samples=96,
+                                  max_torso_radius=20.0)
+    underbust_band = _build_band_mesh(underbust_ring,
+                                        band_thickness=1.2,
+                                        offset=0.55)
+    straps.append(("underbust_band", underbust_band))
+
+    # 1c) Crotch gusset — a tube going under the crotch from front-low to
+    #     back-low. Real swimwear has this as a separate fabric piece that
+    #     visibly bridges the front and back bottoms. Without it the front
+    #     and back panels look like two disconnected adhesive patches.
+    #     Generic: present on every Genome, scales radius with smaller of
+    #     bot_front_half_u / bot_back_half_u so it shrinks for thongs and
+    #     widens for full-coverage one-pieces.
+    gusset_radius = max(0.40,
+                          min(g.bot_front_half_u, g.bot_back_half_u) * 5.0)
+    gusset_y = y_crotch - 0.5
+    P_front = _body_point_at(V, 0.0, gusset_y)        # front-low
+    P_back  = _body_point_at(V, 1.0, gusset_y)        # back-low (u=1 = back)
+    # Mid control point dropped a little to dip the gusset below the seat
+    # so it follows real inseam geometry instead of cutting straight through.
+    P_mid = 0.5 * (P_front + P_back) + np.array([0.0, -2.5, 0.0])
+    gusset = _arc_tube(np.array([P_front, P_mid, P_back]),
+                         radius=gusset_radius)
+    straps.append(("gusset", gusset))
+
     # 2) Bottom waist string — thin ring at the average of front/back tops.
     #    Asymmetric waists (high-front + thong-back) rely on the side ties
     #    to bridge the height difference; keep the band itself uniformly
@@ -871,29 +904,48 @@ def build_strap_meshes(body_mesh: o3d.geometry.TriangleMesh, g,
     straps.extend(_build_beads_meshes(g, V, v_to_y))
     straps.extend(_build_shell_mesh(g, V, v_to_y))
 
-    # 6) Shoulder straps — two short tubes from the outer-top of each cup
-    #    up to the clavicle / top of the shoulder. End position is derived
-    #    from the cup anchor + a fixed up-and-in offset rather than
-    #    sampling the body mesh high above y_neck — a _body_point_at()
-    #    lookup at y_neck+8 lands on the head (ears / jaw) on this
-    #    T-pose mesh because the neck constriction makes the nearest
-    #    torso-radius vertex the skull.
+    # 6) Shoulder straps — full route from front cup top, OVER the shoulder
+    #    ridge, DOWN the back, to the top of the back panel.
+    #
+    #    Real one-piece / camisole / structured-bikini straps must visibly
+    #    continue front-to-back; otherwise the garment looks like adhesive
+    #    tape stuck on the body (no anchor point that holds it up).
+    #    We sample three control points along the route and bend the tube
+    #    through them with _arc_tube:
+    #        P0 = cup-top outer (front)
+    #        P1 = shoulder ridge apex (top of shoulder, slightly inward)
+    #        P2 = back panel top (mirror of P0 across body, on the back)
+    #    Generic across archetypes — same parametrization works for halter,
+    #    triangle, or one-piece geometries provided top_shoulder_strap > 0.
     if g.top_shoulder_strap > 0.15:
         strap_r = 0.15 + 0.22 * g.top_shoulder_strap
         cup_top_v = g.top_center_v + g.top_half_v
         u_outer = g.top_inner_u + 2 * g.top_half_u
-        y_start = v_to_y(cup_top_v)
+        y_front = v_to_y(cup_top_v)
+        y_back  = v_to_y(g.top_center_v)   # mid-back, slightly lower than the cup top
         for u_s, name in [(u_outer, "shoulder_R"), (-u_outer, "shoulder_L")]:
-            anchor = _body_point_at(V, u_s, y_start)
-            # end point: up 4cm (just to shoulder top / clavicle level),
-            # pulled 30% inward in X (toward neck) and +1cm in Z (front
-            # of shoulder). Stays safely below the head.
-            shoulder_end = anchor + np.array([
-                -0.30 * anchor[0],   # pull toward center
-                4.0,                 # up
-                1.0,                 # forward
+            P0 = _body_point_at(V, u_s, y_front)            # front cup top
+            # Shoulder ridge apex: at the body's local maximum Y above
+            # the cup, pulled 30% toward center, slightly forward.
+            ridge = P0 + np.array([
+                -0.25 * P0[0],
+                4.0,
+                0.4,
             ])
-            strap = _arc_tube(np.array([anchor, shoulder_end]), radius=strap_r)
+            # Back endpoint: same |u| but flipped to the back hemisphere.
+            # u_back is the back equivalent of u_s. We sample the body at
+            # back azimuth to land on the back surface.
+            u_back = (u_s + 1.0) if u_s < 0 else (u_s - 1.0)  # mirror through u=+/-1
+            P2 = _body_point_at(V, u_back, y_back)
+            # If the back point ended up on the wrong side (theta numerics),
+            # flip its Z-sign — the back surface should have negative Z.
+            if P2[2] > 0:
+                P2 = P2 * np.array([1.0, 1.0, -1.0])
+            # Mid-control just past the ridge, sloping back-and-down so the
+            # arc curves cleanly over the shoulder.
+            mid_back = ridge + np.array([0.0, -1.0, -3.0])
+            strap = _arc_tube(np.array([P0, ridge, mid_back, P2]),
+                                radius=strap_r)
             straps.append((name, strap))
 
     return straps

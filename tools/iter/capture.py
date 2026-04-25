@@ -123,6 +123,8 @@ def render_views(genome: Genome, params, out_dir: str,
             boundary_snap=params.boundary_snap,
             min_offset=params.min_offset_cm,
             cup_extra_offset=params.cup_extra_cm,
+            genome=g,
+            cup_dome_depth_cm=getattr(params, "cup_dome_depth_cm", 0.0),
         )
         wr_amp = (0.04 + 0.10 * (1.0 - g.fabric_weight)) * params.wrinkle_amp_scale
         if wr_amp > 0.001:
@@ -164,6 +166,18 @@ def render_views(genome: Genome, params, out_dir: str,
         # Apply weave shading at `weave_intensity`. 0.0 = unshaded albedo
         # (pure pattern), 1.0 = original effect, >1 = exaggerated.
         base_tex = genome_to_texture(g)
+        # Side-seam top-stitch: bake a thin darker vertical line at u=+/-0.5
+        # so the garment reads as having visible panel seams. This is the
+        # generic equivalent of a coverstitch seam line on real swimwear.
+        if getattr(params, "side_seam_overlay", True):
+            from PIL import ImageDraw
+            tex_w, tex_h = base_tex.size
+            base_tex = base_tex.copy()
+            d = ImageDraw.Draw(base_tex)
+            # u=+0.5 in [-1,1] -> 0.75 in atlas-u. u=-0.5 -> 0.25.
+            for u_atlas in (0.25, 0.75):
+                x = int(u_atlas * tex_w)
+                d.line([(x, 0), (x, tex_h)], fill=(40, 40, 40), width=2)
         if params.weave_intensity > 0.001:
             shaded = _apply_weave_shade_to_texture(base_tex)
             base_arr = np.array(base_tex.convert("RGB"), dtype=np.float32)
