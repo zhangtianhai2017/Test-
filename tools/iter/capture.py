@@ -166,18 +166,39 @@ def render_views(genome: Genome, params, out_dir: str,
         # Apply weave shading at `weave_intensity`. 0.0 = unshaded albedo
         # (pure pattern), 1.0 = original effect, >1 = exaggerated.
         base_tex = genome_to_texture(g)
-        # Side-seam top-stitch: bake a thin darker vertical line at u=+/-0.5
-        # so the garment reads as having visible panel seams. This is the
-        # generic equivalent of a coverstitch seam line on real swimwear.
+        # Bake stitch overlays into the albedo. Two kinds:
+        #   - Side seam: vertical line at u=+/-0.5 (panel division)
+        #   - Boundary top-stitch: trace each Genome polygon offset 4 mm
+        #     inside its edge (coverstitch / picot finish line)
+        from PIL import ImageDraw
+        tex_w, tex_h = base_tex.size
+        base_tex = base_tex.copy()
+        draw_tex = ImageDraw.Draw(base_tex)
         if getattr(params, "side_seam_overlay", True):
-            from PIL import ImageDraw
-            tex_w, tex_h = base_tex.size
-            base_tex = base_tex.copy()
-            d = ImageDraw.Draw(base_tex)
-            # u=+0.5 in [-1,1] -> 0.75 in atlas-u. u=-0.5 -> 0.25.
             for u_atlas in (0.25, 0.75):
                 x = int(u_atlas * tex_w)
-                d.line([(x, 0), (x, tex_h)], fill=(40, 40, 40), width=2)
+                draw_tex.line([(x, 0), (x, tex_h)], fill=(40, 40, 40), width=2)
+        if getattr(params, "boundary_topstitch", True):
+            polys = polys_uv
+            inset_uv = 0.012   # ~ 4 mm at body scale -> 0.012 in genome u
+            for poly in polys:
+                if len(poly) < 4:
+                    continue
+                arr = np.asarray(poly, dtype=np.float64)
+                # Compute the polygon centroid; insetting toward centroid
+                # gives a smaller polygon at ~inset_uv distance from edge.
+                ctr = arr.mean(axis=0)
+                inset = arr + (ctr - arr) * (inset_uv /
+                                              np.maximum(np.linalg.norm(arr - ctr,
+                                                                          axis=-1, keepdims=True), 1e-3))
+                # Convert to atlas-px coordinates: u in [-1,1] -> [0, tex_w]
+                pts = [
+                    (int((p[0] + 1.0) * 0.5 * tex_w), int(p[1] * tex_h))
+                    for p in inset
+                ]
+                # Close the loop.
+                pts.append(pts[0])
+                draw_tex.line(pts, fill=(45, 45, 50), width=2)
         if params.weave_intensity > 0.001:
             shaded = _apply_weave_shade_to_texture(base_tex)
             base_arr = np.array(base_tex.convert("RGB"), dtype=np.float32)
@@ -205,6 +226,37 @@ def render_views(genome: Genome, params, out_dir: str,
     bind_mat = o3d.visualization.rendering.MaterialRecord()
     bind_mat.shader = "defaultLit"
     bind_mat.base_roughness = 0.6
+    # Lining hint: shift the binding color slightly darker than the
+    # primary albedo so the rim reads as a separate inner-fabric edge,
+    # not just an extruded ribbon of the same fabric. Real swimwear
+    # binding shows a faint shadow at the inside lip.
+    if getattr(params, "lining_hint", True) and len(shell.vertices) > 0:
+        # Sample primary fabric color from the texture's bright background
+        try:
+            import colorsys
+            r, g_, b = colorsys.hls_to_rgb(g.hue, max(0.05, g.lightness * 0.78),
+                                             g.saturation)
+            bind_mat.base_color = [float(r), float(g_), float(b), 1.0]
+        except Exception:
+            pass
+
+    # Strap classification — some straps are fabric continuations of the
+    # main shell (back band, underbust band, gusset, shoulder strap on a
+    # one-piece) and should render with the FABRIC albedo. Others are
+    # trim / hardware (binding rim, halter ties, side ties, dangles,
+    # fringes, beads, bows, shells) and use trim color. Without this
+    # split everything was uniformly white which read as visual clutter.
+    FABRIC_STRAP_NAMES = {
+        "top_back_band", "underbust_band", "waist_band",
+        "shoulder_R", "shoulder_L", "gusset",
+    }
+    fabric_strap_mat = None
+    if len(shell.vertices) > 0:
+        fabric_strap_mat = o3d.visualization.rendering.MaterialRecord()
+        fabric_strap_mat.shader = "defaultLit"
+        fabric_strap_mat.albedo_img = o3d.geometry.Image(tex_np)
+        fabric_strap_mat.base_roughness = shell_mat.base_roughness
+        fabric_strap_mat.base_metallic = shell_mat.base_metallic
 
     out_paths = []
     for view in VIEWS:
@@ -216,7 +268,10 @@ def render_views(genome: Genome, params, out_dir: str,
             R.scene.add_geometry("binding", binding, bind_mat)
         for name, m in straps:
             if len(m.vertices) > 0:
-                R.scene.add_geometry(f"strap_{name}", m, bind_mat)
+                use_mat = (fabric_strap_mat if (name in FABRIC_STRAP_NAMES
+                                                   and fabric_strap_mat is not None)
+                            else bind_mat)
+                R.scene.add_geometry(f"strap_{name}", m, use_mat)
         _frame(R, body_mesh, view)
         img = R.render_to_image()
         path = os.path.join(out_dir, f"{view.name}.png")

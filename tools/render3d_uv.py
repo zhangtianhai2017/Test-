@@ -812,45 +812,73 @@ def build_strap_meshes(body_mesh: o3d.geometry.TriangleMesh, g,
                                         offset=0.55)
     straps.append(("underbust_band", underbust_band))
 
-    # 1c) Crotch gusset — a tube going under the crotch from front-low to
-    #     back-low. Real swimwear has this as a separate fabric piece that
-    #     visibly bridges the front and back bottoms. Without it the front
-    #     and back panels look like two disconnected adhesive patches.
-    #     Generic: present on every Genome, scales radius with smaller of
-    #     bot_front_half_u / bot_back_half_u so it shrinks for thongs and
-    #     widens for full-coverage one-pieces.
-    gusset_radius = max(0.40,
-                          min(g.bot_front_half_u, g.bot_back_half_u) * 5.0)
-    gusset_y = y_crotch - 0.5
-    P_front = _body_point_at(V, 0.0, gusset_y)        # front-low
-    P_back  = _body_point_at(V, 1.0, gusset_y)        # back-low (u=1 = back)
-    # Mid control point dropped a little to dip the gusset below the seat
-    # so it follows real inseam geometry instead of cutting straight through.
-    P_mid = 0.5 * (P_front + P_back) + np.array([0.0, -2.5, 0.0])
-    gusset = _arc_tube(np.array([P_front, P_mid, P_back]),
-                         radius=gusset_radius)
-    straps.append(("gusset", gusset))
+    # 1c) Crotch gusset — a tube tracing the inseam from front pubic
+    #     anchor over the perineum to the back-buttock anchor. Real
+    #     swimwear has this as a separate fabric piece that bridges the
+    #     front and back bottoms. The path goes UP into the body's
+    #     crotch concavity, not straight through space — we sample the
+    #     body surface at a small array of u values along the path so
+    #     the tube hugs the body. Width scales with bot_front/back_half_u
+    #     so thongs get a thin string and one-pieces get a visible strip.
+    gusset_radius = max(0.32,
+                          min(g.bot_front_half_u, g.bot_back_half_u) * 4.0)
+    # Sample the body along an arc from front (u=0) to back (u=1) at the
+    # crotch line, lifted slightly above y_crotch where the legs actually
+    # meet the pelvis. Using only torso vertices via _body_point_at's
+    # built-in radius filter keeps the path off the legs.
+    inseam_y = y_crotch + 1.0
+    n_pts = 7
+    inseam_path = []
+    for k in range(n_pts):
+        t = k / (n_pts - 1)
+        u = t * 1.0      # front=0, back=1
+        # Y rises slightly toward the back so the path mounts the buttock
+        y_k = inseam_y + 0.8 * t
+        try:
+            p = _body_point_at(V, u, y_k, max_torso_radius=18.0)
+            inseam_path.append(p)
+        except Exception:
+            pass
+    if len(inseam_path) >= 2:
+        gusset = _arc_tube(np.array(inseam_path), radius=gusset_radius)
+        # Suppress for any Genome where the bottom panels are too small
+        # to need a gusset — thongs / Brazilian / cheeky cuts. With
+        # bot_back_half_u < 0.13 the back panel is barely there and the
+        # gusset reads as off-body debris. Threshold based on visible
+        # back coverage only (not is_one_piece) so a high-cut maillot
+        # still gets a gusset, but a string bikini doesn't.
+        if g.bot_back_half_u >= 0.13:
+            straps.append(("gusset", gusset))
 
     # 2) Bottom waist string — thin ring at the average of front/back tops.
     #    Asymmetric waists (high-front + thong-back) rely on the side ties
     #    to bridge the height difference; keep the band itself uniformly
     #    thin so it reads as a string, not a wide belt.
+    #
+    #    SUPPRESSION RULE: a one-piece (top_back_coverage > 0.7 AND
+    #    bot_front_top_v overlaps the bust panel) doesn't need a waist
+    #    tie because the front and back are already continuous fabric.
+    #    Drawing a waist tie on a one-piece reads as fabric debris.
     y_front = v_to_y(g.bot_front_top_v)
     y_back  = v_to_y(g.bot_back_top_v)
-    band_y2 = (y_front + y_back) / 2
-    band_h2 = 1.5
-    ring2 = _body_ring(V, band_y2, y_halfband=3.0, n_samples=96)
-    waist_band = _build_band_mesh(ring2, band_h2, offset=0.5)
-    straps.append(("waist_band", waist_band))
+    is_one_piece = (g.top_back_coverage > 0.7
+                    and g.bot_front_top_v > g.top_center_v - g.top_half_v - 0.15)
+    if not is_one_piece:
+        band_y2 = (y_front + y_back) / 2
+        band_h2 = 1.5
+        ring2 = _body_ring(V, band_y2, y_halfband=3.0, n_samples=96)
+        waist_band = _build_band_mesh(ring2, band_h2, offset=0.5)
+        straps.append(("waist_band", waist_band))
 
     # 3) Side ties — slim vertical ribbon on each hip spanning the v-range
     #    between front and back waist-lines (visible bridge for tie-side
-    #    bikinis).
-    y_side_lo = min(y_front, y_back) - 0.8
-    y_side_hi = max(y_front, y_back) + 0.8
-    for u_side, name in [(0.5, "side_tie_R"), (-0.5, "side_tie_L")]:
-        tie = _build_tie_mesh(V, y_side_lo, y_side_hi, u_side)
-        straps.append((name, tie))
+    #    bikinis). One-pieces don't have side ties either.
+    if not is_one_piece:
+        y_side_lo = min(y_front, y_back) - 0.8
+        y_side_hi = max(y_front, y_back) + 0.8
+        for u_side, name in [(0.5, "side_tie_R"), (-0.5, "side_tie_L")]:
+            tie = _build_tie_mesh(V, y_side_lo, y_side_hi, u_side)
+            straps.append((name, tie))
 
     # 4) Tie dangles — hanging "tail" tubes off the side ties. Length
     #    scales with g.bot_tie_dangle. Drawn as a thin tube going straight
@@ -903,6 +931,27 @@ def build_strap_meshes(body_mesh: o3d.geometry.TriangleMesh, g,
     straps.extend(_build_fringe_meshes(g, V, v_to_y))
     straps.extend(_build_beads_meshes(g, V, v_to_y))
     straps.extend(_build_shell_mesh(g, V, v_to_y))
+
+    # 5b) Bar-tack reinforcements — small dense knot of stitching where a
+    #     shoulder/halter strap meets a cup edge. Real swimwear has this
+    #     so the strap doesn't tear out under load. We approximate as a
+    #     tiny ellipsoid (radius ~3 mm) at each cup-top anchor point.
+    if g.top_shoulder_strap > 0.15 or g.top_neck_strap > 0.15:
+        cup_top_v = g.top_center_v + g.top_half_v
+        u_outer = g.top_inner_u + 2 * g.top_half_u
+        u_inner = 0.03 + 0.05 * g.top_inner_u
+        for tag, u in (("OR", u_outer), ("OL", -u_outer),
+                          ("IR", u_inner), ("IL", -u_inner)):
+            try:
+                anc = _body_point_at(V, u, v_to_y(cup_top_v),
+                                       max_torso_radius=18.0)
+                tack = o3d.geometry.TriangleMesh.create_sphere(
+                    radius=0.30, resolution=8)
+                tack.translate(anc.tolist())
+                tack.compute_vertex_normals()
+                straps.append((f"bartack_{tag}", tack))
+            except Exception:
+                pass
 
     # 6) Shoulder straps — full route from front cup top, OVER the shoulder
     #    ridge, DOWN the back, to the top of the back panel.

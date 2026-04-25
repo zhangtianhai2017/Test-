@@ -49,6 +49,8 @@ class IterParams:
     weave_intensity: float = 1.0
     cup_dome_depth_cm: float = 0.0
     side_seam_overlay: bool = True
+    boundary_topstitch: bool = True
+    lining_hint: bool = True
     # Per-Genome overrides applied on top of the seed Genome. Continuous
     # fields are clipped by Genome.clipped(); discrete fields must be
     # valid enum values. We keep this as a flat dict for trivial JSON.

@@ -481,6 +481,12 @@ def cup_dome_replace(shell: o3d.geometry.TriangleMesh,
             r2 = u_local * u_local + v_local * v_local
             if r2 >= 1.0:
                 continue
+            # Smooth blend at the cup edge so the dome doesn't transition
+            # sharply into the surrounding shell. Use a Hermite-like
+            # falloff (smoothstep) keyed to r2 so dome contribution fades
+            # to zero at r2 = 1.0.
+            blend = 1.0 - r2
+            blend = blend * blend * (3.0 - 2.0 * blend)   # smoothstep
             # Find body surface at this (theta, y) (torso only)
             tv_y = y / yh
             bv_normalized = np.stack([
@@ -493,11 +499,14 @@ def cup_dome_replace(shell: o3d.geometry.TriangleMesh,
             j = int(np.argmin(d2))
             base_pt = BV_t[j]
             normal = BN_t[j]
-            dome_h = cup_depth_cm * float(np.sqrt(1.0 - r2))
+            dome_h = cup_depth_cm * float(np.sqrt(1.0 - r2)) * blend
             # The dome height is added on top of a small base offset
             # so the cup never touches the body even at its rim.
+            # Blend keeps the existing vertex position when far from
+            # cup center, dome-target when close.
             base_offset = 0.30
-            new_V[i] = base_pt + normal * (base_offset + dome_h)
+            target = base_pt + normal * (base_offset + dome_h)
+            new_V[i] = (1.0 - blend) * p + blend * target
             break
 
     out = o3d.geometry.TriangleMesh()
