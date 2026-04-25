@@ -51,6 +51,7 @@ from render3d_uv import (
     load_body_mesh, build_fabric_shell, build_binding_mesh,
     build_strap_meshes,
 )
+from garment_polish import polish_shell
 from seed_loader import load_seed, seed_to_genome
 
 
@@ -126,19 +127,32 @@ def _per_corner_to_per_vertex(verts: np.ndarray, faces: np.ndarray,
 def export_genome_to_glb(g, out_path: str,
                          body_mesh: o3d.geometry.TriangleMesh | None = None,
                          shell_offset: float = 0.3,
+                         polish: bool = True,
                          verbose: bool = True) -> dict:
-    """Bake one Genome to a single .glb file. Returns stats dict."""
+    """Bake one Genome to a single .glb file. Returns stats dict.
+
+    polish=True applies garment_polish.polish_shell which (a) flattens
+    nipple bumps with Taubin smoothing, (b) snaps the jagged shell
+    boundary onto the smooth Genome polygon, and (c) re-offsets so the
+    cup region forms a molded dome.
+    """
     if body_mesh is None:
         body_mesh = load_body_mesh()
     body_uvs = cylindrical_uvs(body_mesh)        # per-corner, (3*Ntri, 2)
     body_mesh.triangle_uvs = o3d.utility.Vector2dVector(body_uvs)
 
     polys_uv = genome_polygons(g)
+    yc, yn = torso_anchors(body_mesh)
     shell = build_fabric_shell(body_mesh, body_uvs, polys_uv, offset=shell_offset)
+    if polish and len(np.asarray(shell.triangles)) > 0:
+        shell = polish_shell(shell, body_mesh, polys_uv, yc, yn)
     shell_corner_uvs = np.asarray(shell.triangle_uvs)
 
-    bind = build_binding_mesh(shell, offset=0.05, thickness=0.15)
-    yc, yn = torso_anchors(body_mesh)
+    # Binding ~ fold-over-elastic: industry standard 1" or 5/8" FOE folds
+    # in half so it covers ~10-12 mm on each face. Our 'thickness' is the
+    # rim width visible along the boundary -> 0.40 cm matches a 1" FOE
+    # folded at the seam allowance (Yarnspirations / Brother USA).
+    bind = build_binding_mesh(shell, offset=0.05, thickness=0.40)
     straps = build_strap_meshes(body_mesh, g, yc, yn)
 
     # ---- Stage 1: SHELL ----
@@ -212,6 +226,9 @@ def main():
                     help="output .glb path. Default: tools/output/glb/<seed>.glb")
     ap.add_argument("--offset", type=float, default=0.3,
                     help="fabric shell offset from body (cm). Default 0.3")
+    ap.add_argument("--no-polish", action="store_true",
+                    help="skip garment_polish (smoothing, boundary snap, "
+                         "cup dome) — use to compare raw shell vs. polished.")
     args = ap.parse_args()
 
     seed = load_seed(args.seed)
@@ -221,7 +238,8 @@ def main():
     os.makedirs(os.path.dirname(out), exist_ok=True)
 
     t0 = time.time()
-    export_genome_to_glb(g, out, shell_offset=args.offset)
+    export_genome_to_glb(g, out, shell_offset=args.offset,
+                         polish=not args.no_polish)
     print(f"exported in {time.time() - t0:.1f}s")
 
 

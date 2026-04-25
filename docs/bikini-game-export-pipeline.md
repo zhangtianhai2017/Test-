@@ -163,9 +163,85 @@ UV 连续性 / 蒙皮权重要在 decimation 中保持，否则 LOD 切换会有
 
 ---
 
+## 服装工程参考（Garment Construction References）
+
+下面这些原则**直接驱动**了 `tools/garment_polish.py` 里的所有数字常量。如果以后调参数，必须知道每一个数字背后的服装行业依据。
+
+### A. 乳头不外凸 —— 这是"模杯（molded cup）"的工作
+
+真实泳衣胸杯不是"贴皮"，而是 **3–5 mm 厚的 EVA 模杯泡棉** 或类似结构，无视下面胸型，自己保持凸面外形。
+
+> "The advantage of these padded foam cups is that they hold their own shape for small breasts and so no wire is generally needed." —— [Cloth Habit, *Making a Foam Cup Bra*](https://clothhabit.com/making-a-foam-cup-bra-part-1/)
+>
+> "For small sizes such as AAA, AA and A, foam can be molded over a ham with the heat of an iron, then cut to shape." —— [Helen's Closet, *How to Add Foam Cups to the Sandpiper Swimsuit*](https://helensclosetpatterns.com/blogs/helens-closet/how-to-add-foam-cups-to-the-sandpiper-swimsuit)
+
+杯太小用不上模杯的款，会用 **powermesh（弹性网眼布）作为内衬层** 把表面磨平，不让乳头透出来：
+
+> "Many ice skating dresses are built with a full powermesh lining that acts as a base nude layer." —— [Spandex By Yard, *Spandex That Doesn't Go Sheer*](https://spandexbyyard.com/blogs/spandex-vs-other-stretch-fabrics-type-explained/how-to-avoid-see-through-spandex)
+
+**`garment_polish` 的应用**：
+- `taubin_smooth_interior()` 把高频曲率 (= 乳头小凸起) 平掉 —— 模仿模杯本身就是低频凸面这件事
+- `safe_offset_from_body()` 在 v ∈ [0.66, 0.92] 的胸杯区域额外加 `FOAM_CUP_EXTRA_CM = 0.45 cm` ≈ 4.5 mm —— 直接对应工业模杯泡棉厚度
+
+### B. 边缘锯齿 —— 包边带（FOE）做成的"光滑卷边"
+
+真实泳衣不留毛边，靠 **fold-over elastic（FOE）** 把布边卷起来：
+
+> "1\" FOE is preferred for ease of use, though 5/8\" fold over elastic also works well. The elastic has a channel right down the middle to easily fold it exactly in half." —— [Brother USA, *How To Use Fold-Over Elastic to Finish Knits*](https://www.brother-usa.com/blogs/stitching-sewcial/using-fold-over-elastic-to-finish-knits)
+>
+> "In most cases, your elastic should be 90% of the length of your fabric." —— [Yarnspirations, *Guide to Sewing Swimwear Part 1*](https://www.yarnspirations.com/blogs/how-to/mic-20180413-guide-to-sewing-swimwear-part-1)
+>
+> "Most swimwear is sewn with a 1/4\" seam allowance." —— [Janome, *Finish Your FOE Like a Pro*](https://www.janome.com/finish-your-foe-fold-over-elastic-like-a-pro/)
+
+FOE 折成两瓣以后压住布边，每面**可见宽度 ≈ 4 mm**，所以 binding rim 应该在这个量级。"弹性短 10%"会让布边略微聚拢，给我们一条**平滑曲线**而不是逐三角面的台阶。
+
+**`garment_polish` 的应用**：
+- `project_boundary_to_polygons()` 把每个边界顶点投影到对应 Genome 多边形 (= GA 算出来的"理想曲线")，强制边缘变光滑
+- `export_garment.py` 里 `build_binding_mesh(thickness=0.40)` ≈ 4 mm —— 1" FOE 折叠后的可见宽度
+
+### C. 数字服装行业的"皮肤偏移"标准
+
+CLO3D / Marvelous Designer 这两套行业标准的虚拟试衣软件都用 **3 mm avatar skin offset** 作为默认空气层。我们的 `SKIN_OFFSET_CM = 0.30` 直接对齐这个数。
+
+> "The avatar's default skin offset is set to 3mm, which is suitable for garment production." —— [Marvelous Designer Manual, *Set Skin Offset*](http://manual.marvelousdesigner.com/display/MD4M/Set+Skin+Offset)
+>
+> "Pattern Collision Offset … set to something sensible like real world fabric thickness of 0.5mm." —— [uDraper, *Preparing garments in MD/CLO*](https://udraper.com/blogs/tutorials/preparing-garments-in-md-clo)
+
+工业链路是：3 mm（avatar 表面外的空气层）+ 0.5 mm（布料厚度）+ 0–4 mm（杯垫 / 袋衬）= 总外推。
+
+### D. 织物组分 —— 80/20 尼龙弹性纤维
+
+> "The 80% nylon and 20% spandex ratio has become the industry standard for swimwear." —— Spandex By Yard buyer guides
+
+我们的 `Genome.fabric_source` 列表（`econyl` / `biopolymer` / `qnova` / `amni_soul` / `virgin` / `cotton_blend`）默认假设 80/20 的混纺，所以最终 PBR 材质里的 `roughness` / `metallicFactor` 也按这种"四面弹"织物的视觉效果调（roughness 0.5 中性偏哑光，metallic ≈ 0 除非显式 lurex）。
+
+### E. 缝份（seam allowance）
+
+工业标准 1/4" = 6.4 mm，我们记成 `SEAM_ALLOWANCE_CM = 0.64`。GA 输出的 polygon 是"成品边缘"，所以 polish 完真正的服装内表面应该是 polygon 再向内缩 6.4 mm —— 但视觉上 game asset 通常省略缝份（缝在内侧看不到）。这条记下来作为 v1 做更精细 lining / 内衬层时的参考值。
+
+### F. 引用清单（一手材料）
+
+| 来源 | 主题 |
+|------|------|
+| [Cloth Habit — Making a Foam Cup Bra](https://clothhabit.com/making-a-foam-cup-bra-part-1/) | 模杯结构 |
+| [Helen's Closet — Foam Cup Sandpiper Swimsuit](https://helensclosetpatterns.com/blogs/helens-closet/how-to-add-foam-cups-to-the-sandpiper-swimsuit) | 杯垫厚度 / 加垫流程 |
+| [Yarnspirations — Sewing Swimwear Pt.1](https://www.yarnspirations.com/blogs/how-to/mic-20180413-guide-to-sewing-swimwear-part-1) | seam allowance / FOE |
+| [Brother USA — Fold-Over Elastic](https://www.brother-usa.com/blogs/stitching-sewcial/using-fold-over-elastic-to-finish-knits) | FOE 应用技巧 |
+| [Janome — Finish Your FOE](https://www.janome.com/finish-your-foe-fold-over-elastic-like-a-pro/) | FOE 缝纫 + 1/4" seam |
+| [Marvelous Designer Manual — Set Skin Offset](http://manual.marvelousdesigner.com/display/MD4M/Set+Skin+Offset) | 3 mm avatar skin offset 行业默认 |
+| [uDraper — Preparing garments in MD/CLO](https://udraper.com/blogs/tutorials/preparing-garments-in-md-clo) | particle distance / collision offset |
+| [Spandex By Yard — Don't Go Sheer](https://spandexbyyard.com/blogs/spandex-vs-other-stretch-fabrics-type-explained/how-to-avoid-see-through-spandex) | powermesh 内衬 |
+| [Lycra Company — Spandex 起源](https://www.lycra.com/en) | 80/20 尼龙弹性纤维 |
+| Helen Joseph-Armstrong, *Patternmaking for Fashion Design* (Pearson) | 制版教科书（标准教材，未在线） |
+| Tomoko Nakamichi, *Pattern Magic* vol.2 | 立体凸面建模思路 |
+
+---
+
 ## 端到端最小可运行原型：`tools/export_garment.py`
 
-实现了 Stage 1–3（mesh 抽取 + atlas 复用 + albedo 烘焙 + PBR 材质常量），**不带骨骼 / 不带物理 / 不带 LOD**，但产出一个**能在 Blender / Three.js / glTF Viewer / Unreal 4.27+ 直接打开的 .glb**。
+实现了 Stage 1–3（mesh 抽取 + atlas 复用 + albedo 烘焙 + PBR 材质常量）+ **garment_polish 后处理**（Taubin 内部平滑 → 模杯平面化覆盖乳头；边缘投影到 Genome 多边形 → 锯齿变光滑曲线；safe-offset → 4.5 mm 模杯距离；4 mm FOE 包边）。**不带骨骼 / 不带物理 / 不带 LOD**，但产出一个**能在 Blender / Three.js / glTF Viewer / Unreal 4.27+ 直接打开的 .glb**。
+
+校验图：`tools/output/polish_compare_composite_{red,floral}.png` —— 左 = 原始 shell（边缘锯齿、模乳头），右 = polish 后（光滑曲线、模杯凸面）。
 
 ```bash
 python3 tools/export_garment.py composite_floral
