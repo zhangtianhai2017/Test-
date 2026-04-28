@@ -135,6 +135,11 @@ def render_views(genome: Genome, params, out_dir: str,
                 if len(shell.vertices) > 0 else o3d.geometry.TriangleMesh())
 
     # Strap radius scale: temporarily monkey-patch by scaling strap meshes.
+    # build_strap_meshes is now the post-cutover public dispatcher in
+    # render3d_uv.py — it internally builds the manufacturing latent
+    # state (Garment) from the Genome and routes to the garment-driven
+    # sub-mesh builder, falling back to the legacy raw-Genome path for
+    # one-piece archetypes (v2 deferred).
     straps = build_strap_meshes(body_mesh, g, yc, yn)
     if params.strap_radius_scale != 1.0 and straps:
         scaled = []

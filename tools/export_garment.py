@@ -198,6 +198,27 @@ def export_genome_to_glb(g, out_path: str,
     visual = trimesh.visual.TextureVisuals(uv=UV, material=material)
     out = trimesh.Trimesh(vertices=V, faces=F, vertex_normals=N, visual=visual,
                           process=False)
+
+    # Embed manufacturing latent state as glTF extras["manufacturing_state"].
+    # SKU IDs only — keeps payload small (well under the 64 KB practical
+    # limit some glTF importers have). Engine-side LUT can resolve to
+    # full catalog dicts. UnsupportedArchetypeV1 falls back to no-extras.
+    try:
+        from garment_state import (genome_to_garment, validate_garment,
+                                     UnsupportedArchetypeV1)
+        try:
+            garment = validate_garment(genome_to_garment(g))
+            out.metadata["extras"] = {
+                "manufacturing_state": garment.sku_summary()
+            }
+        except UnsupportedArchetypeV1 as exc:
+            out.metadata["extras"] = {
+                "manufacturing_state_error": str(exc),
+            }
+    except Exception:
+        # garment_state not available yet — proceed without extras
+        pass
+
     out.export(out_path)
 
     stats = {

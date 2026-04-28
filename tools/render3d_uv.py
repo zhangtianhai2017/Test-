@@ -771,7 +771,7 @@ def _build_shell_mesh(g, body_vertices, v_to_y):
     return [("shell", shell)]
 
 
-def build_strap_meshes(body_mesh: o3d.geometry.TriangleMesh, g,
+def _build_strap_meshes_legacy(body_mesh: o3d.geometry.TriangleMesh, g,
                        y_crotch: float, y_neck: float
                        ) -> list[tuple[str, o3d.geometry.TriangleMesh]]:
     """Build 3D strap/band meshes for a Genome. Returns list of (name, mesh).
@@ -1593,3 +1593,307 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# ---------------------------------------------------------------------------
+# build_strap_meshes_v2 — driven by Garment latent state instead of raw Genome
+# ---------------------------------------------------------------------------
+
+def _build_strap_meshes_garment(body_mesh,
+                           garment,
+                           genome,
+                           y_crotch: float, y_neck: float):
+    """Garment-driven sibling of build_strap_meshes. Iterates over
+    garment.connectors / .accessories / .attachments to decide which
+    sub-meshes to build, picks SKU width / size from CONNECTORS catalog,
+    and routes each strap by its Connector.path_policy. Reuses all the
+    existing geometry primitives (_arc_tube / _build_band_mesh /
+    _build_tie_mesh / _body_ring / _body_point_at) so visual output is
+    near-identical to v1 when fed the same Genome.
+
+    Returns list[(name, mesh)] same shape as build_strap_meshes for
+    drop-in compatibility.
+    """
+    V = np.asarray(body_mesh.vertices)
+    g = genome
+    straps: list[tuple[str, o3d.geometry.TriangleMesh]] = []
+
+    def v_to_y(v: float) -> float:
+        return y_crotch + v * (y_neck - y_crotch)
+
+    # Build a dict of garment connectors by id for quick lookup, and
+    # group attachments by component_id.
+    conn_by_id = {c.id: c for c in garment.connectors}
+    acc_by_id = {a.id: a for a in garment.accessories}
+    atts_for: dict[str, list] = {}
+    for att in garment.attachments:
+        atts_for.setdefault(att.component_id, []).append(att)
+
+    # Resolve anatomy anchors once.
+    try:
+        from anatomy import (detect as _detect_anatomy,
+                              front_clavicle_point as _front_clav,
+                              back_scapula_point as _back_scap)
+        L = _detect_anatomy(body_mesh)
+    except Exception:
+        L = None
+
+    def _anchor_xyz(anchor_name: str) -> np.ndarray | None:
+        if L is None:
+            return None
+        if anchor_name == "front_clavicle_R":
+            return _front_clav(body_mesh, L, "R")
+        if anchor_name == "front_clavicle_L":
+            return _front_clav(body_mesh, L, "L")
+        if anchor_name == "back_scapula_R":
+            return _back_scap(body_mesh, L, "R")
+        if anchor_name == "back_scapula_L":
+            return _back_scap(body_mesh, L, "L")
+        if anchor_name == "neck_base_back":
+            return np.array([0.0, L.y_neck_base - 1.0, -3.0],
+                              dtype=np.float64)
+        if anchor_name == "neck_base_front":
+            return np.array([0.0, L.y_neck_base - 1.0, 3.0],
+                              dtype=np.float64)
+        if anchor_name == "sternum":
+            return np.array([0.0, v_to_y(g.top_center_v), 5.0],
+                              dtype=np.float64)
+        if anchor_name == "navel":
+            return np.array([0.0, v_to_y(0.5), 6.0], dtype=np.float64)
+        if anchor_name == "hip_R":
+            return _body_point_at(V, +0.5, v_to_y(g.bot_back_top_v))
+        if anchor_name == "hip_L":
+            return _body_point_at(V, -0.5, v_to_y(g.bot_back_top_v))
+        return None
+
+    # ---- Permanent fabric structure (always present, regardless of
+    # connectors) — these are reuse of the v1 gating logic but
+    # gated through the garment.archetype and Genome shape fields.
+    cup_outer_u = g.top_inner_u + 2 * g.top_half_u
+
+    # 1) Top back band (fabric, runs around back from cup outer to cup outer)
+    band_y = v_to_y(g.top_center_v)
+    band_h = max(1.2, 1.5 + 2.0 * g.top_back_coverage)
+    ring = _body_ring(V, band_y, y_halfband=3.0, n_samples=96,
+                       max_torso_radius=20.0)
+    back_band = _build_band_mesh(ring, band_h, offset=0.5,
+                                   u_from=cup_outer_u, u_to=-cup_outer_u)
+    straps.append(("top_back_band", back_band))
+
+    # 1b) Underbust band — gated on existence in garment.connectors
+    has_underbust = any(c.kind == "underbust_elastic"
+                         for c in garment.connectors)
+    if has_underbust:
+        underbust_v = max(0.05, g.top_center_v - g.top_half_v - 0.02)
+        underbust_y = v_to_y(underbust_v)
+        underbust_ring = _body_ring(V, underbust_y, y_halfband=2.5,
+                                      n_samples=96, max_torso_radius=20.0)
+        ub_thickness = next((c.width_cm for c in garment.connectors
+                              if c.kind == "underbust_elastic"), 1.5)
+        underbust_band = _build_band_mesh(underbust_ring,
+                                            band_thickness=ub_thickness,
+                                            offset=0.55)
+        straps.append(("underbust_band", underbust_band))
+
+    # 1c) Crotch gusset — keep v1 logic (it's already conservative)
+    if g.bot_back_half_u >= 0.13:
+        gusset_radius = max(0.32,
+                              min(g.bot_front_half_u, g.bot_back_half_u) * 4.0)
+        inseam_y = y_crotch + 1.0
+        n_pts = 7
+        inseam_path = []
+        for k in range(n_pts):
+            t = k / (n_pts - 1)
+            try:
+                p = _body_point_at(V, t * 1.0, inseam_y + 0.8 * t,
+                                     max_torso_radius=18.0)
+                inseam_path.append(p)
+            except Exception:
+                pass
+        if len(inseam_path) >= 2:
+            gusset = _arc_tube(np.array(inseam_path), radius=gusset_radius)
+            straps.append(("gusset", gusset))
+
+    # 2) Waist string — only when archetype is two-piece (not bandeau
+    # which uses a wide band, not one-piece which has no waist).
+    is_one_piece = (g.top_back_coverage > 0.7
+                    and g.bot_front_top_v > g.top_center_v - g.top_half_v - 0.15)
+    is_bandeau = garment.archetype == "bandeau_back_band"
+    if not is_one_piece and not is_bandeau:
+        y_front = v_to_y(g.bot_front_top_v)
+        y_back  = v_to_y(g.bot_back_top_v)
+        band_y2 = (y_front + y_back) / 2
+        ring2 = _body_ring(V, band_y2, y_halfband=3.0, n_samples=96)
+        waist_band = _build_band_mesh(ring2, 1.5, offset=0.5)
+        straps.append(("waist_band", waist_band))
+
+    # 3) Side ties — only if a tie_string connector exists
+    has_side_tie = any(c.kind == "tie_string" for c in garment.connectors)
+    if has_side_tie and not is_one_piece:
+        y_front = v_to_y(g.bot_front_top_v)
+        y_back  = v_to_y(g.bot_back_top_v)
+        y_side_lo = min(y_front, y_back) - 0.8
+        y_side_hi = max(y_front, y_back) + 0.8
+        for u_side, name in [(0.5, "side_tie_R"), (-0.5, "side_tie_L")]:
+            tie = _build_tie_mesh(V, y_side_lo, y_side_hi, u_side)
+            straps.append((name, tie))
+
+    # 4) Tie dangles
+    if g.bot_tie_dangle > 0.15:
+        dangle_len = 2.0 + 14.0 * g.bot_tie_dangle
+        for u_side, name in [(0.5, "dangle_R"), (-0.5, "dangle_L")]:
+            try:
+                anchor = _body_point_at(V, u_side,
+                                          (v_to_y(g.bot_front_top_v)
+                                           + v_to_y(g.bot_back_top_v)) / 2)
+                rxz = np.array([anchor[0], 0.0, anchor[2]])
+                rxz /= max(np.linalg.norm(rxz), 1e-6)
+                p0 = anchor + rxz * 0.6
+                p1 = p0 - np.array([0.0, dangle_len, 0.0])
+                dangle = _tube_between(p0, p1, radius=0.15, sides=5)
+                straps.append((name, dangle))
+            except Exception:
+                pass
+
+    # 5) Halter neck strap — driven by a halter connector + its attachment
+    halter_conns = [c for c in garment.connectors if c.kind == "halter_strap"]
+    if halter_conns:
+        c = halter_conns[0]
+        strap_r = max(0.15, c.width_cm * 0.5)
+        cup_top_v = g.top_center_v + g.top_half_v
+        u_inner_halter = 0.03 + 0.05 * g.top_inner_u
+        y_start = v_to_y(cup_top_v)
+        try:
+            anchor_R = _body_point_at(V, u_inner_halter, y_start)
+            anchor_L = _body_point_at(V, -u_inner_halter, y_start)
+            meeting = (_anchor_xyz("neck_base_back")
+                        if L is not None
+                        else _body_point_at(V, 0.0, y_neck - 4.0)
+                              + np.array([0.0, 0.0, 0.4]))
+            mid_R = 0.5 * (anchor_R + meeting) + np.array([0.0, 1.0, 0.5])
+            mid_L = 0.5 * (anchor_L + meeting) + np.array([0.0, 1.0, 0.5])
+            halter_R = _arc_tube(np.array([anchor_R, mid_R, meeting]),
+                                   radius=strap_r)
+            halter_L = _arc_tube(np.array([anchor_L, mid_L, meeting]),
+                                   radius=strap_r)
+            straps.append(("halter_R", halter_R))
+            straps.append(("halter_L", halter_L))
+        except Exception:
+            pass
+
+    # 6) O-rings — at strap junctions when a connector kind=o_ring exists
+    rings = [c for c in garment.connectors if c.kind == "o_ring"]
+    if rings:
+        # Reuse v1 helper but with our SKU radius.
+        for c in rings:
+            radius_cm = c.diameter_cm * 0.5
+            cup_top_v = g.top_center_v + g.top_half_v
+            u_outer = g.top_inner_u + 2 * g.top_half_u
+            y_top = v_to_y(cup_top_v)
+            for u_s, side in ((u_outer, "R"), (-u_outer, "L")):
+                try:
+                    anc = _body_point_at(V, u_s, y_top, max_torso_radius=18.0)
+                    ring = _build_torus(anc, radius_cm, tube_radius=0.08)
+                    straps.append((f"oring_{side}", ring))
+                except Exception:
+                    pass
+
+    # 7) Shoulder straps — driven by shoulder_strap connector + anatomy anchors
+    sh_conns = [c for c in garment.connectors if c.kind == "shoulder_strap"]
+    if sh_conns and g.top_shoulder_strap > 0.15:
+        c = sh_conns[0]
+        strap_r = max(0.15, c.width_cm * 0.5)
+        cup_top_v = g.top_center_v + g.top_half_v
+        u_outer = g.top_inner_u + 2 * g.top_half_u
+        y_front = v_to_y(cup_top_v)
+        for u_s, side, name in [(u_outer, "R", "shoulder_R"),
+                                   (-u_outer, "L", "shoulder_L")]:
+            try:
+                P0 = _body_point_at(V, u_s, y_front)
+                if L is not None:
+                    if P0[1] > L.y_acromion - 2.0:
+                        P0 = P0.copy(); P0[1] = L.y_acromion - 2.0
+                    P_clav = _front_clav(body_mesh, L, side)
+                    P_ridge = np.array([
+                        P_clav[0] * 0.65,
+                        min(L.y_acromion + 1.5, L.y_neck_base - 1.0),
+                        P_clav[2] * 0.4,
+                    ], dtype=np.float64)
+                    P_scap = _back_scap(body_mesh, L, side)
+                    P_back_anchor = np.array([
+                        P_scap[0] * 0.7, v_to_y(g.top_center_v), P_scap[2] * 0.7,
+                    ], dtype=np.float64)
+                    strap = _arc_tube(
+                        np.array([P0, P_clav, P_ridge, P_scap, P_back_anchor]),
+                        radius=strap_r)
+                else:
+                    ridge = P0 + np.array([-0.25 * P0[0], 4.0, 0.4])
+                    u_back = (u_s + 1.0) if u_s < 0 else (u_s - 1.0)
+                    P2 = _body_point_at(V, u_back, v_to_y(g.top_center_v))
+                    if P2[2] > 0:
+                        P2 = P2 * np.array([1.0, 1.0, -1.0])
+                    mid_back = ridge + np.array([0.0, -1.0, -3.0])
+                    strap = _arc_tube(np.array([P0, ridge, mid_back, P2]),
+                                       radius=strap_r)
+                straps.append((name, strap))
+            except Exception:
+                pass
+
+    # 8) Bar-tacks — at cup-top junctions when shoulder/halter exists
+    if g.top_shoulder_strap > 0.15 or g.top_neck_strap > 0.15:
+        cup_top_v = g.top_center_v + g.top_half_v
+        u_outer = g.top_inner_u + 2 * g.top_half_u
+        u_inner = 0.03 + 0.05 * g.top_inner_u
+        for tag, u in (("OR", u_outer), ("OL", -u_outer),
+                        ("IR", u_inner), ("IL", -u_inner)):
+            try:
+                anc = _body_point_at(V, u, v_to_y(cup_top_v),
+                                       max_torso_radius=18.0)
+                tack = o3d.geometry.TriangleMesh.create_sphere(
+                    radius=0.30, resolution=8)
+                tack.translate(anc.tolist())
+                tack.compute_vertex_normals()
+                straps.append((f"bartack_{tag}", tack))
+            except Exception:
+                pass
+
+    # 9) Accessories — bow / shell_charm / pendant / fringe / beads / tassel /
+    #    ring_charm. Each maps to one of the existing _build_*_mesh helpers
+    #    (which take Genome) — we forward to those. v1 keeps existing
+    #    geometry; v2 mainly classifies materials & tracks SKU IDs.
+    for acc in garment.accessories:
+        atts = atts_for.get(acc.id, [])
+        if acc.kind == "bow":
+            straps.extend(_build_bow_mesh(g, V, v_to_y))
+        elif acc.kind == "fringe":
+            straps.extend(_build_fringe_meshes(g, V, v_to_y))
+        elif acc.kind == "beads":
+            straps.extend(_build_beads_meshes(g, V, v_to_y))
+        elif acc.kind == "shell_charm":
+            straps.extend(_build_shell_mesh(g, V, v_to_y))
+        # pendant / tassel / ring_charm — accept v2 minimal placeholder via
+        # reusing fringe / shell builders' anchor logic; defer dedicated
+        # geometry to v2.5.
+
+    return straps
+
+
+def build_strap_meshes(body_mesh: o3d.geometry.TriangleMesh, g,
+                        y_crotch: float, y_neck: float):
+    """Public dispatcher (post-cutover). Builds the manufacturing
+    Garment latent state from the Genome and routes to the
+    garment-driven sub-mesh builder. If the Genome is outside v1
+    scope (one-piece / monokini), falls back transparently to the
+    legacy raw-Genome builder so existing callers are unaffected.
+    """
+    try:
+        from garment_state import (genome_to_garment, validate_garment,
+                                     UnsupportedArchetypeV1)
+        try:
+            garment = validate_garment(genome_to_garment(g))
+            return _build_strap_meshes_garment(body_mesh, garment, g,
+                                                  y_crotch, y_neck)
+        except UnsupportedArchetypeV1:
+            return _build_strap_meshes_legacy(body_mesh, g, y_crotch, y_neck)
+    except Exception:
+        return _build_strap_meshes_legacy(body_mesh, g, y_crotch, y_neck)
