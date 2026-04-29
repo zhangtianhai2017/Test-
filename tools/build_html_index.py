@@ -345,6 +345,188 @@ def _html_escape(s: str) -> str:
     return (s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
 
 
+# ---------------------------------------------------------------------------
+# Markdown READMEs — for GitHub's native rendering. These are the primary
+# files for clicking into a folder on github.com; the .html versions provide
+# an enhanced viewer (lightbox, sticky header) for local browsing or
+# GitHub Pages.
+# ---------------------------------------------------------------------------
+
+def build_task_readme(task_dir: str) -> str:
+    """Generate README.md inside the task folder. Renders inline on GitHub
+    when the user clicks into the directory."""
+    task_dir = os.path.abspath(task_dir)
+    info = _scan_task(task_dir)
+    task_name = os.path.basename(task_dir)
+    day_name = os.path.basename(os.path.dirname(task_dir))
+
+    n_seeds = len(info["seeds"])
+    n_pngs = sum(len(s["pngs"]) for s in info["seeds"]) + len(info["stray_pngs"])
+
+    lines: list[str] = []
+    lines.append(f"# {task_name}")
+    lines.append("")
+    lines.append(f"_Day: [`{day_name}/`](../README.md)_  ·  "
+                  f"_Seeds: {n_seeds}_  ·  _Images: {n_pngs}_")
+    lines.append("")
+    lines.append(f"Local interactive viewer: [`index.html`](index.html)  ·  "
+                  f"Top: [`tools/output/`](../../README.md)")
+    lines.append("")
+
+    if info["stray_pngs"]:
+        lines.append("## Top-level images")
+        lines.append("")
+        for p in info["stray_pngs"]:
+            rel = _rel(p, task_dir)
+            lines.append(f"### {os.path.basename(p)}")
+            lines.append("")
+            lines.append(f"![{os.path.basename(p)}]({rel})")
+            lines.append("")
+
+    if info["seeds"]:
+        # Group seeds by archetype using assets/seeds/<name>.json metadata.
+        from collections import defaultdict
+        by_arch: dict[str, list] = defaultdict(list)
+        for s in info["seeds"]:
+            seed_meta = _seed_meta(s["name"])
+            arch = "unknown"
+            if seed_meta:
+                arch = seed_meta.get("genome", {}).get("style_archetype",
+                                                          "unknown")
+            by_arch[arch].append((s, seed_meta))
+
+        lines.append(f"## Seeds ({n_seeds})")
+        lines.append("")
+
+        for arch in sorted(by_arch.keys()):
+            items = by_arch[arch]
+            lines.append(f"### archetype: `{arch}` ({len(items)})")
+            lines.append("")
+            for s, seed_meta in items:
+                summ = _genome_summary(seed_meta)
+                lines.append(f"#### `{s['name']}`")
+                if summ:
+                    lines.append(f"_{summ}_")
+                lines.append("")
+                # 4-column HTML table of thumbnails. Github renders <img>
+                # inside <table> as long as we keep simple inline tags.
+                lines.append("<table>")
+                pngs = s["pngs"]
+                cols = 4
+                for r in range(0, len(pngs), cols):
+                    row = pngs[r:r + cols]
+                    lines.append("  <tr>")
+                    for p in row:
+                        rel = _rel(p, task_dir)
+                        view = os.path.basename(p).replace(".png", "")
+                        lines.append(
+                            f"    <td align='center'>"
+                            f"<a href='{rel}'>"
+                            f"<img src='{rel}' width='180' alt='{view}'/></a>"
+                            f"<br/><sub>{view}</sub></td>")
+                    lines.append("  </tr>")
+                lines.append("</table>")
+                lines.append("")
+
+    if info["report_md"]:
+        lines.append("## Run report")
+        lines.append("")
+        with open(info["report_md"]) as f:
+            lines.append(f.read())
+        lines.append("")
+
+    out = os.path.join(task_dir, "README.md")
+    with open(out, "w") as f:
+        f.write("\n".join(lines))
+    return out
+
+
+def build_day_readme(day_dir: str) -> str:
+    day_dir = os.path.abspath(day_dir)
+    day_name = os.path.basename(day_dir)
+    tasks = sorted(d for d in os.listdir(day_dir)
+                   if os.path.isdir(os.path.join(day_dir, d)))
+
+    lines = [
+        f"# {day_name}",
+        "",
+        f"_Top: [`tools/output/`](../README.md)_",
+        "",
+        "## Tasks",
+        "",
+    ]
+    for t in tasks:
+        full = os.path.join(day_dir, t)
+        info = _scan_task(full)
+        n_seeds = len(info["seeds"])
+        n_pngs = sum(len(s["pngs"]) for s in info["seeds"]) + len(info["stray_pngs"])
+        lines.append(f"- [`{t}/`]({t}/README.md) — {n_seeds} seed dirs · "
+                      f"{n_pngs} images")
+        # If a top-level overview image exists, include a small thumbnail.
+        for p in info["stray_pngs"]:
+            if "overview" in os.path.basename(p):
+                rel_path = f"{t}/{_rel(p, full)}"
+                lines.append(f"  <br/>"
+                              f"<a href='{t}/README.md'>"
+                              f"<img src='{rel_path}' width='280'/></a>")
+                break
+        lines.append("")
+
+    out = os.path.join(day_dir, "README.md")
+    with open(out, "w") as f:
+        f.write("\n".join(lines))
+    return out
+
+
+def build_root_readme(root_dir: str) -> str:
+    """Top-level tools/output/README.md — lists each YYYY-MM-DD and the
+    historical flat directories so legacy outputs are still findable."""
+    root_dir = os.path.abspath(root_dir)
+    days = sorted([d for d in os.listdir(root_dir)
+                    if os.path.isdir(os.path.join(root_dir, d))
+                    and len(d) == 10 and d.count("-") == 2],
+                  reverse=True)
+    legacy = sorted([d for d in os.listdir(root_dir)
+                      if os.path.isdir(os.path.join(root_dir, d))
+                      and not (len(d) == 10 and d.count("-") == 2)
+                      and d != "__pycache__"])
+    lines = [
+        "# tools/output",
+        "",
+        "Render outputs and per-task artifacts. New runs land under "
+        "the dated hierarchy `YYYY-MM-DD/HHMM_<task>/` (see "
+        "[`tools/output_paths.py`](../../tools/output_paths.py)).",
+        "",
+        "Click into any day folder below — GitHub renders its README.md "
+        "automatically. For richer browsing (lightbox, larger thumbnails) "
+        "use the local `index.html` once you've cloned the repo.",
+        "",
+        "## By day",
+        "",
+    ]
+    for d in days:
+        full = os.path.join(root_dir, d)
+        n_tasks = sum(1 for x in os.listdir(full)
+                       if os.path.isdir(os.path.join(full, x)))
+        lines.append(f"- [`{d}/`]({d}/README.md) — {n_tasks} tasks")
+    lines.append("")
+
+    if legacy:
+        lines.append("## Legacy (pre-dated) outputs")
+        lines.append("")
+        lines.append("Kept in place because earlier commits / docs link to "
+                      "these paths.")
+        lines.append("")
+        for d in legacy:
+            lines.append(f"- `{d}/`")
+        lines.append("")
+
+    out = os.path.join(root_dir, "README.md")
+    with open(out, "w") as f:
+        f.write("\n".join(lines))
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("path", nargs="?", help="task folder OR day folder")
@@ -363,12 +545,12 @@ def main():
             for entry in os.listdir(day_dir):
                 full = os.path.join(day_dir, entry)
                 if os.path.isdir(full):
-                    p = build_task_index(full)
-                    print(f"  {p}")
-            p = build_day_index(day_dir)
-            print(f"  {p}")
-        p = build_root_index(output_root)
-        print(f"  {p}")
+                    p = build_task_index(full); print(f"  {p}")
+                    p = build_task_readme(full); print(f"  {p}")
+            p = build_day_index(day_dir);    print(f"  {p}")
+            p = build_day_readme(day_dir);   print(f"  {p}")
+        p = build_root_index(output_root);  print(f"  {p}")
+        p = build_root_readme(output_root); print(f"  {p}")
         return
 
     if args.path is None:
@@ -383,20 +565,20 @@ def main():
         for entry in sorted(os.listdir(target)):
             full = os.path.join(target, entry)
             if os.path.isdir(full):
-                p = build_task_index(full)
-                print(f"  task index: {p}")
-        p = build_day_index(target)
-        print(f"  day index:  {p}")
+                p = build_task_index(full);  print(f"  task .html: {p}")
+                p = build_task_readme(full); print(f"  task README: {p}")
+        p = build_day_index(target);  print(f"  day .html:  {p}")
+        p = build_day_readme(target); print(f"  day README: {p}")
     else:
-        p = build_task_index(target)
-        print(f"  task index: {p}")
+        p = build_task_index(target);  print(f"  task .html: {p}")
+        p = build_task_readme(target); print(f"  task README: {p}")
         if args.day:
             day_dir = os.path.dirname(target)
-            p = build_day_index(day_dir)
-            print(f"  day index:  {p}")
+            p = build_day_index(day_dir);  print(f"  day .html:  {p}")
+            p = build_day_readme(day_dir); print(f"  day README: {p}")
 
-    p = build_root_index(output_root)
-    print(f"  root index: {p}")
+    p = build_root_index(output_root);  print(f"  root .html:  {p}")
+    p = build_root_readme(output_root); print(f"  root README: {p}")
 
 
 if __name__ == "__main__":
