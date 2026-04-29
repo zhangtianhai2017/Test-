@@ -154,8 +154,89 @@ PRINCIPLES = [balance, proportion, harmony, emphasis, rhythm, unity, contrast]
 
 def evaluate(g: "Genome") -> dict:
     scores = {fn.__name__: fn(g) for fn in PRINCIPLES}
-    scores["overall"] = float(np.mean(list(scores.values())))
+    # Garment-level scores (manufacturing-aware) — added in step 5.
+    scores.update(garment_scores(g))
+    scores["overall"] = float(np.mean([scores[k] for k in PRINCIPLE_KEYS]))
+    scores["overall_with_garment"] = float(
+        np.mean([scores[k] for k in PRINCIPLE_KEYS + GARMENT_SCORE_KEYS]))
     return scores
+
+
+# --------------------------------------------------------------------------
+# Garment-aware scoring (step 5).
+#
+# Pulls Genome through the manufacturing latent state (genome_to_garment +
+# validate_garment) and derives:
+#   - manufacturability:   1.0 minus the validator warning count, soft-saturated
+#   - sustainability:      fraction of fabrics with biodegradable=True
+#   - sku_consistency:     fewer distinct fabrics across pieces = higher score
+#                           (real garments use 1-3 fabrics, not 8)
+#   - construction_simplicity: fewer connectors / accessories = simpler,
+#                                more wearable
+# All scores are in [0, 1]. Used to extend the aesthetic-only fitness with a
+# "this could actually be made and is a coherent garment" axis.
+# --------------------------------------------------------------------------
+
+GARMENT_SCORE_KEYS = (
+    "manufacturability", "sustainability",
+    "sku_consistency", "construction_simplicity",
+)
+
+
+def garment_scores(g: "Genome") -> dict:
+    """Run Genome -> Garment -> validate and derive 4 manufacturing axes.
+    Returns all-zero scores on any failure (e.g. import not available)
+    so this remains a soft, additive layer on top of the design fitness.
+    """
+    out = {k: 0.0 for k in GARMENT_SCORE_KEYS}
+    try:
+        from garment_state import (genome_to_garment, validate_garment,
+                                     UnsupportedArchetypeV1)
+    except Exception:
+        return out
+    try:
+        garm = validate_garment(genome_to_garment(g))
+    except UnsupportedArchetypeV1:
+        # Old behaviour pre-step-4; no longer raised but defensive.
+        return out
+    except Exception:
+        return out
+
+    # 1. manufacturability: each validator warning costs 0.10, capped at 1.
+    n_warn = len(garm.metadata.get("validation_warnings", []))
+    out["manufacturability"] = float(np.clip(1.0 - 0.10 * n_warn, 0.0, 1.0))
+
+    # 2. sustainability: fraction of fabrics that are biodegradable, plus
+    # bonus for biopolymer / amni_soul / cotton_blend sources.
+    if garm.fabrics:
+        bio = sum(1 for f in garm.fabrics if f.biodegradable) / len(garm.fabrics)
+        eco_bonus = sum(1 for f in garm.fabrics
+                          if f.source in ("biopolymer", "amni_soul",
+                                            "cotton_blend", "qnova", "econyl")) \
+                    / len(garm.fabrics)
+        out["sustainability"] = float(np.clip(0.6 * bio + 0.4 * eco_bonus,
+                                                 0.0, 1.0))
+
+    # 3. sku_consistency: fewer distinct fabric SKUs is more like a real
+    # production garment (1-3 typical). Linear falloff above 3.
+    if garm.fabrics:
+        n_fab = len({f.id for f in garm.fabrics})
+        if n_fab <= 3:
+            out["sku_consistency"] = 1.0
+        else:
+            out["sku_consistency"] = float(np.clip(1.0 - 0.20 * (n_fab - 3),
+                                                     0.0, 1.0))
+
+    # 4. construction_simplicity: penalise overly busy designs. Each
+    # connector + accessory above a baseline of 5 components costs 0.05.
+    n_components = len(garm.connectors) + len(garm.accessories)
+    out["construction_simplicity"] = float(
+        np.clip(1.0 - 0.05 * max(0, n_components - 5), 0.0, 1.0))
+
+    return out
+
+
+PRINCIPLE_KEYS = tuple(fn.__name__ for fn in PRINCIPLES)
 
 
 # --------------------------------------------------------------------------
