@@ -1074,6 +1074,10 @@ def build_fabric_shell(body_mesh: o3d.geometry.TriangleMesh, body_uvs: np.ndarra
         # Hard Y ceiling at neck_base + 1 cm — anything above this is
         # the neck or head, never garment-covered for swimwear.
         tri_inside &= tri_y < (_L.y_neck_base + 1.0)
+        # NOTE: a Y floor (legs / knees / feet) was briefly added here as
+        # a render-time patch but reverted. The correct fix lives in the
+        # latent state: PatternPiece.body_mapping.must_clear = ["legs"].
+        # See discussion + proposal for the BodyMapping latent space.
         # Per-Y radius cap. Below axilla: torso ~16-17 cm wide.
         # Between axilla and acromion: that's the upper chest / shoulder
         # cap region — radius ~ deltoid (19.9). Between acromion and neck:
