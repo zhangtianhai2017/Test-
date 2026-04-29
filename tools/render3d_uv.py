@@ -1972,3 +1972,111 @@ def build_strap_meshes(body_mesh: o3d.geometry.TriangleMesh, g,
             return _build_strap_meshes_legacy(body_mesh, g, y_crotch, y_neck)
     except Exception:
         return _build_strap_meshes_legacy(body_mesh, g, y_crotch, y_neck)
+
+
+# ---------------------------------------------------------------------------
+# build_seam_lines_for_garment — auto seam-line geometry from PatternPiece
+#   tagging. Each shell triangle is labeled by the polygon its centroid
+#   falls inside; adjacent triangles with different labels share a seam
+#   edge, which gets a thin tube along it. Removes the need to bake fake
+#   stitch lines into the albedo.
+# ---------------------------------------------------------------------------
+
+def build_seam_lines_for_garment(shell: o3d.geometry.TriangleMesh,
+                                   garment,
+                                   offset: float = 0.05,
+                                   tube_radius: float = 0.12,
+                                   ) -> o3d.geometry.TriangleMesh:
+    """Compute piece-tag boundary edges on the shell and return a thin
+    tube mesh tracing each seam edge.
+
+    Tagging rule: a triangle's piece_id is the first PatternPiece (in
+    garment.pieces order) whose polygon contains the triangle's UV
+    centroid. polygon_uv lives in Genome UV space [-1,1] x [0,1]; we
+    derive the triangle's centroid from per-corner UVs already attached
+    to the shell (shell.triangle_uvs).
+    """
+    from matplotlib.path import Path
+
+    F = np.asarray(shell.triangles)
+    if len(F) == 0 or not shell.has_triangle_uvs():
+        return o3d.geometry.TriangleMesh()
+    UV = np.asarray(shell.triangle_uvs)         # per-corner, (3*Ntri, 2)
+    V = np.asarray(shell.vertices)
+    if not shell.has_vertex_normals():
+        shell.compute_vertex_normals()
+    N = np.asarray(shell.vertex_normals)
+
+    # Per-triangle UV centroid in Genome [-1,1] x [0,1].
+    n_tri = len(F)
+    tri_uv = UV.reshape(n_tri, 3, 2).mean(axis=1)
+    tri_uv_g = tri_uv.copy()
+    tri_uv_g[:, 0] = tri_uv_g[:, 0] * 2.0 - 1.0
+
+    # Build (piece_id, Path) list including mirrored shell pieces.
+    polys: list[tuple[str, "Path"]] = []
+    for piece in garment.pieces:
+        if piece.layer_role != "shell":
+            continue
+        polys.append((piece.id,
+                       Path(np.asarray(piece.polygon_uv, dtype=np.float32))))
+        if piece.count == 2 and piece.mirror_axis == "u":
+            mirror = [(-u, v) for (u, v) in piece.polygon_uv]
+            polys.append((piece.id + "_mirror",
+                           Path(np.asarray(mirror, dtype=np.float32))))
+
+    # Tag triangles. First-match wins (garment.pieces order = priority).
+    tri_piece: list[str | None] = [None] * n_tri
+    for piece_id, path in polys:
+        inside = path.contains_points(tri_uv_g)
+        for i in np.where(inside)[0]:
+            if tri_piece[i] is None:
+                tri_piece[i] = piece_id
+
+    # Build edge -> [(triangle_idx)] map; only triangles with a tag count.
+    edge_to_tris: dict[tuple[int, int], list[int]] = {}
+    for ti, (a, b, c) in enumerate(F):
+        if tri_piece[ti] is None:
+            continue
+        for u, v in ((a, b), (b, c), (c, a)):
+            e = (int(min(u, v)), int(max(u, v)))
+            edge_to_tris.setdefault(e, []).append(ti)
+
+    # Seam edge: shared by ≥2 triangles whose piece tags differ.
+    # _mirror suffix is collapsed to base id so left/right of same piece
+    # don't get a fake seam down the center.
+    def _base(pid: str | None) -> str | None:
+        if pid is None:
+            return None
+        return pid[: -len("_mirror")] if pid.endswith("_mirror") else pid
+
+    seam_edges: list[tuple[int, int]] = []
+    for edge, tris in edge_to_tris.items():
+        if len(tris) < 2:
+            continue
+        pids = {_base(tri_piece[ti]) for ti in tris}
+        pids.discard(None)
+        if len(pids) >= 2:
+            seam_edges.append(edge)
+
+    if not seam_edges:
+        return o3d.geometry.TriangleMesh()
+
+    # Build thin tubes along each seam edge, offset slightly outward
+    # along the average vertex normal so the tube sits proud of the shell.
+    out_meshes: list[o3d.geometry.TriangleMesh] = []
+    for u, v in seam_edges:
+        p0 = V[u] + N[u] * offset
+        p1 = V[v] + N[v] * offset
+        if np.linalg.norm(p1 - p0) < 0.05:
+            continue
+        tube = _tube_between(p0, p1, radius=tube_radius, sides=4)
+        out_meshes.append(tube)
+    if not out_meshes:
+        return o3d.geometry.TriangleMesh()
+
+    merged = out_meshes[0]
+    for m in out_meshes[1:]:
+        merged += m
+    merged.compute_vertex_normals()
+    return merged

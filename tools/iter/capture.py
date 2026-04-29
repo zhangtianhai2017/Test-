@@ -134,6 +134,27 @@ def render_views(genome: Genome, params, out_dir: str,
                                     thickness=params.binding_thickness_cm)
                 if len(shell.vertices) > 0 else o3d.geometry.TriangleMesh())
 
+    # Step 2: piece-tagged seam-line geometry. Builds the Garment latent
+    # state and asks for the boundary edges between adjacent shell
+    # triangles whose PatternPiece tag differs — that gives a real
+    # construction seam (cup ↔ back band, front bottom ↔ side tie,
+    # etc.) traced as a thin tube. UnsupportedArchetypeV1 → no seams.
+    seam_mesh = o3d.geometry.TriangleMesh()
+    if len(shell.vertices) > 0 and getattr(params, "auto_seam_lines", True):
+        try:
+            from garment_state import (genome_to_garment, validate_garment,
+                                         UnsupportedArchetypeV1)
+            from render3d_uv import build_seam_lines_for_garment
+            try:
+                garm = validate_garment(genome_to_garment(g))
+                seam_mesh = build_seam_lines_for_garment(shell, garm,
+                                                            offset=0.05,
+                                                            tube_radius=0.10)
+            except UnsupportedArchetypeV1:
+                pass
+        except Exception:
+            pass
+
     # Strap radius scale: temporarily monkey-patch by scaling strap meshes.
     # build_strap_meshes is now the post-cutover public dispatcher in
     # render3d_uv.py — it internally builds the manufacturing latent
@@ -271,6 +292,12 @@ def render_views(genome: Genome, params, out_dir: str,
             R.scene.add_geometry("shell", shell, shell_mat)
         if len(binding.vertices) > 0:
             R.scene.add_geometry("binding", binding, bind_mat)
+        if len(seam_mesh.vertices) > 0:
+            seam_mat = o3d.visualization.rendering.MaterialRecord()
+            seam_mat.shader = "defaultLit"
+            seam_mat.base_color = [0.18, 0.18, 0.20, 1.0]   # dark thread
+            seam_mat.base_roughness = 0.4
+            R.scene.add_geometry("seams", seam_mesh, seam_mat)
         for name, m in straps:
             if len(m.vertices) > 0:
                 use_mat = (fabric_strap_mat if (name in FABRIC_STRAP_NAMES
