@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import glob
 import os
+import math
 import sys
 import time
 
@@ -1666,19 +1667,24 @@ def _build_strap_meshes_garment(body_mesh,
             return _body_point_at(V, -0.5, v_to_y(g.bot_back_top_v))
         return None
 
-    # ---- Permanent fabric structure (always present, regardless of
-    # connectors) — these are reuse of the v1 gating logic but
-    # gated through the garment.archetype and Genome shape fields.
+    # ---- Components are emitted ONLY when the manufacturing latent
+    # state actually contains them. Anything missing a Connector +
+    # Attachment chain is presumed structurally invalid (= a piece
+    # floating in space disconnected from any anchor) and gets dropped.
     cup_outer_u = g.top_inner_u + 2 * g.top_half_u
 
-    # 1) Top back band (fabric, runs around back from cup outer to cup outer)
-    band_y = v_to_y(g.top_center_v)
-    band_h = max(1.2, 1.5 + 2.0 * g.top_back_coverage)
-    ring = _body_ring(V, band_y, y_halfband=3.0, n_samples=96,
-                       max_torso_radius=20.0)
-    back_band = _build_band_mesh(ring, band_h, offset=0.5,
-                                   u_from=cup_outer_u, u_to=-cup_outer_u)
-    straps.append(("top_back_band", back_band))
+    # 1) Top back band — this is a continuous fabric ribbon. It only
+    #    belongs on archetypes that use one (bandeau / bralette).
+    #    Triangle-string-halter archetypes use a thin string going
+    #    around the back at chest level instead — emitted in (5b).
+    if garment.archetype in ("bandeau_back_band", "bralette_shoulder_strap"):
+        band_y = v_to_y(g.top_center_v)
+        band_h = max(1.2, 1.5 + 2.0 * g.top_back_coverage)
+        ring = _body_ring(V, band_y, y_halfband=3.0, n_samples=96,
+                           max_torso_radius=20.0)
+        back_band = _build_band_mesh(ring, band_h, offset=0.5,
+                                       u_from=cup_outer_u, u_to=-cup_outer_u)
+        straps.append(("top_back_band", back_band))
 
     # 1b) Underbust band — gated on existence in garment.connectors
     has_underbust = any(c.kind == "underbust_elastic"
@@ -1695,8 +1701,11 @@ def _build_strap_meshes_garment(body_mesh,
                                             offset=0.55)
         straps.append(("underbust_band", underbust_band))
 
-    # 1c) Crotch gusset — keep v1 logic (it's already conservative)
-    if g.bot_back_half_u >= 0.13:
+    # 1c) Crotch gusset — only emit if there's an inseam seam in the
+    # garment. seams (currently auto-added by genome_to_garment when
+    # both front_bottom and back_bottom pieces exist).
+    has_inseam_seam = any(s.id.startswith("seam_inseam") for s in garment.seams)
+    if has_inseam_seam and g.bot_back_half_u >= 0.13:
         gusset_radius = max(0.32,
                               min(g.bot_front_half_u, g.bot_back_half_u) * 4.0)
         inseam_y = y_crotch + 1.0
@@ -1714,12 +1723,11 @@ def _build_strap_meshes_garment(body_mesh,
             gusset = _arc_tube(np.array(inseam_path), radius=gusset_radius)
             straps.append(("gusset", gusset))
 
-    # 2) Waist string — only when archetype is two-piece (not bandeau
-    # which uses a wide band, not one-piece which has no waist).
-    is_one_piece = (g.top_back_coverage > 0.7
-                    and g.bot_front_top_v > g.top_center_v - g.top_half_v - 0.15)
-    is_bandeau = garment.archetype == "bandeau_back_band"
-    if not is_one_piece and not is_bandeau:
+    # 2) Waist string — only emit when garment.connectors carries a
+    # waist_elastic. Without it, the waist band was floating fabric
+    # belonging to nothing.
+    has_waist = any(c.kind == "waist_elastic" for c in garment.connectors)
+    if has_waist:
         y_front = v_to_y(g.bot_front_top_v)
         y_back  = v_to_y(g.bot_back_top_v)
         band_y2 = (y_front + y_back) / 2
@@ -1727,21 +1735,33 @@ def _build_strap_meshes_garment(body_mesh,
         waist_band = _build_band_mesh(ring2, 1.5, offset=0.5)
         straps.append(("waist_band", waist_band))
 
-    # 3) Side ties — only if a tie_string connector exists
-    has_side_tie = any(c.kind == "tie_string" for c in garment.connectors)
-    if has_side_tie and not is_one_piece:
+    # 3) Side ties — emit only if a tie_string connector has an
+    # attachment to hip_R / hip_L. Each side tie corresponds to a
+    # specific anatomy_anchor — we draw only the anchored sides.
+    tie_atts = [a for a in garment.attachments
+                if a.target_kind == "anatomy_anchor"
+                and a.anatomy_anchor in ("hip_R", "hip_L")
+                and a.component_kind == "connector"]
+    if tie_atts:
         y_front = v_to_y(g.bot_front_top_v)
         y_back  = v_to_y(g.bot_back_top_v)
         y_side_lo = min(y_front, y_back) - 0.8
         y_side_hi = max(y_front, y_back) + 0.8
-        for u_side, name in [(0.5, "side_tie_R"), (-0.5, "side_tie_L")]:
+        for att in tie_atts:
+            u_side = +0.5 if att.anatomy_anchor == "hip_R" else -0.5
+            name = "side_tie_R" if att.anatomy_anchor == "hip_R" else "side_tie_L"
             tie = _build_tie_mesh(V, y_side_lo, y_side_hi, u_side)
             straps.append((name, tie))
 
-    # 4) Tie dangles
-    if g.bot_tie_dangle > 0.15:
+    # 4) Tie dangles — these are decorative tails of the side tie. The
+    # garment latent state doesn't model dangles as separate Connectors;
+    # they're a property of the side tie ribbon. We emit them only if a
+    # side tie connector exists AND Genome.bot_tie_dangle is set.
+    if tie_atts and g.bot_tie_dangle > 0.15:
         dangle_len = 2.0 + 14.0 * g.bot_tie_dangle
-        for u_side, name in [(0.5, "dangle_R"), (-0.5, "dangle_L")]:
+        for att in tie_atts:
+            u_side = +0.5 if att.anatomy_anchor == "hip_R" else -0.5
+            name = "dangle_R" if att.anatomy_anchor == "hip_R" else "dangle_L"
             try:
                 anchor = _body_point_at(V, u_side,
                                           (v_to_y(g.bot_front_top_v)
@@ -1755,7 +1775,40 @@ def _build_strap_meshes_garment(body_mesh,
             except Exception:
                 pass
 
-    # 5) Halter neck strap — driven by a halter connector + its attachment
+    # 5) Back-closure tie string — only for archetypes that use a
+    # behind-back tie at chest level. The Connector list contains a
+    # tie_string with attachment to back_scapula_R when the back
+    # closure is a string (Brazilian halter style).
+    back_tie_atts = [a for a in garment.attachments
+                     if a.target_kind == "anatomy_anchor"
+                     and a.anatomy_anchor in ("back_scapula_R", "back_scapula_L")
+                     and a.component_kind == "connector"
+                     and any(c.id == a.component_id and c.kind == "tie_string"
+                              for c in garment.connectors)]
+    if back_tie_atts and garment.archetype == "triangle_string_halter":
+        try:
+            band_y = v_to_y(g.top_center_v)
+            ring_pts = _body_ring(V, band_y, y_halfband=2.0,
+                                    n_samples=48, max_torso_radius=20.0)
+            cup_outer_u = g.top_inner_u + 2 * g.top_half_u
+            arc_pts = []
+            for p in ring_pts:
+                u = math.atan2(p[0], p[2]) / math.pi
+                if u >= cup_outer_u or u <= -cup_outer_u:
+                    arc_pts.append(p)
+            if len(arc_pts) >= 3:
+                tie_r = next((c.width_cm * 0.5 for c in garment.connectors
+                                if any(a.component_id == c.id
+                                       and a.anatomy_anchor in ("back_scapula_R",
+                                                                  "back_scapula_L")
+                                       for a in garment.attachments)),
+                              0.25)
+                back_tie = _arc_tube(np.array(arc_pts), radius=max(0.18, tie_r))
+                straps.append(("back_tie_string", back_tie))
+        except Exception:
+            pass
+
+    # 5b) Halter neck strap — driven by a halter connector + its attachment
     halter_conns = [c for c in garment.connectors if c.kind == "halter_strap"]
     if halter_conns:
         c = halter_conns[0]
