@@ -1673,11 +1673,11 @@ def _build_strap_meshes_garment(body_mesh,
     # floating in space disconnected from any anchor) and gets dropped.
     cup_outer_u = g.top_inner_u + 2 * g.top_half_u
 
-    # 1) Top back band — this is a continuous fabric ribbon. It only
-    #    belongs on archetypes that use one (bandeau / bralette).
-    #    Triangle-string-halter archetypes use a thin string going
-    #    around the back at chest level instead — emitted in (5b).
-    if garment.archetype in ("bandeau_back_band", "bralette_shoulder_strap"):
+    # 1) Top back band — continuous fabric ribbon. Belongs on bandeau
+    # / bralette / one-piece. Triangle-string-halter uses a thin string
+    # at chest level instead (emitted in section 5).
+    if garment.archetype in ("bandeau_back_band", "bralette_shoulder_strap",
+                                "one_piece_maillot"):
         band_y = v_to_y(g.top_center_v)
         band_h = max(1.2, 1.5 + 2.0 * g.top_back_coverage)
         ring = _body_ring(V, band_y, y_halfband=3.0, n_samples=96,

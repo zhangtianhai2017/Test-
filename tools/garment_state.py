@@ -311,14 +311,17 @@ from verify_ga_uv import (
 
 
 def _detect_archetype(g) -> str:
-    """v1 dispatch — see plan §archetype."""
+    """v1 dispatch including the v2-promoted one_piece_maillot.
+
+    Priority:
+      1. one_piece_maillot — full-coverage continuous garment
+      2. bralette_shoulder_strap — sporty bralette with shoulder straps
+      3. triangle_string_halter — Brazilian halter triangle
+      4. bandeau_back_band — strapless bandeau (catch-all)
+    """
     cup_bottom = g.top_center_v - g.top_half_v
     if g.top_back_coverage > 0.7 and g.bot_front_top_v > cup_bottom - 0.15:
-        raise UnsupportedArchetypeV1(
-            f"Genome describes a one-piece "
-            f"(top_back_coverage={g.top_back_coverage:.2f}, "
-            f"bot_front_top_v={g.bot_front_top_v:.2f}, "
-            f"cup_bottom={cup_bottom:.2f}) — deferred to v2.")
+        return "one_piece_maillot"
     if g.top_shoulder_strap > 0.5:
         return "bralette_shoulder_strap"
     if g.top_neck_strap > 0.4 and g.top_inner_u > 0.05:
@@ -591,6 +594,45 @@ def snap_strap_slider(width_cm: float) -> str:
     return min(candidates, key=lambda kv: abs(kv[1].width_cm - width_cm))[0]
 
 
+def _connectors_for_one_piece(g) -> tuple[list[ConnectorRef],
+                                            list[Attachment]]:
+    """One-piece maillot: shoulder/halter strap routing + underbust
+    support. No side ties (panels are continuous through the side
+    seam). Optional waist elastic if Genome wants a defined waist.
+    """
+    conns: list[ConnectorRef] = []
+    atts: list[Attachment] = []
+
+    if g.top_shoulder_strap > 0.15:
+        strap_w = 1.0 + 1.0 * float(g.top_shoulder_strap)
+        strap_id = snap_strap(strap_w, padded=bool(g.fabric_weight > 0.55))
+        strap = _connector_ref(strap_id)
+        conns.append(strap)
+        atts.append(Attachment(
+            id="att_strap_R", component_kind="connector",
+            component_id=strap.id, target_kind="anatomy_anchor",
+            anatomy_anchor="front_clavicle_R"))
+        atts.append(Attachment(
+            id="att_strap_L", component_kind="connector",
+            component_id=strap.id, target_kind="anatomy_anchor",
+            anatomy_anchor="front_clavicle_L"))
+    elif g.top_neck_strap > 0.15:
+        halter = _connector_ref("STR_HALTER_CORD")
+        conns.append(halter)
+        atts.append(Attachment(
+            id="att_halter", component_kind="connector",
+            component_id=halter.id, target_kind="anatomy_anchor",
+            anatomy_anchor="neck_base_back"))
+
+    underbust = _connector_ref("ELS_UNDERBUST_15MM")
+    conns.append(underbust)
+    atts.append(Attachment(
+        id="att_underbust", component_kind="connector",
+        component_id=underbust.id, target_kind="anatomy_anchor",
+        anatomy_anchor="sternum"))
+    return conns, atts
+
+
 def _accessories_for_genome(g) -> tuple[list[AccessoryRef],
                                           list[Attachment]]:
     """Optional accessories driven by Genome.has_bow / has_fringe / has_beads / has_shell."""
@@ -685,6 +727,8 @@ def genome_to_garment(g, anatomy=None) -> Garment:
         conns, c_atts = _connectors_for_triangle_halter(g)
     elif archetype == "bandeau_back_band":
         conns, c_atts = _connectors_for_bandeau(g)
+    elif archetype == "one_piece_maillot":
+        conns, c_atts = _connectors_for_one_piece(g)
     else:   # bralette_shoulder_strap
         conns, c_atts = _connectors_for_bralette(g)
 
