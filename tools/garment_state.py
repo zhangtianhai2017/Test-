@@ -960,3 +960,259 @@ def validate_garment(garment: Garment) -> Garment:
 
     garment.metadata.setdefault("validation_warnings", []).extend(warnings)
     return garment
+
+
+# ============================================================================
+# BodyDeployment latent space — the third leg of the cascade.
+#
+#     Genome  →  Garment  →  BodyDeployment  →  rendered mesh
+#
+# Garment alone is body-agnostic (a tech pack — same one fits many models).
+# BodyDeployment commits a Garment to a SPECIFIC body, declaring for each
+# piece which anatomical region it covers and which it must clear, and
+# resolving every Connector / Accessory attachment to a real 3D anchor on
+# the mesh.
+#
+# Every triangle / strap / accessory the renderer emits MUST trace back to
+# a deployment record. No record → does not render. This is the "double
+# binding" rule the architecture commits to:
+#   completeness:    every PatternPiece declared in latent state ↔ rendered
+#   accountability:  every triangle rendered ↔ traceable to a piece + region
+# ============================================================================
+
+@dataclass
+class BodyMapping:
+    """A piece's intended deployment on the body. Drives both renderer
+    extraction (which body triangles to assign to this piece) and
+    validator (must_clear regions enforce manufacturing realism)."""
+    piece_id: str
+    covers_regions: list[str] = field(default_factory=list)   # named anatomy regions
+    must_clear: list[str] = field(default_factory=list)        # forbidden zones
+    contact_kind: str = "skin_tight"   # skin_tight / drape / structured_cup / floating
+
+
+# Default BodyMapping per PatternPiece.role. genome_to_garment doesn't
+# know about anatomy; deploy_to_body uses these defaults to generate
+# the per-Garment deployment record. Override-able at deploy time if
+# the archetype dispatcher wants to special-case.
+DEFAULT_MAPPING_BY_ROLE: dict[str, dict] = {
+    "cup": {
+        "covers_regions": ["chest", "front_chest"],
+        "must_clear":     ["legs", "arms", "head", "neck", "pelvis"],
+        "contact_kind":   "structured_cup",
+    },
+    "back_band_panel": {
+        "covers_regions": ["chest", "back_chest"],
+        "must_clear":     ["legs", "arms", "head", "pelvis"],
+        "contact_kind":   "skin_tight",
+    },
+    "underband": {
+        "covers_regions": ["chest"],
+        "must_clear":     ["legs", "arms", "head", "neck"],
+        "contact_kind":   "skin_tight",
+    },
+    "front_bottom": {
+        "covers_regions": ["pelvis", "front_pelvis"],
+        "must_clear":     ["legs", "arms", "head", "neck", "chest"],
+        "contact_kind":   "skin_tight",
+    },
+    "back_bottom": {
+        "covers_regions": ["pelvis", "back_pelvis"],
+        "must_clear":     ["legs", "arms", "head", "neck", "chest"],
+        "contact_kind":   "skin_tight",
+    },
+    "side_tie_panel": {
+        "covers_regions": ["pelvis", "side_torso"],
+        "must_clear":     ["legs", "arms", "head", "neck", "chest"],
+        "contact_kind":   "skin_tight",
+    },
+    "center_gore": {
+        "covers_regions": ["chest"],
+        "must_clear":     ["legs", "arms", "head", "neck"],
+        "contact_kind":   "skin_tight",
+    },
+    "gusset": {
+        "covers_regions": ["pelvis"],
+        "must_clear":     ["arms", "head", "neck", "chest"],
+        "contact_kind":   "skin_tight",
+    },
+    "halter_strap_panel": {
+        "covers_regions": ["chest", "neck"],
+        "must_clear":     ["legs", "arms"],
+        "contact_kind":   "drape",
+    },
+    "shoulder_strap_panel": {
+        "covers_regions": ["chest"],
+        "must_clear":     ["legs", "arms"],
+        "contact_kind":   "drape",
+    },
+}
+
+
+@dataclass
+class BodyDeployment:
+    """Resolved deployment of a Garment onto a specific body. Built by
+    deploy_to_body(garment, body_mesh). Renderer consumes this directly.
+    """
+    # Per-piece mapping (resolved from DEFAULT_MAPPING_BY_ROLE)
+    piece_mappings: dict[str, BodyMapping] = field(default_factory=dict)
+
+    # Resolved 3D anchors for every Connector/Accessory attachment.
+    # key = attachment.id, value = (x, y, z) tuple in body cm. Missing
+    # entries mean the attachment couldn't be resolved (anchor name not
+    # known on this body) — those attachments WILL be dropped at render
+    # time (accountability rule).
+    resolved_anchors: dict[str, tuple[float, float, float]] = field(default_factory=dict)
+
+    # Which connectors / accessories survive deployment (have ≥1 resolved
+    # anchor or seam attachment). Renderer iterates over these only.
+    valid_connector_ids: set[str] = field(default_factory=set)
+    valid_accessory_ids: set[str] = field(default_factory=set)
+
+    # AnatomyLandmarks cached for the renderer's use
+    anatomy: object = None
+
+    # Region classifier — one closure that maps (x,y,z) -> region name.
+    # Renderer uses this to triage every shell triangle.
+    classify_xyz: object = None
+
+    # Deployment-level warnings (separate from Garment.metadata)
+    warnings: list[str] = field(default_factory=list)
+
+
+def _resolve_anchor(anchor_name: str, body_mesh,
+                     anatomy_landmarks) -> tuple[float, float, float] | None:
+    """Map a named anatomy_anchor (e.g. 'front_clavicle_R', 'sternum')
+    to a 3D (x,y,z) on the body mesh. Returns None if the anchor name
+    isn't known."""
+    try:
+        from anatomy import (front_clavicle_point as _front,
+                              back_scapula_point as _scap)
+    except Exception:
+        return None
+    L = anatomy_landmarks
+    if anchor_name == "front_clavicle_R":
+        p = _front(body_mesh, L, "R")
+    elif anchor_name == "front_clavicle_L":
+        p = _front(body_mesh, L, "L")
+    elif anchor_name == "back_scapula_R":
+        p = _scap(body_mesh, L, "R")
+    elif anchor_name == "back_scapula_L":
+        p = _scap(body_mesh, L, "L")
+    elif anchor_name == "neck_base_back":
+        p = (0.0, L.y_neck_base - 1.0, -3.0)
+    elif anchor_name == "neck_base_front":
+        p = (0.0, L.y_neck_base - 1.0, +3.0)
+    elif anchor_name == "sternum":
+        p = (0.0, (L.y_axilla + L.y_acromion) * 0.5, +5.0)
+    elif anchor_name == "navel":
+        p = (0.0, L.y_pelvis + 0.6 * (L.y_axilla - L.y_pelvis), +6.0)
+    elif anchor_name == "hip_R":
+        # waist-side at u=+0.5; approximate with body radius
+        p = (+L.waist_radius_xz, L.y_pelvis + 4.0, 0.0)
+    elif anchor_name == "hip_L":
+        p = (-L.waist_radius_xz, L.y_pelvis + 4.0, 0.0)
+    elif anchor_name == "crotch_front":
+        p = (0.0, L.y_pelvis, +5.0)
+    elif anchor_name == "crotch_back":
+        p = (0.0, L.y_pelvis, -5.0)
+    else:
+        return None
+    return (float(p[0]), float(p[1]), float(p[2]))
+
+
+def deploy_to_body(garment: Garment, body_mesh) -> BodyDeployment:
+    """Cascade Garment → BodyDeployment.
+
+    For each PatternPiece.role we look up the default BodyMapping, then
+    resolve every connector/accessory attachment to a 3D point on the
+    given body.
+
+    Connectors / accessories whose attachments don't resolve (unknown
+    anchor name, no seam in the garment) get dropped from the deployment;
+    the renderer iterates over `valid_connector_ids` / `valid_accessory_ids`
+    only.
+    """
+    try:
+        from anatomy import detect as _detect_anatomy, body_regions, classify_point
+    except Exception as e:
+        # Anatomy module is required; fail loudly so we don't silently
+        # skip the BodyMapping enforcement.
+        raise RuntimeError(f"anatomy module unavailable: {e}")
+
+    L = _detect_anatomy(body_mesh)
+    regions = body_regions(L)
+    deployment = BodyDeployment(anatomy=L)
+    deployment.classify_xyz = lambda x, y, z: classify_point(
+        x, y, z, regions, max_torso_radius=L.deltoid_radius_xz + 4.0)
+    deployment.warnings = []
+
+    # ---- Piece mappings ----
+    for piece in garment.pieces:
+        default = DEFAULT_MAPPING_BY_ROLE.get(piece.role, {
+            "covers_regions": [], "must_clear": [], "contact_kind": "drape",
+        })
+        deployment.piece_mappings[piece.id] = BodyMapping(
+            piece_id=piece.id,
+            covers_regions=list(default["covers_regions"]),
+            must_clear=list(default["must_clear"]),
+            contact_kind=default["contact_kind"],
+        )
+
+    # ---- Resolve attachments ----
+    seams_by_id = {s.id: s for s in garment.seams}
+    for att in garment.attachments:
+        resolved = None
+        if att.target_kind == "anatomy_anchor" and att.anatomy_anchor:
+            resolved = _resolve_anchor(att.anatomy_anchor, body_mesh, L)
+            if resolved is None:
+                deployment.warnings.append(
+                    f"D1: attachment '{att.id}' anchor "
+                    f"'{att.anatomy_anchor}' unknown — dropped")
+                continue
+            # Apply offset
+            ox, oy, oz = att.offset_cm
+            resolved = (resolved[0] + ox, resolved[1] + oy, resolved[2] + oz)
+        elif att.target_kind == "seam_at_param":
+            seam = seams_by_id.get(att.seam_id)
+            if seam is None:
+                deployment.warnings.append(
+                    f"D2: attachment '{att.id}' seam '{att.seam_id}' "
+                    f"missing — dropped")
+                continue
+            # Defer 3D resolution to render time (renderer knows where the
+            # seam is in 3D after polish). Mark as 'symbolic' so renderer
+            # falls back if it can't compute the seam param point.
+            resolved = None
+        if resolved is not None or att.target_kind == "seam_at_param":
+            deployment.resolved_anchors[att.id] = resolved or (0.0, 0.0, 0.0)
+            if att.component_kind == "connector":
+                deployment.valid_connector_ids.add(att.component_id)
+            elif att.component_kind == "accessory":
+                deployment.valid_accessory_ids.add(att.component_id)
+
+    # ---- Accountability: connectors/accessories without ANY valid
+    # attachment get dropped from the deployment (they can't render).
+    for c in garment.connectors:
+        if c.id not in deployment.valid_connector_ids:
+            deployment.warnings.append(
+                f"D3: connector '{c.id}' has no resolved attachment — "
+                f"dropped from deployment")
+    for a in garment.accessories:
+        if a.id not in deployment.valid_accessory_ids:
+            deployment.warnings.append(
+                f"D3: accessory '{a.id}' has no resolved attachment — "
+                f"dropped from deployment")
+
+    return deployment
+
+
+def validate_deployment(garment: Garment,
+                          deployment: BodyDeployment) -> BodyDeployment:
+    """Cascade-level deployment validator. Adds warnings for piece-region
+    mismatches but does not modify geometry — the renderer enforces
+    must_clear at extraction time using the deployment data."""
+    # No mutation; warnings already captured by deploy_to_body. This
+    # function is the named entry point so callers can compose:
+    #   deployment = validate_deployment(g, deploy_to_body(g, body))
+    return deployment

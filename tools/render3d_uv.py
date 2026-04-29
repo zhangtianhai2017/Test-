@@ -1024,6 +1024,7 @@ def build_fabric_shell(body_mesh: o3d.geometry.TriangleMesh, body_uvs: np.ndarra
                        polys_uv: list[list[tuple[float, float]]],
                        offset: float = 0.3,
                        max_torso_radius: float = 20.0,
+                       body_deployment=None,
                        ) -> o3d.geometry.TriangleMesh:
     """Build a thin fabric shell from the body's triangles that fall inside
     any Genome UV polygon. Each such triangle gets offset outward along its
@@ -1033,6 +1034,13 @@ def build_fabric_shell(body_mesh: o3d.geometry.TriangleMesh, body_uvs: np.ndarra
     Triangles on the T-pose arms are excluded by a torso-radius filter —
     arm and torso side vertices share the same cylindrical u so without
     this filter a wide bandeau's shell extends onto the forearms.
+
+    `body_deployment`: optional BodyDeployment from garment_state.
+    When provided, every triangle's centroid is classified by
+    deployment.classify_xyz and rejected if its region is in the
+    intersection of must_clear across all PatternPieces. This is the
+    cascade-aware filter that pulls the latent state's BodyMapping
+    into the renderer — replaces the legacy hard-coded Y filters.
     """
     from matplotlib.path import Path
 
@@ -1066,18 +1074,37 @@ def build_fabric_shell(body_mesh: o3d.geometry.TriangleMesh, body_uvs: np.ndarra
     tri_r = np.sqrt(tri_xz[:, 0] ** 2 + tri_xz[:, 1] ** 2)
     tri_y = V[T][:, :, 1].mean(axis=1)
 
-    # Anatomy-aware filtering: never include head/upper-neck verts and
-    # use a per-Y radius cap so the shell stays off the deltoid / arm.
+    # Anatomy-aware filtering: when a BodyDeployment is supplied, the
+    # filter comes from the latent state (intersection of must_clear
+    # across all pieces). Otherwise fall back to a coarse Y/radius cap
+    # via anatomy.detect — kept for backward compatibility with callers
+    # that don't yet pass the deployment.
     try:
         from anatomy import detect as _detect_anatomy
         _L = _detect_anatomy(body_mesh)
-        # Hard Y ceiling at neck_base + 1 cm — anything above this is
-        # the neck or head, never garment-covered for swimwear.
         tri_inside &= tri_y < (_L.y_neck_base + 1.0)
-        # NOTE: a Y floor (legs / knees / feet) was briefly added here as
-        # a render-time patch but reverted. The correct fix lives in the
-        # latent state: PatternPiece.body_mapping.must_clear = ["legs"].
-        # See discussion + proposal for the BodyMapping latent space.
+
+        # ---- BodyDeployment-driven must_clear rejection ----
+        if body_deployment is not None and body_deployment.classify_xyz is not None:
+            # Forbidden region = regions in must_clear of ALL pieces (any
+            # triangle in such a region is uniformly forbidden). For v1
+            # bikini that intersection is reliably {legs, arms, head, neck}.
+            mappings = list(body_deployment.piece_mappings.values())
+            if mappings:
+                forbidden = set(mappings[0].must_clear)
+                for m in mappings[1:]:
+                    forbidden &= set(m.must_clear)
+            else:
+                forbidden = {"legs", "arms", "head", "neck"}
+            classify = body_deployment.classify_xyz
+            # Vectorize: classify each triangle centroid
+            centroids = V[T].mean(axis=1)
+            tri_region = np.array([
+                classify(float(c[0]), float(c[1]), float(c[2]))
+                for c in centroids
+            ], dtype=object)
+            forbidden_mask = np.array([r in forbidden for r in tri_region])
+            tri_inside &= ~forbidden_mask
         # Per-Y radius cap. Below axilla: torso ~16-17 cm wide.
         # Between axilla and acromion: that's the upper chest / shoulder
         # cap region — radius ~ deltoid (19.9). Between acromion and neck:
@@ -1607,7 +1634,8 @@ if __name__ == "__main__":
 def _build_strap_meshes_garment(body_mesh,
                            garment,
                            genome,
-                           y_crotch: float, y_neck: float):
+                           y_crotch: float, y_neck: float,
+                           body_deployment=None):
     """Garment-driven sibling of build_strap_meshes. Iterates over
     garment.connectors / .accessories / .attachments to decide which
     sub-meshes to build, picks SKU width / size from CONNECTORS catalog,
@@ -1628,8 +1656,31 @@ def _build_strap_meshes_garment(body_mesh,
 
     # Build a dict of garment connectors by id for quick lookup, and
     # group attachments by component_id.
-    conn_by_id = {c.id: c for c in garment.connectors}
-    acc_by_id = {a.id: a for a in garment.accessories}
+    # Accountability rule (cascade-aware): when a BodyDeployment is
+    # supplied, only connectors / accessories that survived
+    # deploy_to_body's anchor resolution stay in the build set. This
+    # is what kills the "floating in space, attached to nothing"
+    # problem at the latent-state layer.
+    if body_deployment is not None:
+        valid_c = body_deployment.valid_connector_ids
+        valid_a = body_deployment.valid_accessory_ids
+        conns = [c for c in garment.connectors if c.id in valid_c]
+        accs = [a for a in garment.accessories if a.id in valid_a]
+    else:
+        conns = list(garment.connectors)
+        accs = list(garment.accessories)
+    conn_by_id = {c.id: c for c in conns}
+    acc_by_id = {a.id: a for a in accs}
+    # Replace garment lookups inside this function with the filtered
+    # local copies to keep the rest of the function's logic intact.
+    class _filtered:
+        connectors = conns
+        accessories = accs
+        archetype = garment.archetype
+        attachments = garment.attachments
+        seams = garment.seams
+        pieces = garment.pieces
+    garment = _filtered()
     atts_for: dict[str, list] = {}
     for att in garment.attachments:
         atts_for.setdefault(att.component_id, []).append(att)
@@ -1958,20 +2009,29 @@ def _build_strap_meshes_garment(body_mesh,
 
 
 def build_strap_meshes(body_mesh: o3d.geometry.TriangleMesh, g,
-                        y_crotch: float, y_neck: float):
-    """Public dispatcher (post-cutover). Builds the manufacturing
-    Garment latent state from the Genome and routes to the
-    garment-driven sub-mesh builder. If the Genome is outside v1
-    scope (one-piece / monokini), falls back transparently to the
-    legacy raw-Genome builder so existing callers are unaffected.
+                        y_crotch: float, y_neck: float,
+                        body_deployment=None):
+    """Public dispatcher. Builds the manufacturing Garment latent state
+    from the Genome and routes to the garment-driven sub-mesh builder.
+
+    body_deployment (optional): a BodyDeployment from
+    garment_state.deploy_to_body. When supplied, accountability rules
+    apply — connectors / accessories without resolved attachments are
+    skipped at strap-build time. The dispatcher computes one internally
+    if not provided.
     """
     try:
         from garment_state import (genome_to_garment, validate_garment,
+                                     deploy_to_body, validate_deployment,
                                      UnsupportedArchetypeV1)
         try:
             garment = validate_garment(genome_to_garment(g))
+            if body_deployment is None:
+                body_deployment = validate_deployment(
+                    garment, deploy_to_body(garment, body_mesh))
             return _build_strap_meshes_garment(body_mesh, garment, g,
-                                                  y_crotch, y_neck)
+                                                  y_crotch, y_neck,
+                                                  body_deployment)
         except UnsupportedArchetypeV1:
             return _build_strap_meshes_legacy(body_mesh, g, y_crotch, y_neck)
     except Exception:

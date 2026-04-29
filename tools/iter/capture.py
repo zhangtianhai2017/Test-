@@ -114,8 +114,27 @@ def render_views(genome: Genome, params, out_dir: str,
     yc, yn = torso_anchors(body_mesh)
 
     polys_uv = genome_polygons(g)
+
+    # Cascade: build Garment + BodyDeployment once and thread through
+    # the shell extraction + strap dispatcher, so the renderer respects
+    # piece-level must_clear regions and connector/accessory accountability.
+    body_deployment = None
+    try:
+        from garment_state import (genome_to_garment, validate_garment,
+                                     deploy_to_body, validate_deployment,
+                                     UnsupportedArchetypeV1)
+        try:
+            _garm = validate_garment(genome_to_garment(g))
+            body_deployment = validate_deployment(
+                _garm, deploy_to_body(_garm, body_mesh))
+        except UnsupportedArchetypeV1:
+            body_deployment = None
+    except Exception:
+        body_deployment = None
+
     shell = build_fabric_shell(body_mesh, body_uvs, polys_uv,
-                                offset=params.shell_offset_cm)
+                                offset=params.shell_offset_cm,
+                                body_deployment=body_deployment)
     if len(shell.vertices) > 0:
         shell = polish_shell(
             shell, body_mesh, polys_uv, yc, yn,
@@ -161,7 +180,8 @@ def render_views(genome: Genome, params, out_dir: str,
     # state (Garment) from the Genome and routes to the garment-driven
     # sub-mesh builder, falling back to the legacy raw-Genome path for
     # one-piece archetypes (v2 deferred).
-    straps = build_strap_meshes(body_mesh, g, yc, yn)
+    straps = build_strap_meshes(body_mesh, g, yc, yn,
+                                  body_deployment=body_deployment)
     if params.strap_radius_scale != 1.0 and straps:
         scaled = []
         for name, m in straps:

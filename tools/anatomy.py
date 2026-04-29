@@ -149,7 +149,31 @@ def detect(body_mesh: o3d.geometry.TriangleMesh,
     y_neck_base = float(ys[neck_idx]) if neck_idx > 0 else y_acromion + 6.0
     y_head_top = y_hi
 
-    y_pelvis = y_lo + 0.30 * H  # crotch level for these meshes
+    # y_pelvis — actual hip ridge, derived from body topology rather
+    # than a hardcoded fraction. We sweep a wider Y range than the
+    # ys we sampled above (which started at y_lo + 0.4*H — too high
+    # for some standing-pose meshes whose pelvis sits at ~50%) and
+    # find the first prominent local max of torso width going up from
+    # the bottom. That's where the legs converge into the hip.
+    pelvis_ys = np.linspace(y_lo + 0.05 * H, y_lo + 0.65 * H, 40)
+    pelvis_w = np.zeros(len(pelvis_ys))
+    for i, yi in enumerate(pelvis_ys):
+        pw, _, _ = _torso_extent_at(float(yi), V, half=2.0, r_filter=22.0)
+        pelvis_w[i] = pw
+    # Smooth and find first prominent peak above the leg width
+    leg_baseline = float(np.median(pelvis_w[: len(pelvis_w) // 4]))
+    pelvis_idx = -1
+    for i in range(2, len(pelvis_ys) - 1):
+        if (pelvis_w[i] > leg_baseline + 1.0
+                and pelvis_w[i] >= pelvis_w[i - 1]
+                and pelvis_w[i] >= pelvis_w[i + 1]):
+            pelvis_idx = i
+            break
+    if pelvis_idx > 0:
+        y_pelvis = float(pelvis_ys[pelvis_idx])
+    else:
+        # Fallback to the old hardcoded fraction.
+        y_pelvis = y_lo + 0.30 * H
 
     return AnatomyLandmarks(
         y_pelvis=y_pelvis,
@@ -206,3 +230,101 @@ def back_scapula_point(body_mesh: o3d.geometry.TriangleMesh,
                           landmarks.y_acromion - 2.0, -5.0], dtype=np.float64)
     score = sign * cands[:, 0] - 0.6 * cands[:, 2]
     return cands[int(np.argmax(score))].astype(np.float64)
+
+
+# ---------------------------------------------------------------------------
+# Named body regions — the second leg of the cascaded latent stack
+# (Genome → Garment → BodyDeployment → mesh). A BodyRegion classifies
+# any 3D point on the body into a coarse anatomical zone, which is the
+# vocabulary BodyMapping uses for `covers_regions` and `must_clear`.
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True)
+class BodyRegion:
+    """A coarse anatomical zone in body coordinates.
+
+    side="any" means the region wraps the full circumference;
+    "front" restricts to z>0; "back" restricts to z<0; "side" is the
+    lateral strips u in (-0.6, -0.4) and (0.4, 0.6).
+    """
+    name: str
+    y_min: float
+    y_max: float
+    side: str = "any"           # "any" / "front" / "back" / "side"
+    notes: str = ""
+
+    def contains(self, x: float, y: float, z: float) -> bool:
+        if not (self.y_min <= y <= self.y_max):
+            return False
+        if self.side == "front" and z < 0:
+            return False
+        if self.side == "back" and z > 0:
+            return False
+        if self.side == "side":
+            # u = atan2(x, z) / pi; |u| in [0.4, 0.6]
+            if abs(x) < 1e-3 and abs(z) < 1e-3:
+                return False
+            theta = np.arctan2(x, z)
+            u = theta / np.pi
+            if not (0.4 <= abs(u) <= 0.6):
+                return False
+        return True
+
+
+def body_regions(L: AnatomyLandmarks) -> dict[str, BodyRegion]:
+    """Build the v1 set of named regions a swimwear PatternPiece can
+    declare it covers / must clear. Y bounds derive from the
+    AnatomyLandmarks already detected on the body."""
+    epsilon = 0.5
+    return {
+        # Forbidden zones for swimwear pieces
+        "legs":      BodyRegion("legs",
+                                  y_min=-1e6, y_max=L.y_pelvis - epsilon),
+        "head":      BodyRegion("head",
+                                  y_min=L.y_neck_base + epsilon, y_max=1e6),
+        "neck":      BodyRegion("neck",
+                                  y_min=L.y_acromion + epsilon,
+                                  y_max=L.y_neck_base + epsilon),
+
+        # Torso zones — the legitimate coverage targets
+        "chest":     BodyRegion("chest",
+                                  y_min=L.y_axilla, y_max=L.y_acromion + epsilon),
+        "front_chest": BodyRegion("front_chest",
+                                  y_min=L.y_axilla, y_max=L.y_acromion + epsilon,
+                                  side="front"),
+        "back_chest": BodyRegion("back_chest",
+                                  y_min=L.y_axilla, y_max=L.y_acromion + epsilon,
+                                  side="back"),
+        "pelvis":    BodyRegion("pelvis",
+                                  y_min=L.y_pelvis - epsilon, y_max=L.y_axilla),
+        "front_pelvis": BodyRegion("front_pelvis",
+                                  y_min=L.y_pelvis - epsilon, y_max=L.y_axilla,
+                                  side="front"),
+        "back_pelvis": BodyRegion("back_pelvis",
+                                  y_min=L.y_pelvis - epsilon, y_max=L.y_axilla,
+                                  side="back"),
+        "side_torso": BodyRegion("side_torso",
+                                  y_min=L.y_pelvis - epsilon,
+                                  y_max=L.y_acromion + epsilon, side="side"),
+    }
+
+
+def classify_point(x: float, y: float, z: float,
+                   regions: dict[str, BodyRegion],
+                   max_torso_radius: float | None = None) -> str:
+    """Return the FIRST region (in dict order) that contains (x,y,z),
+    or "arms" if the XZ radius exceeds max_torso_radius (lateral
+    extreme = arm), or "outside" otherwise.
+
+    Order matters because of overlap (e.g., a point can be both
+    front_chest and chest). We resolve in dict order, so put more
+    specific regions first.
+    """
+    if max_torso_radius is not None:
+        r_xz = (x * x + z * z) ** 0.5
+        if r_xz > max_torso_radius:
+            return "arms"
+    for name, r in regions.items():
+        if r.contains(x, y, z):
+            return name
+    return "outside"
