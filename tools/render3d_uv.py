@@ -1776,9 +1776,14 @@ def _build_strap_meshes_garment(body_mesh,
                 pass
 
     # 5) Back-closure tie string — only for archetypes that use a
-    # behind-back tie at chest level. The Connector list contains a
-    # tie_string with attachment to back_scapula_R when the back
-    # closure is a string (Brazilian halter style).
+    # behind-back tie at chest level. The string anchors at the cup
+    # outer-top (where it would be sewn to the cup edge in real life),
+    # passes through the scapula left/right (anatomy-resolved
+    # back_scapula_R/L), and meets at the other cup edge.
+    #
+    # This is the anatomy-aware attachment routing requested in step 3:
+    # control points come from named anatomy anchors + UV-derived cup
+    # corners, not from a generic _body_ring walk.
     back_tie_atts = [a for a in garment.attachments
                      if a.target_kind == "anatomy_anchor"
                      and a.anatomy_anchor in ("back_scapula_R", "back_scapula_L")
@@ -1788,23 +1793,40 @@ def _build_strap_meshes_garment(body_mesh,
     if back_tie_atts and garment.archetype == "triangle_string_halter":
         try:
             band_y = v_to_y(g.top_center_v)
-            ring_pts = _body_ring(V, band_y, y_halfband=2.0,
-                                    n_samples=48, max_torso_radius=20.0)
             cup_outer_u = g.top_inner_u + 2 * g.top_half_u
-            arc_pts = []
-            for p in ring_pts:
-                u = math.atan2(p[0], p[2]) / math.pi
-                if u >= cup_outer_u or u <= -cup_outer_u:
-                    arc_pts.append(p)
-            if len(arc_pts) >= 3:
-                tie_r = next((c.width_cm * 0.5 for c in garment.connectors
-                                if any(a.component_id == c.id
-                                       and a.anatomy_anchor in ("back_scapula_R",
-                                                                  "back_scapula_L")
-                                       for a in garment.attachments)),
-                              0.25)
-                back_tie = _arc_tube(np.array(arc_pts), radius=max(0.18, tie_r))
-                straps.append(("back_tie_string", back_tie))
+            # Right-side anchor: cup_outer in 3D at chest band height.
+            cup_R = _body_point_at(V, +cup_outer_u, band_y,
+                                     max_torso_radius=20.0)
+            cup_L = _body_point_at(V, -cup_outer_u, band_y,
+                                     max_torso_radius=20.0)
+            # Anatomy-resolved scapula points (anatomy module returns
+            # body-surface vertices on the back at acromion height).
+            scap_R = _anchor_xyz("back_scapula_R") if L is not None else \
+                      _body_point_at(V, +0.85, band_y, max_torso_radius=20.0)
+            scap_L = _anchor_xyz("back_scapula_L") if L is not None else \
+                      _body_point_at(V, -0.85, band_y, max_torso_radius=20.0)
+            # Center-back midpoint, drop slightly forward of the spine
+            # so the string visibly contacts the body.
+            back_center = np.array([
+                0.0,
+                band_y,
+                min(scap_R[2], scap_L[2]) - 0.4,
+            ], dtype=np.float64)
+            # Pull scapula control points slightly toward the center
+            # so the arc doesn't bow out laterally past the body.
+            ctrl_R = scap_R * np.array([0.85, 1.0, 1.0]) \
+                      + np.array([0.0, 0.0, -0.5])
+            ctrl_L = scap_L * np.array([0.85, 1.0, 1.0]) \
+                      + np.array([0.0, 0.0, -0.5])
+            arc_pts = [cup_R, ctrl_R, back_center, ctrl_L, cup_L]
+            tie_r = next((c.width_cm * 0.5 for c in garment.connectors
+                            if any(a.component_id == c.id
+                                   and a.anatomy_anchor in (
+                                       "back_scapula_R", "back_scapula_L")
+                                   for a in garment.attachments)),
+                          0.25)
+            back_tie = _arc_tube(np.array(arc_pts), radius=max(0.18, tie_r))
+            straps.append(("back_tie_string", back_tie))
         except Exception:
             pass
 
