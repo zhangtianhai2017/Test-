@@ -710,24 +710,30 @@ def _build_bow_mesh(g, body_vertices, v_to_y):
 
 
 def _build_fringe_meshes(g, body_vertices, v_to_y):
-    """Hanging thin tubes along the bottom panel's leg opening."""
+    """Hanging short tassels along the bottom panel's leg opening.
+
+    Anchor band runs along the LEG OPENING (lower edge of the front
+    bottom piece), not the waistline — fringe hangs from the hem like a
+    skirt fringe. Length capped to 6 cm so the strands stay above the
+    knees regardless of g.fringe_length."""
     if g.has_fringe < 0.5:
         return []
-    length = 1.0 + 10.0 * g.fringe_length
-    # sample anchor points along the waistline/leg-opening from front panel
-    # Here we drop fringes from the waist-ties down
+    length = max(2.0, min(6.0, 1.0 + 4.0 * g.fringe_length))
     y_front = v_to_y(g.bot_front_top_v)
     y_back = v_to_y(g.bot_back_top_v)
-    band_y = (y_front + y_back) / 2
-    us = np.linspace(-0.35, 0.35, 11)    # 11 fringes spread along front
+    # Hem of the front panel — leg opening sits a few cm below the
+    # panel's top edge. We approximate by going halfway between front_top
+    # and the crotch-y reference.
+    band_y = min(y_front, y_back) - 4.0
+    us = np.linspace(-0.30, 0.30, 9)
     out = o3d.geometry.TriangleMesh()
     for u in us:
         anchor = _body_point_at(body_vertices, float(u), band_y)
         rxz = np.array([anchor[0], 0.0, anchor[2]])
         rxz /= max(np.linalg.norm(rxz), 1e-6)
-        p0 = anchor + rxz * 0.4
+        p0 = anchor + rxz * 0.3
         p1 = p0 - np.array([0.0, length, 0.0])
-        seg = _tube_between(p0, p1, radius=0.12, sides=5)
+        seg = _tube_between(p0, p1, radius=0.10, sides=5)
         out += seg
     out.compute_vertex_normals()
     return [("fringes", out)]
@@ -1756,27 +1762,14 @@ def _build_strap_meshes_garment(body_mesh,
                                             offset=0.55)
         straps.append(("underbust_band", underbust_band))
 
-    # 1c) Crotch gusset — only emit if there's an inseam seam in the
-    # garment. seams (currently auto-added by genome_to_garment when
-    # both front_bottom and back_bottom pieces exist).
-    has_inseam_seam = any(s.id.startswith("seam_inseam") for s in garment.seams)
-    if has_inseam_seam and g.bot_back_half_u >= 0.13:
-        gusset_radius = max(0.32,
-                              min(g.bot_front_half_u, g.bot_back_half_u) * 4.0)
-        inseam_y = y_crotch + 1.0
-        n_pts = 7
-        inseam_path = []
-        for k in range(n_pts):
-            t = k / (n_pts - 1)
-            try:
-                p = _body_point_at(V, t * 1.0, inseam_y + 0.8 * t,
-                                     max_torso_radius=18.0)
-                inseam_path.append(p)
-            except Exception:
-                pass
-        if len(inseam_path) >= 2:
-            gusset = _arc_tube(np.array(inseam_path), radius=gusset_radius)
-            straps.append(("gusset", gusset))
+    # 1c) Crotch gusset — removed. The earlier `_arc_tube` from u=0 to
+    # u=1.0 traced a half-circle around the torso at crotch height,
+    # producing a horizontal-bar-with-a-loop artifact between the thighs
+    # in front views (front-segment visible, side-segment off-screen,
+    # back-segment hidden behind the body). Real swimwear gussets are
+    # internal fabric panels, not a strap around the hips — the
+    # front_bottom + back_bottom PatternPieces already meet visibly at
+    # the inseam without any extra surface geometry.
 
     # 2) Waist string — only emit when garment.connectors carries a
     # waist_elastic. Without it, the waist band was floating fabric

@@ -56,6 +56,42 @@ from typing import Any, Optional
 # Closed-set vocabularies
 # ---------------------------------------------------------------------------
 
+# Modesty constraint applied to bottom_piece selection.
+#   0.0 — unconstrained: any bottom_piece allowed_tags lets through
+#   0.33+ — drop minimal-coverage entries (thong, brazilian)
+#   0.66+ — only coverage_class="full" (brief / high_waisted),
+#           local_params clamped to upper-end of front_top_v / front_half_u
+#   1.0 — strict: same as 0.66+ plus front-coverage local_params pinned
+#         to schema max
+# random_outfit / genome_to_outfit / mutate consult this when picking
+# the bottom_front slot. Module-global so callers can set once and have
+# all sampling/migration/GA respect it; functions also accept a kwarg.
+BOTTOM_COVERAGE_STRICT: float = 0.0
+
+
+def set_bottom_coverage_strict(value: float) -> None:
+    """Set the global modesty constraint. See BOTTOM_COVERAGE_STRICT."""
+    global BOTTOM_COVERAGE_STRICT
+    BOTTOM_COVERAGE_STRICT = max(0.0, min(1.0, float(value)))
+
+
+def filter_bottoms_by_coverage(candidates, strict: float):
+    """Drop bottom_piece entries whose coverage_class is below the
+    threshold implied by `strict`. Falls back through the coverage
+    ladder so an archetype whose slot tags don't include any 'full'
+    entries (e.g. triangle_string_halter) still returns its highest
+    available coverage tier (medium > minimal) instead of giving up."""
+    if strict <= 0:
+        return candidates
+    full = [c for c in candidates if c.coverage_class == "full"]
+    medium = [c for c in candidates if c.coverage_class == "medium"]
+    if strict >= 0.66:
+        return full or medium or candidates
+    if strict >= 0.33:
+        return (full + medium) or candidates
+    return candidates
+
+
 # Library kinds — every LibraryEntry must declare exactly one.
 LIBRARY_KINDS = (
     "cup_piece",        # bra cup pattern (triangle / balconette / bandeau / molded foam / softcup)

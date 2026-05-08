@@ -15,3 +15,7 @@ _Top: [`tools/output/`](../README.md)_
 
 - [`0657_v2_ga_demo/`](0657_v2_ga_demo/README.md) — 12 seed dirs · 97 images
   <br/><a href='0657_v2_ga_demo/README.md'><img src='0657_v2_ga_demo/overview.png' width='280'/></a>
+
+- [`0743_v2_fixes_verify/`](0743_v2_fixes_verify/README.md) — 0 seed dirs · 0 images
+
+- [`0755_v2_fixes_verify/`](0755_v2_fixes_verify/README.md) — 0 seed dirs · 0 images

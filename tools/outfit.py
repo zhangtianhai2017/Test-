@@ -82,37 +82,59 @@ class Outfit:
 # Random sampling — pick one legal entry per required slot
 # ---------------------------------------------------------------------------
 
-def random_outfit(archetype: str, rng: Optional[random.Random] = None) -> Outfit:
+def _pin_to_max_coverage(entry: LibraryEntry, lp: dict) -> dict:
+    """At strict=1, force front_top_v / front_half_u / back_top_v / back_half_u
+    to schema MAX (most coverage). Other params keep their sample value."""
+    schema = entry.local_params_schema or {}
+    out = dict(lp)
+    for k in ("front_top_v", "front_half_u", "back_top_v", "back_half_u"):
+        if k in schema:
+            _, hi, _ = schema[k]
+            out[k] = float(hi)
+    return out
+
+
+def random_outfit(archetype: str, rng: Optional[random.Random] = None,
+                   bottom_coverage_strict: Optional[float] = None) -> Outfit:
     """Sample an Outfit by picking one library entry per slot. Required
     slots get filled; optional slots get filled with probability 0.5
-    (or 0.3 for body_jewelry / accessory)."""
+    (or 0.3 for body_jewelry / accessory).
+
+    bottom_coverage_strict: 0..1 (None = use library.BOTTOM_COVERAGE_STRICT).
+    """
     if archetype not in ARCHETYPE_SLOTS:
         raise ValueError(f"unknown archetype '{archetype}'")
     rng = rng or random.Random()
+    import library
+    strict = library.BOTTOM_COVERAGE_STRICT if bottom_coverage_strict is None \
+        else float(bottom_coverage_strict)
 
     assignments: list[SlotAssignment] = []
     for spec in ARCHETYPE_SLOTS[archetype]:
         candidates = entries_matching_slot(spec)
+        if spec.kind == "bottom_piece":
+            candidates = library.filter_bottoms_by_coverage(candidates, strict)
         if not candidates:
             if spec.required:
                 raise RuntimeError(
                     f"required slot '{spec.name}' has no library entries")
             continue
-        # Optional-slot inclusion probability
         if not spec.required:
             p_include = 0.3 if spec.kind in ("accessory", "body_jewelry") else 0.5
             if rng.random() > p_include:
                 continue
-        # max_count: pick 1..max_count distinct entries
         n = 1
         if spec.max_count > 1:
             n = rng.randint(1, min(spec.max_count, len(candidates)))
         chosen = rng.sample(candidates, n)
         for entry in chosen:
+            lp = entry.sample_local_params(rng)
+            if spec.kind == "bottom_piece" and strict >= 0.66:
+                lp = _pin_to_max_coverage(entry, lp)
             assignments.append(SlotAssignment(
                 slot_name=spec.name,
                 library_id=entry.id,
-                local_params=entry.sample_local_params(rng),
+                local_params=lp,
             ))
 
     # Resolve compatible_with constraints. If a chosen entry requires a
@@ -615,10 +637,17 @@ def outfit_to_genome(outfit: Outfit):
     return _enforce_constraints(g)
 
 
-def genome_to_outfit(genome) -> Outfit:
+def genome_to_outfit(genome,
+                       bottom_coverage_strict: Optional[float] = None) -> Outfit:
     """Snap a legacy Genome to the closest library entries per slot.
     Used for v1 → v2 seed migration. Picks archetype via the same
-    dispatch rule as garment_state._detect_archetype."""
+    dispatch rule as garment_state._detect_archetype.
+
+    bottom_coverage_strict (None = library.BOTTOM_COVERAGE_STRICT) forces
+    full-coverage bottoms regardless of the source genome's coverage."""
+    import library
+    strict = library.BOTTOM_COVERAGE_STRICT if bottom_coverage_strict is None \
+        else float(bottom_coverage_strict)
     cup_bottom = genome.top_center_v - genome.top_half_v
     if genome.top_back_coverage > 0.7 and genome.bot_front_top_v > cup_bottom - 0.15:
         archetype = "one_piece_maillot"
@@ -673,7 +702,13 @@ def genome_to_outfit(genome) -> Outfit:
     # triangle_string_halter never gets a high_waisted bottom.
     bottom_slot_spec = next(s for s in slots if s.name == "bottom_front")
     allowed = bottom_slot_spec.allowed_tags or ()
-    if genome.bot_back_half_u < 0.08 and (not allowed or "thong" in allowed):
+    if strict >= 0.66 and (not allowed or "high_waisted" in allowed):
+        bot_id = "BOT_HIGHWAIST_M"
+    elif strict >= 0.66 and (not allowed or "brief" in allowed):
+        bot_id = "BOT_BRIEF_M"
+    elif strict >= 0.33 and (not allowed or "cheeky" in allowed):
+        bot_id = "BOT_CHEEKY_M"
+    elif genome.bot_back_half_u < 0.08 and (not allowed or "thong" in allowed):
         bot_id = "BOT_THONG_M"
     elif genome.bot_back_half_u < 0.12 and (not allowed or "brazilian" in allowed):
         bot_id = "BOT_BRAZILIAN_M"
@@ -684,20 +719,19 @@ def genome_to_outfit(genome) -> Outfit:
     elif not allowed or "high_waisted" in allowed:
         bot_id = "BOT_HIGHWAIST_M"
     else:
-        # Fall back to first allowed tag's matching entry
-        from library_data import entries_matching_slot
         candidates = entries_matching_slot(bottom_slot_spec)
         bot_id = candidates[0].id if candidates else "BOT_BRAZILIAN_M"
+    bot_lp = {
+        "front_top_v": genome.bot_front_top_v,
+        "front_half_u": genome.bot_front_half_u,
+        "front_leg_curve": genome.bot_front_leg_curve,
+        "back_top_v": genome.bot_back_top_v,
+        "back_half_u": genome.bot_back_half_u,
+    }
+    if strict >= 0.66:
+        bot_lp = _pin_to_max_coverage(LIBRARY[bot_id], bot_lp)
     assignments.append(SlotAssignment(
-        slot_name="bottom_front", library_id=bot_id,
-        local_params={
-            "front_top_v": genome.bot_front_top_v,
-            "front_half_u": genome.bot_front_half_u,
-            "front_leg_curve": genome.bot_front_leg_curve,
-            "back_top_v": genome.bot_back_top_v,
-            "back_half_u": genome.bot_back_half_u,
-        },
-    ))
+        slot_name="bottom_front", library_id=bot_id, local_params=bot_lp))
 
     # Halter / shoulder strap
     if archetype == "triangle_string_halter":

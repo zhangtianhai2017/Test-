@@ -144,7 +144,12 @@ def mutate(outfit: Outfit, rng: random.Random,
            p_id: float = 0.05, sigma: float = 0.10) -> Outfit:
     """In-place mutation. Each slot: small chance of library_id resample;
     kept entries get gaussian local_params perturbation. global_design
-    HSL gaussian σ=0.05; pattern_overlay resampled at p=0.04."""
+    HSL gaussian σ=0.05; pattern_overlay resampled at p=0.04.
+
+    Bottom-piece resampling honors library.BOTTOM_COVERAGE_STRICT (filters
+    candidates to coverage_class=full at strict>=0.66)."""
+    import library
+    strict = library.BOTTOM_COVERAGE_STRICT
     archetype = outfit.archetype
     slot_specs = {s.name: s for s in ARCHETYPE_SLOTS[archetype]}
     new_slot_assignments: list[SlotAssignment] = []
@@ -155,6 +160,8 @@ def mutate(outfit: Outfit, rng: random.Random,
             continue
         if rng.random() < p_id:
             candidates = entries_matching_slot(spec)
+            if spec.kind == "bottom_piece":
+                candidates = library.filter_bottoms_by_coverage(candidates, strict)
             if candidates:
                 chosen = rng.choice(candidates)
                 new_slot_assignments.append(SlotAssignment(

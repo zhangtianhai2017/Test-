@@ -57,9 +57,10 @@ class IterParams:
     # callers carry slot-level library choices + body jewelry that
     # doesn't fit in the legacy 44-dim Genome.
     outfit: object = None
-    # Per-Genome overrides applied on top of the seed Genome. Continuous
-    # fields are clipped by Genome.clipped(); discrete fields must be
-    # valid enum values. We keep this as a flat dict for trivial JSON.
+    # Modesty constraint forwarded to library.BOTTOM_COVERAGE_STRICT
+    # before each render. 0=any bottom, 1=full coverage only.
+    bottom_coverage_strict: float = 0.0
+    # Per-Genome overrides applied on top of the seed Genome.
     genome_patch: dict = field(default_factory=dict)
 
     def clamped(self) -> "IterParams":
