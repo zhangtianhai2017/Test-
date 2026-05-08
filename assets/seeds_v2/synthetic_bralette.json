@@ -1,0 +1,135 @@
+{
+  "meta": {
+    "name": "synthetic_bralette",
+    "source_views": {},
+    "analysis_notes": "Parent A from verify_ga_uv.make_parents \u2014 sporty bralette with shoulder straps. top_shoulder_strap=0.85 \u21d2 archetype = bralette_shoulder_strap.",
+    "confidence": {
+      "shape": 1.0,
+      "color": 1.0,
+      "pattern": 1.0,
+      "fabric": 0.8,
+      "hardware": 0.8,
+      "style_archetype": 1.0
+    },
+    "migrated_to_v2": "2026-04-29"
+  },
+  "genome": {
+    "pattern": "solid",
+    "top_center_v": 0.76,
+    "top_half_v": 0.09,
+    "top_half_u": 0.18,
+    "top_inner_u": 0.095,
+    "top_apex_lift": 0.08333333333333323,
+    "top_underband_dip": 0.08,
+    "top_back_coverage": 0.109,
+    "top_neck_strap": 0.0,
+    "top_shoulder_strap": 0.85,
+    "bot_front_top_v": 0.45999999999999996,
+    "bot_front_half_u": 0.2005,
+    "bot_front_leg_curve": 0.6825,
+    "bot_back_top_v": 0.36,
+    "bot_back_half_u": 0.098,
+    "bot_tie_dangle": 0.75,
+    "hue": 0.018000000000000016,
+    "saturation": 0.712,
+    "lightness": 0.652,
+    "secondary_hue": 0.12,
+    "secondary_saturation": 0.5,
+    "secondary_lightness": 0.85,
+    "pattern_scale": 0.5,
+    "pattern_angle": 0.0,
+    "trim_color_mode": 0.2,
+    "fabric_sheen": 0.41500000000000004,
+    "fabric_metallic": 0.0,
+    "fabric_opacity": 1.0,
+    "fabric_weight": 0.45,
+    "fabric_weave": "plain",
+    "palette_preset": "sunset_peach",
+    "fabric_source": "econyl",
+    "biodegradable": 0.0,
+    "single_material": 1.0,
+    "has_oring": 1.0,
+    "oring_size": 0.6,
+    "has_bow": 0.0,
+    "bow_size": 0.3,
+    "has_fringe": 1.0,
+    "fringe_length": 0.45,
+    "has_beads": 0.0,
+    "has_shell": 0.0,
+    "style_archetype": "brazilian",
+    "hardware_metal": "gold"
+  },
+  "outfit": {
+    "archetype": "bralette_shoulder_strap",
+    "slot_assignments": [
+      {
+        "slot_name": "cup",
+        "library_id": "CUP_BALCONETTE_M",
+        "local_params": {
+          "half_u": 0.18,
+          "half_v": 0.09,
+          "inner_u": 0.095,
+          "apex_lift": 0.08333333333333323,
+          "underband_dip": 0.08,
+          "center_v": 0.76
+        }
+      },
+      {
+        "slot_name": "bottom_front",
+        "library_id": "BOT_BRAZILIAN_M",
+        "local_params": {
+          "front_top_v": 0.45999999999999996,
+          "front_half_u": 0.17822500000000002,
+          "front_leg_curve": 0.719625,
+          "back_top_v": 0.36,
+          "back_half_u": 0.08810000000000001
+        }
+      },
+      {
+        "slot_name": "shoulder_strap",
+        "library_id": "STR_SHOULDER_PADDED_20MM",
+        "local_params": {
+          "length_cm": 30.0
+        }
+      },
+      {
+        "slot_name": "oring",
+        "library_id": "HW_OR_18MM_SILVER",
+        "local_params": {}
+      },
+      {
+        "slot_name": "primary_fabric",
+        "library_id": "F_ECONYL_PLAIN_LIGHT",
+        "local_params": {}
+      },
+      {
+        "slot_name": "seam_type",
+        "library_id": "S_OVERLOCK_4THREAD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_FRINGE_BEADED_80MM",
+        "local_params": {
+          "length_cm": 5.05
+        }
+      }
+    ],
+    "global_design": {
+      "hue": 0.03720000000000001,
+      "saturation": 0.70516,
+      "lightness": 0.6703600000000001,
+      "secondary_hue": 0.12,
+      "secondary_saturation": 0.5,
+      "secondary_lightness": 0.85,
+      "pattern_overlay": "solid",
+      "pattern_scale": 0.5,
+      "pattern_angle": 0.0,
+      "palette_preset": "sunset_peach"
+    }
+  },
+  "outfit_validation": {
+    "valid": true,
+    "warnings": []
+  }
+}

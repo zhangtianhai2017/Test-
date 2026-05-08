@@ -113,24 +113,39 @@ def render_views(genome: Genome, params, out_dir: str,
     body_mesh.triangle_uvs = o3d.utility.Vector2dVector(body_uvs)
     yc, yn = torso_anchors(body_mesh)
 
-    polys_uv = genome_polygons(g)
-
-    # Cascade: build Garment + BodyDeployment once and thread through
-    # the shell extraction + strap dispatcher, so the renderer respects
-    # piece-level must_clear regions and connector/accessory accountability.
+    # v2 cascade: prefer Outfit → Garment when available (carries body
+    # jewelry + slot-level library entries), fall back to genome →
+    # Garment for pure v1 paths. The chosen Garment drives polygons,
+    # strap dispatcher and BodyDeployment.
     body_deployment = None
+    _garm = None
+    polys_uv = None
     try:
         from garment_state import (genome_to_garment, validate_garment,
                                      deploy_to_body, validate_deployment,
                                      UnsupportedArchetypeV1)
-        try:
-            _garm = validate_garment(genome_to_garment(g))
+        outfit = getattr(params, "outfit", None)
+        if outfit is not None:
+            try:
+                from outfit import outfit_to_garment
+                _garm = validate_garment(outfit_to_garment(outfit))
+            except Exception:
+                _garm = None
+        if _garm is None:
+            try:
+                _garm = validate_garment(genome_to_garment(g))
+            except UnsupportedArchetypeV1:
+                _garm = None
+        if _garm is not None:
             body_deployment = validate_deployment(
                 _garm, deploy_to_body(_garm, body_mesh))
-        except UnsupportedArchetypeV1:
-            body_deployment = None
+            polys_uv = _garm.flatten_polygons()
     except Exception:
         body_deployment = None
+        _garm = None
+
+    if polys_uv is None:
+        polys_uv = genome_polygons(g)
 
     shell = build_fabric_shell(body_mesh, body_uvs, polys_uv,
                                 offset=params.shell_offset_cm,

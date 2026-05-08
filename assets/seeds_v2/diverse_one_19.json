@@ -1,0 +1,135 @@
+{
+  "meta": {
+    "name": "diverse_one_19",
+    "source_views": {},
+    "analysis_notes": "Auto-synthesized via diverse_seeds.py (rng=42, archetype=one_piece_maillot, pattern=tropical, fabric_source=virgin, style_archetype=italian_luxe). Selected by fitness \u00d7 diversity from 80-sample stratified random pool.",
+    "confidence": {
+      "shape": 0.6,
+      "color": 0.6,
+      "pattern": 0.6,
+      "fabric": 0.6,
+      "hardware": 0.6,
+      "style_archetype": 0.6
+    },
+    "migrated_to_v2": "2026-04-29"
+  },
+  "genome": {
+    "pattern": "tropical",
+    "top_center_v": 0.79,
+    "top_half_v": 0.2762103655331404,
+    "top_half_u": 0.14308335903124847,
+    "top_inner_u": 0.095,
+    "top_apex_lift": 0.05902125294317995,
+    "top_underband_dip": 0.24658561664322998,
+    "top_back_coverage": 0.9266139641449649,
+    "top_neck_strap": 0.27813222112315483,
+    "top_shoulder_strap": 0.7835949412704996,
+    "bot_front_top_v": 0.46378963446685967,
+    "bot_front_half_u": 0.1887672117875595,
+    "bot_front_leg_curve": 0.2727575671424539,
+    "bot_back_top_v": 0.5223829681745297,
+    "bot_back_half_u": 0.9852845692200085,
+    "bot_tie_dangle": 0.6047710246087126,
+    "hue": 0.6285240670444319,
+    "saturation": 0.458499026500542,
+    "lightness": 0.45033663102446514,
+    "secondary_hue": 0.9577256956972864,
+    "secondary_saturation": 0.5975871876260743,
+    "secondary_lightness": 0.12036241811230453,
+    "pattern_scale": 0.7425389630887904,
+    "pattern_angle": 0.7354948810098446,
+    "trim_color_mode": 0.19494308176265795,
+    "fabric_sheen": 0.7988484986434076,
+    "fabric_metallic": 0.2646053162343942,
+    "fabric_opacity": 0.7907093046308227,
+    "fabric_weight": 0.42299132571105724,
+    "fabric_weave": "crochet",
+    "palette_preset": "future_dusk",
+    "fabric_source": "virgin",
+    "biodegradable": 1.0,
+    "single_material": 0.0,
+    "has_oring": 1.0,
+    "oring_size": 0.4773268202934155,
+    "has_bow": 0.0,
+    "bow_size": 0.6516349661647399,
+    "has_fringe": 0.0,
+    "fringe_length": 0.07870967215770219,
+    "has_beads": 1.0,
+    "has_shell": 0.0,
+    "style_archetype": "italian_luxe",
+    "hardware_metal": "gold"
+  },
+  "outfit": {
+    "archetype": "one_piece_maillot",
+    "slot_assignments": [
+      {
+        "slot_name": "cup",
+        "library_id": "CUP_BALCONETTE_M",
+        "local_params": {
+          "half_u": 0.14308335903124847,
+          "half_v": 0.2762103655331404,
+          "inner_u": 0.095,
+          "apex_lift": 0.05902125294317995,
+          "underband_dip": 0.24658561664322998,
+          "center_v": 0.79
+        }
+      },
+      {
+        "slot_name": "bottom_front",
+        "library_id": "BOT_HIGHWAIST_M",
+        "local_params": {
+          "front_top_v": 0.46378963446685967,
+          "front_half_u": 0.1887672117875595,
+          "front_leg_curve": 0.2727575671424539,
+          "back_top_v": 0.5223829681745297,
+          "back_half_u": 0.9852845692200085
+        }
+      },
+      {
+        "slot_name": "shoulder_strap",
+        "library_id": "STR_SHOULDER_PADDED_20MM",
+        "local_params": {
+          "length_cm": 32.0
+        }
+      },
+      {
+        "slot_name": "oring",
+        "library_id": "HW_OR_18MM_SILVER",
+        "local_params": {}
+      },
+      {
+        "slot_name": "primary_fabric",
+        "library_id": "F_CROCHET_COTTON",
+        "local_params": {}
+      },
+      {
+        "slot_name": "seam_type",
+        "library_id": "S_OVERLOCK_4THREAD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_BEADS_OVAL_8MM",
+        "local_params": {
+          "count": 12
+        }
+      }
+    ],
+    "global_design": {
+      "hue": 0.6654096268177727,
+      "saturation": 0.5241298247700976,
+      "lightness": 0.37213465240978605,
+      "secondary_hue": 0.9577256956972864,
+      "secondary_saturation": 0.5975871876260743,
+      "secondary_lightness": 0.12036241811230453,
+      "pattern_overlay": "floral",
+      "pattern_scale": 0.7466425333899557,
+      "pattern_angle": 0.7354948810098446,
+      "palette_preset": "future_dusk"
+    }
+  },
+  "outfit_validation": {
+    "valid": true,
+    "warnings": []
+  }
+}

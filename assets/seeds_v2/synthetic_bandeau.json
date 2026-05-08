@@ -1,0 +1,135 @@
+{
+  "meta": {
+    "name": "synthetic_bandeau",
+    "source_views": {},
+    "analysis_notes": "Parent B from verify_ga_uv.make_parents \u2014 strapless bandeau / retro Missoni. top_neck_strap=0.8 but top_inner_u=0 \u21d2 archetype = bandeau_back_band.",
+    "confidence": {
+      "shape": 1.0,
+      "color": 1.0,
+      "pattern": 1.0,
+      "fabric": 0.8,
+      "hardware": 0.8,
+      "style_archetype": 1.0
+    },
+    "migrated_to_v2": "2026-04-29"
+  },
+  "genome": {
+    "pattern": "stripe",
+    "top_center_v": 0.74,
+    "top_half_v": 0.08,
+    "top_half_u": 0.45,
+    "top_inner_u": 0.0,
+    "top_apex_lift": 0.0,
+    "top_underband_dip": 0.02,
+    "top_back_coverage": 0.55,
+    "top_neck_strap": 0.8,
+    "top_shoulder_strap": 0.0,
+    "bot_front_top_v": 0.45999999999999996,
+    "bot_front_half_u": 0.55,
+    "bot_front_leg_curve": 0.2,
+    "bot_back_top_v": 0.42,
+    "bot_back_half_u": 0.55,
+    "bot_tie_dangle": 0.05,
+    "hue": 0.546,
+    "saturation": 0.772,
+    "lightness": 0.452,
+    "secondary_hue": 0.15,
+    "secondary_saturation": 0.05,
+    "secondary_lightness": 0.95,
+    "pattern_scale": 0.4275,
+    "pattern_angle": 0.0,
+    "trim_color_mode": 0.8,
+    "fabric_sheen": 0.6174999999999999,
+    "fabric_metallic": 0.05,
+    "fabric_opacity": 1.0,
+    "fabric_weight": 0.55,
+    "fabric_weave": "plain",
+    "palette_preset": "aquatic_awe",
+    "fabric_source": "qnova",
+    "biodegradable": 1.0,
+    "single_material": 1.0,
+    "has_oring": 0.0,
+    "oring_size": 0.4,
+    "has_bow": 1.0,
+    "bow_size": 0.55,
+    "has_fringe": 0.0,
+    "fringe_length": 0.2,
+    "has_beads": 1.0,
+    "has_shell": 0.0,
+    "style_archetype": "retro_missoni",
+    "hardware_metal": "pearl"
+  },
+  "outfit": {
+    "archetype": "bandeau_back_band",
+    "slot_assignments": [
+      {
+        "slot_name": "cup",
+        "library_id": "CUP_BANDEAU_L",
+        "local_params": {
+          "half_u": 0.45,
+          "half_v": 0.08,
+          "inner_u": 0.0,
+          "apex_lift": 0.0,
+          "underband_dip": 0.02,
+          "center_v": 0.74
+        }
+      },
+      {
+        "slot_name": "bottom_front",
+        "library_id": "BOT_HIGHWAIST_M",
+        "local_params": {
+          "front_top_v": 0.45999999999999996,
+          "front_half_u": 0.55,
+          "front_leg_curve": 0.2,
+          "back_top_v": 0.42,
+          "back_half_u": 0.55
+        }
+      },
+      {
+        "slot_name": "back_band",
+        "library_id": "STR_BACKBAND_PLAIN",
+        "local_params": {}
+      },
+      {
+        "slot_name": "primary_fabric",
+        "library_id": "F_MISSONI_SHINY_KNIT",
+        "local_params": {}
+      },
+      {
+        "slot_name": "seam_type",
+        "library_id": "S_OVERLOCK_4THREAD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_BOW_CHIFFON_30MM",
+        "local_params": {
+          "size_cm": 3.2
+        }
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_BEADS_OVAL_8MM",
+        "local_params": {
+          "count": 12
+        }
+      }
+    ],
+    "global_design": {
+      "hue": 0.5364,
+      "saturation": 0.7408,
+      "lightness": 0.4328,
+      "secondary_hue": 0.15,
+      "secondary_saturation": 0.05,
+      "secondary_lightness": 0.95,
+      "pattern_overlay": "chevron",
+      "pattern_scale": 0.439875,
+      "pattern_angle": 0.0,
+      "palette_preset": "aquatic_awe"
+    }
+  },
+  "outfit_validation": {
+    "valid": true,
+    "warnings": []
+  }
+}

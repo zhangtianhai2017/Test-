@@ -1,0 +1,130 @@
+{
+  "meta": {
+    "name": "diverse_triangle_04",
+    "source_views": {},
+    "analysis_notes": "Auto-synthesized via diverse_seeds.py (rng=42, archetype=triangle_string_halter, pattern=checker, fabric_source=biopolymer, style_archetype=free). Selected by fitness \u00d7 diversity from 80-sample stratified random pool.",
+    "confidence": {
+      "shape": 0.6,
+      "color": 0.6,
+      "pattern": 0.6,
+      "fabric": 0.6,
+      "hardware": 0.6,
+      "style_archetype": 0.6
+    },
+    "migrated_to_v2": "2026-04-29"
+  },
+  "genome": {
+    "pattern": "checker",
+    "top_center_v": 0.71,
+    "top_half_v": 0.6547876707135497,
+    "top_half_u": 0.5720232397985618,
+    "top_inner_u": 0.095,
+    "top_apex_lift": 0.17219972815673157,
+    "top_underband_dip": 0.4029739584315767,
+    "top_back_coverage": 0.1312840079483237,
+    "top_neck_strap": 0.822325145285312,
+    "top_shoulder_strap": 0.08034397965488214,
+    "bot_front_top_v": 0.45999999999999996,
+    "bot_front_half_u": 0.8789576316736196,
+    "bot_front_leg_curve": 0.6905137541709787,
+    "bot_back_top_v": 0.36,
+    "bot_back_half_u": 0.4752181911530716,
+    "bot_tie_dangle": 0.26858435494476074,
+    "hue": 0.372440695913381,
+    "saturation": 0.4762467870447728,
+    "lightness": 0.7936520599056404,
+    "secondary_hue": 0.31094929784794634,
+    "secondary_saturation": 0.8428465686114073,
+    "secondary_lightness": 0.8582347832335743,
+    "pattern_scale": 0.6848520271347268,
+    "pattern_angle": 0.9724966426856817,
+    "trim_color_mode": 0.22795741360176736,
+    "fabric_sheen": 0.30048044751748004,
+    "fabric_metallic": 0.7437236416571632,
+    "fabric_opacity": 0.7740309001939246,
+    "fabric_weight": 0.3208683153198657,
+    "fabric_weave": "shiny_knit",
+    "palette_preset": "free",
+    "fabric_source": "biopolymer",
+    "biodegradable": 1.0,
+    "single_material": 0.0,
+    "has_oring": 0.0,
+    "oring_size": 0.4417165980591662,
+    "has_bow": 0.0,
+    "bow_size": 0.40717036084044567,
+    "has_fringe": 0.0,
+    "fringe_length": 0.5165014182566774,
+    "has_beads": 0.0,
+    "has_shell": 0.0,
+    "style_archetype": "free",
+    "hardware_metal": "none"
+  },
+  "outfit": {
+    "archetype": "triangle_string_halter",
+    "slot_assignments": [
+      {
+        "slot_name": "cup",
+        "library_id": "CUP_TRIANGLE_L",
+        "local_params": {
+          "half_u": 0.5720232397985618,
+          "half_v": 0.6547876707135497,
+          "inner_u": 0.095,
+          "apex_lift": 0.17219972815673157,
+          "underband_dip": 0.4029739584315767,
+          "center_v": 0.71
+        }
+      },
+      {
+        "slot_name": "bottom_front",
+        "library_id": "BOT_THONG_S",
+        "local_params": {
+          "front_top_v": 0.45999999999999996,
+          "front_half_u": 0.8789576316736196,
+          "front_leg_curve": 0.6905137541709787,
+          "back_top_v": 0.36,
+          "back_half_u": 0.4752181911530716
+        }
+      },
+      {
+        "slot_name": "halter_strap",
+        "library_id": "STR_HALTER_5MM",
+        "local_params": {
+          "length_cm": 55.0
+        }
+      },
+      {
+        "slot_name": "side_tie",
+        "library_id": "STR_TIE_CORD_3MM",
+        "local_params": {
+          "length_cm": 22.0
+        }
+      },
+      {
+        "slot_name": "primary_fabric",
+        "library_id": "F_MISSONI_SHINY_KNIT",
+        "local_params": {}
+      },
+      {
+        "slot_name": "seam_type",
+        "library_id": "S_OVERLOCK_4THREAD",
+        "local_params": {}
+      }
+    ],
+    "global_design": {
+      "hue": 0.372440695913381,
+      "saturation": 0.4762467870447728,
+      "lightness": 0.7936520599056404,
+      "secondary_hue": 0.31094929784794634,
+      "secondary_saturation": 0.8428465686114073,
+      "secondary_lightness": 0.8582347832335743,
+      "pattern_overlay": "checker",
+      "pattern_scale": 0.6848520271347268,
+      "pattern_angle": 0.9724966426856817,
+      "palette_preset": "free"
+    }
+  },
+  "outfit_validation": {
+    "valid": true,
+    "warnings": []
+  }
+}

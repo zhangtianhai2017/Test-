@@ -1,0 +1,133 @@
+{
+  "meta": {
+    "name": "diverse_bandeau_07",
+    "source_views": {},
+    "analysis_notes": "Auto-synthesized via diverse_seeds.py (rng=42, archetype=bandeau_back_band, pattern=polka, fabric_source=econyl, style_archetype=hunzag_crinkle). Selected by fitness \u00d7 diversity from 80-sample stratified random pool.",
+    "confidence": {
+      "shape": 0.6,
+      "color": 0.6,
+      "pattern": 0.6,
+      "fabric": 0.6,
+      "hardware": 0.6,
+      "style_archetype": 0.6
+    },
+    "migrated_to_v2": "2026-04-29"
+  },
+  "genome": {
+    "pattern": "polka",
+    "top_center_v": 0.71,
+    "top_half_v": 0.33323413980496186,
+    "top_half_u": 0.22289180225249758,
+    "top_inner_u": 0.007828629957057371,
+    "top_apex_lift": 0.40539023300826965,
+    "top_underband_dip": 0.00418055067087908,
+    "top_back_coverage": 0.6584965381786967,
+    "top_neck_strap": 0.1095552962929145,
+    "top_shoulder_strap": 0.07485156281509057,
+    "bot_front_top_v": 0.45999999999999996,
+    "bot_front_half_u": 0.41582016602370875,
+    "bot_front_leg_curve": 0.39464969911048287,
+    "bot_back_top_v": 0.7421939847852654,
+    "bot_back_half_u": 0.3840374238010579,
+    "bot_tie_dangle": 0.30781082541531857,
+    "hue": 0.9875220625721589,
+    "saturation": 0.42993310552880176,
+    "lightness": 0.8849995809706068,
+    "secondary_hue": 0.9924724692225698,
+    "secondary_saturation": 0.12447750855107609,
+    "secondary_lightness": 0.9321295586646243,
+    "pattern_scale": 0.1623623832630231,
+    "pattern_angle": 0.7629508557639862,
+    "trim_color_mode": 0.9570968766157211,
+    "fabric_sheen": 0.7712703787765353,
+    "fabric_metallic": 0.7515774050522245,
+    "fabric_opacity": 0.3485786878288415,
+    "fabric_weight": 0.511607809438406,
+    "fabric_weave": "crinkle",
+    "palette_preset": "free",
+    "fabric_source": "econyl",
+    "biodegradable": 0.0,
+    "single_material": 1.0,
+    "has_oring": 1.0,
+    "oring_size": 0.3853331575283315,
+    "has_bow": 0.0,
+    "bow_size": 0.2467918116029565,
+    "has_fringe": 0.0,
+    "fringe_length": 0.9214685470843792,
+    "has_beads": 1.0,
+    "has_shell": 0.0,
+    "style_archetype": "hunzag_crinkle",
+    "hardware_metal": "chrome"
+  },
+  "outfit": {
+    "archetype": "bandeau_back_band",
+    "slot_assignments": [
+      {
+        "slot_name": "cup",
+        "library_id": "CUP_BANDEAU_L",
+        "local_params": {
+          "half_u": 0.22289180225249758,
+          "half_v": 0.33323413980496186,
+          "inner_u": 0.007828629957057371,
+          "apex_lift": 0.40539023300826965,
+          "underband_dip": 0.00418055067087908,
+          "center_v": 0.71
+        }
+      },
+      {
+        "slot_name": "bottom_front",
+        "library_id": "BOT_HIGHWAIST_M",
+        "local_params": {
+          "front_top_v": 0.45999999999999996,
+          "front_half_u": 0.41582016602370875,
+          "front_leg_curve": 0.39464969911048287,
+          "back_top_v": 0.7421939847852654,
+          "back_half_u": 0.3840374238010579
+        }
+      },
+      {
+        "slot_name": "back_band",
+        "library_id": "STR_BACKBAND_PLAIN",
+        "local_params": {}
+      },
+      {
+        "slot_name": "oring",
+        "library_id": "HW_OR_12MM_GOLD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "primary_fabric",
+        "library_id": "F_HUNZA_CRINKLE",
+        "local_params": {}
+      },
+      {
+        "slot_name": "seam_type",
+        "library_id": "S_OVERLOCK_4THREAD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_BEADS_OVAL_8MM",
+        "local_params": {
+          "count": 12
+        }
+      }
+    ],
+    "global_design": {
+      "hue": 0.9875220625721589,
+      "saturation": 0.5784698974879607,
+      "lightness": 0.8849995809706068,
+      "secondary_hue": 0.9924724692225698,
+      "secondary_saturation": 0.12447750855107609,
+      "secondary_lightness": 0.9321295586646243,
+      "pattern_overlay": "polka",
+      "pattern_scale": 0.1623623832630231,
+      "pattern_angle": 0.7629508557639862,
+      "palette_preset": "free"
+    }
+  },
+  "outfit_validation": {
+    "valid": true,
+    "warnings": []
+  }
+}

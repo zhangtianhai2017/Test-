@@ -51,6 +51,12 @@ class IterParams:
     side_seam_overlay: bool = True
     boundary_topstitch: bool = True
     lining_hint: bool = True
+
+    # v2 — when set, the render pipeline pulls the Garment from
+    # outfit_to_garment(outfit) instead of genome_to_garment(g). Lets
+    # callers carry slot-level library choices + body jewelry that
+    # doesn't fit in the legacy 44-dim Genome.
+    outfit: object = None
     # Per-Genome overrides applied on top of the seed Genome. Continuous
     # fields are clipped by Genome.clipped(); discrete fields must be
     # valid enum values. We keep this as a flat dict for trivial JSON.

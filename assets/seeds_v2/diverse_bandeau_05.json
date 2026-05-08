@@ -1,0 +1,140 @@
+{
+  "meta": {
+    "name": "diverse_bandeau_05",
+    "source_views": {},
+    "analysis_notes": "Auto-synthesized via diverse_seeds.py (rng=42, archetype=bandeau_back_band, pattern=gingham, fabric_source=amni_soul, style_archetype=boho_cultgaia). Selected by fitness \u00d7 diversity from 80-sample stratified random pool.",
+    "confidence": {
+      "shape": 0.6,
+      "color": 0.6,
+      "pattern": 0.6,
+      "fabric": 0.6,
+      "hardware": 0.6,
+      "style_archetype": 0.6
+    },
+    "migrated_to_v2": "2026-04-29"
+  },
+  "genome": {
+    "pattern": "gingham",
+    "top_center_v": 0.79,
+    "top_half_v": 0.5214719274762049,
+    "top_half_u": 0.19101272841201464,
+    "top_inner_u": 0.02519130051316102,
+    "top_apex_lift": 0.06461688034137136,
+    "top_underband_dip": 0.49164228938508714,
+    "top_back_coverage": 0.6860983569751652,
+    "top_neck_strap": 0.00781602930393101,
+    "top_shoulder_strap": 0.1984025137745321,
+    "bot_front_top_v": 0.45999999999999996,
+    "bot_front_half_u": 0.12556099960028666,
+    "bot_front_leg_curve": 0.17367582464688003,
+    "bot_back_top_v": 0.8382745266275109,
+    "bot_back_half_u": 0.795233092694079,
+    "bot_tie_dangle": 0.20437333163850102,
+    "hue": 0.09313641879312404,
+    "saturation": 0.34177260468521,
+    "lightness": 0.7150733645563077,
+    "secondary_hue": 0.16415881158168433,
+    "secondary_saturation": 0.19753626171443572,
+    "secondary_lightness": 0.424016775015261,
+    "pattern_scale": 0.6058512348604904,
+    "pattern_angle": 0.3031007072728342,
+    "trim_color_mode": 0.5764218304177462,
+    "fabric_sheen": 0.967725810673861,
+    "fabric_metallic": 0.20140100473061784,
+    "fabric_opacity": 0.862425526837177,
+    "fabric_weight": 0.4811707070471045,
+    "fabric_weave": "ribbed",
+    "palette_preset": "transcendent_pink",
+    "fabric_source": "amni_soul",
+    "biodegradable": 1.0,
+    "single_material": 1.0,
+    "has_oring": 1.0,
+    "oring_size": 0.47071348459553763,
+    "has_bow": 0.0,
+    "bow_size": 0.6093942205230005,
+    "has_fringe": 1.0,
+    "fringe_length": 0.48264531060175386,
+    "has_beads": 1.0,
+    "has_shell": 1.0,
+    "style_archetype": "boho_cultgaia",
+    "hardware_metal": "pearl"
+  },
+  "outfit": {
+    "archetype": "bandeau_back_band",
+    "slot_assignments": [
+      {
+        "slot_name": "cup",
+        "library_id": "CUP_BANDEAU_L",
+        "local_params": {
+          "half_u": 0.19101272841201464,
+          "half_v": 0.5214719274762049,
+          "inner_u": 0.02519130051316102,
+          "apex_lift": 0.06461688034137136,
+          "underband_dip": 0.49164228938508714,
+          "center_v": 0.79
+        }
+      },
+      {
+        "slot_name": "bottom_front",
+        "library_id": "BOT_HIGHWAIST_M",
+        "local_params": {
+          "front_top_v": 0.45999999999999996,
+          "front_half_u": 0.12556099960028666,
+          "front_leg_curve": 0.17367582464688003,
+          "back_top_v": 0.8382745266275109,
+          "back_half_u": 0.795233092694079
+        }
+      },
+      {
+        "slot_name": "back_band",
+        "library_id": "STR_BACKBAND_PLAIN",
+        "local_params": {}
+      },
+      {
+        "slot_name": "oring",
+        "library_id": "HW_OR_18MM_SILVER",
+        "local_params": {}
+      },
+      {
+        "slot_name": "primary_fabric",
+        "library_id": "F_CROCHET_COTTON",
+        "local_params": {}
+      },
+      {
+        "slot_name": "seam_type",
+        "library_id": "S_OVERLOCK_4THREAD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_SHELL_TROCHUS_25MM",
+        "local_params": {
+          "size_cm": 2.5
+        }
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_BEADS_OVAL_8MM",
+        "local_params": {
+          "count": 12
+        }
+      }
+    ],
+    "global_design": {
+      "hue": 0.018564555382762304,
+      "saturation": 0.2915190688433378,
+      "lightness": 0.7597132056201354,
+      "secondary_hue": 0.16415881158168433,
+      "secondary_saturation": 0.19753626171443572,
+      "secondary_lightness": 0.424016775015261,
+      "pattern_overlay": "gingham",
+      "pattern_scale": 0.6058512348604904,
+      "pattern_angle": 0.3031007072728342,
+      "palette_preset": "transcendent_pink"
+    }
+  },
+  "outfit_validation": {
+    "valid": true,
+    "warnings": []
+  }
+}

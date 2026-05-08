@@ -1,0 +1,140 @@
+{
+  "meta": {
+    "name": "diverse_bandeau_08",
+    "source_views": {},
+    "analysis_notes": "Auto-synthesized via diverse_seeds.py (rng=42, archetype=bandeau_back_band, pattern=herringbone, fabric_source=qnova, style_archetype=spanish_mediterranean). Selected by fitness \u00d7 diversity from 80-sample stratified random pool.",
+    "confidence": {
+      "shape": 0.6,
+      "color": 0.6,
+      "pattern": 0.6,
+      "fabric": 0.6,
+      "hardware": 0.6,
+      "style_archetype": 0.6
+    },
+    "migrated_to_v2": "2026-04-29"
+  },
+  "genome": {
+    "pattern": "herringbone",
+    "top_center_v": 0.79,
+    "top_half_v": 0.6976228769070474,
+    "top_half_u": 0.19062219839878272,
+    "top_inner_u": 0.02390336795346243,
+    "top_apex_lift": 0.6310475226410597,
+    "top_underband_dip": 0.6358511364258357,
+    "top_back_coverage": 0.5691953460163862,
+    "top_neck_strap": 0.07851897065317612,
+    "top_shoulder_strap": 0.12790564974216242,
+    "bot_front_top_v": 0.45999999999999996,
+    "bot_front_half_u": 0.3471683001641309,
+    "bot_front_leg_curve": 0.5396681221360596,
+    "bot_back_top_v": 0.804707766246453,
+    "bot_back_half_u": 0.44186030557653444,
+    "bot_tie_dangle": 0.3657833219483778,
+    "hue": 0.09436526790879038,
+    "saturation": 0.61093457983213,
+    "lightness": 0.5530166223510871,
+    "secondary_hue": 0.8153797891608882,
+    "secondary_saturation": 0.8479464883826706,
+    "secondary_lightness": 0.34388491724999426,
+    "pattern_scale": 0.4691979552440262,
+    "pattern_angle": 0.0083171105963733,
+    "trim_color_mode": 0.9220883957440529,
+    "fabric_sheen": 0.9469575118681244,
+    "fabric_metallic": 0.47706707045145713,
+    "fabric_opacity": 0.009132599576333167,
+    "fabric_weight": 0.43043531326923345,
+    "fabric_weave": "crochet",
+    "palette_preset": "sunset_peach",
+    "fabric_source": "qnova",
+    "biodegradable": 0.0,
+    "single_material": 1.0,
+    "has_oring": 1.0,
+    "oring_size": 0.37364387652703357,
+    "has_bow": 1.0,
+    "bow_size": 0.5605543586396154,
+    "has_fringe": 1.0,
+    "fringe_length": 0.37597127289862997,
+    "has_beads": 0.0,
+    "has_shell": 0.0,
+    "style_archetype": "spanish_mediterranean",
+    "hardware_metal": "gold"
+  },
+  "outfit": {
+    "archetype": "bandeau_back_band",
+    "slot_assignments": [
+      {
+        "slot_name": "cup",
+        "library_id": "CUP_BANDEAU_L",
+        "local_params": {
+          "half_u": 0.19062219839878272,
+          "half_v": 0.6976228769070474,
+          "inner_u": 0.02390336795346243,
+          "apex_lift": 0.6310475226410597,
+          "underband_dip": 0.6358511364258357,
+          "center_v": 0.79
+        }
+      },
+      {
+        "slot_name": "bottom_front",
+        "library_id": "BOT_HIGHWAIST_M",
+        "local_params": {
+          "front_top_v": 0.45999999999999996,
+          "front_half_u": 0.3471683001641309,
+          "front_leg_curve": 0.5396681221360596,
+          "back_top_v": 0.804707766246453,
+          "back_half_u": 0.44186030557653444
+        }
+      },
+      {
+        "slot_name": "back_band",
+        "library_id": "STR_BACKBAND_PLAIN",
+        "local_params": {}
+      },
+      {
+        "slot_name": "oring",
+        "library_id": "HW_OR_12MM_GOLD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "primary_fabric",
+        "library_id": "F_CROCHET_COTTON",
+        "local_params": {}
+      },
+      {
+        "slot_name": "seam_type",
+        "library_id": "S_OVERLOCK_4THREAD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_BOW_CHIFFON_30MM",
+        "local_params": {
+          "size_cm": 3.242217434558462
+        }
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_FRINGE_BEADED_80MM",
+        "local_params": {
+          "length_cm": 5.245183655239451
+        }
+      }
+    ],
+    "global_design": {
+      "hue": 0.06458574822358229,
+      "saturation": 0.6209682243697834,
+      "lightness": 0.6525429920231958,
+      "secondary_hue": 0.8153797891608882,
+      "secondary_saturation": 0.8479464883826706,
+      "secondary_lightness": 0.34388491724999426,
+      "pattern_overlay": "solid",
+      "pattern_scale": 0.4691979552440262,
+      "pattern_angle": 0.0083171105963733,
+      "palette_preset": "sunset_peach"
+    }
+  },
+  "outfit_validation": {
+    "valid": true,
+    "warnings": []
+  }
+}

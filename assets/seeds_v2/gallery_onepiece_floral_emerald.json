@@ -1,0 +1,137 @@
+{
+  "meta": {
+    "name": "gallery_onepiece_floral_emerald",
+    "source_views": {},
+    "analysis_notes": "Synthetic gallery seed. archetype=one_piece_maillot, pieces=8, connectors=2, accessories=3.",
+    "confidence": {
+      "shape": 1.0,
+      "color": 1.0,
+      "pattern": 1.0,
+      "fabric": 0.8,
+      "hardware": 0.8,
+      "style_archetype": 1.0
+    },
+    "migrated_to_v2": "2026-04-29"
+  },
+  "genome": {
+    "pattern": "floral",
+    "top_center_v": 0.74,
+    "top_half_v": 0.18,
+    "top_half_u": 0.2,
+    "top_inner_u": 0.05,
+    "top_apex_lift": 0.15,
+    "top_underband_dip": 0.0,
+    "top_back_coverage": 1.0,
+    "top_neck_strap": 0.0,
+    "top_shoulder_strap": 1.0,
+    "bot_front_top_v": 0.51,
+    "bot_front_half_u": 0.2,
+    "bot_front_leg_curve": 0.65,
+    "bot_back_top_v": 0.52,
+    "bot_back_half_u": 0.18,
+    "bot_tie_dangle": 0.2,
+    "hue": 0.1935,
+    "saturation": 0.29750000000000004,
+    "lightness": 0.73,
+    "secondary_hue": 0.32,
+    "secondary_saturation": 0.65,
+    "secondary_lightness": 0.3,
+    "pattern_scale": 0.85,
+    "pattern_angle": 0.0,
+    "trim_color_mode": 0.3,
+    "fabric_sheen": 0.4,
+    "fabric_metallic": 0.0,
+    "fabric_opacity": 1.0,
+    "fabric_weight": 0.5,
+    "fabric_weave": "plain",
+    "palette_preset": "free",
+    "fabric_source": "biopolymer",
+    "biodegradable": 1.0,
+    "single_material": 1.0,
+    "has_oring": 0.0,
+    "oring_size": 0.4,
+    "has_bow": 0.0,
+    "bow_size": 0.3,
+    "has_fringe": 1.0,
+    "fringe_length": 0.5025000000000001,
+    "has_beads": 1.0,
+    "has_shell": 1.0,
+    "style_archetype": "boho_cultgaia",
+    "hardware_metal": "none"
+  },
+  "outfit": {
+    "archetype": "one_piece_maillot",
+    "slot_assignments": [
+      {
+        "slot_name": "cup",
+        "library_id": "CUP_BALCONETTE_L",
+        "local_params": {
+          "half_u": 0.2,
+          "half_v": 0.18,
+          "inner_u": 0.05,
+          "apex_lift": 0.15,
+          "underband_dip": 0.0,
+          "center_v": 0.74
+        }
+      },
+      {
+        "slot_name": "bottom_front",
+        "library_id": "BOT_HIGHWAIST_M",
+        "local_params": {
+          "front_top_v": 0.51,
+          "front_half_u": 0.2,
+          "front_leg_curve": 0.65,
+          "back_top_v": 0.52,
+          "back_half_u": 0.18
+        }
+      },
+      {
+        "slot_name": "shoulder_strap",
+        "library_id": "STR_SHOULDER_PADDED_20MM",
+        "local_params": {
+          "length_cm": 32.0
+        }
+      },
+      {
+        "slot_name": "primary_fabric",
+        "library_id": "F_CROCHET_COTTON",
+        "local_params": {}
+      },
+      {
+        "slot_name": "seam_type",
+        "library_id": "S_OVERLOCK_4THREAD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_SHELL_TROCHUS_25MM",
+        "local_params": {
+          "size_cm": 2.5
+        }
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_BEADS_OVAL_8MM",
+        "local_params": {
+          "count": 12
+        }
+      }
+    ],
+    "global_design": {
+      "hue": 0.13657499999999997,
+      "saturation": 0.408875,
+      "lightness": 0.631,
+      "secondary_hue": 0.32,
+      "secondary_saturation": 0.65,
+      "secondary_lightness": 0.3,
+      "pattern_overlay": "floral",
+      "pattern_scale": 0.85,
+      "pattern_angle": 0.0,
+      "palette_preset": "free"
+    }
+  },
+  "outfit_validation": {
+    "valid": true,
+    "warnings": []
+  }
+}
