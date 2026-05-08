@@ -49,6 +49,7 @@ from outfit import Outfit, SlotAssignment, random_outfit, outfit_to_genome
 from library import ARCHETYPE_SLOTS, validate_outfit
 from library_data import LIBRARY, entries_matching_slot
 import fitness as fitness_mod
+from outfit_fitness import outfit_evaluate
 
 
 # ---------------------------------------------------------------------------
@@ -238,13 +239,24 @@ def _heal_invalid(child: Outfit, parent_a: Outfit, parent_b: Outfit,
 def evolve(parent_a: Outfit, parent_b: Outfit,
             pop_size: int = 30, gens: int = 8,
             rng: Optional[random.Random] = None,
+            use_outfit_fitness: bool = True,
             ) -> tuple[list[tuple[Outfit, dict]], list[float], list[float]]:
     """Tournament-3 + 2-elitism GA on Outfits. Returns (ranked_pop_with_fit,
-    mean_traj, max_traj)."""
+    mean_traj, max_traj).
+
+    use_outfit_fitness=True (default, v2): selects on outfit_evaluate's
+    'overall' composite (40% aesthetic + 25% manufacturing + 35% outfit).
+    Set False to fall back to v1 fitness via outfit_to_genome — the
+    pre-Step-8 behaviour, useful for A/B comparison.
+    """
     rng = rng or random.Random()
 
-    def fit_of(o: Outfit) -> dict:
-        return fitness_mod.evaluate(outfit_to_genome(o))
+    if use_outfit_fitness:
+        def fit_of(o: Outfit) -> dict:
+            return outfit_evaluate(o)
+    else:
+        def fit_of(o: Outfit) -> dict:
+            return fitness_mod.evaluate(outfit_to_genome(o))
 
     pop: list[Outfit] = [copy.deepcopy(parent_a), copy.deepcopy(parent_b)]
     while len(pop) < pop_size:

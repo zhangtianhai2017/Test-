@@ -310,14 +310,49 @@ else:
 
 ---
 
-## 12. 下一步
+## 12. Step 8 — outfit-native fitness（已完成）
 
-完整 v2 7 步已经完成。后续改进方向：
+`tools/fitness.py` 之前是 Genome-based；GA 通过 `outfit_to_genome` 投影后调用，
+丢失了所有 Genome 装不下的信号（library_id 选择、compatible_with 链密度、
+anatomy_hints 完整度、body_jewelry 锚点变化等）。
+
+`tools/outfit_fitness.py` 新增 6 个 outfit-native 评分轴（直接读 LibraryEntry 元数据）：
+
+| 轴 | 范围 | 说明 |
+|---|---|---|
+| `slot_richness` | [0,1] | optional slot 填充率落在 40-70% 健康区间得高分；过少（裸）或过多（堆砌）都扣分 |
+| `library_diversity` | [0,1] | distinct library_id / 总 slot 数；惩罚 body_jewelry 重复 |
+| `compatibility_strength` | [0,1] | `compatible_with` 链中实际出现在 outfit 内的 partner 比例 |
+| `anatomy_coverage` | [0,1] | body_jewelry + accessory 用到的不同 anatomy_anchor 数量 |
+| `palette_coherence` | [0,1] | global_design 双色相 angular 距离评分（15° 内冲突，50-125° 最佳） |
+| `manufacturing_realism` | [0,1] | distinct fabric/seam/hardware 数量超过常规生产范围扣分 |
+
+`outfit_evaluate(outfit)` 复合权重 = **0.40 aesthetic + 0.25 manufacturing + 0.35 outfit-native**。
+v1 美学/制造分仍通过 `outfit_to_genome` 的有损投影获得（这是兼容性，不是核心信号）。
+
+`tools/iter/outfit_ga.py::evolve(use_outfit_fitness=True)` 默认使用新 fitness。
+A/B 切换：`use_outfit_fitness=False` 回退到 v1 行为。
+
+### Step 8 demo 结果
+
+`tools/output/2026-05-08/0352_v2_ga_demo/` — 4 archetype × pop=20 × gens=12，每个取 top-3 渲染：
+
+| archetype | mean start→end | max start→end | Δmax |
+|---|---|---|---|
+| triangle_string_halter | 0.760→0.852 | 0.793→**0.875** | +0.082 |
+| bandeau_back_band | 0.736→0.800 | 0.768→**0.812** | +0.044 |
+| bralette_shoulder_strap | 0.788→0.856 | 0.820→**0.877** | +0.058 |
+| one_piece_maillot | 0.815→0.843 | 0.848→**0.869** | +0.021 |
+
+所有 4 archetype 都有 monotonic 提升，说明 outfit-native fitness 在 GA 信号里有判别力，
+不是 trivial constant。bandeau Δ 较小因为 slot 模板更紧（优化空间小）。
+
+## 13. 下一步
+
 1. **库扩展**：当前 86 条目，可继续加 (a) 高端泳装的 cutout / mesh paneling 杯款，
-   (b) 更多 body jewelry 形态（waist beads / arm chain / nipple chain），
+   (b) 更多 body jewelry 形态（waist beads / arm chain），
    (c) 季节性面料（terry / corduroy / metallic）。
-2. **前端编辑器**：现在 Outfit 是 dataclass + JSON，可以做一个纯 Web 的可视化
-   slot picker（archetype 下拉 → 每个 slot 一个 thumbnail grid）。
-3. **fitness 函数 v2**：当前 `tools/fitness.py` 还是 Genome-based。
-   可以加一个 `outfit_fitness(outfit)` 直接用 library 元数据评估
-   （兼容性 / anatomy_hints 完整度 / 制造工序复杂度等），把 GA loop 完全脱离 Genome。
+2. **前端编辑器**：Outfit 是 dataclass + JSON，可以做一个纯 Web 的可视化
+   slot picker（archetype 下拉 → 每 slot 一个 thumbnail grid）。
+3. **rendered-image fitness**：在 outfit_evaluate 之上挂 CLIP / aesthetic
+   model 评估渲染图，闭环反馈给 GA。
