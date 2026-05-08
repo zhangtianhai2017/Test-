@@ -66,23 +66,22 @@
         "slot_name": "cup",
         "library_id": "CUP_TRIANGLE_L",
         "local_params": {
-          "half_u": 0.45845802854414863,
-          "half_v": 0.8955779401398597,
+          "half_u": 0.236,
+          "half_v": 0.118,
           "inner_u": 0.095,
-          "apex_lift": 0.5807706273762658,
-          "underband_dip": 0.5054277638607758,
-          "center_v": 0.71
+          "apex_lift": 0.3,
+          "underband_dip": 0.1
         }
       },
       {
         "slot_name": "bottom_front",
         "library_id": "BOT_THONG_S",
         "local_params": {
-          "front_top_v": 0.45999999999999996,
-          "front_half_u": 0.662443928153949,
-          "front_leg_curve": 0.13070828644016186,
-          "back_top_v": 0.36,
-          "back_half_u": 0.8509137057886191
+          "front_top_v": 0.32,
+          "front_half_u": 0.17,
+          "front_leg_curve": 0.5,
+          "back_top_v": 0.3,
+          "back_half_u": 0.1
         }
       },
       {
@@ -125,7 +124,7 @@
         "slot_name": "accessory",
         "library_id": "ACC_BEADS_OVAL_8MM",
         "local_params": {
-          "count": 12
+          "count": 12.0
         }
       }
     ],

@@ -12,7 +12,7 @@ Pipeline functions
 ------------------
 - random_outfit(archetype, rng) — sample a legal Outfit from scratch
   by picking one matching library entry per slot.
-- outfit_to_garment(outfit, anatomy=None) — concretize Outfit into the
+- outfit_to_garment(outfit) — concretize Outfit into the
   existing Garment dataclass that downstream code already consumes
   (validate_garment, deploy_to_body, build_strap_meshes, etc.).
 - outfit_to_genome(outfit) — lossy projection back to the legacy 44-dim
@@ -115,10 +115,12 @@ def random_outfit(archetype: str, rng: Optional[random.Random] = None) -> Outfit
                 local_params=entry.sample_local_params(rng),
             ))
 
-    # Resolve compatible_with constraints — if any chosen entry requires
-    # a partner library_id and that partner isn't already in the outfit,
-    # try to add it as a satellite "lining_fabric" / "auxiliary" slot
-    # (or pick a different cup if no graceful satellite slot exists).
+    # Resolve compatible_with constraints. If a chosen entry requires a
+    # partner that isn't already selected, prefer to drop the offending
+    # entry and resample from candidates whose compatible_with is already
+    # satisfied. This avoids the worst case (foam cups forcing foam
+    # laminate into the primary fabric slot — foam isn't a swim fabric).
+    archetype_slots = {s.name: s for s in ARCHETYPE_SLOTS[archetype]}
     selected_ids = {a.library_id for a in assignments}
     for a in list(assignments):
         entry = LIBRARY.get(a.library_id)
@@ -126,28 +128,31 @@ def random_outfit(archetype: str, rng: Optional[random.Random] = None) -> Outfit
             continue
         if set(entry.compatible_with) & selected_ids:
             continue
-        # Try to inject the first listed required partner.
+        spec = archetype_slots.get(a.slot_name)
+        if spec is not None:
+            alts = [c for c in entries_matching_slot(spec)
+                    if c.id != entry.id and (
+                        not c.compatible_with
+                        or set(c.compatible_with) & selected_ids)]
+            if alts:
+                replacement = rng.choice(alts)
+                a.library_id = replacement.id
+                a.local_params = replacement.sample_local_params(rng)
+                selected_ids.discard(entry.id)
+                selected_ids.add(replacement.id)
+                continue
+        # No clean alternate; inject the partner. Fabric partners go to
+        # a real lining_fabric slot if the archetype has one, else
+        # 'auxiliary_<kind>' (will validate against O4 if no matching
+        # slot exists, surfacing the conflict instead of hiding it).
         req_id = entry.compatible_with[0]
         req_entry = LIBRARY.get(req_id)
         if req_entry is None:
             continue
-        # Pick a slot name. For fabric partners use "lining_fabric"
-        # if the archetype has one, else "primary_fabric" (overrides
-        # the existing primary fabric so that the foam cup's required
-        # foam fabric supersedes the random pick — molded cups need
-        # the foam laminate as their primary).
-        slot_name = "lining_fabric"
-        has_lining = any(s.name == "lining_fabric"
-                          for s in ARCHETYPE_SLOTS[archetype])
-        if not has_lining and req_entry.kind == "fabric":
-            # replace primary_fabric to satisfy the dependency
-            for sa in assignments:
-                if sa.slot_name == "primary_fabric":
-                    sa.library_id = req_id
-                    sa.local_params = {}
-                    selected_ids.add(req_id)
-                    break
-            continue
+        if "lining_fabric" in archetype_slots and req_entry.kind == "fabric":
+            slot_name = "lining_fabric"
+        else:
+            slot_name = f"auxiliary_{req_entry.kind}"
         assignments.append(SlotAssignment(
             slot_name=slot_name, library_id=req_id,
             local_params=req_entry.sample_local_params(rng)))
@@ -202,7 +207,7 @@ def _build_connector_ref(entry: LibraryEntry) -> ConnectorRef:
         elif "tie" in entry.tags or "side_tie" in entry.tags:
             kind = "tie_string"
         elif "underbust" in entry.tags or "FOE" in entry.tags:
-            kind = "elastic_band" if "underbust" not in entry.tags else "underbust_elastic"
+            kind = "underbust_elastic"
         elif "back_band" in entry.tags:
             kind = "elastic_band"
         else:
@@ -229,7 +234,7 @@ def _build_connector_ref(entry: LibraryEntry) -> ConnectorRef:
     )
 
 
-def _build_accessory_ref(entry: LibraryEntry, count: int = 1) -> AccessoryRef:
+def _build_accessory_ref(entry: LibraryEntry) -> AccessoryRef:
     # Derive accessory.kind from tags
     for tag in ("bow", "shell_charm", "pendant", "fringe",
                   "beads", "tassel", "ring_charm"):
@@ -242,7 +247,7 @@ def _build_accessory_ref(entry: LibraryEntry, count: int = 1) -> AccessoryRef:
     return AccessoryRef(
         id=entry.id, name=entry.name, kind=kind,
         size_cm=float(size), material="", metal_finish=entry.metal_finish,
-        count=count,
+        count=1,
     )
 
 
@@ -252,18 +257,7 @@ def _make_pattern_piece_from_cup(cup_entry: LibraryEntry,
     """One PatternPiece with count=2 mirror_axis=u for the cup."""
     poly = polygon_recipes.call_recipe(
         cup_entry.base_polygon_recipe, local_params, side=1)
-    edge_names = []
-    for i in range(len(poly) - 1):
-        if i == 0:
-            edge_names.append("cup_outer")
-        elif i == 1:
-            edge_names.append("armhole")
-        elif i == 2:
-            edge_names.append("underbust")
-        elif i == 3:
-            edge_names.append("cup_inner")
-        else:
-            edge_names.append("cup_outer")
+    edge_names = ["cup_outer", "armhole", "underbust", "cup_inner"][:len(poly) - 1]
     return PatternPiece(
         id="cup", role="cup", polygon_uv=list(poly),
         count=2, mirror_axis="u", fabric_id=fabric_id,
@@ -274,39 +268,34 @@ def _make_pattern_piece_from_cup(cup_entry: LibraryEntry,
 
 def _make_bottom_pieces(bottom_entry: LibraryEntry,
                           local_params: dict, fabric_id: str
-                          ) -> tuple[list[PatternPiece], list[Seam]]:
+                          ) -> list[PatternPiece]:
     """Build front bottom + back bottom strips from a bottom_piece entry."""
     pieces: list[PatternPiece] = []
-    seams: list[Seam] = []
-    # Front
     front_poly = polygon_recipes.call_recipe(
         bottom_entry.base_polygon_recipe, local_params)
     en_front = ["waistband", "leg_opening", "inseam",
                 "leg_opening", "side_seam", "leg_opening"]
-    en_front = en_front[: len(front_poly) - 1]
     pieces.append(PatternPiece(
         id="bottom_front", role="front_bottom",
         polygon_uv=list(front_poly), count=1,
         fabric_id=fabric_id, layer_role="shell",
-        edge_names=en_front,
+        edge_names=en_front[: len(front_poly) - 1],
         notes=f"library: {bottom_entry.id}",
     ))
-    # Back: two strips
     back_strips = polygon_recipes.back_bottom_strips(local_params)
     for i, p in enumerate(back_strips):
         side = "R" if i == 0 else "L"
         en = ["waistband", "leg_opening", "inseam", "back_seam"]
-        en = en[: len(p) - 1]
         pieces.append(PatternPiece(
             id=f"bottom_back_{side}", role="back_bottom",
             polygon_uv=list(p), count=1, fabric_id=fabric_id,
-            layer_role="shell", edge_names=en,
+            layer_role="shell", edge_names=en[: len(p) - 1],
             notes=f"library: {bottom_entry.id} (back strip)",
         ))
-    return pieces, seams
+    return pieces
 
 
-def outfit_to_garment(outfit: Outfit, anatomy=None) -> Garment:
+def outfit_to_garment(outfit: Outfit) -> Garment:
     """Concretize an Outfit into a Garment. Pattern-piece slots produce
     PatternPieces; connector slots produce ConnectorRefs; accessory
     slots produce AccessoryRefs; each connector/accessory gets default
@@ -381,10 +370,8 @@ def outfit_to_garment(outfit: Outfit, anatomy=None) -> Garment:
     if bot_front_assn is not None:
         bot_entry = _entry(bot_front_assn.library_id)
         bot_params = bot_entry.clamp_local_params(bot_front_assn.local_params)
-        bot_pieces, bot_seams = _make_bottom_pieces(
-            bot_entry, bot_params, primary_fabric_id)
-        pieces.extend(bot_pieces)
-        seams.extend(bot_seams)
+        pieces.extend(_make_bottom_pieces(
+            bot_entry, bot_params, primary_fabric_id))
         # Inseam join
         if any(p.id == "bottom_front" for p in pieces) and \
            any(p.id.startswith("bottom_back_") for p in pieces):
@@ -524,6 +511,23 @@ def _outfit_summary(outfit: Outfit) -> dict:
 # Bidirectional projection — Outfit ↔ Genome (for v1 backward compat)
 # ---------------------------------------------------------------------------
 
+# v2 archetype → closest v1 STYLE_ARCHETYPES enum. v1 only had "free" plus
+# culture/brand styles, so v2 archetype maps to a representative v1 style
+# rather than a structural one. Triangle ↔ brazilian (both string-tied),
+# bandeau ↔ hunzag_crinkle (both unstrap top), bralette ↔ sporty_chromat
+# (both shoulder-strapped), one_piece ↔ eres_architect (molded silhouette).
+_V2_TO_V1_STYLE = {
+    "triangle_string_halter":  "brazilian",
+    "bandeau_back_band":       "hunzag_crinkle",
+    "bralette_shoulder_strap": "sporty_chromat",
+    "one_piece_maillot":       "eres_architect",
+}
+
+
+def _v1_style_for(outfit: Outfit) -> str:
+    return _V2_TO_V1_STYLE.get(outfit.archetype, "free")
+
+
 def outfit_to_genome(outfit: Outfit):
     """Lossy projection: extract enough Genome fields for legacy
     fitness.py to score the outfit. Continuous fields come from cup/
@@ -605,7 +609,7 @@ def outfit_to_genome(outfit: Outfit):
         fringe_length=0.4,
         has_beads=1.0 if has_beads else 0.0,
         has_shell=1.0 if has_shell else 0.0,
-        style_archetype="brazilian",  # closest legacy match
+        style_archetype=_v1_style_for(outfit),
         hardware_metal="gold",
     ).clipped()
     return _enforce_constraints(g)
@@ -743,12 +747,14 @@ def genome_to_outfit(genome) -> Outfit:
         assignments.append(SlotAssignment(
             slot_name="oring", library_id=ring, local_params={}))
 
-    # Primary fabric — snap by (weave, source, weight)
+    # Primary fabric — snap by (weave, source, weight), filtered to
+    # entries the slot's SlotSpec.matches accepts (e.g. excluded_tags
+    # keeps foam / powermesh / lining out of primary_fabric).
+    primary_spec = next(s for s in slots if s.name == "primary_fabric")
     target_gsm = int(150 + 100 * genome.fabric_weight)
-    fab_candidates = [(k, v) for k, v in FABRICS.items()
-                      if v.weave == genome.fabric_weave]
-    if not fab_candidates:
-        fab_candidates = list(FABRICS.items())
+    legal = [(k, v) for k, v in FABRICS.items() if primary_spec.matches(v)]
+    fab_candidates = [(k, v) for k, v in legal
+                      if v.weave == genome.fabric_weave] or legal
     same_src = [(k, v) for k, v in fab_candidates
                 if v.fabric_source == genome.fabric_source]
     if same_src:
@@ -798,6 +804,13 @@ def genome_to_outfit(genome) -> Outfit:
         "pattern_angle": genome.pattern_angle,
         "palette_preset": genome.palette_preset,
     }
+    # Snap raw genome floats to each entry's local_params schema bounds.
+    # Without this a v1 seed with bot_front_half_u=0.05 would silently
+    # propagate to a BOT_THONG_M whose schema floor is 0.12.
+    for sa in assignments:
+        entry = LIBRARY.get(sa.library_id)
+        if entry and entry.local_params_schema:
+            sa.local_params = entry.clamp_local_params(sa.local_params)
     return Outfit(archetype=archetype,
                     slot_assignments=assignments,
                     global_design=global_design)

@@ -66,29 +66,30 @@
         "slot_name": "cup",
         "library_id": "CUP_BANDEAU_L",
         "local_params": {
-          "half_u": 0.21,
+          "half_u": 0.236,
           "half_v": 0.1,
           "inner_u": 0.0,
-          "apex_lift": 0.06666666666666654,
-          "underband_dip": 0.05,
-          "center_v": 0.74
+          "apex_lift": 0.05,
+          "underband_dip": 0.05
         }
       },
       {
         "slot_name": "bottom_front",
         "library_id": "BOT_CHEEKY_M",
         "local_params": {
-          "front_top_v": 0.45999999999999996,
+          "front_top_v": 0.34,
           "front_half_u": 0.18,
           "front_leg_curve": 0.65,
-          "back_top_v": 0.36,
+          "back_top_v": 0.32,
           "back_half_u": 0.13
         }
       },
       {
         "slot_name": "back_band",
         "library_id": "STR_BACKBAND_PLAIN",
-        "local_params": {}
+        "local_params": {
+          "height_cm": 3.5
+        }
       },
       {
         "slot_name": "primary_fabric",

@@ -171,6 +171,7 @@ class SlotSpec:
     kind: str                                # must match LibraryEntry.kind
     required: bool = True
     allowed_tags: tuple[str, ...] = ()       # empty = no tag filter
+    excluded_tags: tuple[str, ...] = ()      # blacklist (e.g. foam/lining out of primary_fabric)
     max_count: int = 1                       # body_jewelry / accessory can stack
     notes: str = ""
 
@@ -179,6 +180,9 @@ class SlotSpec:
             return False
         if self.allowed_tags:
             if not (set(self.allowed_tags) & set(entry.tags)):
+                return False
+        if self.excluded_tags:
+            if set(self.excluded_tags) & set(entry.tags):
                 return False
         return True
 
@@ -201,7 +205,7 @@ ARCHETYPE_SLOTS: dict[str, list[SlotSpec]] = {
                   allowed_tags=("tie", "side_tie")),
         SlotSpec("oring",          "hardware",    required=False,
                   allowed_tags=("o_ring",)),
-        SlotSpec("primary_fabric", "fabric"),
+        SlotSpec("primary_fabric", "fabric", excluded_tags=("foam","powermesh","lining","padding")),
         SlotSpec("seam_type",      "seam_type",   required=False),
         SlotSpec("accessory",      "accessory",   required=False, max_count=2),
         SlotSpec("body_jewelry",   "body_jewelry", required=False, max_count=3),
@@ -213,7 +217,7 @@ ARCHETYPE_SLOTS: dict[str, list[SlotSpec]] = {
         SlotSpec("bottom_back",    "bottom_piece", required=False),
         SlotSpec("back_band",      "strap_piece",
                   allowed_tags=("back_band",)),
-        SlotSpec("primary_fabric", "fabric"),
+        SlotSpec("primary_fabric", "fabric", excluded_tags=("foam","powermesh","lining","padding")),
         SlotSpec("seam_type",      "seam_type",   required=False),
         SlotSpec("accessory",      "accessory",   required=False, max_count=2),
         SlotSpec("body_jewelry",   "body_jewelry", required=False, max_count=3),
@@ -230,7 +234,7 @@ ARCHETYPE_SLOTS: dict[str, list[SlotSpec]] = {
                   allowed_tags=("underbust", "FOE")),
         SlotSpec("slider",         "hardware", required=False,
                   allowed_tags=("slider",)),
-        SlotSpec("primary_fabric", "fabric"),
+        SlotSpec("primary_fabric", "fabric", excluded_tags=("foam","powermesh","lining","padding")),
         SlotSpec("seam_type",      "seam_type",   required=False),
         SlotSpec("accessory",      "accessory",   required=False, max_count=2),
         SlotSpec("body_jewelry",   "body_jewelry", required=False, max_count=3),
@@ -247,7 +251,7 @@ ARCHETYPE_SLOTS: dict[str, list[SlotSpec]] = {
                   allowed_tags=("shoulder", "halter")),
         SlotSpec("underbust",      "strap_piece", required=False,
                   allowed_tags=("underbust", "FOE")),
-        SlotSpec("primary_fabric", "fabric"),
+        SlotSpec("primary_fabric", "fabric", excluded_tags=("foam","powermesh","lining","padding")),
         SlotSpec("lining_fabric",  "fabric", required=False),
         SlotSpec("seam_type",      "seam_type",   required=False),
         SlotSpec("accessory",      "accessory",   required=False, max_count=2),

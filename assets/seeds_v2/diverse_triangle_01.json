@@ -66,23 +66,22 @@
         "slot_name": "cup",
         "library_id": "CUP_TRIANGLE_L",
         "local_params": {
-          "half_u": 0.26697782204911336,
-          "half_v": 0.2095070307714877,
+          "half_u": 0.236,
+          "half_v": 0.118,
           "inner_u": 0.095,
           "apex_lift": 0.19917838461914603,
-          "underband_dip": 0.6091310056669882,
-          "center_v": 0.71
+          "underband_dip": 0.1
         }
       },
       {
         "slot_name": "bottom_front",
         "library_id": "BOT_THONG_S",
         "local_params": {
-          "front_top_v": 0.45999999999999996,
-          "front_half_u": 0.9895233506365952,
+          "front_top_v": 0.32,
+          "front_half_u": 0.17,
           "front_leg_curve": 0.6399997598540929,
-          "back_top_v": 0.5569497437746462,
-          "back_half_u": 0.6846142509898746
+          "back_top_v": 0.3,
+          "back_half_u": 0.1
         }
       },
       {
@@ -129,7 +128,7 @@
       "secondary_hue": 0.3154530480590819,
       "secondary_saturation": 0.26774087597570273,
       "secondary_lightness": 0.21098284358632646,
-      "pattern_overlay": "solid",
+      "pattern_overlay": "leopard",
       "pattern_scale": 0.9429097143350544,
       "pattern_angle": 0.8763676264726689,
       "palette_preset": "ethereal_highlight"

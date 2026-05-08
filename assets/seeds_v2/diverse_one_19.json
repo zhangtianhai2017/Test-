@@ -66,12 +66,11 @@
         "slot_name": "cup",
         "library_id": "CUP_BALCONETTE_M",
         "local_params": {
-          "half_u": 0.14308335903124847,
-          "half_v": 0.2762103655331404,
+          "half_u": 0.16,
+          "half_v": 0.1,
           "inner_u": 0.095,
           "apex_lift": 0.05902125294317995,
-          "underband_dip": 0.24658561664322998,
-          "center_v": 0.79
+          "underband_dip": 0.05
         }
       },
       {
@@ -79,10 +78,10 @@
         "library_id": "BOT_HIGHWAIST_M",
         "local_params": {
           "front_top_v": 0.46378963446685967,
-          "front_half_u": 0.1887672117875595,
-          "front_leg_curve": 0.2727575671424539,
+          "front_half_u": 0.2,
+          "front_leg_curve": 0.3,
           "back_top_v": 0.5223829681745297,
-          "back_half_u": 0.9852845692200085
+          "back_half_u": 0.26
         }
       },
       {
@@ -111,7 +110,7 @@
         "slot_name": "accessory",
         "library_id": "ACC_BEADS_OVAL_8MM",
         "local_params": {
-          "count": 12
+          "count": 12.0
         }
       }
     ],
@@ -122,7 +121,7 @@
       "secondary_hue": 0.9577256956972864,
       "secondary_saturation": 0.5975871876260743,
       "secondary_lightness": 0.12036241811230453,
-      "pattern_overlay": "floral",
+      "pattern_overlay": "tropical",
       "pattern_scale": 0.7466425333899557,
       "pattern_angle": 0.7354948810098446,
       "palette_preset": "future_dusk"

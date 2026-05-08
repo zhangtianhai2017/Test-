@@ -70,18 +70,17 @@
           "half_v": 0.1,
           "inner_u": 0.095,
           "apex_lift": 0.06666666666666654,
-          "underband_dip": 0.05,
-          "center_v": 0.74
+          "underband_dip": 0.05
         }
       },
       {
         "slot_name": "bottom_front",
         "library_id": "BOT_BRAZILIAN_M",
         "local_params": {
-          "front_top_v": 0.45999999999999996,
+          "front_top_v": 0.3,
           "front_half_u": 0.18,
           "front_leg_curve": 0.65,
-          "back_top_v": 0.36,
+          "back_top_v": 0.28,
           "back_half_u": 0.1
         }
       },
@@ -101,7 +100,7 @@
       },
       {
         "slot_name": "primary_fabric",
-        "library_id": "F_CROCHET_COTTON",
+        "library_id": "F_BIOPOLYMER_PLAIN",
         "local_params": {}
       },
       {
@@ -120,7 +119,7 @@
         "slot_name": "accessory",
         "library_id": "ACC_BEADS_OVAL_8MM",
         "local_params": {
-          "count": 12
+          "count": 12.0
         }
       }
     ],

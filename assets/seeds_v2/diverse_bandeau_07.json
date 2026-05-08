@@ -66,12 +66,11 @@
         "slot_name": "cup",
         "library_id": "CUP_BANDEAU_L",
         "local_params": {
-          "half_u": 0.22289180225249758,
-          "half_v": 0.33323413980496186,
+          "half_u": 0.236,
+          "half_v": 0.14159999999999998,
           "inner_u": 0.007828629957057371,
-          "apex_lift": 0.40539023300826965,
-          "underband_dip": 0.00418055067087908,
-          "center_v": 0.71
+          "apex_lift": 0.05,
+          "underband_dip": 0.00418055067087908
         }
       },
       {
@@ -79,16 +78,18 @@
         "library_id": "BOT_HIGHWAIST_M",
         "local_params": {
           "front_top_v": 0.45999999999999996,
-          "front_half_u": 0.41582016602370875,
+          "front_half_u": 0.26,
           "front_leg_curve": 0.39464969911048287,
-          "back_top_v": 0.7421939847852654,
-          "back_half_u": 0.3840374238010579
+          "back_top_v": 0.55,
+          "back_half_u": 0.26
         }
       },
       {
         "slot_name": "back_band",
         "library_id": "STR_BACKBAND_PLAIN",
-        "local_params": {}
+        "local_params": {
+          "height_cm": 3.5
+        }
       },
       {
         "slot_name": "oring",
@@ -109,7 +110,7 @@
         "slot_name": "accessory",
         "library_id": "ACC_BEADS_OVAL_8MM",
         "local_params": {
-          "count": 12
+          "count": 12.0
         }
       }
     ],

@@ -66,12 +66,11 @@
         "slot_name": "cup",
         "library_id": "CUP_BALCONETTE_S",
         "local_params": {
-          "half_u": 0.0675,
-          "half_v": 0.33715562417986866,
+          "half_u": 0.136,
+          "half_v": 0.085,
           "inner_u": 0.095,
-          "apex_lift": 0.4119260402997812,
-          "underband_dip": 0.15012807843329945,
-          "center_v": 0.71
+          "apex_lift": 0.1,
+          "underband_dip": 0.05
         }
       },
       {
@@ -81,8 +80,8 @@
           "front_top_v": 0.45999999999999996,
           "front_half_u": 0.22203754164883782,
           "front_leg_curve": 0.36672719563966305,
-          "back_top_v": 0.9676763366905996,
-          "back_half_u": 0.721574205014822
+          "back_top_v": 0.55,
+          "back_half_u": 0.26
         }
       },
       {

@@ -45,10 +45,9 @@ _TOOLS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _TOOLS_DIR not in sys.path:
     sys.path.insert(0, _TOOLS_DIR)
 
-from outfit import Outfit, SlotAssignment, random_outfit, outfit_to_genome
+from outfit import Outfit, SlotAssignment, random_outfit
 from library import ARCHETYPE_SLOTS, validate_outfit
 from library_data import LIBRARY, entries_matching_slot
-import fitness as fitness_mod
 from outfit_fitness import outfit_evaluate
 
 
@@ -192,9 +191,13 @@ def mutate(outfit: Outfit, rng: random.Random,
             ["solid", "stripe", "polka", "gingham", "chevron", "floral",
              "tropical", "leopard", "tie_dye", "ombre", "checker", "herringbone"])
 
-    return Outfit(archetype=archetype,
+    child = Outfit(archetype=archetype,
                     slot_assignments=new_slot_assignments,
                     global_design=new_global)
+    # Resampled library_ids may introduce O5 compatibility violations
+    # (e.g. CUP_FOAM_MOLDED_M needs F_FOAM_CUP_3MM); roll back to the
+    # pre-mutation outfit on any slot the validator flags.
+    return _heal_invalid(child, outfit, outfit, rng)
 
 
 # ---------------------------------------------------------------------------
@@ -206,25 +209,45 @@ def _heal_invalid(child: Outfit, parent_a: Outfit, parent_b: Outfit,
     warnings = validate_outfit(child, LIBRARY)
     if not warnings:
         return child
-    # Naive heal: for any required slot warning O2, try copying from parent_a
-    # then parent_b. For O4 kind/tag mismatch, do the same.
     a_by_slot: dict[str, list[SlotAssignment]] = {}
     b_by_slot: dict[str, list[SlotAssignment]] = {}
     for sa in parent_a.slot_assignments:
         a_by_slot.setdefault(sa.slot_name, []).append(sa)
     for sa in parent_b.slot_assignments:
         b_by_slot.setdefault(sa.slot_name, []).append(sa)
+    a_by_id = {sa.library_id: sa for sa in parent_a.slot_assignments}
+    b_by_id = {sa.library_id: sa for sa in parent_b.slot_assignments}
 
     for w in warnings:
-        # Extract the slot name from messages like "...slot 'foo'..."
+        # O2/O3/O4/O6 messages all carry "slot '<name>'"; O5 carries
+        # "'<library_id>' requires partner from..." (no slot pattern,
+        # so we look up the offending assignment by library_id).
+        if w.startswith("O5"):
+            lib_id = w.split("'")[1]
+            offending = [sa for sa in child.slot_assignments
+                         if sa.library_id == lib_id]
+            if not offending:
+                continue
+            slot_name = offending[0].slot_name
+            replacement = a_by_id.get(lib_id) or b_by_id.get(lib_id)
+            if replacement is None:
+                # parents lacked the partner too — fall back to whichever
+                # parent had this slot filled
+                for src in (a_by_slot.get(slot_name), b_by_slot.get(slot_name)):
+                    if src:
+                        child.slot_assignments = [
+                            sa for sa in child.slot_assignments
+                            if sa.slot_name != slot_name
+                        ]
+                        child.slot_assignments.extend(copy.deepcopy(src))
+                        break
+            continue
         if "slot '" not in w:
             continue
         slot_name = w.split("slot '")[1].split("'")[0]
-        # Drop existing offending assignments
         child.slot_assignments = [
             sa for sa in child.slot_assignments if sa.slot_name != slot_name
         ]
-        # Refill from parent_a or parent_b
         for src in (a_by_slot.get(slot_name), b_by_slot.get(slot_name)):
             if src:
                 child.slot_assignments.extend(copy.deepcopy(src))
@@ -239,24 +262,14 @@ def _heal_invalid(child: Outfit, parent_a: Outfit, parent_b: Outfit,
 def evolve(parent_a: Outfit, parent_b: Outfit,
             pop_size: int = 30, gens: int = 8,
             rng: Optional[random.Random] = None,
-            use_outfit_fitness: bool = True,
             ) -> tuple[list[tuple[Outfit, dict]], list[float], list[float]]:
-    """Tournament-3 + 2-elitism GA on Outfits. Returns (ranked_pop_with_fit,
-    mean_traj, max_traj).
-
-    use_outfit_fitness=True (default, v2): selects on outfit_evaluate's
-    'overall' composite (40% aesthetic + 25% manufacturing + 35% outfit).
-    Set False to fall back to v1 fitness via outfit_to_genome — the
-    pre-Step-8 behaviour, useful for A/B comparison.
-    """
+    """Tournament-3 + 2-elitism GA on Outfits. Selects on outfit_evaluate
+    composite (40% aesthetic + 25% manufacturing + 35% outfit-native).
+    Returns (ranked_pop_with_fit, mean_traj, max_traj)."""
     rng = rng or random.Random()
 
-    if use_outfit_fitness:
-        def fit_of(o: Outfit) -> dict:
-            return outfit_evaluate(o)
-    else:
-        def fit_of(o: Outfit) -> dict:
-            return fitness_mod.evaluate(outfit_to_genome(o))
+    def fit_of(o: Outfit) -> dict:
+        return outfit_evaluate(o)
 
     pop: list[Outfit] = [copy.deepcopy(parent_a), copy.deepcopy(parent_b)]
     while len(pop) < pop_size:

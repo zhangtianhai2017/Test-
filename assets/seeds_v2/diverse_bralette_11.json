@@ -66,12 +66,11 @@
         "slot_name": "cup",
         "library_id": "CUP_BALCONETTE_S",
         "local_params": {
-          "half_u": 0.11855107760312522,
-          "half_v": 0.28479095671767396,
+          "half_u": 0.136,
+          "half_v": 0.085,
           "inner_u": 0.06738485000031867,
-          "apex_lift": 0.32465159452945647,
-          "underband_dip": 0.8853491631844697,
-          "center_v": 0.71
+          "apex_lift": 0.1,
+          "underband_dip": 0.05
         }
       },
       {
@@ -79,9 +78,9 @@
         "library_id": "BOT_HIGHWAIST_M",
         "local_params": {
           "front_top_v": 0.45999999999999996,
-          "front_half_u": 0.9245158525681092,
-          "front_leg_curve": 0.6664336120980137,
-          "back_top_v": 0.6534688048520643,
+          "front_half_u": 0.26,
+          "front_leg_curve": 0.5,
+          "back_top_v": 0.55,
           "back_half_u": 0.20684311205270467
         }
       },
@@ -118,7 +117,7 @@
         "slot_name": "accessory",
         "library_id": "ACC_BEADS_OVAL_8MM",
         "local_params": {
-          "count": 12
+          "count": 12.0
         }
       }
     ],

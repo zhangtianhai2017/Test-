@@ -335,61 +335,78 @@ STRAP_PIECES: dict[str, LibraryEntry] = {
 # HARDWARE — 10 entries (rings + sliders + buckles)
 # ---------------------------------------------------------------------------
 
+# Hardware anchors: rings/sliders sit where strap-piece meets cup edge
+# (front_clavicle), closures sit at the back-band/center-back. Without
+# anatomy_hints deploy_to_body would drop these connectors entirely.
 HARDWARE: dict[str, LibraryEntry] = {
     "HW_OR_8MM_GOLD": LibraryEntry(
         id="HW_OR_8MM_GOLD", kind="hardware",
         name="O-ring 8 mm gold",
         tags=("o_ring", "small", "gold"),
+        anatomy_hints=("front_clavicle_R", "front_clavicle_L"),
         diameter_cm=0.8, metal_finish="gold",
     ),
     "HW_OR_12MM_GOLD": LibraryEntry(
         id="HW_OR_12MM_GOLD", kind="hardware",
         name="O-ring 12 mm gold",
         tags=("o_ring", "gold"),
+        anatomy_hints=("front_clavicle_R", "front_clavicle_L"),
         diameter_cm=1.2, metal_finish="gold",
     ),
     "HW_OR_18MM_SILVER": LibraryEntry(
         id="HW_OR_18MM_SILVER", kind="hardware",
         name="O-ring 18 mm silver",
         tags=("o_ring", "large", "silver"),
+        anatomy_hints=("front_clavicle_R", "front_clavicle_L"),
         diameter_cm=1.8, metal_finish="silver",
     ),
     "HW_OR_12MM_ROSEGOLD": LibraryEntry(
         id="HW_OR_12MM_ROSEGOLD", kind="hardware",
         name="O-ring 12 mm rose gold",
         tags=("o_ring", "rose_gold"),
+        anatomy_hints=("front_clavicle_R", "front_clavicle_L"),
         diameter_cm=1.2, metal_finish="rose_gold",
     ),
     "HW_DR_15MM_SILVER": LibraryEntry(
         id="HW_DR_15MM_SILVER", kind="hardware",
         name="D-ring 15 mm silver",
         tags=("d_ring", "silver"),
+        anatomy_hints=("front_clavicle_R", "front_clavicle_L"),
         diameter_cm=1.5, metal_finish="silver",
     ),
     "HW_SLIDER_10MM_NICKEL": LibraryEntry(
         id="HW_SLIDER_10MM_NICKEL", kind="hardware",
         name="Strap slider 10 mm nickel",
-        tags=("slider",), width_cm=1.0, metal_finish="silver",
+        tags=("slider",),
+        anatomy_hints=("front_clavicle_R", "front_clavicle_L"),
+        width_cm=1.0, metal_finish="silver",
     ),
     "HW_SLIDER_15MM_NICKEL": LibraryEntry(
         id="HW_SLIDER_15MM_NICKEL", kind="hardware",
         name="Strap slider 15 mm nickel",
-        tags=("slider",), width_cm=1.5, metal_finish="silver",
+        tags=("slider",),
+        anatomy_hints=("front_clavicle_R", "front_clavicle_L"),
+        width_cm=1.5, metal_finish="silver",
     ),
     "HW_SLIDER_20MM_GOLD": LibraryEntry(
         id="HW_SLIDER_20MM_GOLD", kind="hardware",
         name="Strap slider 20 mm gold",
-        tags=("slider", "gold"), width_cm=2.0, metal_finish="gold",
+        tags=("slider", "gold"),
+        anatomy_hints=("front_clavicle_R", "front_clavicle_L"),
+        width_cm=2.0, metal_finish="gold",
     ),
     "HW_BUCKLE_15MM_GOLD": LibraryEntry(
         id="HW_BUCKLE_15MM_GOLD", kind="hardware",
         name="Side buckle 15 mm gold",
-        tags=("buckle", "gold"), width_cm=1.5, metal_finish="gold",
+        tags=("buckle", "gold"),
+        anatomy_hints=("hip_R", "hip_L"),
+        width_cm=1.5, metal_finish="gold",
     ),
     "HW_HOOKEYE_BLACK": LibraryEntry(
         id="HW_HOOKEYE_BLACK", kind="hardware",
         name="Hook & eye pair black",
         tags=("hook_eye", "closure"),
+        anatomy_hints=("neck_base_back",),
         width_cm=0.8, metal_finish="none",
     ),
 }
@@ -716,10 +733,9 @@ def entries_by_kind(kind: str) -> list[LibraryEntry]:
     return [e for e in LIBRARY.values() if e.kind == kind]
 
 
-def entries_matching_slot(slot, library: dict = None) -> list[LibraryEntry]:
+def entries_matching_slot(slot) -> list[LibraryEntry]:
     """Return all library entries that satisfy a SlotSpec."""
-    library = library or LIBRARY
-    return [e for e in library.values() if slot.matches(e)]
+    return [e for e in LIBRARY.values() if slot.matches(e)]
 
 
 # Sanity: every SlotSpec.allowed_tags has at least 2 matching entries

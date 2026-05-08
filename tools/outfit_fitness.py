@@ -126,23 +126,15 @@ def _anatomy_coverage(outfit, library) -> float:
         return 0.7
     anchors = set()
     for e in decorative:
-        # anatomy_hints may be a dict {"anchor": "wrist_R"} or list of those
-        hints = e.anatomy_hints or {}
-        if isinstance(hints, dict):
-            anc = hints.get("anchor") or hints.get("anchors")
-            if isinstance(anc, str):
-                anchors.add(anc)
-            elif isinstance(anc, (list, tuple)):
-                anchors.update(anc)
-        elif isinstance(hints, (list, tuple)):
-            for h in hints:
-                if isinstance(h, dict):
-                    anc = h.get("anchor")
-                    if anc:
-                        anchors.add(anc)
+        for h in e.anatomy_hints or ():
+            if isinstance(h, str):
+                anchors.add(h)
+            elif isinstance(h, dict):
+                anc = h.get("anchor")
+                if anc:
+                    anchors.add(anc)
     n_decorative = len(decorative)
     n_anchors = max(1, len(anchors))
-    # 1 anchor for 1 piece is fine; 1 anchor for 3 pieces is bad
     return min(1.0, n_anchors / n_decorative)
 
 
@@ -156,8 +148,10 @@ def _palette_coherence(outfit) -> float:
     h2 = gd.get("secondary_hue")
     if h1 is None:
         return 0.7
-    # Palette preset overrides — designed combinations get a flat bonus
-    if gd.get("palette_preset"):
+    # Named WGSN palette presets are designer-curated; "free" is just
+    # the random_outfit sentinel for "no preset, score from hues".
+    preset = gd.get("palette_preset")
+    if preset and preset != "free":
         return 0.92
     if h2 is None:
         return 0.85

@@ -72,18 +72,17 @@
           "half_v": 0.07,
           "inner_u": 0.095,
           "apex_lift": 0.050000000000000044,
-          "underband_dip": 0.03333333333333318,
-          "center_v": 0.76
+          "underband_dip": 0.03333333333333318
         }
       },
       {
         "slot_name": "bottom_front",
         "library_id": "BOT_BRAZILIAN_M",
         "local_params": {
-          "front_top_v": 0.45999999999999996,
+          "front_top_v": 0.3,
           "front_half_u": 0.16899999999999998,
           "front_leg_curve": 0.7275,
-          "back_top_v": 0.36,
+          "back_top_v": 0.28,
           "back_half_u": 0.089
         }
       },

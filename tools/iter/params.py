@@ -64,20 +64,23 @@ class IterParams:
 
     def clamped(self) -> "IterParams":
         d = asdict(self)
+        # asdict() recursively flattens nested dataclasses to dicts; the
+        # Outfit must be preserved by reference, not via dict round-trip.
+        d.pop("outfit", None)
         for k, (lo, hi) in BOUNDS.items():
             if k in d and isinstance(d[k], (int, float)) and not isinstance(d[k], bool):
                 v = max(lo, min(hi, d[k]))
-                # smooth_iters must stay int
                 if k == "smooth_iters":
                     v = int(round(v))
                 d[k] = v
-        return IterParams(**d)
+        return IterParams(outfit=self.outfit, **d)
 
     def with_delta(self, delta: dict) -> "IterParams":
         """Return a new IterParams with `delta` added (numeric) or merged
         (genome_patch). Always passes through clamped().
         """
         new = asdict(self)
+        new.pop("outfit", None)
         gp_new = dict(self.genome_patch)
         for k, v in delta.items():
             if k == "genome_patch":
@@ -87,11 +90,13 @@ class IterParams:
                 continue
             new[k] = new[k] + v
         new["genome_patch"] = gp_new
-        return IterParams(**new).clamped()
+        return IterParams(outfit=self.outfit, **new).clamped()
 
     def diff(self, other: "IterParams") -> dict:
         """{ field: (other -> self) numeric deltas + genome diff }."""
         d_self, d_other = asdict(self), asdict(other)
+        d_self.pop("outfit", None)
+        d_other.pop("outfit", None)
         out = {}
         for k in d_self:
             if k == "genome_patch":
@@ -105,14 +110,15 @@ class IterParams:
         return out
 
     def to_json(self, path: str) -> None:
+        d = asdict(self)
+        d.pop("outfit", None)
         with open(path, "w") as f:
-            json.dump(asdict(self), f, indent=2)
+            json.dump(d, f, indent=2)
 
     @classmethod
     def from_json(cls, path: str) -> "IterParams":
         with open(path) as f:
             data = json.load(f)
-        # Drop unknown keys for forward compat.
-        valid = {f.name for f in fields(cls)}
+        valid = {f.name for f in fields(cls)} - {"outfit"}
         data = {k: v for k, v in data.items() if k in valid}
         return cls(**data)

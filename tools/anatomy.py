@@ -233,34 +233,26 @@ def back_scapula_point(body_mesh: o3d.geometry.TriangleMesh,
 
 
 # ---------------------------------------------------------------------------
-# Extended body-jewelry anchors (v2)
-#
-# These resolve named anchors used by body_jewelry / accessory library
-# entries: wrist / forearm / bicep (arm chain), earlobe (earrings),
-# ankle (anklet), belly_button (body chain), neck_front (necklace).
+# Extended body-jewelry anchors (v2): wrist, earlobe, ankle, belly_button,
+# neck_front. Forearm / bicep helpers were dropped — no library entry uses
+# them and `_resolve_anchor` would never reach those branches.
 # ---------------------------------------------------------------------------
 
-def _arm_anchor(body_mesh: o3d.geometry.TriangleMesh,
+def wrist_point(body_mesh: o3d.geometry.TriangleMesh,
                 landmarks: AnatomyLandmarks,
-                side: str, fraction_from_shoulder: float
-                ) -> np.ndarray:
-    """Pick a vertex on the laterally-extended arm at a given fraction
-    along the shoulder→hand line. fraction=0 ≈ deltoid (acromion lateral),
-    fraction=1 ≈ hand tip. Wrist ≈ 0.85, forearm-mid ≈ 0.65, bicep ≈ 0.30."""
+                side: str = "R") -> np.ndarray:
+    """Pick a body vertex near the wrist on the given side. Walk along
+    the shoulder→hand line at fraction 0.85; the |x|>8 filter skips the
+    torso slab so we stay on the arm."""
     V = np.asarray(body_mesh.vertices)
-    y = V[:, 1]
     sign = +1 if side == "R" else -1
-    # Hand tip = vertex with most extreme |x| anywhere
     abs_x = np.abs(V[:, 0])
     hand_idx = int(np.argmax(abs_x))
-    hand_x = V[hand_idx, 0]
-    hand_y = V[hand_idx, 1]
-    # Shoulder lateral (deltoid) = at acromion height
+    hand_x, hand_y = V[hand_idx, 0], V[hand_idx, 1]
     shoulder_x = sign * landmarks.deltoid_radius_xz
     shoulder_y = landmarks.y_acromion
-    target_x = shoulder_x + fraction_from_shoulder * (sign * abs(hand_x) - shoulder_x)
-    target_y = shoulder_y + fraction_from_shoulder * (hand_y - shoulder_y)
-    # Pick the body vertex closest to (target_x, target_y) on the right side
+    target_x = shoulder_x + 0.85 * (sign * abs(hand_x) - shoulder_x)
+    target_y = shoulder_y + 0.85 * (hand_y - shoulder_y)
     candidates_idx = np.where((np.sign(V[:, 0]) == sign)
                                 & (np.abs(V[:, 0]) > 8))[0]
     if len(candidates_idx) == 0:
@@ -268,18 +260,6 @@ def _arm_anchor(body_mesh: o3d.geometry.TriangleMesh,
     cand = V[candidates_idx]
     d2 = (cand[:, 0] - target_x) ** 2 + (cand[:, 1] - target_y) ** 2
     return cand[int(np.argmin(d2))].astype(np.float64)
-
-
-def wrist_point(body_mesh, landmarks, side: str = "R") -> np.ndarray:
-    return _arm_anchor(body_mesh, landmarks, side, fraction_from_shoulder=0.85)
-
-
-def forearm_point(body_mesh, landmarks, side: str = "R") -> np.ndarray:
-    return _arm_anchor(body_mesh, landmarks, side, fraction_from_shoulder=0.65)
-
-
-def bicep_point(body_mesh, landmarks, side: str = "R") -> np.ndarray:
-    return _arm_anchor(body_mesh, landmarks, side, fraction_from_shoulder=0.30)
 
 
 def earlobe_point(body_mesh: o3d.geometry.TriangleMesh,

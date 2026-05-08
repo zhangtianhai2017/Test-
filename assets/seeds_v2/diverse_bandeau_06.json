@@ -66,12 +66,11 @@
         "slot_name": "cup",
         "library_id": "CUP_BANDEAU_L",
         "local_params": {
-          "half_u": 0.22766079958373497,
-          "half_v": 0.2997353342941135,
+          "half_u": 0.236,
+          "half_v": 0.14159999999999998,
           "inner_u": 0.027182357103988565,
-          "apex_lift": 0.48289222382352226,
-          "underband_dip": 0.699117780980378,
-          "center_v": 0.79
+          "apex_lift": 0.05,
+          "underband_dip": 0.05
         }
       },
       {
@@ -79,16 +78,18 @@
         "library_id": "BOT_HIGHWAIST_M",
         "local_params": {
           "front_top_v": 0.45999999999999996,
-          "front_half_u": 0.611490756172103,
-          "front_leg_curve": 0.510423879356663,
-          "back_top_v": 0.8476367453303612,
-          "back_half_u": 0.8525051794512917
+          "front_half_u": 0.26,
+          "front_leg_curve": 0.5,
+          "back_top_v": 0.55,
+          "back_half_u": 0.26
         }
       },
       {
         "slot_name": "back_band",
         "library_id": "STR_BACKBAND_PLAIN",
-        "local_params": {}
+        "local_params": {
+          "height_cm": 3.5
+        }
       },
       {
         "slot_name": "primary_fabric",

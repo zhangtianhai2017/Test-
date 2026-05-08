@@ -70,18 +70,17 @@
           "half_v": 0.11,
           "inner_u": 0.095,
           "apex_lift": 0.08333333333333323,
-          "underband_dip": 0.05,
-          "center_v": 0.74
+          "underband_dip": 0.05
         }
       },
       {
         "slot_name": "bottom_front",
         "library_id": "BOT_CHEEKY_M",
         "local_params": {
-          "front_top_v": 0.5095000000000001,
+          "front_top_v": 0.34,
           "front_half_u": 0.18,
           "front_leg_curve": 0.65,
-          "back_top_v": 0.4095000000000001,
+          "back_top_v": 0.32,
           "back_half_u": 0.12
         }
       },
@@ -110,7 +109,7 @@
       "secondary_hue": 0.62,
       "secondary_saturation": 0.85,
       "secondary_lightness": 0.4,
-      "pattern_overlay": "solid",
+      "pattern_overlay": "stripe",
       "pattern_scale": 0.4,
       "pattern_angle": 0.0,
       "palette_preset": "free"

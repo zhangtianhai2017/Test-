@@ -113,10 +113,9 @@ def render_views(genome: Genome, params, out_dir: str,
     body_mesh.triangle_uvs = o3d.utility.Vector2dVector(body_uvs)
     yc, yn = torso_anchors(body_mesh)
 
-    # v2 cascade: prefer Outfit → Garment when available (carries body
-    # jewelry + slot-level library entries), fall back to genome →
-    # Garment for pure v1 paths. The chosen Garment drives polygons,
-    # strap dispatcher and BodyDeployment.
+    # Prefer Outfit → Garment when params.outfit is set (carries body
+    # jewelry + slot-level library entries); fall back to genome →
+    # Garment for v1 paths.
     body_deployment = None
     _garm = None
     polys_uv = None
@@ -124,11 +123,10 @@ def render_views(genome: Genome, params, out_dir: str,
         from garment_state import (genome_to_garment, validate_garment,
                                      deploy_to_body, validate_deployment,
                                      UnsupportedArchetypeV1)
-        outfit = getattr(params, "outfit", None)
-        if outfit is not None:
+        if params.outfit is not None:
             try:
                 from outfit import outfit_to_garment
-                _garm = validate_garment(outfit_to_garment(outfit))
+                _garm = validate_garment(outfit_to_garment(params.outfit))
             except Exception:
                 _garm = None
         if _garm is None:

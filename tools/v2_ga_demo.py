@@ -43,7 +43,7 @@ for arch in ARCHETYPES:
     print(f"\n[{arch}] evolve pop={POP_SIZE} gens={GENS}")
     t0 = time.time()
     ranked, mean_t, max_t = evolve(pa, pb, pop_size=POP_SIZE, gens=GENS,
-                                    rng=rng, use_outfit_fitness=True)
+                                    rng=rng)
     dt = time.time() - t0
     trajectories[arch] = {"mean": mean_t, "max": max_t}
     print(f"  done in {dt:.1f}s  mean {mean_t[0]:.3f}->{mean_t[-1]:.3f}  "

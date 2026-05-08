@@ -1088,8 +1088,7 @@ def _resolve_anchor(anchor_name: str, body_mesh,
     try:
         from anatomy import (front_clavicle_point as _front,
                               back_scapula_point as _scap,
-                              wrist_point, forearm_point, bicep_point,
-                              earlobe_point, ankle_point,
+                              wrist_point, earlobe_point, ankle_point,
                               belly_button_point, neck_front_point)
     except Exception:
         return None
@@ -1120,19 +1119,10 @@ def _resolve_anchor(anchor_name: str, body_mesh,
         p = (0.0, L.y_pelvis, +5.0)
     elif anchor_name == "crotch_back":
         p = (0.0, L.y_pelvis, -5.0)
-    # ---- v2 body-jewelry anchors ----
     elif anchor_name == "wrist_R":
         p = wrist_point(body_mesh, L, "R")
     elif anchor_name == "wrist_L":
         p = wrist_point(body_mesh, L, "L")
-    elif anchor_name == "forearm_R":
-        p = forearm_point(body_mesh, L, "R")
-    elif anchor_name == "forearm_L":
-        p = forearm_point(body_mesh, L, "L")
-    elif anchor_name == "bicep_R":
-        p = bicep_point(body_mesh, L, "R")
-    elif anchor_name == "bicep_L":
-        p = bicep_point(body_mesh, L, "L")
     elif anchor_name == "earlobe_R":
         p = earlobe_point(body_mesh, L, "R")
     elif anchor_name == "earlobe_L":

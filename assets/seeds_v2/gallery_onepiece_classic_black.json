@@ -67,11 +67,10 @@
         "library_id": "CUP_BALCONETTE_L",
         "local_params": {
           "half_u": 0.22,
-          "half_v": 0.16,
+          "half_v": 0.118,
           "inner_u": 0.095,
-          "apex_lift": 0.15,
-          "underband_dip": 0.0,
-          "center_v": 0.74
+          "apex_lift": 0.1,
+          "underband_dip": 0.0
         }
       },
       {
@@ -80,9 +79,9 @@
         "local_params": {
           "front_top_v": 0.5299999999999999,
           "front_half_u": 0.21,
-          "front_leg_curve": 0.65,
+          "front_leg_curve": 0.5,
           "back_top_v": 0.52,
-          "back_half_u": 0.18
+          "back_half_u": 0.2
         }
       },
       {

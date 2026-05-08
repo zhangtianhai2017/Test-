@@ -67,11 +67,10 @@
         "library_id": "CUP_BALCONETTE_L",
         "local_params": {
           "half_u": 0.2,
-          "half_v": 0.18,
+          "half_v": 0.118,
           "inner_u": 0.05,
-          "apex_lift": 0.15,
-          "underband_dip": 0.0,
-          "center_v": 0.74
+          "apex_lift": 0.1,
+          "underband_dip": 0.0
         }
       },
       {
@@ -80,9 +79,9 @@
         "local_params": {
           "front_top_v": 0.51,
           "front_half_u": 0.2,
-          "front_leg_curve": 0.65,
+          "front_leg_curve": 0.5,
           "back_top_v": 0.52,
-          "back_half_u": 0.18
+          "back_half_u": 0.2
         }
       },
       {
@@ -94,7 +93,7 @@
       },
       {
         "slot_name": "primary_fabric",
-        "library_id": "F_CROCHET_COTTON",
+        "library_id": "F_BIOPOLYMER_PLAIN",
         "local_params": {}
       },
       {
@@ -113,7 +112,7 @@
         "slot_name": "accessory",
         "library_id": "ACC_BEADS_OVAL_8MM",
         "local_params": {
-          "count": 12
+          "count": 12.0
         }
       }
     ],

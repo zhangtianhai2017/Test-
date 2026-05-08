@@ -66,22 +66,21 @@
         "slot_name": "cup",
         "library_id": "CUP_BALCONETTE_L",
         "local_params": {
-          "half_u": 0.3148099250515737,
-          "half_v": 0.706809801518452,
+          "half_u": 0.28319999999999995,
+          "half_v": 0.118,
           "inner_u": 0.095,
-          "apex_lift": 0.4333776243063717,
-          "underband_dip": 0.9323680006347871,
-          "center_v": 0.7770455708659328
+          "apex_lift": 0.1,
+          "underband_dip": 0.05
         }
       },
       {
         "slot_name": "bottom_front",
         "library_id": "BOT_THONG_M",
         "local_params": {
-          "front_top_v": 0.45999999999999996,
-          "front_half_u": 0.3053086402422291,
+          "front_top_v": 0.32,
+          "front_half_u": 0.2,
           "front_leg_curve": 0.6053413277097752,
-          "back_top_v": 0.6344971554524083,
+          "back_top_v": 0.3,
           "back_half_u": 0.06541404412088939
         }
       },
@@ -111,7 +110,7 @@
         "slot_name": "accessory",
         "library_id": "ACC_FRINGE_BEADED_80MM",
         "local_params": {
-          "length_cm": 4.422612068647425
+          "length_cm": 5.0
         }
       }
     ],

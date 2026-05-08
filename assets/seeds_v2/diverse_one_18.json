@@ -67,11 +67,10 @@
         "library_id": "CUP_BALCONETTE_L",
         "local_params": {
           "half_u": 0.24689535644320448,
-          "half_v": 0.9862557925465316,
+          "half_v": 0.118,
           "inner_u": 0.095,
-          "apex_lift": 0.12876467478738274,
-          "underband_dip": 0.9810110249927598,
-          "center_v": 0.79
+          "apex_lift": 0.1,
+          "underband_dip": 0.05
         }
       },
       {
@@ -80,9 +79,9 @@
         "local_params": {
           "front_top_v": 0.45999999999999996,
           "front_half_u": 0.22843521408422013,
-          "front_leg_curve": 0.6040915863798888,
-          "back_top_v": 0.7201062466825752,
-          "back_half_u": 0.7175645359020268
+          "front_leg_curve": 0.5,
+          "back_top_v": 0.55,
+          "back_half_u": 0.26
         }
       },
       {
@@ -122,7 +121,7 @@
       "secondary_hue": 0.5742591532812521,
       "secondary_saturation": 0.05320145532666787,
       "secondary_lightness": 0.6188059407313984,
-      "pattern_overlay": "tie_dye",
+      "pattern_overlay": "floral",
       "pattern_scale": 0.6987944216630626,
       "pattern_angle": 0.4361842503000628,
       "palette_preset": "ethereal_highlight"

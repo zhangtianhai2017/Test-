@@ -66,12 +66,11 @@
         "slot_name": "cup",
         "library_id": "CUP_BALCONETTE_L",
         "local_params": {
-          "half_u": 0.47462551594769187,
-          "half_v": 0.6647023138228251,
+          "half_u": 0.28319999999999995,
+          "half_v": 0.118,
           "inner_u": 0.095,
-          "apex_lift": 0.24323195894521643,
-          "underband_dip": 0.9278677618170751,
-          "center_v": 0.79
+          "apex_lift": 0.1,
+          "underband_dip": 0.05
         }
       },
       {
@@ -79,10 +78,10 @@
         "library_id": "BOT_HIGHWAIST_M",
         "local_params": {
           "front_top_v": 0.45999999999999996,
-          "front_half_u": 0.1917910227683643,
-          "front_leg_curve": 0.6598619669416579,
+          "front_half_u": 0.2,
+          "front_leg_curve": 0.5,
           "back_top_v": 0.5459188921251659,
-          "back_half_u": 0.5573684741780659
+          "back_half_u": 0.26
         }
       },
       {
@@ -99,7 +98,7 @@
         "slot_name": "accessory",
         "library_id": "ACC_BEADS_OVAL_8MM",
         "local_params": {
-          "count": 12
+          "count": 12.0
         }
       }
     ],
@@ -110,7 +109,7 @@
       "secondary_hue": 0.11584982692946921,
       "secondary_saturation": 0.03975576335376718,
       "secondary_lightness": 0.2024472664847018,
-      "pattern_overlay": "chevron",
+      "pattern_overlay": "stripe",
       "pattern_scale": 0.4196944787016213,
       "pattern_angle": 0.7466421477606437,
       "palette_preset": "ethereal_highlight"
