@@ -146,10 +146,12 @@ def mutate(outfit: Outfit, rng: random.Random,
     kept entries get gaussian local_params perturbation. global_design
     HSL gaussian σ=0.05; pattern_overlay resampled at p=0.04.
 
-    Bottom-piece resampling honors library.BOTTOM_COVERAGE_STRICT (filters
-    candidates to coverage_class=full at strict>=0.66)."""
+    Bottom- and cup-piece resampling honor library.BOTTOM_COVERAGE_STRICT
+    and library.CUP_COVERAGE_STRICT (drop low-coverage candidates at
+    strict>=0.33, keep only full-coverage at strict>=0.66)."""
     import library
-    strict = library.BOTTOM_COVERAGE_STRICT
+    bottom_strict = library.BOTTOM_COVERAGE_STRICT
+    cup_strict = library.CUP_COVERAGE_STRICT
     archetype = outfit.archetype
     slot_specs = {s.name: s for s in ARCHETYPE_SLOTS[archetype]}
     new_slot_assignments: list[SlotAssignment] = []
@@ -161,7 +163,9 @@ def mutate(outfit: Outfit, rng: random.Random,
         if rng.random() < p_id:
             candidates = entries_matching_slot(spec)
             if spec.kind == "bottom_piece":
-                candidates = library.filter_bottoms_by_coverage(candidates, strict)
+                candidates = library.filter_bottoms_by_coverage(candidates, bottom_strict)
+            elif spec.kind == "cup_piece":
+                candidates = library.filter_cups_by_coverage(candidates, cup_strict)
             if candidates:
                 chosen = rng.choice(candidates)
                 new_slot_assignments.append(SlotAssignment(

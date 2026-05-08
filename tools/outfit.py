@@ -83,8 +83,8 @@ class Outfit:
 # ---------------------------------------------------------------------------
 
 def _pin_to_max_coverage(entry: LibraryEntry, lp: dict) -> dict:
-    """At strict=1, force front_top_v / front_half_u / back_top_v / back_half_u
-    to schema MAX (most coverage). Other params keep their sample value."""
+    """At bottom strict=1, force front_top_v / front_half_u / back_top_v
+    / back_half_u to schema MAX (most coverage)."""
     schema = entry.local_params_schema or {}
     out = dict(lp)
     for k in ("front_top_v", "front_half_u", "back_top_v", "back_half_u"):
@@ -94,26 +94,48 @@ def _pin_to_max_coverage(entry: LibraryEntry, lp: dict) -> dict:
     return out
 
 
+def _pin_to_max_cup_coverage(entry: LibraryEntry, lp: dict) -> dict:
+    """At cup strict=1, pin half_u / half_v to schema MAX (wider, taller
+    cup) and inner_u to schema MIN (cups close in toward sternum, less
+    cleavage gap). Lift / underband_dip stay at their sampled values."""
+    schema = entry.local_params_schema or {}
+    out = dict(lp)
+    for k in ("half_u", "half_v"):
+        if k in schema:
+            _, hi, _ = schema[k]
+            out[k] = float(hi)
+    if "inner_u" in schema:
+        lo, _, _ = schema["inner_u"]
+        out["inner_u"] = float(lo)
+    return out
+
+
 def random_outfit(archetype: str, rng: Optional[random.Random] = None,
-                   bottom_coverage_strict: Optional[float] = None) -> Outfit:
+                   bottom_coverage_strict: Optional[float] = None,
+                   cup_coverage_strict: Optional[float] = None) -> Outfit:
     """Sample an Outfit by picking one library entry per slot. Required
     slots get filled; optional slots get filled with probability 0.5
     (or 0.3 for body_jewelry / accessory).
 
-    bottom_coverage_strict: 0..1 (None = use library.BOTTOM_COVERAGE_STRICT).
+    bottom_coverage_strict / cup_coverage_strict: 0..1 each (None = use
+    the corresponding library.* module global).
     """
     if archetype not in ARCHETYPE_SLOTS:
         raise ValueError(f"unknown archetype '{archetype}'")
     rng = rng or random.Random()
     import library
-    strict = library.BOTTOM_COVERAGE_STRICT if bottom_coverage_strict is None \
+    bottom_strict = library.BOTTOM_COVERAGE_STRICT if bottom_coverage_strict is None \
         else float(bottom_coverage_strict)
+    cup_strict = library.CUP_COVERAGE_STRICT if cup_coverage_strict is None \
+        else float(cup_coverage_strict)
 
     assignments: list[SlotAssignment] = []
     for spec in ARCHETYPE_SLOTS[archetype]:
         candidates = entries_matching_slot(spec)
         if spec.kind == "bottom_piece":
-            candidates = library.filter_bottoms_by_coverage(candidates, strict)
+            candidates = library.filter_bottoms_by_coverage(candidates, bottom_strict)
+        elif spec.kind == "cup_piece":
+            candidates = library.filter_cups_by_coverage(candidates, cup_strict)
         if not candidates:
             if spec.required:
                 raise RuntimeError(
@@ -129,19 +151,22 @@ def random_outfit(archetype: str, rng: Optional[random.Random] = None,
         chosen = rng.sample(candidates, n)
         for entry in chosen:
             lp = entry.sample_local_params(rng)
-            if spec.kind == "bottom_piece" and strict >= 0.66:
+            if spec.kind == "bottom_piece" and bottom_strict >= 0.66:
                 lp = _pin_to_max_coverage(entry, lp)
+            elif spec.kind == "cup_piece" and cup_strict >= 0.66:
+                lp = _pin_to_max_cup_coverage(entry, lp)
             assignments.append(SlotAssignment(
                 slot_name=spec.name,
                 library_id=entry.id,
                 local_params=lp,
             ))
 
-    # Resolve compatible_with constraints. If a chosen entry requires a
-    # partner that isn't already selected, prefer to drop the offending
-    # entry and resample from candidates whose compatible_with is already
-    # satisfied. This avoids the worst case (foam cups forcing foam
-    # laminate into the primary fabric slot — foam isn't a swim fabric).
+    # Resolve compatible_with constraints. Default policy: drop the
+    # offending entry and resample from candidates whose compatible_with
+    # is already satisfied (avoids foam laminate in primary_fabric).
+    # When cup_strict >= 0.66 the user explicitly chose a structured cup
+    # (molded foam needs foam laminate), so we respect that and override
+    # primary_fabric instead of swapping the cup back to a softer geom.
     archetype_slots = {s.name: s for s in ARCHETYPE_SLOTS[archetype]}
     selected_ids = {a.library_id for a in assignments}
     for a in list(assignments):
@@ -151,8 +176,15 @@ def random_outfit(archetype: str, rng: Optional[random.Random] = None,
         if set(entry.compatible_with) & selected_ids:
             continue
         spec = archetype_slots.get(a.slot_name)
-        if spec is not None:
-            alts = [c for c in entries_matching_slot(spec)
+        force_keep = (spec is not None and spec.kind == "cup_piece"
+                       and cup_strict >= 0.66)
+        if spec is not None and not force_keep:
+            same_slot = entries_matching_slot(spec)
+            if spec.kind == "cup_piece":
+                same_slot = library.filter_cups_by_coverage(same_slot, cup_strict)
+            elif spec.kind == "bottom_piece":
+                same_slot = library.filter_bottoms_by_coverage(same_slot, bottom_strict)
+            alts = [c for c in same_slot
                     if c.id != entry.id and (
                         not c.compatible_with
                         or set(c.compatible_with) & selected_ids)]
@@ -163,21 +195,37 @@ def random_outfit(archetype: str, rng: Optional[random.Random] = None,
                 selected_ids.discard(entry.id)
                 selected_ids.add(replacement.id)
                 continue
-        # No clean alternate; inject the partner. Fabric partners go to
-        # a real lining_fabric slot if the archetype has one, else
-        # 'auxiliary_<kind>' (will validate against O4 if no matching
-        # slot exists, surfacing the conflict instead of hiding it).
+        # No clean alternate (or strict cup forced us to keep): inject
+        # the partner. Fabric partners go to a real lining_fabric slot
+        # if the archetype has one; else under strict cup we override
+        # primary_fabric (foam laminate IS the right material for a
+        # molded cup), else fall back to 'auxiliary_<kind>' which the
+        # validator surfaces as an O4 conflict.
         req_id = entry.compatible_with[0]
         req_entry = LIBRARY.get(req_id)
         if req_entry is None:
             continue
         if "lining_fabric" in archetype_slots and req_entry.kind == "fabric":
-            slot_name = "lining_fabric"
+            existing = next((sa for sa in assignments
+                              if sa.slot_name == "lining_fabric"), None)
+            if existing is not None:
+                existing.library_id = req_id
+                existing.local_params = req_entry.sample_local_params(rng)
+            else:
+                assignments.append(SlotAssignment(
+                    slot_name="lining_fabric", library_id=req_id,
+                    local_params=req_entry.sample_local_params(rng)))
+        elif force_keep and req_entry.kind == "fabric":
+            for sa in assignments:
+                if sa.slot_name == "primary_fabric":
+                    sa.library_id = req_id
+                    sa.local_params = {}
+                    break
         else:
-            slot_name = f"auxiliary_{req_entry.kind}"
-        assignments.append(SlotAssignment(
-            slot_name=slot_name, library_id=req_id,
-            local_params=req_entry.sample_local_params(rng)))
+            assignments.append(SlotAssignment(
+                slot_name=f"auxiliary_{req_entry.kind}",
+                library_id=req_id,
+                local_params=req_entry.sample_local_params(rng)))
         selected_ids.add(req_id)
 
     # Random global_design
@@ -638,16 +686,20 @@ def outfit_to_genome(outfit: Outfit):
 
 
 def genome_to_outfit(genome,
-                       bottom_coverage_strict: Optional[float] = None) -> Outfit:
+                       bottom_coverage_strict: Optional[float] = None,
+                       cup_coverage_strict: Optional[float] = None) -> Outfit:
     """Snap a legacy Genome to the closest library entries per slot.
     Used for v1 → v2 seed migration. Picks archetype via the same
     dispatch rule as garment_state._detect_archetype.
 
-    bottom_coverage_strict (None = library.BOTTOM_COVERAGE_STRICT) forces
-    full-coverage bottoms regardless of the source genome's coverage."""
+    bottom_coverage_strict / cup_coverage_strict (None = use the
+    corresponding library.* module global) force full-coverage choices
+    regardless of what the source genome's coverage looked like."""
     import library
     strict = library.BOTTOM_COVERAGE_STRICT if bottom_coverage_strict is None \
         else float(bottom_coverage_strict)
+    cup_strict = library.CUP_COVERAGE_STRICT if cup_coverage_strict is None \
+        else float(cup_coverage_strict)
     cup_bottom = genome.top_center_v - genome.top_half_v
     if genome.top_back_coverage > 0.7 and genome.bot_front_top_v > cup_bottom - 0.15:
         archetype = "one_piece_maillot"
@@ -685,18 +737,30 @@ def genome_to_outfit(genome,
         ("bandeau", "M"): "CUP_BANDEAU_M",
         ("bandeau", "L"): "CUP_BANDEAU_L",
     }
-    cup_id = cup_id_map.get((cup_geo, sz), "CUP_TRIANGLE_M")
+    # Cup modesty override: if cup_strict pushes toward higher coverage,
+    # pick a sturdier geometry the archetype's slot tags still allow.
+    cup_slot_spec = next(s for s in slots if s.name == "cup")
+    cup_allowed = cup_slot_spec.allowed_tags or ()
+    if cup_strict >= 0.66 and (not cup_allowed or "molded_foam" in cup_allowed):
+        cup_id = f"CUP_FOAM_MOLDED_{sz}"
+    elif cup_strict >= 0.33 and (not cup_allowed or "balconette" in cup_allowed):
+        cup_id = f"CUP_BALCONETTE_{sz}"
+    elif cup_strict >= 0.33 and (not cup_allowed or "bandeau" in cup_allowed):
+        cup_id = f"CUP_BANDEAU_{sz}"
+    else:
+        cup_id = cup_id_map.get((cup_geo, sz), "CUP_TRIANGLE_M")
+    cup_lp = {
+        "half_u": genome.top_half_u,
+        "half_v": genome.top_half_v,
+        "inner_u": genome.top_inner_u,
+        "apex_lift": genome.top_apex_lift,
+        "underband_dip": genome.top_underband_dip,
+        "center_v": genome.top_center_v,
+    }
+    if cup_strict >= 0.66 and cup_id in LIBRARY:
+        cup_lp = _pin_to_max_cup_coverage(LIBRARY[cup_id], cup_lp)
     assignments.append(SlotAssignment(
-        slot_name="cup", library_id=cup_id,
-        local_params={
-            "half_u": genome.top_half_u,
-            "half_v": genome.top_half_v,
-            "inner_u": genome.top_inner_u,
-            "apex_lift": genome.top_apex_lift,
-            "underband_dip": genome.top_underband_dip,
-            "center_v": genome.top_center_v,
-        },
-    ))
+        slot_name="cup", library_id=cup_id, local_params=cup_lp))
 
     # Bottom: pick by coverage — but obey archetype's allowed_tags so a
     # triangle_string_halter never gets a high_waisted bottom.

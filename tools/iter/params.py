@@ -57,9 +57,10 @@ class IterParams:
     # callers carry slot-level library choices + body jewelry that
     # doesn't fit in the legacy 44-dim Genome.
     outfit: object = None
-    # Modesty constraint forwarded to library.BOTTOM_COVERAGE_STRICT
-    # before each render. 0=any bottom, 1=full coverage only.
+    # Modesty constraints forwarded to library.{BOTTOM,CUP}_COVERAGE_STRICT
+    # before each render. 0=unconstrained, 1=force full coverage.
     bottom_coverage_strict: float = 0.0
+    cup_coverage_strict: float = 0.0
     # Per-Genome overrides applied on top of the seed Genome.
     genome_patch: dict = field(default_factory=dict)
 

@@ -68,11 +68,27 @@ from typing import Any, Optional
 # all sampling/migration/GA respect it; functions also accept a kwarg.
 BOTTOM_COVERAGE_STRICT: float = 0.0
 
+# Modesty constraint applied to cup_piece selection.
+#   0.0 — unconstrained: any cup_piece allowed_tags lets through
+#   0.33+ — drop pure triangle (minimal); prefer balconette/bandeau/molded
+#   0.66+ — only molded_foam / softcup; falls back to balconette/bandeau
+#           if archetype's slot tags don't allow molded
+#   1.0 — strict: same as 0.66+ plus cup-coverage local_params pinned
+#         (half_u/half_v to schema max, inner_u to schema min so the
+#         cups close in toward the sternum)
+CUP_COVERAGE_STRICT: float = 0.0
+
 
 def set_bottom_coverage_strict(value: float) -> None:
-    """Set the global modesty constraint. See BOTTOM_COVERAGE_STRICT."""
+    """Set the global bottom modesty constraint. See BOTTOM_COVERAGE_STRICT."""
     global BOTTOM_COVERAGE_STRICT
     BOTTOM_COVERAGE_STRICT = max(0.0, min(1.0, float(value)))
+
+
+def set_cup_coverage_strict(value: float) -> None:
+    """Set the global cup modesty constraint. See CUP_COVERAGE_STRICT."""
+    global CUP_COVERAGE_STRICT
+    CUP_COVERAGE_STRICT = max(0.0, min(1.0, float(value)))
 
 
 def filter_bottoms_by_coverage(candidates, strict: float):
@@ -85,6 +101,30 @@ def filter_bottoms_by_coverage(candidates, strict: float):
         return candidates
     full = [c for c in candidates if c.coverage_class == "full"]
     medium = [c for c in candidates if c.coverage_class == "medium"]
+    if strict >= 0.66:
+        return full or medium or candidates
+    if strict >= 0.33:
+        return (full + medium) or candidates
+    return candidates
+
+
+# Cup coverage tiers driven by geometry_kind. cup_piece entries don't
+# carry a coverage_class field, so we map by shape: molded foam
+# physically wraps the most fabric, balconette/bandeau cover wide,
+# triangle is the bare minimum.
+_CUP_FULL_GEOS = ("molded_foam", "softcup_squareneck")
+_CUP_MEDIUM_GEOS = ("balconette", "bandeau_unified", "bandeau")
+
+
+def filter_cups_by_coverage(candidates, strict: float):
+    """Drop cup_piece entries whose geometry_kind is below the threshold
+    implied by `strict`. Falls back through full → medium → all so an
+    archetype whose slot tags don't include molded foam (e.g. pure
+    triangle_string_halter) still returns its highest available tier."""
+    if strict <= 0:
+        return candidates
+    full = [c for c in candidates if c.geometry_kind in _CUP_FULL_GEOS]
+    medium = [c for c in candidates if c.geometry_kind in _CUP_MEDIUM_GEOS]
     if strict >= 0.66:
         return full or medium or candidates
     if strict >= 0.33:
@@ -254,6 +294,7 @@ ARCHETYPE_SLOTS: dict[str, list[SlotSpec]] = {
         SlotSpec("back_band",      "strap_piece",
                   allowed_tags=("back_band",)),
         SlotSpec("primary_fabric", "fabric", excluded_tags=("foam","powermesh","lining","padding")),
+        SlotSpec("lining_fabric",  "fabric", required=False),
         SlotSpec("seam_type",      "seam_type",   required=False),
         SlotSpec("accessory",      "accessory",   required=False, max_count=2),
         SlotSpec("body_jewelry",   "body_jewelry", required=False, max_count=3),
@@ -271,6 +312,7 @@ ARCHETYPE_SLOTS: dict[str, list[SlotSpec]] = {
         SlotSpec("slider",         "hardware", required=False,
                   allowed_tags=("slider",)),
         SlotSpec("primary_fabric", "fabric", excluded_tags=("foam","powermesh","lining","padding")),
+        SlotSpec("lining_fabric",  "fabric", required=False),
         SlotSpec("seam_type",      "seam_type",   required=False),
         SlotSpec("accessory",      "accessory",   required=False, max_count=2),
         SlotSpec("body_jewelry",   "body_jewelry", required=False, max_count=3),

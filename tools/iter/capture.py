@@ -113,10 +113,11 @@ def render_views(genome: Genome, params, out_dir: str,
     body_mesh.triangle_uvs = o3d.utility.Vector2dVector(body_uvs)
     yc, yn = torso_anchors(body_mesh)
 
-    # Forward modesty constraint to the library before any sampling /
+    # Forward modesty constraints to the library before any sampling /
     # migration in this render fires.
     import library as _library
     _library.set_bottom_coverage_strict(params.bottom_coverage_strict)
+    _library.set_cup_coverage_strict(params.cup_coverage_strict)
 
     # Prefer Outfit → Garment when params.outfit is set (carries body
     # jewelry + slot-level library entries); fall back to genome →
