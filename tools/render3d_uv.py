@@ -1989,10 +1989,8 @@ def _build_strap_meshes_garment(body_mesh,
 
     # 9) Accessories — bow / shell_charm / pendant / fringe / beads / tassel /
     #    ring_charm. Each maps to one of the existing _build_*_mesh helpers
-    #    (which take Genome) — we forward to those. v1 keeps existing
-    #    geometry; v2 mainly classifies materials & tracks SKU IDs.
+    #    (which take Genome) — we forward to those.
     for acc in garment.accessories:
-        atts = atts_for.get(acc.id, [])
         if acc.kind == "bow":
             straps.extend(_build_bow_mesh(g, V, v_to_y))
         elif acc.kind == "fringe":
@@ -2001,9 +1999,15 @@ def _build_strap_meshes_garment(body_mesh,
             straps.extend(_build_beads_meshes(g, V, v_to_y))
         elif acc.kind == "shell_charm":
             straps.extend(_build_shell_mesh(g, V, v_to_y))
-        # pendant / tassel / ring_charm — accept v2 minimal placeholder via
-        # reusing fringe / shell builders' anchor logic; defer dedicated
-        # geometry to v2.5.
+
+    # 10) Body jewelry (v2 — bracelets, necklaces, earrings, anklets,
+    # body chains). Each library entry resolves through BodyDeployment to
+    # a 3D anchor (wrist_R / earlobe_R / ankle_R / neck_front / belly_button)
+    # and then routes to a small mesh primitive. No geometry if the
+    # deployment didn't resolve the entry's anchors.
+    if body_deployment is not None:
+        straps.extend(_build_body_jewelry_meshes(body_mesh, garment,
+                                                    body_deployment))
 
     return straps
 
@@ -2144,3 +2148,219 @@ def build_seam_lines_for_garment(shell: o3d.geometry.TriangleMesh,
         merged += m
     merged.compute_vertex_normals()
     return merged
+
+
+# ---------------------------------------------------------------------------
+# v2 body jewelry — bracelets, necklaces, earrings, anklets, body chains.
+# Built from library entries (kind=body_jewelry) routed via the
+# corresponding anatomy_anchor in the BodyDeployment.
+# ---------------------------------------------------------------------------
+
+def _bracelet_mesh(anchor_xyz: np.ndarray, side_sign: int,
+                    diameter_cm: float = 6.5,
+                    tube_r: float = 0.20) -> o3d.geometry.TriangleMesh:
+    """Bracelet = torus around the arm, axis aligned with the arm
+    direction. For a T-pose body that's the X axis, so the torus
+    naturally has its axis = X. _build_torus default axis is Y; we
+    rotate to align with X."""
+    torus = _build_torus(major_r=diameter_cm * 0.5,
+                          minor_r=tube_r, major_seg=24, minor_seg=8)
+    # Rotate Y axis -> X axis (pi/2 around Z)
+    R = torus.get_rotation_matrix_from_xyz((0.0, 0.0, np.pi / 2))
+    torus.rotate(R, center=(0.0, 0.0, 0.0))
+    torus.translate(anchor_xyz.tolist())
+    torus.compute_vertex_normals()
+    return torus
+
+
+def _anklet_mesh(anchor_xyz: np.ndarray,
+                  diameter_cm: float = 8.5,
+                  tube_r: float = 0.18) -> o3d.geometry.TriangleMesh:
+    """Anklet = torus around the leg, axis = Y (legs are vertical)."""
+    torus = _build_torus(major_r=diameter_cm * 0.5,
+                          minor_r=tube_r, major_seg=24, minor_seg=8)
+    torus.translate(anchor_xyz.tolist())
+    torus.compute_vertex_normals()
+    return torus
+
+
+def _necklace_choker_mesh(anchor_xyz: np.ndarray,
+                            radius_cm: float = 7.0,
+                            tube_r: float = 0.15) -> o3d.geometry.TriangleMesh:
+    """Choker = small torus around the neck, axis = Y. Anchored at
+    neck_front, but the torus is centered slightly behind so it wraps
+    the neck cylinder."""
+    torus = _build_torus(major_r=radius_cm,
+                          minor_r=tube_r, major_seg=24, minor_seg=6)
+    # Pull center slightly back from neck_front anchor
+    center = anchor_xyz + np.array([0.0, 0.0, -3.0])
+    torus.translate(center.tolist())
+    torus.compute_vertex_normals()
+    return torus
+
+
+def _necklace_pendant_mesh(anchor_xyz: np.ndarray,
+                             chain_radius_cm: float = 8.0,
+                             pendant_size_cm: float = 1.2,
+                             tube_r: float = 0.10
+                             ) -> o3d.geometry.TriangleMesh:
+    """Pendant necklace = thin loop around neck + small drop at the
+    front center of the chain, dropped chain_radius_cm/4 below."""
+    chain = _build_torus(major_r=chain_radius_cm,
+                          minor_r=tube_r, major_seg=28, minor_seg=5)
+    center = anchor_xyz + np.array([0.0, 0.0, -3.0])
+    chain.translate(center.tolist())
+    drop = o3d.geometry.TriangleMesh.create_sphere(
+        radius=pendant_size_cm * 0.5, resolution=10)
+    drop.translate((anchor_xyz + np.array([0.0, -3.0, 1.0])).tolist())
+    out = chain + drop
+    out.compute_vertex_normals()
+    return out
+
+
+def _earring_drop_mesh(anchor_xyz: np.ndarray,
+                        length_cm: float = 2.5
+                        ) -> o3d.geometry.TriangleMesh:
+    """Drop earring = small sphere at earlobe + a slim cylinder hanging
+    below."""
+    stud = o3d.geometry.TriangleMesh.create_sphere(radius=0.25, resolution=8)
+    stud.translate(anchor_xyz.tolist())
+    drop = o3d.geometry.TriangleMesh.create_cylinder(
+        radius=0.15, height=length_cm, resolution=8)
+    # cylinder default axis is Z; rotate to Y (vertical hanging) and
+    # translate down from the earlobe.
+    R = drop.get_rotation_matrix_from_xyz((np.pi / 2, 0.0, 0.0))
+    drop.rotate(R, center=(0.0, 0.0, 0.0))
+    drop.translate((anchor_xyz + np.array([0.0, -length_cm * 0.5 - 0.4, 0.0])).tolist())
+    out = stud + drop
+    out.compute_vertex_normals()
+    return out
+
+
+def _earring_stud_mesh(anchor_xyz: np.ndarray,
+                        size_cm: float = 0.6) -> o3d.geometry.TriangleMesh:
+    stud = o3d.geometry.TriangleMesh.create_sphere(
+        radius=size_cm * 0.5, resolution=10)
+    stud.translate(anchor_xyz.tolist())
+    stud.compute_vertex_normals()
+    return stud
+
+
+def _body_chain_waist_mesh(belly_anchor: np.ndarray,
+                             waist_circumference_cm: float = 75.0,
+                             tube_r: float = 0.15
+                             ) -> o3d.geometry.TriangleMesh:
+    """Waist body chain = thin horizontal torus around the body at
+    belly_button height, axis = Y."""
+    radius = waist_circumference_cm / (2 * np.pi)
+    torus = _build_torus(major_r=radius, minor_r=tube_r,
+                          major_seg=36, minor_seg=5)
+    # Center at the body's central axis at belly button height
+    torus.translate((0.0, float(belly_anchor[1]), 0.0))
+    torus.compute_vertex_normals()
+    return torus
+
+
+def _body_chain_belly_mesh(belly_anchor: np.ndarray,
+                             tube_r: float = 0.12
+                             ) -> o3d.geometry.TriangleMesh:
+    """Belly body chain = waist loop + a thin vertical drop chain from
+    the waist to the navel."""
+    waist = _body_chain_waist_mesh(belly_anchor + np.array([0.0, 4.0, 0.0]),
+                                      waist_circumference_cm=75.0,
+                                      tube_r=tube_r)
+    drop = o3d.geometry.TriangleMesh.create_cylinder(
+        radius=tube_r, height=4.5, resolution=8)
+    R = drop.get_rotation_matrix_from_xyz((np.pi / 2, 0.0, 0.0))
+    drop.rotate(R, center=(0.0, 0.0, 0.0))
+    drop.translate((belly_anchor + np.array([0.0, 1.5, 0.5])).tolist())
+    out = waist + drop
+    out.compute_vertex_normals()
+    return out
+
+
+def _build_body_jewelry_meshes(body_mesh, garment, body_deployment
+                                  ) -> list[tuple[str, o3d.geometry.TriangleMesh]]:
+    """Walk garment.accessories looking for body_jewelry kinds and emit
+    geometry per the corresponding library entry."""
+    if body_deployment is None:
+        return []
+    try:
+        from library_data import LIBRARY
+    except Exception:
+        return []
+
+    out: list[tuple[str, o3d.geometry.TriangleMesh]] = []
+    for acc in garment.accessories:
+        entry = LIBRARY.get(acc.id)
+        if entry is None or entry.kind != "body_jewelry":
+            continue
+        if acc.id not in body_deployment.valid_accessory_ids:
+            continue
+        # find the resolved anchor 3D position from any of the entry's anatomy_hints
+        anchor_xyz = None
+        for att in garment.attachments:
+            if (att.component_kind == "accessory" and att.component_id == acc.id
+                    and att.id in body_deployment.resolved_anchors):
+                p = body_deployment.resolved_anchors[att.id]
+                if p is None:
+                    continue
+                anchor_xyz = np.array(p, dtype=np.float64)
+                break
+        if anchor_xyz is None:
+            continue
+
+        form = entry.jewelry_form
+        diam = float(entry.local_params_schema.get(
+            "diameter_cm", (5.0, 10.0, acc.size_cm))[2])
+        if form == "bracelet_chain" or form == "bracelet_beaded":
+            side = +1 if anchor_xyz[0] > 0 else -1
+            mesh = _bracelet_mesh(anchor_xyz, side_sign=side,
+                                    diameter_cm=diam, tube_r=0.20)
+            out.append((f"jewelry_{entry.id}", mesh))
+        elif form == "necklace_choker":
+            mesh = _necklace_choker_mesh(anchor_xyz, radius_cm=7.0,
+                                            tube_r=0.15)
+            out.append((f"jewelry_{entry.id}", mesh))
+        elif form == "necklace_pendant":
+            chain_r = float(entry.local_params_schema.get(
+                "chain_length_cm", (40.0, 55.0, 45.0))[2]) / (2 * np.pi)
+            mesh = _necklace_pendant_mesh(anchor_xyz, chain_radius_cm=chain_r,
+                                             pendant_size_cm=1.4)
+            out.append((f"jewelry_{entry.id}", mesh))
+        elif form == "earring_drop":
+            length = float(entry.local_params_schema.get(
+                "length_cm", (1.5, 4.0, 2.5))[2])
+            mesh = _earring_drop_mesh(anchor_xyz, length_cm=length)
+            out.append((f"jewelry_{entry.id}_R", mesh))
+            # Mirror to the other earlobe by negating X
+            mirror = _earring_drop_mesh(
+                np.array([-anchor_xyz[0], anchor_xyz[1], anchor_xyz[2]]),
+                length_cm=length)
+            out.append((f"jewelry_{entry.id}_L", mirror))
+        elif form == "earring_stud":
+            size = float(entry.local_params_schema.get(
+                "size_cm", (0.4, 1.0, 0.6))[2])
+            out.append((f"jewelry_{entry.id}_R",
+                          _earring_stud_mesh(anchor_xyz, size_cm=size)))
+            out.append((f"jewelry_{entry.id}_L",
+                          _earring_stud_mesh(np.array([-anchor_xyz[0], anchor_xyz[1], anchor_xyz[2]]),
+                                              size_cm=size)))
+        elif form == "body_chain_waist":
+            length = float(entry.local_params_schema.get(
+                "length_cm", (60.0, 90.0, 75.0))[2])
+            mesh = _body_chain_waist_mesh(anchor_xyz,
+                                            waist_circumference_cm=length)
+            out.append((f"jewelry_{entry.id}", mesh))
+        elif form == "body_chain_belly":
+            mesh = _body_chain_belly_mesh(anchor_xyz)
+            out.append((f"jewelry_{entry.id}", mesh))
+        elif form in ("anklet_chain", "anklet_charm"):
+            side = +1 if anchor_xyz[0] > 0 else -1
+            mesh = _anklet_mesh(anchor_xyz, diameter_cm=diam, tube_r=0.15)
+            out.append((f"jewelry_{entry.id}_R", mesh))
+            mirror = _anklet_mesh(
+                np.array([-anchor_xyz[0], anchor_xyz[1], anchor_xyz[2]]),
+                diameter_cm=diam, tube_r=0.15)
+            out.append((f"jewelry_{entry.id}_L", mirror))
+    return out

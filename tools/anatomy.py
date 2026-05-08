@@ -233,6 +233,120 @@ def back_scapula_point(body_mesh: o3d.geometry.TriangleMesh,
 
 
 # ---------------------------------------------------------------------------
+# Extended body-jewelry anchors (v2)
+#
+# These resolve named anchors used by body_jewelry / accessory library
+# entries: wrist / forearm / bicep (arm chain), earlobe (earrings),
+# ankle (anklet), belly_button (body chain), neck_front (necklace).
+# ---------------------------------------------------------------------------
+
+def _arm_anchor(body_mesh: o3d.geometry.TriangleMesh,
+                landmarks: AnatomyLandmarks,
+                side: str, fraction_from_shoulder: float
+                ) -> np.ndarray:
+    """Pick a vertex on the laterally-extended arm at a given fraction
+    along the shoulder→hand line. fraction=0 ≈ deltoid (acromion lateral),
+    fraction=1 ≈ hand tip. Wrist ≈ 0.85, forearm-mid ≈ 0.65, bicep ≈ 0.30."""
+    V = np.asarray(body_mesh.vertices)
+    y = V[:, 1]
+    sign = +1 if side == "R" else -1
+    # Hand tip = vertex with most extreme |x| anywhere
+    abs_x = np.abs(V[:, 0])
+    hand_idx = int(np.argmax(abs_x))
+    hand_x = V[hand_idx, 0]
+    hand_y = V[hand_idx, 1]
+    # Shoulder lateral (deltoid) = at acromion height
+    shoulder_x = sign * landmarks.deltoid_radius_xz
+    shoulder_y = landmarks.y_acromion
+    target_x = shoulder_x + fraction_from_shoulder * (sign * abs(hand_x) - shoulder_x)
+    target_y = shoulder_y + fraction_from_shoulder * (hand_y - shoulder_y)
+    # Pick the body vertex closest to (target_x, target_y) on the right side
+    candidates_idx = np.where((np.sign(V[:, 0]) == sign)
+                                & (np.abs(V[:, 0]) > 8))[0]
+    if len(candidates_idx) == 0:
+        return np.array([target_x, target_y, 0.0], dtype=np.float64)
+    cand = V[candidates_idx]
+    d2 = (cand[:, 0] - target_x) ** 2 + (cand[:, 1] - target_y) ** 2
+    return cand[int(np.argmin(d2))].astype(np.float64)
+
+
+def wrist_point(body_mesh, landmarks, side: str = "R") -> np.ndarray:
+    return _arm_anchor(body_mesh, landmarks, side, fraction_from_shoulder=0.85)
+
+
+def forearm_point(body_mesh, landmarks, side: str = "R") -> np.ndarray:
+    return _arm_anchor(body_mesh, landmarks, side, fraction_from_shoulder=0.65)
+
+
+def bicep_point(body_mesh, landmarks, side: str = "R") -> np.ndarray:
+    return _arm_anchor(body_mesh, landmarks, side, fraction_from_shoulder=0.30)
+
+
+def earlobe_point(body_mesh: o3d.geometry.TriangleMesh,
+                   landmarks: AnatomyLandmarks,
+                   side: str = "R") -> np.ndarray:
+    """Lateral edge of head at ~70% of head height."""
+    V = np.asarray(body_mesh.vertices)
+    sign = +1 if side == "R" else -1
+    # Head Y window: from neck_base + 4 cm to head_top - 5 cm
+    y_lo = landmarks.y_neck_base + 4.0
+    y_hi = landmarks.y_head_top - 5.0
+    mask = ((V[:, 1] > y_lo) & (V[:, 1] < y_hi) & (np.sign(V[:, 0]) == sign))
+    cands = V[mask]
+    if len(cands) == 0:
+        return np.array([sign * 8.5, (y_lo + y_hi) * 0.5, 0.0], dtype=np.float64)
+    # Most lateral on the chosen side
+    return cands[int(np.argmax(sign * cands[:, 0]))].astype(np.float64)
+
+
+def ankle_point(body_mesh: o3d.geometry.TriangleMesh,
+                 landmarks: AnatomyLandmarks,
+                 side: str = "R") -> np.ndarray:
+    """Ankle ≈ a few cm above the foot (near body Y minimum)."""
+    V = np.asarray(body_mesh.vertices)
+    y = V[:, 1]
+    y_lo = float(np.percentile(y, 1))
+    sign = +1 if side == "R" else -1
+    mask = ((y > y_lo + 2.0) & (y < y_lo + 12.0) & (np.sign(V[:, 0]) == sign))
+    cands = V[mask]
+    if len(cands) == 0:
+        return np.array([sign * 13.0, y_lo + 7.0, 0.0], dtype=np.float64)
+    # Pick vert closest to centroid of the chosen-side leg slab
+    cx = float(np.mean(cands[:, 0]))
+    d2 = (cands[:, 0] - cx) ** 2
+    return cands[int(np.argmin(d2))].astype(np.float64)
+
+
+def belly_button_point(body_mesh: o3d.geometry.TriangleMesh,
+                         landmarks: AnatomyLandmarks) -> np.ndarray:
+    """Belly button: front center between pelvis and axilla."""
+    V = np.asarray(body_mesh.vertices)
+    y_target = (landmarks.y_pelvis + landmarks.y_axilla) * 0.5
+    mask = ((V[:, 1] > y_target - 1.5) & (V[:, 1] < y_target + 1.5)
+            & (np.abs(V[:, 0]) < 3.0) & (V[:, 2] > 0.0))
+    cands = V[mask]
+    if len(cands) == 0:
+        return np.array([0.0, y_target, 7.0], dtype=np.float64)
+    # Most-forward (max z) closest to center
+    score = cands[:, 2] - np.abs(cands[:, 0]) * 0.5
+    return cands[int(np.argmax(score))].astype(np.float64)
+
+
+def neck_front_point(body_mesh: o3d.geometry.TriangleMesh,
+                       landmarks: AnatomyLandmarks) -> np.ndarray:
+    """Front of neck — between collar bones, just below jaw."""
+    V = np.asarray(body_mesh.vertices)
+    y_target = landmarks.y_neck_base + 2.0
+    mask = ((V[:, 1] > y_target - 1.5) & (V[:, 1] < y_target + 1.5)
+            & (np.abs(V[:, 0]) < 4.0) & (V[:, 2] > 0.0))
+    cands = V[mask]
+    if len(cands) == 0:
+        return np.array([0.0, y_target, 4.0], dtype=np.float64)
+    score = cands[:, 2] - np.abs(cands[:, 0]) * 0.5
+    return cands[int(np.argmax(score))].astype(np.float64)
+
+
+# ---------------------------------------------------------------------------
 # Named body regions — the second leg of the cascaded latent stack
 # (Genome → Garment → BodyDeployment → mesh). A BodyRegion classifies
 # any 3D point on the body into a coarse anatomical zone, which is the

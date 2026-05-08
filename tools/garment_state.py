@@ -1087,7 +1087,10 @@ def _resolve_anchor(anchor_name: str, body_mesh,
     isn't known."""
     try:
         from anatomy import (front_clavicle_point as _front,
-                              back_scapula_point as _scap)
+                              back_scapula_point as _scap,
+                              wrist_point, forearm_point, bicep_point,
+                              earlobe_point, ankle_point,
+                              belly_button_point, neck_front_point)
     except Exception:
         return None
     L = anatomy_landmarks
@@ -1103,12 +1106,13 @@ def _resolve_anchor(anchor_name: str, body_mesh,
         p = (0.0, L.y_neck_base - 1.0, -3.0)
     elif anchor_name == "neck_base_front":
         p = (0.0, L.y_neck_base - 1.0, +3.0)
+    elif anchor_name == "neck_front":
+        p = neck_front_point(body_mesh, L)
     elif anchor_name == "sternum":
         p = (0.0, (L.y_axilla + L.y_acromion) * 0.5, +5.0)
-    elif anchor_name == "navel":
-        p = (0.0, L.y_pelvis + 0.6 * (L.y_axilla - L.y_pelvis), +6.0)
+    elif anchor_name == "navel" or anchor_name == "belly_button":
+        p = belly_button_point(body_mesh, L)
     elif anchor_name == "hip_R":
-        # waist-side at u=+0.5; approximate with body radius
         p = (+L.waist_radius_xz, L.y_pelvis + 4.0, 0.0)
     elif anchor_name == "hip_L":
         p = (-L.waist_radius_xz, L.y_pelvis + 4.0, 0.0)
@@ -1116,6 +1120,27 @@ def _resolve_anchor(anchor_name: str, body_mesh,
         p = (0.0, L.y_pelvis, +5.0)
     elif anchor_name == "crotch_back":
         p = (0.0, L.y_pelvis, -5.0)
+    # ---- v2 body-jewelry anchors ----
+    elif anchor_name == "wrist_R":
+        p = wrist_point(body_mesh, L, "R")
+    elif anchor_name == "wrist_L":
+        p = wrist_point(body_mesh, L, "L")
+    elif anchor_name == "forearm_R":
+        p = forearm_point(body_mesh, L, "R")
+    elif anchor_name == "forearm_L":
+        p = forearm_point(body_mesh, L, "L")
+    elif anchor_name == "bicep_R":
+        p = bicep_point(body_mesh, L, "R")
+    elif anchor_name == "bicep_L":
+        p = bicep_point(body_mesh, L, "L")
+    elif anchor_name == "earlobe_R":
+        p = earlobe_point(body_mesh, L, "R")
+    elif anchor_name == "earlobe_L":
+        p = earlobe_point(body_mesh, L, "L")
+    elif anchor_name == "ankle_R":
+        p = ankle_point(body_mesh, L, "R")
+    elif anchor_name == "ankle_L":
+        p = ankle_point(body_mesh, L, "L")
     else:
         return None
     return (float(p[0]), float(p[1]), float(p[2]))
