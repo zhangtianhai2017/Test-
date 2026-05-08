@@ -25,3 +25,6 @@ _Top: [`tools/output/`](../README.md)_
 
 - [`1135_v2_strict_both_max/`](1135_v2_strict_both_max/README.md) — 16 seed dirs · 129 images
   <br/><a href='1135_v2_strict_both_max/README.md'><img src='1135_v2_strict_both_max/overview.png' width='280'/></a>
+
+- [`1238_v2_tieside_series/`](1238_v2_tieside_series/README.md) — 12 seed dirs · 97 images
+  <br/><a href='1238_v2_tieside_series/README.md'><img src='1238_v2_tieside_series/overview.png' width='280'/></a>
