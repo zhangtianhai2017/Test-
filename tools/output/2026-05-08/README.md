@@ -19,3 +19,6 @@ _Top: [`tools/output/`](../README.md)_
 - [`0755_v2_fixes_verify/`](0755_v2_fixes_verify/README.md) — 0 seed dirs · 0 images
 
 - [`0823_v2_cup_strict_verify/`](0823_v2_cup_strict_verify/README.md) — 0 seed dirs · 0 images
+
+- [`1021_v2_pure_random/`](1021_v2_pure_random/README.md) — 16 seed dirs · 129 images
+  <br/><a href='1021_v2_pure_random/README.md'><img src='1021_v2_pure_random/overview.png' width='280'/></a>
