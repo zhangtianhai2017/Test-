@@ -1784,36 +1784,17 @@ def _build_strap_meshes_garment(body_mesh,
         waist_band = _build_band_mesh(ring2, 1.5, offset=0.5)
         straps.append(("waist_band", waist_band))
 
-    # 3a) Hip side-band — structural fabric strip bridging the
-    # front_bottom and back_bottom panels at each hip. Without this,
-    # the two pattern pieces appear floating with a gap of bare hip
-    # between them. Drawn whenever both pieces are present, regardless
-    # of archetype (one_piece, bralette, bandeau, triangle all wear
-    # bottoms whose front and back must be sewn together at the hip).
-    has_front_bot = any(p.id == "bottom_front" for p in garment.pieces)
-    has_back_bot = any(p.id.startswith("bottom_back_") for p in garment.pieces)
-    if has_front_bot and has_back_bot:
-        y_front = v_to_y(g.bot_front_top_v)
-        y_back = v_to_y(g.bot_back_top_v)
-        y_hip_lo = min(y_front, y_back) - 1.5
-        y_hip_hi = max(y_front, y_back) + 1.5
-        # Band width scales with the bottom's hip half_u — wider hip
-        # coverage => wider visible side band. Floor of 1.0 cm so it's
-        # always at least a noticeable strip even on minimal bottoms.
-        band_half_w = max(1.0, 12.0 * float(g.bot_back_half_u))
-        for u_side, name in [(0.5, "hip_band_R"), (-0.5, "hip_band_L")]:
-            band = _build_tie_mesh(V, y_hip_lo, y_hip_hi, u_side,
-                                    band_offset=0.4,
-                                    half_width_cm=band_half_w)
-            straps.append((name, band))
-
-    # 3b) Side ties — emit only if a tie_string connector has an
-    # attachment to hip_R / hip_L. Each side tie corresponds to a
-    # specific anatomy_anchor — we draw only the anchored sides.
+    # 3) Hip-side connector — a thin cord / ribbon / elastic strap
+    # holding the front and back bottom panels together at the hip.
+    # Optional style element: rendered only when an outfit slot
+    # (side_tie / hip_strap) routed a connector to hip_R / hip_L.
+    # Width comes from the strap library entry's width_cm so cords
+    # stay thin (3mm), ribbons wider (15mm), sport elastic widest (25mm).
     tie_atts = [a for a in garment.attachments
                 if a.target_kind == "anatomy_anchor"
                 and a.anatomy_anchor in ("hip_R", "hip_L")
                 and a.component_kind == "connector"]
+    conn_by_id = {c.id: c for c in garment.connectors}
     if tie_atts:
         y_front = v_to_y(g.bot_front_top_v)
         y_back  = v_to_y(g.bot_back_top_v)
@@ -1822,7 +1803,10 @@ def _build_strap_meshes_garment(body_mesh,
         for att in tie_atts:
             u_side = +0.5 if att.anatomy_anchor == "hip_R" else -0.5
             name = "side_tie_R" if att.anatomy_anchor == "hip_R" else "side_tie_L"
-            tie = _build_tie_mesh(V, y_side_lo, y_side_hi, u_side)
+            c = conn_by_id.get(att.component_id)
+            half_w = max(0.15, (c.width_cm if c is not None else 1.2) * 0.5)
+            tie = _build_tie_mesh(V, y_side_lo, y_side_hi, u_side,
+                                    half_width_cm=half_w)
             straps.append((name, tie))
 
     # 4) Tie dangles — these are decorative tails of the side tie. The

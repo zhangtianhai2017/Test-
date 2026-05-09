@@ -86,9 +86,9 @@
       },
       {
         "slot_name": "back_band",
-        "library_id": "STR_BACKBAND_PLAIN",
+        "library_id": "STR_BACKBAND_RIBBED",
         "local_params": {
-          "height_cm": 3.5
+          "height_cm": 4.5
         }
       },
       {
@@ -98,7 +98,7 @@
       },
       {
         "slot_name": "primary_fabric",
-        "library_id": "F_CROCHET_COTTON",
+        "library_id": "F_AMNI_SOUL_RIBBED",
         "local_params": {}
       },
       {

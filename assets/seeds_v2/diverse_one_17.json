@@ -85,8 +85,13 @@
         }
       },
       {
+        "slot_name": "underbust",
+        "library_id": "STR_FOE_15MM",
+        "local_params": {}
+      },
+      {
         "slot_name": "primary_fabric",
-        "library_id": "F_MISSONI_SHINY_KNIT",
+        "library_id": "F_QNOVA_RIBBED",
         "local_params": {}
       },
       {

@@ -268,7 +268,7 @@ STRAP_PIECES: dict[str, LibraryEntry] = {
     "STR_TIE_CORD_3MM": LibraryEntry(
         id="STR_TIE_CORD_3MM", kind="strap_piece",
         name="Side tie cord 3 mm",
-        tags=("tie", "side_tie", "cord", "thin"),
+        tags=("tie", "side_tie", "cord", "thin", "hip_side"),
         anatomy_hints=("hip_R", "hip_L"),
         width_cm=0.3,
         local_params_schema={"length_cm": (15.0, 30.0, 22.0)},
@@ -276,7 +276,7 @@ STRAP_PIECES: dict[str, LibraryEntry] = {
     "STR_TIE_CORD_5MM": LibraryEntry(
         id="STR_TIE_CORD_5MM", kind="strap_piece",
         name="Side tie cord 5 mm",
-        tags=("tie", "side_tie", "cord"),
+        tags=("tie", "side_tie", "cord", "hip_side"),
         anatomy_hints=("hip_R", "hip_L"),
         width_cm=0.5,
         local_params_schema={"length_cm": (15.0, 30.0, 22.0)},
@@ -284,10 +284,36 @@ STRAP_PIECES: dict[str, LibraryEntry] = {
     "STR_TIE_RIBBON_15MM": LibraryEntry(
         id="STR_TIE_RIBBON_15MM", kind="strap_piece",
         name="Side tie ribbon 15 mm",
-        tags=("tie", "side_tie", "ribbon", "wide"),
+        tags=("tie", "side_tie", "ribbon", "wide", "hip_side"),
         anatomy_hints=("hip_R", "hip_L"),
         width_cm=1.5,
         local_params_schema={"length_cm": (20.0, 35.0, 28.0)},
+    ),
+    # Hip-side connectors (no visible knot/dangle — they hold the
+    # bottom panels together through tension, not a tied bow).
+    "STR_HIP_ELASTIC_8MM": LibraryEntry(
+        id="STR_HIP_ELASTIC_8MM", kind="strap_piece",
+        name="Hip-side elastic 8 mm",
+        tags=("hip_side", "elastic", "thin"),
+        anatomy_hints=("hip_R", "hip_L"),
+        width_cm=0.8, elastic=True,
+        local_params_schema={"length_cm": (8.0, 14.0, 11.0)},
+    ),
+    "STR_HIP_ELASTIC_15MM": LibraryEntry(
+        id="STR_HIP_ELASTIC_15MM", kind="strap_piece",
+        name="Hip-side elastic 15 mm",
+        tags=("hip_side", "elastic"),
+        anatomy_hints=("hip_R", "hip_L"),
+        width_cm=1.5, elastic=True,
+        local_params_schema={"length_cm": (8.0, 14.0, 11.0)},
+    ),
+    "STR_HIP_BAND_SPORT_25MM": LibraryEntry(
+        id="STR_HIP_BAND_SPORT_25MM", kind="strap_piece",
+        name="Hip-side sport band 25 mm",
+        tags=("hip_side", "elastic", "wide", "sport"),
+        anatomy_hints=("hip_R", "hip_L"),
+        width_cm=2.5, elastic=True,
+        local_params_schema={"length_cm": (8.0, 14.0, 11.0)},
     ),
     # FOE elastic — fold-over edge finish, also used as underbust band
     "STR_FOE_10MM": LibraryEntry(

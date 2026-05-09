@@ -276,6 +276,8 @@ def _build_connector_ref(entry: LibraryEntry) -> ConnectorRef:
             kind = "shoulder_strap"
         elif "tie" in entry.tags or "side_tie" in entry.tags:
             kind = "tie_string"
+        elif "hip_side" in entry.tags:
+            kind = "hip_strap"
         elif "underbust" in entry.tags or "FOE" in entry.tags:
             kind = "underbust_elastic"
         elif "back_band" in entry.tags:
@@ -827,11 +829,20 @@ def genome_to_outfit(genome,
             slot_name="back_band", library_id=bb_id,
             local_params={}))
     elif archetype == "one_piece_maillot":
+        # one_piece's anchor straps are all optional in the schema, but
+        # the cup needs *some* anchor (O7 wearability rule). If the
+        # genome's shoulder_strap signal is high enough, use shoulder;
+        # otherwise add an underbust elastic so the cup stays on.
         if genome.top_shoulder_strap > 0.15:
             assignments.append(SlotAssignment(
                 slot_name="shoulder_strap",
                 library_id="STR_SHOULDER_PADDED_20MM",
                 local_params={"length_cm": 32.0}))
+        else:
+            assignments.append(SlotAssignment(
+                slot_name="underbust",
+                library_id="STR_FOE_15MM",
+                local_params={}))
 
     # Optional O-ring
     if genome.has_oring > 0.5:

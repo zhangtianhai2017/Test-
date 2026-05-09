@@ -293,6 +293,8 @@ ARCHETYPE_SLOTS: dict[str, list[SlotSpec]] = {
         SlotSpec("bottom_back",    "bottom_piece", required=False),
         SlotSpec("back_band",      "strap_piece",
                   allowed_tags=("back_band",)),
+        SlotSpec("hip_strap",      "strap_piece", required=False,
+                  allowed_tags=("hip_side",)),
         SlotSpec("primary_fabric", "fabric", excluded_tags=("foam","powermesh","lining","padding")),
         SlotSpec("lining_fabric",  "fabric", required=False),
         SlotSpec("seam_type",      "seam_type",   required=False),
@@ -309,6 +311,8 @@ ARCHETYPE_SLOTS: dict[str, list[SlotSpec]] = {
                   allowed_tags=("shoulder",)),
         SlotSpec("underbust",      "strap_piece", required=False,
                   allowed_tags=("underbust", "FOE")),
+        SlotSpec("hip_strap",      "strap_piece", required=False,
+                  allowed_tags=("hip_side",)),
         SlotSpec("slider",         "hardware", required=False,
                   allowed_tags=("slider",)),
         SlotSpec("primary_fabric", "fabric", excluded_tags=("foam","powermesh","lining","padding")),
@@ -329,6 +333,8 @@ ARCHETYPE_SLOTS: dict[str, list[SlotSpec]] = {
                   allowed_tags=("shoulder", "halter")),
         SlotSpec("underbust",      "strap_piece", required=False,
                   allowed_tags=("underbust", "FOE")),
+        SlotSpec("hip_strap",      "strap_piece", required=False,
+                  allowed_tags=("hip_side",)),
         SlotSpec("primary_fabric", "fabric", excluded_tags=("foam","powermesh","lining","padding")),
         SlotSpec("lining_fabric",  "fabric", required=False),
         SlotSpec("seam_type",      "seam_type",   required=False),
@@ -354,6 +360,10 @@ def validate_outfit(outfit, library: dict[str, LibraryEntry]) -> list[str]:
           intersection with the union of selected ids in the same outfit,
           OR is empty (no constraint)
       O6  per-slot count ≤ SlotSpec.max_count
+      O7  wearability — when a `cup` is filled, the outfit must include
+          at least one strap-class anchor (halter, shoulder, back_band,
+          or underbust) so the cup physically stays on the body. Without
+          a strap the cup would fall off.
     """
     out: list[str] = []
     if outfit.archetype not in ARCHETYPE_SLOTS:
@@ -397,6 +407,21 @@ def validate_outfit(outfit, library: dict[str, LibraryEntry]) -> list[str]:
             out.append(f"O5: '{a.library_id}' requires partner from "
                         f"{entry.compatible_with} but none selected "
                         f"(selected: {sorted(selected_ids)})")
+
+    # O7: wearability — a cup floating without any strap to hold it
+    # would fall off, so any outfit with a cup needs at least one
+    # anchor strap present. The acceptable anchor slots vary by
+    # archetype (halter, shoulder, back_band, or underbust all qualify).
+    cup_slots = [s for s in slot_specs.values() if s.kind == "cup_piece"]
+    if cup_slots and any(by_slot.get(s.name) for s in cup_slots):
+        anchor_slots = ("halter_strap", "shoulder_strap", "back_band",
+                          "underbust")
+        has_anchor = any(by_slot.get(name) for name in anchor_slots
+                          if name in slot_specs)
+        if not has_anchor:
+            out.append("O7: wearability — cup is filled but no anchor "
+                       "strap (halter/shoulder/back_band/underbust) is "
+                       "present; the cup would fall off the body")
     return out
 
 

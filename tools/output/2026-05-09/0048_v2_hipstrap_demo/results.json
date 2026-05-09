@@ -1,0 +1,92 @@
+[
+  {
+    "archetype": "bandeau_back_band",
+    "variant": "none",
+    "hip_strap": "(none)",
+    "composite": 0.787
+  },
+  {
+    "archetype": "bandeau_back_band",
+    "variant": "cord_3mm",
+    "hip_strap": "STR_TIE_CORD_3MM",
+    "composite": 0.767
+  },
+  {
+    "archetype": "bandeau_back_band",
+    "variant": "ribbon",
+    "hip_strap": "STR_TIE_RIBBON_15MM",
+    "composite": 0.744
+  },
+  {
+    "archetype": "bandeau_back_band",
+    "variant": "elastic",
+    "hip_strap": "STR_HIP_ELASTIC_15MM",
+    "composite": 0.784
+  },
+  {
+    "archetype": "bandeau_back_band",
+    "variant": "sport",
+    "hip_strap": "STR_HIP_BAND_SPORT_25MM",
+    "composite": 0.772
+  },
+  {
+    "archetype": "bralette_shoulder_strap",
+    "variant": "none",
+    "hip_strap": "(none)",
+    "composite": 0.802
+  },
+  {
+    "archetype": "bralette_shoulder_strap",
+    "variant": "cord_3mm",
+    "hip_strap": "STR_TIE_CORD_3MM",
+    "composite": 0.8
+  },
+  {
+    "archetype": "bralette_shoulder_strap",
+    "variant": "ribbon",
+    "hip_strap": "STR_TIE_RIBBON_15MM",
+    "composite": 0.852
+  },
+  {
+    "archetype": "bralette_shoulder_strap",
+    "variant": "elastic",
+    "hip_strap": "STR_HIP_ELASTIC_15MM",
+    "composite": 0.861
+  },
+  {
+    "archetype": "bralette_shoulder_strap",
+    "variant": "sport",
+    "hip_strap": "STR_HIP_BAND_SPORT_25MM",
+    "composite": 0.798
+  },
+  {
+    "archetype": "one_piece_maillot",
+    "variant": "none",
+    "hip_strap": "(none)",
+    "composite": 0.771
+  },
+  {
+    "archetype": "one_piece_maillot",
+    "variant": "cord_3mm",
+    "hip_strap": "STR_TIE_CORD_3MM",
+    "composite": 0.868
+  },
+  {
+    "archetype": "one_piece_maillot",
+    "variant": "ribbon",
+    "hip_strap": "STR_TIE_RIBBON_15MM",
+    "composite": 0.789
+  },
+  {
+    "archetype": "one_piece_maillot",
+    "variant": "elastic",
+    "hip_strap": "STR_HIP_ELASTIC_15MM",
+    "composite": 0.757
+  },
+  {
+    "archetype": "one_piece_maillot",
+    "variant": "sport",
+    "hip_strap": "STR_HIP_BAND_SPORT_25MM",
+    "composite": 0.798
+  }
+]
