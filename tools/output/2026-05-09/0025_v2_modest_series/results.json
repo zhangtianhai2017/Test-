@@ -1,0 +1,650 @@
+[
+  {
+    "name": "modest_triangle_string_halter__rng0",
+    "archetype": "triangle_string_halter",
+    "cup": "CUP_TRIANGLE_M",
+    "bottom": "BOT_CHEEKY_M",
+    "front_half_u": 0.22,
+    "back_half_u": 0.16,
+    "composite": 0.845,
+    "outfit_native": 0.827,
+    "slots": [
+      [
+        "cup",
+        "CUP_TRIANGLE_M"
+      ],
+      [
+        "bottom_front",
+        "BOT_CHEEKY_M"
+      ],
+      [
+        "halter_strap",
+        "STR_HALTER_5MM"
+      ],
+      [
+        "oring",
+        "HW_OR_12MM_ROSEGOLD"
+      ],
+      [
+        "primary_fabric",
+        "F_QNOVA_RIBBED"
+      ],
+      [
+        "seam_type",
+        "S_COVERSTITCH_3NEEDLE"
+      ],
+      [
+        "accessory",
+        "ACC_SHELL_TROCHUS_25MM"
+      ],
+      [
+        "accessory",
+        "ACC_SHELL_COWRIE_20MM"
+      ]
+    ]
+  },
+  {
+    "name": "modest_triangle_string_halter__rng1",
+    "archetype": "triangle_string_halter",
+    "cup": "CUP_TRIANGLE_S",
+    "bottom": "BOT_CHEEKY_M",
+    "front_half_u": 0.22,
+    "back_half_u": 0.16,
+    "composite": 0.792,
+    "outfit_native": 0.809,
+    "slots": [
+      [
+        "cup",
+        "CUP_TRIANGLE_S"
+      ],
+      [
+        "bottom_front",
+        "BOT_CHEEKY_M"
+      ],
+      [
+        "halter_strap",
+        "STR_HALTER_5MM"
+      ],
+      [
+        "side_tie",
+        "STR_TIE_CORD_5MM"
+      ],
+      [
+        "oring",
+        "HW_OR_12MM_GOLD"
+      ],
+      [
+        "primary_fabric",
+        "F_ECONYL_PLAIN_HEAVY"
+      ]
+    ]
+  },
+  {
+    "name": "modest_triangle_string_halter__rng2",
+    "archetype": "triangle_string_halter",
+    "cup": "CUP_TRIANGLE_L",
+    "bottom": "BOT_CHEEKY_S",
+    "front_half_u": 0.187,
+    "back_half_u": 0.16,
+    "composite": 0.8,
+    "outfit_native": 0.86,
+    "slots": [
+      [
+        "cup",
+        "CUP_TRIANGLE_L"
+      ],
+      [
+        "bottom_front",
+        "BOT_CHEEKY_S"
+      ],
+      [
+        "halter_strap",
+        "STR_HALTER_3MM"
+      ],
+      [
+        "side_tie",
+        "STR_TIE_CORD_3MM"
+      ],
+      [
+        "oring",
+        "HW_OR_8MM_GOLD"
+      ],
+      [
+        "primary_fabric",
+        "F_MESH_OUTER"
+      ],
+      [
+        "seam_type",
+        "S_OVERLOCK_4THREAD"
+      ]
+    ]
+  },
+  {
+    "name": "modest_triangle_string_halter__rng3",
+    "archetype": "triangle_string_halter",
+    "cup": "CUP_BRAZILIAN_M",
+    "bottom": "BOT_CHEEKY_M",
+    "front_half_u": 0.22,
+    "back_half_u": 0.16,
+    "composite": 0.749,
+    "outfit_native": 0.811,
+    "slots": [
+      [
+        "cup",
+        "CUP_BRAZILIAN_M"
+      ],
+      [
+        "bottom_front",
+        "BOT_CHEEKY_M"
+      ],
+      [
+        "bottom_back",
+        "BOT_CHEEKY_M"
+      ],
+      [
+        "halter_strap",
+        "STR_HALTER_5MM"
+      ],
+      [
+        "side_tie",
+        "STR_TIE_CORD_5MM"
+      ],
+      [
+        "oring",
+        "HW_OR_12MM_ROSEGOLD"
+      ],
+      [
+        "primary_fabric",
+        "F_MISSONI_SHINY_KNIT"
+      ],
+      [
+        "seam_type",
+        "S_FLATLOCK"
+      ]
+    ]
+  },
+  {
+    "name": "modest_bandeau_back_band__rng0",
+    "archetype": "bandeau_back_band",
+    "cup": "CUP_FOAM_MOLDED_M",
+    "bottom": "BOT_BRIEF_M",
+    "front_half_u": 0.26,
+    "back_half_u": 0.24,
+    "composite": 0.821,
+    "outfit_native": 0.956,
+    "slots": [
+      [
+        "cup",
+        "CUP_FOAM_MOLDED_M"
+      ],
+      [
+        "bottom_front",
+        "BOT_BRIEF_M"
+      ],
+      [
+        "bottom_back",
+        "BOT_HIGHWAIST_M"
+      ],
+      [
+        "back_band",
+        "STR_BACKBAND_PLAIN"
+      ],
+      [
+        "primary_fabric",
+        "F_ECONYL_PLAIN_LIGHT"
+      ],
+      [
+        "body_jewelry",
+        "BJ_BODY_CHAIN_BELLY"
+      ],
+      [
+        "lining_fabric",
+        "F_FOAM_CUP_3MM"
+      ]
+    ]
+  },
+  {
+    "name": "modest_bandeau_back_band__rng1",
+    "archetype": "bandeau_back_band",
+    "cup": "CUP_FOAM_MOLDED_L",
+    "bottom": "BOT_BRIEF_S",
+    "front_half_u": 0.221,
+    "back_half_u": 0.24,
+    "composite": 0.764,
+    "outfit_native": 0.819,
+    "slots": [
+      [
+        "cup",
+        "CUP_FOAM_MOLDED_L"
+      ],
+      [
+        "bottom_front",
+        "BOT_BRIEF_S"
+      ],
+      [
+        "back_band",
+        "STR_BACKBAND_PLAIN"
+      ],
+      [
+        "primary_fabric",
+        "F_ECONYL_PLAIN_LIGHT"
+      ],
+      [
+        "lining_fabric",
+        "F_FOAM_CUP_3MM"
+      ]
+    ]
+  },
+  {
+    "name": "modest_bandeau_back_band__rng2",
+    "archetype": "bandeau_back_band",
+    "cup": "CUP_FOAM_MOLDED_S",
+    "bottom": "BOT_HIGHWAIST_M",
+    "front_half_u": 0.26,
+    "back_half_u": 0.26,
+    "composite": 0.826,
+    "outfit_native": 0.93,
+    "slots": [
+      [
+        "cup",
+        "CUP_FOAM_MOLDED_S"
+      ],
+      [
+        "bottom_front",
+        "BOT_HIGHWAIST_M"
+      ],
+      [
+        "back_band",
+        "STR_BACKBAND_RIBBED"
+      ],
+      [
+        "primary_fabric",
+        "F_AMNI_SOUL_RIBBED"
+      ],
+      [
+        "lining_fabric",
+        "F_FOAM_CUP_3MM"
+      ],
+      [
+        "accessory",
+        "ACC_SHELL_TROCHUS_25MM"
+      ]
+    ]
+  },
+  {
+    "name": "modest_bandeau_back_band__rng3",
+    "archetype": "bandeau_back_band",
+    "cup": "CUP_FOAM_MOLDED_S",
+    "bottom": "BOT_HIGHWAIST_S",
+    "front_half_u": 0.221,
+    "back_half_u": 0.26,
+    "composite": 0.787,
+    "outfit_native": 0.819,
+    "slots": [
+      [
+        "cup",
+        "CUP_FOAM_MOLDED_S"
+      ],
+      [
+        "bottom_front",
+        "BOT_HIGHWAIST_S"
+      ],
+      [
+        "back_band",
+        "STR_BACKBAND_PLAIN"
+      ],
+      [
+        "primary_fabric",
+        "F_HUNZA_CRINKLE"
+      ],
+      [
+        "lining_fabric",
+        "F_FOAM_CUP_3MM"
+      ]
+    ]
+  },
+  {
+    "name": "modest_bralette_shoulder_strap__rng0",
+    "archetype": "bralette_shoulder_strap",
+    "cup": "CUP_FOAM_MOLDED_L",
+    "bottom": "BOT_BRIEF_M",
+    "front_half_u": 0.26,
+    "back_half_u": 0.24,
+    "composite": 0.823,
+    "outfit_native": 0.967,
+    "slots": [
+      [
+        "cup",
+        "CUP_FOAM_MOLDED_L"
+      ],
+      [
+        "bottom_front",
+        "BOT_BRIEF_M"
+      ],
+      [
+        "shoulder_strap",
+        "STR_SHOULDER_WOVEN_10MM"
+      ],
+      [
+        "underbust",
+        "STR_FOE_10MM"
+      ],
+      [
+        "slider",
+        "HW_SLIDER_15MM_NICKEL"
+      ],
+      [
+        "primary_fabric",
+        "F_ECONYL_PLAIN_HEAVY"
+      ],
+      [
+        "lining_fabric",
+        "F_FOAM_CUP_3MM"
+      ],
+      [
+        "body_jewelry",
+        "BJ_BRACELET_CHAIN_GOLD"
+      ]
+    ]
+  },
+  {
+    "name": "modest_bralette_shoulder_strap__rng1",
+    "archetype": "bralette_shoulder_strap",
+    "cup": "CUP_FOAM_MOLDED_L",
+    "bottom": "BOT_BRIEF_S",
+    "front_half_u": 0.221,
+    "back_half_u": 0.24,
+    "composite": 0.872,
+    "outfit_native": 0.938,
+    "slots": [
+      [
+        "cup",
+        "CUP_FOAM_MOLDED_L"
+      ],
+      [
+        "bottom_front",
+        "BOT_BRIEF_S"
+      ],
+      [
+        "shoulder_strap",
+        "STR_SHOULDER_WOVEN_10MM"
+      ],
+      [
+        "underbust",
+        "STR_FOE_15MM"
+      ],
+      [
+        "primary_fabric",
+        "F_BIOPOLYMER_PLAIN"
+      ],
+      [
+        "accessory",
+        "ACC_SHELL_TROCHUS_25MM"
+      ],
+      [
+        "lining_fabric",
+        "F_FOAM_CUP_3MM"
+      ]
+    ]
+  },
+  {
+    "name": "modest_bralette_shoulder_strap__rng2",
+    "archetype": "bralette_shoulder_strap",
+    "cup": "CUP_FOAM_MOLDED_M",
+    "bottom": "BOT_HIGHWAIST_S",
+    "front_half_u": 0.221,
+    "back_half_u": 0.26,
+    "composite": 0.938,
+    "outfit_native": 0.967,
+    "slots": [
+      [
+        "cup",
+        "CUP_FOAM_MOLDED_M"
+      ],
+      [
+        "bottom_front",
+        "BOT_HIGHWAIST_S"
+      ],
+      [
+        "bottom_back",
+        "BOT_HIGHWAIST_M"
+      ],
+      [
+        "shoulder_strap",
+        "STR_SHOULDER_PADDED_20MM"
+      ],
+      [
+        "slider",
+        "HW_SLIDER_20MM_GOLD"
+      ],
+      [
+        "primary_fabric",
+        "F_BIOPOLYMER_PLAIN"
+      ],
+      [
+        "accessory",
+        "ACC_BOW_SATIN_40MM"
+      ],
+      [
+        "lining_fabric",
+        "F_FOAM_CUP_3MM"
+      ]
+    ]
+  },
+  {
+    "name": "modest_bralette_shoulder_strap__rng3",
+    "archetype": "bralette_shoulder_strap",
+    "cup": "CUP_FOAM_MOLDED_S",
+    "bottom": "BOT_HIGHWAIST_M",
+    "front_half_u": 0.26,
+    "back_half_u": 0.26,
+    "composite": 0.801,
+    "outfit_native": 0.967,
+    "slots": [
+      [
+        "cup",
+        "CUP_FOAM_MOLDED_S"
+      ],
+      [
+        "bottom_front",
+        "BOT_HIGHWAIST_M"
+      ],
+      [
+        "shoulder_strap",
+        "STR_SHOULDER_WOVEN_10MM"
+      ],
+      [
+        "underbust",
+        "STR_FOE_10MM"
+      ],
+      [
+        "slider",
+        "HW_SLIDER_20MM_GOLD"
+      ],
+      [
+        "primary_fabric",
+        "F_MISSONI_SHINY_KNIT"
+      ],
+      [
+        "body_jewelry",
+        "BJ_NECKLACE_CHOKER_GOLD"
+      ],
+      [
+        "body_jewelry",
+        "BJ_BODY_CHAIN_BELLY"
+      ],
+      [
+        "lining_fabric",
+        "F_FOAM_CUP_3MM"
+      ]
+    ]
+  },
+  {
+    "name": "modest_one_piece_maillot__rng0",
+    "archetype": "one_piece_maillot",
+    "cup": "CUP_FOAM_MOLDED_M",
+    "bottom": "BOT_BRIEF_M",
+    "front_half_u": 0.26,
+    "back_half_u": 0.24,
+    "composite": 0.815,
+    "outfit_native": 0.888,
+    "slots": [
+      [
+        "cup",
+        "CUP_FOAM_MOLDED_M"
+      ],
+      [
+        "bottom_front",
+        "BOT_BRIEF_M"
+      ],
+      [
+        "shoulder_strap",
+        "STR_SHOULDER_WOVEN_15MM"
+      ],
+      [
+        "primary_fabric",
+        "F_VIRGIN_VELVET"
+      ],
+      [
+        "lining_fabric",
+        "F_FOAM_CUP_3MM"
+      ],
+      [
+        "seam_type",
+        "S_BARTACK"
+      ]
+    ]
+  },
+  {
+    "name": "modest_one_piece_maillot__rng1",
+    "archetype": "one_piece_maillot",
+    "cup": "CUP_FOAM_MOLDED_L",
+    "bottom": "BOT_BRIEF_M",
+    "front_half_u": 0.26,
+    "back_half_u": 0.24,
+    "composite": 0.819,
+    "outfit_native": 0.967,
+    "slots": [
+      [
+        "cup",
+        "CUP_FOAM_MOLDED_L"
+      ],
+      [
+        "bottom_front",
+        "BOT_BRIEF_M"
+      ],
+      [
+        "shoulder_strap",
+        "STR_SHOULDER_WOVEN_15MM"
+      ],
+      [
+        "primary_fabric",
+        "F_ECONYL_PLAIN_HEAVY"
+      ],
+      [
+        "lining_fabric",
+        "F_FOAM_CUP_3MM"
+      ],
+      [
+        "seam_type",
+        "S_COVERSTITCH_3NEEDLE"
+      ],
+      [
+        "body_jewelry",
+        "BJ_EARRING_DROP_GOLD"
+      ],
+      [
+        "body_jewelry",
+        "BJ_EARRING_STUD_PEARL"
+      ],
+      [
+        "body_jewelry",
+        "BJ_BRACELET_CHAIN_GOLD"
+      ]
+    ]
+  },
+  {
+    "name": "modest_one_piece_maillot__rng2",
+    "archetype": "one_piece_maillot",
+    "cup": "CUP_FOAM_MOLDED_S",
+    "bottom": "BOT_BRIEF_M",
+    "front_half_u": 0.26,
+    "back_half_u": 0.24,
+    "composite": 0.859,
+    "outfit_native": 0.914,
+    "slots": [
+      [
+        "cup",
+        "CUP_FOAM_MOLDED_S"
+      ],
+      [
+        "bottom_front",
+        "BOT_BRIEF_M"
+      ],
+      [
+        "bottom_back",
+        "BOT_BRIEF_S"
+      ],
+      [
+        "primary_fabric",
+        "F_AMNI_SOUL_RIBBED"
+      ],
+      [
+        "lining_fabric",
+        "F_FOAM_CUP_3MM"
+      ],
+      [
+        "seam_type",
+        "S_OVERLOCK_4THREAD"
+      ],
+      [
+        "accessory",
+        "ACC_SHELL_COWRIE_20MM"
+      ],
+      [
+        "body_jewelry",
+        "BJ_BRACELET_CHAIN_GOLD"
+      ]
+    ]
+  },
+  {
+    "name": "modest_one_piece_maillot__rng3",
+    "archetype": "one_piece_maillot",
+    "cup": "CUP_FOAM_MOLDED_L",
+    "bottom": "BOT_BRIEF_S",
+    "front_half_u": 0.221,
+    "back_half_u": 0.24,
+    "composite": 0.803,
+    "outfit_native": 0.917,
+    "slots": [
+      [
+        "cup",
+        "CUP_FOAM_MOLDED_L"
+      ],
+      [
+        "bottom_front",
+        "BOT_BRIEF_S"
+      ],
+      [
+        "shoulder_strap",
+        "STR_HALTER_3MM"
+      ],
+      [
+        "underbust",
+        "STR_FOE_25MM"
+      ],
+      [
+        "primary_fabric",
+        "F_VIRGIN_VELVET"
+      ],
+      [
+        "lining_fabric",
+        "F_FOAM_CUP_3MM"
+      ],
+      [
+        "seam_type",
+        "S_FLATLOCK"
+      ]
+    ]
+  }
+]

@@ -483,13 +483,14 @@ def _build_band_mesh(ring: np.ndarray, band_thickness: float, offset: float,
 
 
 def _build_tie_mesh(body_vertices: np.ndarray, y_lo_world: float, y_hi_world: float,
-                    u_side: float, band_offset: float = 0.6
+                    u_side: float, band_offset: float = 0.6,
+                    half_width_cm: float = 0.6
                     ) -> o3d.geometry.TriangleMesh:
     """Slim vertical ribbon at the side of the hip that bridges front and
-    back waist-lines (the side-tie knot area of a tie-side bikini)."""
-    # find a body vertex near (u_side, y_center)
+    back waist-lines (the side-tie knot area of a tie-side bikini, or the
+    structural side seam of any bottom that has both front and back
+    panels). half_width_cm controls the visible band thickness."""
     theta = u_side * np.pi
-    y_center = (y_lo_world + y_hi_world) / 2
     near = body_vertices[(body_vertices[:, 1] > y_lo_world - 1) &
                           (body_vertices[:, 1] < y_hi_world + 1)]
     if len(near) < 4:
@@ -500,7 +501,7 @@ def _build_tie_mesh(body_vertices: np.ndarray, y_lo_world: float, y_hi_world: fl
     p = near[idx]
     rxz = np.array([p[0], 0, p[2]]); rxz /= max(np.linalg.norm(rxz), 1e-6)
     p_out = p + rxz * band_offset
-    half_w = 0.6
+    half_w = half_width_cm
     # vertices: four corners of a slim vertical rectangle facing outward
     tangent = np.array([-rxz[2], 0, rxz[0]]) * half_w
     v0 = p_out + tangent; v0[1] = y_lo_world
@@ -1783,7 +1784,30 @@ def _build_strap_meshes_garment(body_mesh,
         waist_band = _build_band_mesh(ring2, 1.5, offset=0.5)
         straps.append(("waist_band", waist_band))
 
-    # 3) Side ties — emit only if a tie_string connector has an
+    # 3a) Hip side-band — structural fabric strip bridging the
+    # front_bottom and back_bottom panels at each hip. Without this,
+    # the two pattern pieces appear floating with a gap of bare hip
+    # between them. Drawn whenever both pieces are present, regardless
+    # of archetype (one_piece, bralette, bandeau, triangle all wear
+    # bottoms whose front and back must be sewn together at the hip).
+    has_front_bot = any(p.id == "bottom_front" for p in garment.pieces)
+    has_back_bot = any(p.id.startswith("bottom_back_") for p in garment.pieces)
+    if has_front_bot and has_back_bot:
+        y_front = v_to_y(g.bot_front_top_v)
+        y_back = v_to_y(g.bot_back_top_v)
+        y_hip_lo = min(y_front, y_back) - 1.5
+        y_hip_hi = max(y_front, y_back) + 1.5
+        # Band width scales with the bottom's hip half_u — wider hip
+        # coverage => wider visible side band. Floor of 1.0 cm so it's
+        # always at least a noticeable strip even on minimal bottoms.
+        band_half_w = max(1.0, 12.0 * float(g.bot_back_half_u))
+        for u_side, name in [(0.5, "hip_band_R"), (-0.5, "hip_band_L")]:
+            band = _build_tie_mesh(V, y_hip_lo, y_hip_hi, u_side,
+                                    band_offset=0.4,
+                                    half_width_cm=band_half_w)
+            straps.append((name, band))
+
+    # 3b) Side ties — emit only if a tie_string connector has an
     # attachment to hip_R / hip_L. Each side tie corresponds to a
     # specific anatomy_anchor — we draw only the anchored sides.
     tie_atts = [a for a in garment.attachments
