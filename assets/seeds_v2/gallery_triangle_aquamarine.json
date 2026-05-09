@@ -78,7 +78,7 @@
         "library_id": "BOT_THONG_M",
         "local_params": {
           "front_top_v": 0.32,
-          "front_half_u": 0.16404999999999997,
+          "front_half_u": 0.22,
           "front_leg_curve": 0.72975,
           "back_top_v": 0.3,
           "back_half_u": 0.07797500000000002

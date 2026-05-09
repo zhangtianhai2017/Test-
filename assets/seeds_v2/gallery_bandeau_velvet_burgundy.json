@@ -78,10 +78,10 @@
         "library_id": "BOT_CHEEKY_M",
         "local_params": {
           "front_top_v": 0.34,
-          "front_half_u": 0.18,
+          "front_half_u": 0.34,
           "front_leg_curve": 0.65,
           "back_top_v": 0.32,
-          "back_half_u": 0.15
+          "back_half_u": 0.18
         }
       },
       {

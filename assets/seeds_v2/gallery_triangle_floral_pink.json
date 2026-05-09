@@ -78,7 +78,7 @@
         "library_id": "BOT_BRAZILIAN_M",
         "local_params": {
           "front_top_v": 0.3,
-          "front_half_u": 0.18,
+          "front_half_u": 0.28,
           "front_leg_curve": 0.65,
           "back_top_v": 0.28,
           "back_half_u": 0.1

@@ -139,6 +139,12 @@ for size_class, scale in (("S", 0.85), ("M", 1.00), ("L", 1.18)):
 #   high_waisted  — rises above natural waist
 
 BOTTOM_PIECES: dict[str, LibraryEntry] = {}
+# front_half_u / back_half_u define the polygon's azimuthal half-extent
+# in cylindrical body UV space (u ∈ [-1, 1], 0 = front center, ±1 = back).
+# At hip Y, the body's surface widens — to actually cover visible hip
+# triangles, briefs/highwaist need front_half_u ≈ 0.40-0.55 (i.e. polygon
+# wraps from front-center around to the side seam). Anything below ≈ 0.30
+# leaves the polygon over thin air at the front and renders nothing.
 for cov_class, scale in (("S", 0.85), ("M", 1.00)):
     BOTTOM_PIECES[f"BOT_THONG_{cov_class}"] = LibraryEntry(
         id=f"BOT_THONG_{cov_class}", kind="bottom_piece",
@@ -149,10 +155,10 @@ for cov_class, scale in (("S", 0.85), ("M", 1.00)):
         coverage_class="minimal",
         local_params_schema={
             "front_top_v":   (0.20, 0.32, 0.25),
-            "front_half_u":  (0.12 * scale, 0.20 * scale, 0.15 * scale),
+            "front_half_u":  (0.22 * scale, 0.32 * scale, 0.27 * scale),
             "front_leg_curve": (0.50, 0.80, 0.65),
             "back_top_v":    (0.20, 0.30, 0.25),
-            "back_half_u":   (0.04, 0.10, 0.06),
+            "back_half_u":   (0.06, 0.14, 0.09),
         },
     )
     BOTTOM_PIECES[f"BOT_BRAZILIAN_{cov_class}"] = LibraryEntry(
@@ -164,10 +170,10 @@ for cov_class, scale in (("S", 0.85), ("M", 1.00)):
         coverage_class="minimal",
         local_params_schema={
             "front_top_v":   (0.22, 0.30, 0.25),
-            "front_half_u":  (0.16 * scale, 0.22 * scale, 0.18 * scale),
+            "front_half_u":  (0.28 * scale, 0.36 * scale, 0.32 * scale),
             "front_leg_curve": (0.55, 0.80, 0.70),
             "back_top_v":    (0.22, 0.28, 0.25),
-            "back_half_u":   (0.08, 0.12, 0.10),
+            "back_half_u":   (0.10, 0.18, 0.14),
         },
     )
     BOTTOM_PIECES[f"BOT_CHEEKY_{cov_class}"] = LibraryEntry(
@@ -179,10 +185,10 @@ for cov_class, scale in (("S", 0.85), ("M", 1.00)):
         coverage_class="medium",
         local_params_schema={
             "front_top_v":   (0.24, 0.34, 0.28),
-            "front_half_u":  (0.18 * scale, 0.22 * scale, 0.20 * scale),
+            "front_half_u":  (0.34 * scale, 0.42 * scale, 0.38 * scale),
             "front_leg_curve": (0.50, 0.75, 0.60),
             "back_top_v":    (0.24, 0.32, 0.28),
-            "back_half_u":   (0.12, 0.16, 0.14),
+            "back_half_u":   (0.18, 0.26, 0.22),
         },
     )
     BOTTOM_PIECES[f"BOT_BRIEF_{cov_class}"] = LibraryEntry(
@@ -194,10 +200,10 @@ for cov_class, scale in (("S", 0.85), ("M", 1.00)):
         coverage_class="full",
         local_params_schema={
             "front_top_v":   (0.30, 0.40, 0.34),
-            "front_half_u":  (0.20 * scale, 0.26 * scale, 0.22 * scale),
+            "front_half_u":  (0.42 * scale, 0.52 * scale, 0.46 * scale),
             "front_leg_curve": (0.30, 0.55, 0.45),
             "back_top_v":    (0.30, 0.38, 0.34),
-            "back_half_u":   (0.18, 0.24, 0.20),
+            "back_half_u":   (0.30, 0.42, 0.36),
         },
     )
     BOTTOM_PIECES[f"BOT_HIGHWAIST_{cov_class}"] = LibraryEntry(
@@ -209,10 +215,10 @@ for cov_class, scale in (("S", 0.85), ("M", 1.00)):
         coverage_class="full",
         local_params_schema={
             "front_top_v":   (0.40, 0.55, 0.48),
-            "front_half_u":  (0.20 * scale, 0.26 * scale, 0.22 * scale),
+            "front_half_u":  (0.46 * scale, 0.58 * scale, 0.50 * scale),
             "front_leg_curve": (0.30, 0.50, 0.40),
             "back_top_v":    (0.40, 0.55, 0.48),
-            "back_half_u":   (0.20, 0.26, 0.22),
+            "back_half_u":   (0.34 * scale, 0.46 * scale, 0.40 * scale),
         },
     )
 

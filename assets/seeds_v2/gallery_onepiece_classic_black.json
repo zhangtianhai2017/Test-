@@ -78,10 +78,10 @@
         "library_id": "BOT_HIGHWAIST_M",
         "local_params": {
           "front_top_v": 0.5299999999999999,
-          "front_half_u": 0.21,
+          "front_half_u": 0.46,
           "front_leg_curve": 0.5,
           "back_top_v": 0.52,
-          "back_half_u": 0.2
+          "back_half_u": 0.34
         }
       },
       {

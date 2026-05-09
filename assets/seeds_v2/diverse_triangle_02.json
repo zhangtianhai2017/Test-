@@ -78,10 +78,10 @@
         "library_id": "BOT_THONG_M",
         "local_params": {
           "front_top_v": 0.32,
-          "front_half_u": 0.2,
+          "front_half_u": 0.32,
           "front_leg_curve": 0.8,
           "back_top_v": 0.3,
-          "back_half_u": 0.04
+          "back_half_u": 0.06
         }
       },
       {

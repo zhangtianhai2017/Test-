@@ -78,10 +78,10 @@
         "library_id": "BOT_HIGHWAIST_M",
         "local_params": {
           "front_top_v": 0.45999999999999996,
-          "front_half_u": 0.2,
+          "front_half_u": 0.46,
           "front_leg_curve": 0.5,
           "back_top_v": 0.5459188921251659,
-          "back_half_u": 0.26
+          "back_half_u": 0.46
         }
       },
       {
@@ -91,7 +91,7 @@
       },
       {
         "slot_name": "primary_fabric",
-        "library_id": "F_QNOVA_RIBBED",
+        "library_id": "F_MISSONI_SHINY_KNIT",
         "local_params": {}
       },
       {

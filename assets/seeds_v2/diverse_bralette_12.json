@@ -78,10 +78,10 @@
         "library_id": "BOT_HIGHWAIST_M",
         "local_params": {
           "front_top_v": 0.45999999999999996,
-          "front_half_u": 0.26,
+          "front_half_u": 0.58,
           "front_leg_curve": 0.5,
           "back_top_v": 0.4,
-          "back_half_u": 0.2058318030369436
+          "back_half_u": 0.34
         }
       },
       {
@@ -128,7 +128,7 @@
       "secondary_hue": 0.27167392384925626,
       "secondary_saturation": 0.3187486873783988,
       "secondary_lightness": 0.1075591117687199,
-      "pattern_overlay": "chevron",
+      "pattern_overlay": "herringbone",
       "pattern_scale": 0.4364417842063001,
       "pattern_angle": 0.1997207743461581,
       "palette_preset": "future_dusk"
