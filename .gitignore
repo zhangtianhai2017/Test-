@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.pyo
+
+# generated body-skin pickle (developer-local; regenerate via
+# `python3 tools/bake_body_assets.py <body.glb>`)
+assets/glb/_body_skin.pkl
