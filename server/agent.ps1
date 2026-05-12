@@ -131,8 +131,10 @@ while ($true) {
     }
 
     $stdout = ""; $stderr = ""
-    if (Test-Path $stdoutFile) { $stdout = [IO.File]::ReadAllText($stdoutFile, [System.Text.UTF8Encoding]::new($false)) }
-    if (Test-Path $stderrFile) { $stderr = [IO.File]::ReadAllText($stderrFile, [System.Text.UTF8Encoding]::new($false)) }
+    # powershell.exe writes its stdout in the system ANSI codepage (CP936
+    # on Chinese Windows), not UTF-8. Use Encoding::Default to match.
+    if (Test-Path $stdoutFile) { $stdout = [IO.File]::ReadAllText($stdoutFile, [System.Text.Encoding]::Default) }
+    if (Test-Path $stderrFile) { $stderr = [IO.File]::ReadAllText($stderrFile, [System.Text.Encoding]::Default) }
     if ($null -eq $stdout) { $stdout = "" }
     if ($null -eq $stderr) { $stderr = "" }
     Remove-Item -Force -ErrorAction SilentlyContinue $tmpScript, $stdoutFile, $stderrFile
