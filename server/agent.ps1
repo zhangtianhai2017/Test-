@@ -19,7 +19,7 @@ param(
     [string]$Branch     = "claude-relay",
     [string]$RelayDir   = (Join-Path (Get-Location).Path ".relay-clone"),
     [string]$WorkDir    = (Get-Location).Path,
-    [int]   $PollSec    = 5
+    [int]   $PollSec    = 20
 )
 
 $ErrorActionPreference = "Continue"
