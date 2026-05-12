@@ -45,6 +45,10 @@ if (-not (Test-Path (Join-Path $RelayDir ".git"))) {
     Push-Location $RelayDir
     git config user.email "agent@local"
     git config user.name  "relay-agent"
+    # make slow / flaky GitHub access more tolerant (China network)
+    git config http.lowSpeedLimit  1000
+    git config http.lowSpeedTime   60
+    git config http.postBuffer     524288000
     Pop-Location
 }
 
@@ -58,9 +62,16 @@ Log "press Ctrl+C to stop"
 while ($true) {
     Push-Location $RelayDir
 
-    # --- pull latest ---
-    git fetch origin $Branch --quiet 2>$null
-    git reset --hard "origin/$Branch" --quiet 2>$null
+    # --- pull latest (tolerate network blips) ---
+    $fetchOut = (git fetch origin $Branch 2>&1) -join " "
+    if ($LASTEXITCODE -eq 0) {
+        git reset --hard "origin/$Branch" 2>&1 | Out-Null
+    } else {
+        Log "fetch failed (will retry next loop): $fetchOut"
+        Pop-Location
+        Start-Sleep -Seconds 10
+        continue
+    }
 
     # --- read inbox & outbox ---
     $inbox  = $null
@@ -139,29 +150,35 @@ while ($true) {
     $resultJson = $result | ConvertTo-Json -Depth 3 -Compress
     Set-Content -Path outbox.json -Value $resultJson -Encoding UTF8
 
-    # --- commit + push (retry on non-ff) ---
+    # --- commit + push (distinguish network errors from non-ff) ---
     $pushed = $false
     for ($attempt = 1; $attempt -le 5; $attempt++) {
-        git add outbox.json --quiet
-        git commit -m "relay-agent: result $jobId" --quiet 2>&1 | Out-Null
-        git push origin $Branch 2>&1 | Tee-Object -Variable pushOut | Out-Null
-        if ($LASTEXITCODE -eq 0) { $pushed = $true; break }
+        git add outbox.json 2>&1 | Out-Null
+        git commit --allow-empty -m "relay-agent: result $jobId" 2>&1 | Out-Null
+        $pushOut = (git push origin $Branch 2>&1) -join "`n"
+        $pushExit = $LASTEXITCODE
+        if ($pushExit -eq 0) { $pushed = $true; break }
 
-        $msg = ($pushOut -join " ")
-        if ($msg -match "could not read Username|Authentication|denied|403|401") {
-            Log "PUSH AUTH FAILED — see agent.log + on-screen instructions below"
-            Log "fix: run once interactively to cache credentials:"
+        Log "push attempt $attempt failed (exit=$pushExit): $pushOut"
+
+        if ($pushOut -match "Username|Authentication|denied|403|401|could not read") {
+            Log "PUSH AUTH FAILED. fix: run interactively once:"
             Log "  cd $RelayDir"
             Log "  git push origin $Branch"
-            Log "  (a popup or prompt should ask for your GitHub login)"
-            Log "  after success, restart this agent."
+            Log "  (complete the GitHub login popup, then restart this agent)"
             break
         }
 
-        # non-ff: someone (claude) pushed a new inbox. fetch + replay our outbox change.
-        Log "push non-ff (attempt $attempt) — rebasing on remote"
-        git fetch origin $Branch --quiet
-        git reset --hard "origin/$Branch" --quiet
+        if ($pushOut -match "Could not connect|Failed to connect|Connection refused|Connection timed out|Could not resolve host|TLS|SSL|GnuTLS|RPC failed") {
+            Log "network error — sleeping 15s then retrying (commit stays local)"
+            Start-Sleep -Seconds 15
+            continue   # keep local commit; just try the push again
+        }
+
+        # genuine non-ff: someone else pushed. rebase by saving outbox, resetting, replaying.
+        Log "non-fast-forward — rebasing outbox onto remote"
+        git fetch origin $Branch 2>&1 | Out-Null
+        git reset --hard "origin/$Branch" 2>&1 | Out-Null
         Set-Content -Path outbox.json -Value $resultJson -Encoding UTF8
     }
 
