@@ -104,21 +104,39 @@ while ($true) {
     $tmpScript  = Join-Path $tmpDir "$jobId.ps1"
     $stdoutFile = Join-Path $tmpDir "$jobId.out"
     $stderrFile = Join-Path $tmpDir "$jobId.err"
-    # Force the child to emit UTF-8 so we can read it back unambiguously.
-    $header = @"
-chcp 65001 > `$null
-[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new(`$false)
-`$OutputEncoding = [System.Text.UTF8Encoding]::new(`$false)
 
+    # Wrap the user script so the child captures all output INSIDE PowerShell
+    # (as System.String, internally UTF-16) and writes UTF-8 bytes via
+    # [IO.File]::WriteAllText. This avoids console-redirect encoding entirely.
+    $escOut = $stdoutFile.Replace("'", "''")
+    $escErr = $stderrFile.Replace("'", "''")
+    $wrapped = @"
+`$ErrorActionPreference = 'Continue'
+`$__buf = New-Object System.Text.StringBuilder
+`$__err = New-Object System.Text.StringBuilder
+try {
+    & {
+$scriptText
+    } 2>&1 | ForEach-Object {
+        if (`$_ -is [System.Management.Automation.ErrorRecord]) {
+            [void]`$__err.AppendLine((`$_ | Out-String).TrimEnd("`r`n"))
+        } else {
+            [void]`$__buf.AppendLine((`$_ | Out-String).TrimEnd("`r`n"))
+        }
+    }
+} catch {
+    [void]`$__err.AppendLine((`$_ | Out-String).TrimEnd("`r`n"))
+}
+[IO.File]::WriteAllText('$escOut', `$__buf.ToString(), [System.Text.UTF8Encoding]::new(`$false))
+[IO.File]::WriteAllText('$escErr', `$__err.ToString(), [System.Text.UTF8Encoding]::new(`$false))
 "@
-    Set-Content -Path $tmpScript -Value ($header + $scriptText) -Encoding UTF8
+    Set-Content -Path $tmpScript -Value $wrapped -Encoding UTF8
 
     $proc = $null
     try {
+        # No -RedirectStandardOutput; the wrapped script writes UTF-8 files directly.
         $proc = Start-Process -FilePath "powershell.exe" `
             -ArgumentList @("-NoProfile","-ExecutionPolicy","Bypass","-File",$tmpScript) `
-            -RedirectStandardOutput $stdoutFile `
-            -RedirectStandardError  $stderrFile `
             -WorkingDirectory $WorkDir `
             -NoNewWindow -PassThru
     } catch {
