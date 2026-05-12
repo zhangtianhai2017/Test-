@@ -10,7 +10,8 @@
 #include "Components/SkyLightComponent.h"
 #include "Components/DirectionalLightComponent.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "GameFramework/Character.h"
+#include "Engine/SkeletalMesh.h"
+#include "Rendering/SkeletalMeshRenderData.h"
 #include "GameFramework/PlayerController.h"
 #include "Animation/Skeleton.h"
 #include "Misc/Paths.h"
@@ -73,10 +74,25 @@ void ABikiniValidatorGameMode::SpawnMetaHuman()
 		return;
 	}
 
-	MetaHumanActor = W->SpawnActor<ACharacter>(Cls, FVector::ZeroVector, FRotator::ZeroRotator);
+	// MetaHuman BPs are plain AActor (not ACharacter) with several
+	// SkeletalMeshComponents (Face, Body, Hair, ...). Spawn as AActor and
+	// pick the SkelComp whose mesh has the most vertices — that's the body.
+	MetaHumanActor = W->SpawnActor<AActor>(Cls, FVector::ZeroVector, FRotator::ZeroRotator);
 	if (MetaHumanActor)
 	{
-		MetaHumanBodyComp = MetaHumanActor->GetMesh();
+		TArray<USkeletalMeshComponent*> SkelComps;
+		MetaHumanActor->GetComponents(SkelComps);
+		int32 BestVerts = -1;
+		for (USkeletalMeshComponent* C : SkelComps)
+		{
+			if (!C) { continue; }
+			USkeletalMesh* M = C->GetSkeletalMeshAsset();
+			if (!M || !M->GetResourceForRendering() || M->GetResourceForRendering()->LODRenderData.Num() == 0) { continue; }
+			const int32 N = M->GetResourceForRendering()->LODRenderData[0].GetNumVertices();
+			if (N > BestVerts) { BestVerts = N; MetaHumanBodyComp = C; }
+		}
+		UE_LOG(LogTemp, Log, TEXT("[GameMode] MetaHuman has %d SkelComps; picked body=%s (%d verts)"),
+		       SkelComps.Num(), MetaHumanBodyComp ? *MetaHumanBodyComp->GetName() : TEXT("(none)"), BestVerts);
 	}
 
 	if (MetaHumanSkeletonPath.IsValid())

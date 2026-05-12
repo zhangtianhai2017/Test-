@@ -9,7 +9,6 @@ class UOutfitDownloader;
 class UOutfitLoader;
 class USimpleSelectorWidget;
 class AOrbitPawn;
-class ACharacter;
 class USkeletalMeshComponent;
 class USkeleton;
 
@@ -44,7 +43,7 @@ protected:
 	UFUNCTION() void HandleLoadClicked(FString File);
 	UFUNCTION() void HandleGlbReady(bool bSuccess, const TArray<uint8>& Bytes);
 
-	UPROPERTY() ACharacter*               MetaHumanActor   = nullptr;
+	UPROPERTY() AActor*                   MetaHumanActor   = nullptr;
 	UPROPERTY() USkeletalMeshComponent*   MetaHumanBodyComp = nullptr;
 	UPROPERTY() USkeleton*                MetaHumanSkeleton = nullptr;
 	UPROPERTY() AActor*                   CurrentOutfitActor = nullptr;
