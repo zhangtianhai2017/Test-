@@ -1,0 +1,1340 @@
+{
+  "version": 1,
+  "branch": "claude/bikini-variation-algorithm-Dv5q5",
+  "skeleton": "/Game/MetaHuman/Mannequin/SK_Body",
+  "outfits": [
+    {
+      "seed": "composite_floral",
+      "file": "composite_floral.glb",
+      "archetype": "one_piece_maillot",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BALCONETTE_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_HIGHWAIST_M"
+        },
+        {
+          "name": "shoulder_strap",
+          "library_id": "STR_SHOULDER_PADDED_20MM"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_CROCHET_COTTON"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_SHELL_TROCHUS_25MM"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BEADS_OVAL_8MM"
+        }
+      ],
+      "kb": 2876,
+      "vertex_count": 43564
+    },
+    {
+      "seed": "composite_red",
+      "file": "composite_red.glb",
+      "archetype": "triangle_string_halter",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_TRIANGLE_M"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_BRAZILIAN_M"
+        },
+        {
+          "name": "halter_strap",
+          "library_id": "STR_HALTER_5MM"
+        },
+        {
+          "name": "side_tie",
+          "library_id": "STR_TIE_CORD_5MM"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_ECONYL_PLAIN_LIGHT"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        }
+      ],
+      "kb": 464,
+      "vertex_count": 5992
+    },
+    {
+      "seed": "diverse_bandeau_05",
+      "file": "diverse_bandeau_05.glb",
+      "archetype": "bandeau_back_band",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BANDEAU_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_HIGHWAIST_M"
+        },
+        {
+          "name": "back_band",
+          "library_id": "STR_BACKBAND_PLAIN"
+        },
+        {
+          "name": "oring",
+          "library_id": "HW_OR_18MM_SILVER"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_CROCHET_COTTON"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_SHELL_TROCHUS_25MM"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BEADS_OVAL_8MM"
+        }
+      ],
+      "kb": 3533,
+      "vertex_count": 54814
+    },
+    {
+      "seed": "diverse_bandeau_06",
+      "file": "diverse_bandeau_06.glb",
+      "archetype": "bandeau_back_band",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BANDEAU_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_HIGHWAIST_M"
+        },
+        {
+          "name": "back_band",
+          "library_id": "STR_BACKBAND_PLAIN"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_MISSONI_SHINY_KNIT"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BOW_CHIFFON_30MM"
+        }
+      ],
+      "kb": 2805,
+      "vertex_count": 45375
+    },
+    {
+      "seed": "diverse_bandeau_07",
+      "file": "diverse_bandeau_07.glb",
+      "archetype": "bandeau_back_band",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BANDEAU_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_HIGHWAIST_M"
+        },
+        {
+          "name": "back_band",
+          "library_id": "STR_BACKBAND_PLAIN"
+        },
+        {
+          "name": "oring",
+          "library_id": "HW_OR_12MM_GOLD"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_HUNZA_CRINKLE"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BEADS_OVAL_8MM"
+        }
+      ],
+      "kb": 2818,
+      "vertex_count": 42969
+    },
+    {
+      "seed": "diverse_bandeau_08",
+      "file": "diverse_bandeau_08.glb",
+      "archetype": "bandeau_back_band",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BANDEAU_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_HIGHWAIST_M"
+        },
+        {
+          "name": "back_band",
+          "library_id": "STR_BACKBAND_PLAIN"
+        },
+        {
+          "name": "oring",
+          "library_id": "HW_OR_12MM_GOLD"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_CROCHET_COTTON"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BOW_CHIFFON_30MM"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_FRINGE_BEADED_80MM"
+        }
+      ],
+      "kb": 2491,
+      "vertex_count": 39892
+    },
+    {
+      "seed": "diverse_bandeau_09",
+      "file": "diverse_bandeau_09.glb",
+      "archetype": "bandeau_back_band",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BANDEAU_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_HIGHWAIST_M"
+        },
+        {
+          "name": "back_band",
+          "library_id": "STR_BACKBAND_PLAIN"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_MESH_OUTER"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_FRINGE_BEADED_80MM"
+        }
+      ],
+      "kb": 2055,
+      "vertex_count": 32935
+    },
+    {
+      "seed": "diverse_bralette_10",
+      "file": "diverse_bralette_10.glb",
+      "archetype": "bralette_shoulder_strap",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BALCONETTE_S"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_HIGHWAIST_M"
+        },
+        {
+          "name": "shoulder_strap",
+          "library_id": "STR_SHOULDER_WOVEN_15MM"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_BIOPOLYMER_PLAIN"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        }
+      ],
+      "kb": 1465,
+      "vertex_count": 22825
+    },
+    {
+      "seed": "diverse_bralette_11",
+      "file": "diverse_bralette_11.glb",
+      "archetype": "bralette_shoulder_strap",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BALCONETTE_S"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_HIGHWAIST_M"
+        },
+        {
+          "name": "shoulder_strap",
+          "library_id": "STR_SHOULDER_PADDED_20MM"
+        },
+        {
+          "name": "oring",
+          "library_id": "HW_OR_8MM_GOLD"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_CROCHET_COTTON"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_SHELL_TROCHUS_25MM"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BEADS_OVAL_8MM"
+        }
+      ],
+      "kb": 2331,
+      "vertex_count": 34163
+    },
+    {
+      "seed": "diverse_bralette_12",
+      "file": "diverse_bralette_12.glb",
+      "archetype": "bralette_shoulder_strap",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BALCONETTE_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_HIGHWAIST_M"
+        },
+        {
+          "name": "shoulder_strap",
+          "library_id": "STR_SHOULDER_PADDED_20MM"
+        },
+        {
+          "name": "oring",
+          "library_id": "HW_OR_18MM_SILVER"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_MISSONI_SHINY_KNIT"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BOW_CHIFFON_30MM"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BEADS_OVAL_8MM"
+        }
+      ],
+      "kb": 3549,
+      "vertex_count": 55076
+    },
+    {
+      "seed": "diverse_bralette_13",
+      "file": "diverse_bralette_13.glb",
+      "archetype": "bralette_shoulder_strap",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BALCONETTE_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_THONG_M"
+        },
+        {
+          "name": "shoulder_strap",
+          "library_id": "STR_SHOULDER_PADDED_20MM"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_MISSONI_SHINY_KNIT"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BOW_CHIFFON_30MM"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_FRINGE_BEADED_80MM"
+        }
+      ],
+      "kb": 1684,
+      "vertex_count": 26303
+    },
+    {
+      "seed": "diverse_bralette_14",
+      "file": "diverse_bralette_14.glb",
+      "archetype": "bralette_shoulder_strap",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BALCONETTE_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_THONG_M"
+        },
+        {
+          "name": "shoulder_strap",
+          "library_id": "STR_SHOULDER_PADDED_20MM"
+        },
+        {
+          "name": "oring",
+          "library_id": "HW_OR_12MM_GOLD"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_VIRGIN_VELVET"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_FRINGE_BEADED_80MM"
+        }
+      ],
+      "kb": 2415,
+      "vertex_count": 38915
+    },
+    {
+      "seed": "diverse_one_15",
+      "file": "diverse_one_15.glb",
+      "archetype": "one_piece_maillot",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BALCONETTE_S"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_HIGHWAIST_M"
+        },
+        {
+          "name": "shoulder_strap",
+          "library_id": "STR_SHOULDER_PADDED_20MM"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_VIRGIN_VELVET"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BOW_CHIFFON_30MM"
+        }
+      ],
+      "kb": 2538,
+      "vertex_count": 40783
+    },
+    {
+      "seed": "diverse_one_16",
+      "file": "diverse_one_16.glb",
+      "archetype": "one_piece_maillot",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BALCONETTE_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_HIGHWAIST_M"
+        },
+        {
+          "name": "shoulder_strap",
+          "library_id": "STR_SHOULDER_PADDED_20MM"
+        },
+        {
+          "name": "oring",
+          "library_id": "HW_OR_18MM_SILVER"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_CROCHET_COTTON"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_SHELL_TROCHUS_25MM"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BEADS_OVAL_8MM"
+        }
+      ],
+      "kb": 6407,
+      "vertex_count": 103816
+    },
+    {
+      "seed": "diverse_one_17",
+      "file": "diverse_one_17.glb",
+      "archetype": "one_piece_maillot",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BALCONETTE_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_HIGHWAIST_M"
+        },
+        {
+          "name": "underbust",
+          "library_id": "STR_FOE_15MM"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_MISSONI_SHINY_KNIT"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BEADS_OVAL_8MM"
+        }
+      ],
+      "kb": 3418,
+      "vertex_count": 53392
+    },
+    {
+      "seed": "diverse_one_18",
+      "file": "diverse_one_18.glb",
+      "archetype": "one_piece_maillot",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BALCONETTE_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_HIGHWAIST_M"
+        },
+        {
+          "name": "shoulder_strap",
+          "library_id": "STR_SHOULDER_PADDED_20MM"
+        },
+        {
+          "name": "oring",
+          "library_id": "HW_OR_18MM_SILVER"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_MISSONI_SHINY_KNIT"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_FRINGE_BEADED_80MM"
+        }
+      ],
+      "kb": 4876,
+      "vertex_count": 80738
+    },
+    {
+      "seed": "diverse_one_19",
+      "file": "diverse_one_19.glb",
+      "archetype": "one_piece_maillot",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BALCONETTE_M"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_HIGHWAIST_M"
+        },
+        {
+          "name": "shoulder_strap",
+          "library_id": "STR_SHOULDER_PADDED_20MM"
+        },
+        {
+          "name": "oring",
+          "library_id": "HW_OR_18MM_SILVER"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_CROCHET_COTTON"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BEADS_OVAL_8MM"
+        }
+      ],
+      "kb": 3401,
+      "vertex_count": 52696
+    },
+    {
+      "seed": "diverse_triangle_00",
+      "file": "diverse_triangle_00.glb",
+      "archetype": "triangle_string_halter",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_TRIANGLE_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_THONG_S"
+        },
+        {
+          "name": "halter_strap",
+          "library_id": "STR_HALTER_5MM"
+        },
+        {
+          "name": "side_tie",
+          "library_id": "STR_TIE_CORD_5MM"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_AMNI_SOUL_RIBBED"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BEADS_OVAL_8MM"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_FRINGE_BEADED_80MM"
+        }
+      ],
+      "kb": 3470,
+      "vertex_count": 54102
+    },
+    {
+      "seed": "diverse_triangle_01",
+      "file": "diverse_triangle_01.glb",
+      "archetype": "triangle_string_halter",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_TRIANGLE_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_THONG_S"
+        },
+        {
+          "name": "halter_strap",
+          "library_id": "STR_HALTER_5MM"
+        },
+        {
+          "name": "side_tie",
+          "library_id": "STR_TIE_RIBBON_15MM"
+        },
+        {
+          "name": "oring",
+          "library_id": "HW_OR_12MM_GOLD"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_HUNZA_CRINKLE"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_SHELL_TROCHUS_25MM"
+        }
+      ],
+      "kb": 2176,
+      "vertex_count": 34762
+    },
+    {
+      "seed": "diverse_triangle_02",
+      "file": "diverse_triangle_02.glb",
+      "archetype": "triangle_string_halter",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_TRIANGLE_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_THONG_M"
+        },
+        {
+          "name": "halter_strap",
+          "library_id": "STR_HALTER_5MM"
+        },
+        {
+          "name": "side_tie",
+          "library_id": "STR_TIE_RIBBON_15MM"
+        },
+        {
+          "name": "oring",
+          "library_id": "HW_OR_18MM_SILVER"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_VIRGIN_VELVET"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BOW_CHIFFON_30MM"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_FRINGE_BEADED_80MM"
+        }
+      ],
+      "kb": 1635,
+      "vertex_count": 25319
+    },
+    {
+      "seed": "diverse_triangle_03",
+      "file": "diverse_triangle_03.glb",
+      "archetype": "triangle_string_halter",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_TRIANGLE_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_THONG_S"
+        },
+        {
+          "name": "halter_strap",
+          "library_id": "STR_HALTER_5MM"
+        },
+        {
+          "name": "side_tie",
+          "library_id": "STR_TIE_RIBBON_15MM"
+        },
+        {
+          "name": "oring",
+          "library_id": "HW_OR_18MM_SILVER"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_CROCHET_COTTON"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_SHELL_TROCHUS_25MM"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BEADS_OVAL_8MM"
+        }
+      ],
+      "kb": 6398,
+      "vertex_count": 103570
+    },
+    {
+      "seed": "diverse_triangle_04",
+      "file": "diverse_triangle_04.glb",
+      "archetype": "triangle_string_halter",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_TRIANGLE_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_THONG_S"
+        },
+        {
+          "name": "halter_strap",
+          "library_id": "STR_HALTER_5MM"
+        },
+        {
+          "name": "side_tie",
+          "library_id": "STR_TIE_CORD_3MM"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_MISSONI_SHINY_KNIT"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        }
+      ],
+      "kb": 2921,
+      "vertex_count": 47817
+    },
+    {
+      "seed": "gallery_bandeau_crinkle_aqua",
+      "file": "gallery_bandeau_crinkle_aqua.glb",
+      "archetype": "bandeau_back_band",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BANDEAU_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_CHEEKY_M"
+        },
+        {
+          "name": "back_band",
+          "library_id": "STR_BACKBAND_PLAIN"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_HUNZA_CRINKLE"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        }
+      ],
+      "kb": 1002,
+      "vertex_count": 15187
+    },
+    {
+      "seed": "gallery_bandeau_navy_solid",
+      "file": "gallery_bandeau_navy_solid.glb",
+      "archetype": "bandeau_back_band",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BANDEAU_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_HIGHWAIST_M"
+        },
+        {
+          "name": "back_band",
+          "library_id": "STR_BACKBAND_PLAIN"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_ECONYL_PLAIN_HEAVY"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        }
+      ],
+      "kb": 912,
+      "vertex_count": 13664
+    },
+    {
+      "seed": "gallery_bandeau_velvet_burgundy",
+      "file": "gallery_bandeau_velvet_burgundy.glb",
+      "archetype": "bandeau_back_band",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BANDEAU_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_CHEEKY_M"
+        },
+        {
+          "name": "back_band",
+          "library_id": "STR_BACKBAND_PLAIN"
+        },
+        {
+          "name": "oring",
+          "library_id": "HW_OR_18MM_SILVER"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_VIRGIN_VELVET"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BOW_CHIFFON_30MM"
+        }
+      ],
+      "kb": 1185,
+      "vertex_count": 17933
+    },
+    {
+      "seed": "gallery_bralette_chromat_red",
+      "file": "gallery_bralette_chromat_red.glb",
+      "archetype": "bralette_shoulder_strap",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BALCONETTE_M"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_CHEEKY_M"
+        },
+        {
+          "name": "shoulder_strap",
+          "library_id": "STR_SHOULDER_PADDED_20MM"
+        },
+        {
+          "name": "oring",
+          "library_id": "HW_OR_18MM_SILVER"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_ECONYL_PLAIN_LIGHT"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        }
+      ],
+      "kb": 1141,
+      "vertex_count": 17373
+    },
+    {
+      "seed": "gallery_bralette_softcup_lavender",
+      "file": "gallery_bralette_softcup_lavender.glb",
+      "archetype": "bralette_shoulder_strap",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BALCONETTE_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_CHEEKY_M"
+        },
+        {
+          "name": "shoulder_strap",
+          "library_id": "STR_SHOULDER_WOVEN_15MM"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_QNOVA_RIBBED"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BOW_CHIFFON_30MM"
+        }
+      ],
+      "kb": 920,
+      "vertex_count": 13347
+    },
+    {
+      "seed": "gallery_bralette_sport_white",
+      "file": "gallery_bralette_sport_white.glb",
+      "archetype": "one_piece_maillot",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BALCONETTE_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_CHEEKY_M"
+        },
+        {
+          "name": "shoulder_strap",
+          "library_id": "STR_SHOULDER_PADDED_20MM"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_ECONYL_PLAIN_HEAVY"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        }
+      ],
+      "kb": 1379,
+      "vertex_count": 21395
+    },
+    {
+      "seed": "gallery_onepiece_classic_black",
+      "file": "gallery_onepiece_classic_black.glb",
+      "archetype": "one_piece_maillot",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BALCONETTE_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_HIGHWAIST_M"
+        },
+        {
+          "name": "shoulder_strap",
+          "library_id": "STR_SHOULDER_PADDED_20MM"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_ECONYL_PLAIN_LIGHT"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        }
+      ],
+      "kb": 1959,
+      "vertex_count": 31339
+    },
+    {
+      "seed": "gallery_onepiece_floral_emerald",
+      "file": "gallery_onepiece_floral_emerald.glb",
+      "archetype": "one_piece_maillot",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BALCONETTE_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_HIGHWAIST_M"
+        },
+        {
+          "name": "shoulder_strap",
+          "library_id": "STR_SHOULDER_PADDED_20MM"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_CROCHET_COTTON"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_SHELL_TROCHUS_25MM"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BEADS_OVAL_8MM"
+        }
+      ],
+      "kb": 2862,
+      "vertex_count": 43318
+    },
+    {
+      "seed": "gallery_onepiece_halter_terracotta",
+      "file": "gallery_onepiece_halter_terracotta.glb",
+      "archetype": "one_piece_maillot",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BALCONETTE_M"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_HIGHWAIST_M"
+        },
+        {
+          "name": "underbust",
+          "library_id": "STR_FOE_15MM"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_CROCHET_COTTON"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_FRINGE_BEADED_80MM"
+        }
+      ],
+      "kb": 1742,
+      "vertex_count": 27521
+    },
+    {
+      "seed": "gallery_triangle_aquamarine",
+      "file": "gallery_triangle_aquamarine.glb",
+      "archetype": "triangle_string_halter",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_TRIANGLE_M"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_THONG_M"
+        },
+        {
+          "name": "halter_strap",
+          "library_id": "STR_HALTER_5MM"
+        },
+        {
+          "name": "side_tie",
+          "library_id": "STR_TIE_CORD_5MM"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_ECONYL_PLAIN_LIGHT"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        }
+      ],
+      "kb": 532,
+      "vertex_count": 7131
+    },
+    {
+      "seed": "gallery_triangle_chevron_yellow",
+      "file": "gallery_triangle_chevron_yellow.glb",
+      "archetype": "triangle_string_halter",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_TRIANGLE_M"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_THONG_M"
+        },
+        {
+          "name": "halter_strap",
+          "library_id": "STR_HALTER_5MM"
+        },
+        {
+          "name": "side_tie",
+          "library_id": "STR_TIE_CORD_3MM"
+        },
+        {
+          "name": "oring",
+          "library_id": "HW_OR_18MM_SILVER"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_MISSONI_SHINY_KNIT"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        }
+      ],
+      "kb": 517,
+      "vertex_count": 6820
+    },
+    {
+      "seed": "gallery_triangle_floral_pink",
+      "file": "gallery_triangle_floral_pink.glb",
+      "archetype": "triangle_string_halter",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_TRIANGLE_M"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_BRAZILIAN_M"
+        },
+        {
+          "name": "halter_strap",
+          "library_id": "STR_HALTER_5MM"
+        },
+        {
+          "name": "side_tie",
+          "library_id": "STR_TIE_CORD_5MM"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_CROCHET_COTTON"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_SHELL_TROCHUS_25MM"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BEADS_OVAL_8MM"
+        }
+      ],
+      "kb": 1328,
+      "vertex_count": 17308
+    },
+    {
+      "seed": "swimsuit_2",
+      "file": "swimsuit_2.glb",
+      "archetype": "triangle_string_halter",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_TRIANGLE_M"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_BRAZILIAN_M"
+        },
+        {
+          "name": "halter_strap",
+          "library_id": "STR_HALTER_5MM"
+        },
+        {
+          "name": "side_tie",
+          "library_id": "STR_TIE_CORD_5MM"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_ECONYL_PLAIN_LIGHT"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        }
+      ],
+      "kb": 464,
+      "vertex_count": 5992
+    },
+    {
+      "seed": "synthetic_bandeau",
+      "file": "synthetic_bandeau.glb",
+      "archetype": "bandeau_back_band",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BANDEAU_L"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_HIGHWAIST_M"
+        },
+        {
+          "name": "back_band",
+          "library_id": "STR_BACKBAND_PLAIN"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_MISSONI_SHINY_KNIT"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BOW_CHIFFON_30MM"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_BEADS_OVAL_8MM"
+        }
+      ],
+      "kb": 2695,
+      "vertex_count": 40601
+    },
+    {
+      "seed": "synthetic_bralette",
+      "file": "synthetic_bralette.glb",
+      "archetype": "bralette_shoulder_strap",
+      "slots": [
+        {
+          "name": "cup",
+          "library_id": "CUP_BALCONETTE_M"
+        },
+        {
+          "name": "bottom_front",
+          "library_id": "BOT_BRAZILIAN_M"
+        },
+        {
+          "name": "shoulder_strap",
+          "library_id": "STR_SHOULDER_PADDED_20MM"
+        },
+        {
+          "name": "oring",
+          "library_id": "HW_OR_18MM_SILVER"
+        },
+        {
+          "name": "primary_fabric",
+          "library_id": "F_ECONYL_PLAIN_LIGHT"
+        },
+        {
+          "name": "seam_type",
+          "library_id": "S_OVERLOCK_4THREAD"
+        },
+        {
+          "name": "accessory",
+          "library_id": "ACC_FRINGE_BEADED_80MM"
+        }
+      ],
+      "kb": 577,
+      "vertex_count": 7850
+    }
+  ]
+}
