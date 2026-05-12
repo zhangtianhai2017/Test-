@@ -100,6 +100,8 @@ while ($true) {
     $scriptText = [string]$inbox.script
     $timeoutSec = if ($inbox.timeout) { [int]$inbox.timeout } else { 600 }
     Log "executing $jobId  script.length=$($scriptText.Length)  timeout=${timeoutSec}s"
+    # echo the script so the user can see on the terminal what's about to run
+    Log ("---- script ----`r`n" + $scriptText + "`r`n----------------")
 
     $tmpScript  = Join-Path $tmpDir "$jobId.ps1"
     $stdoutFile = Join-Path $tmpDir "$jobId.out"
@@ -213,6 +215,8 @@ $scriptText
 
     if ($pushed) {
         Log "completed $jobId  exit=$exit  stdout.len=$($stdout.Length)  stderr.len=$($stderr.Length)  -> pushed"
+        if ($stdout.Length -gt 0) { Log ("---- stdout ----`r`n" + $stdout + "`r`n----------------") }
+        if ($stderr.Length -gt 0) { Log ("---- stderr ----`r`n" + $stderr + "`r`n----------------") }
     } else {
         Log "FAILED to push $jobId — will retry on next loop"
     }
