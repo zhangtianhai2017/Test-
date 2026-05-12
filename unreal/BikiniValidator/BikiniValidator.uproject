@@ -29,6 +29,18 @@
 			"Enabled": true
 		},
 		{
+			"Name": "GLTFExporter",
+			"Enabled": true
+		},
+		{
+			"Name": "PythonScriptPlugin",
+			"Enabled": true
+		},
+		{
+			"Name": "EditorScriptingUtilities",
+			"Enabled": true
+		},
+		{
 			"Name": "MetaHumanCharacter",
 			"Enabled": true,
 			"Optional": true
