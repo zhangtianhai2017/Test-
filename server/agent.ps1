@@ -126,13 +126,15 @@ while ($true) {
             $exit = 124
             Log "$jobId TIMED OUT after ${timeoutSec}s"
         } else {
-            $exit = $proc.ExitCode
+            $exit = if ($null -eq $proc.ExitCode) { 0 } else { [int]$proc.ExitCode }
         }
     }
 
     $stdout = ""; $stderr = ""
-    if (Test-Path $stdoutFile) { $stdout = (Get-Content $stdoutFile -Raw); if (-not $stdout) { $stdout = "" } }
-    if (Test-Path $stderrFile) { $stderr = (Get-Content $stderrFile -Raw); if (-not $stderr) { $stderr = "" } }
+    if (Test-Path $stdoutFile) { $stdout = [IO.File]::ReadAllText($stdoutFile, [System.Text.UTF8Encoding]::new($false)) }
+    if (Test-Path $stderrFile) { $stderr = [IO.File]::ReadAllText($stderrFile, [System.Text.UTF8Encoding]::new($false)) }
+    if ($null -eq $stdout) { $stdout = "" }
+    if ($null -eq $stderr) { $stderr = "" }
     Remove-Item -Force -ErrorAction SilentlyContinue $tmpScript, $stdoutFile, $stderrFile
 
     # cap each at 200 KB so commits don't blow up; tail kept (more useful for error diag)
@@ -148,7 +150,8 @@ while ($true) {
         completed_at = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
     }
     $resultJson = $result | ConvertTo-Json -Depth 3 -Compress
-    Set-Content -Path outbox.json -Value $resultJson -Encoding UTF8
+    # Write WITHOUT BOM so consumers can parse plain UTF-8.
+    [IO.File]::WriteAllText("$RelayDir\outbox.json", $resultJson, [System.Text.UTF8Encoding]::new($false))
 
     # --- commit + push (distinguish network errors from non-ff) ---
     $pushed = $false
@@ -179,7 +182,7 @@ while ($true) {
         Log "non-fast-forward — rebasing outbox onto remote"
         git fetch origin $Branch 2>&1 | Out-Null
         git reset --hard "origin/$Branch" 2>&1 | Out-Null
-        Set-Content -Path outbox.json -Value $resultJson -Encoding UTF8
+        [IO.File]::WriteAllText("$RelayDir\outbox.json", $resultJson, [System.Text.UTF8Encoding]::new($false))
     }
 
     if ($pushed) {
