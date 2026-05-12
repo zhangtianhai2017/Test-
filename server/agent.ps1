@@ -1,31 +1,31 @@
-# agent.ps1 — Windows side of the command relay.
+# agent.ps1 v3 — GitHub-relayed command agent.
 #
-# Long-polls <RelayUrl>?action=pull, runs the returned script via
-# powershell.exe, and POSTs stdout/stderr/exit back to ?action=result.
+# Uses the public claude-relay branch as the channel:
+#   inbox.json  (claude pushes commands here)
+#   outbox.json (this agent pushes results here)
 #
-# Designed for no-admin environments:
-#   - No registry / ExecutionPolicy changes (callers must use -Bypass)
-#   - Temp files written to the working dir, not %TEMP%
-#   - Network blips and HTTP errors do not crash the loop
-#   - All output mirrored to .\agent.log so you can tail it post-mortem
+# Auth model:
+#   - inbox is read via public raw URL (no auth needed)
+#   - outbox push uses your locally cached git credentials (Windows
+#     Credential Manager). If you've ever git-push'd this repo from
+#     this Windows account, you're set. If not, the first push will
+#     pop a credential prompt or fail; instructions below.
 #
-# Usage (call via start-agent.bat, or):
-#   powershell -NoProfile -ExecutionPolicy Bypass -File agent.ps1 `
-#     -RelayUrl http://your-server/relay.jsp -AgentToken ABC...
-#
-# Or set $env:RELAY_URL and $env:AGENT_TOKEN before invoking.
+# No PAT to manage. No tokens to edit. Just run start-agent.bat.
 
 param(
-    [string]$RelayUrl   = $env:RELAY_URL,
-    [string]$AgentToken = $env:AGENT_TOKEN,
+    [string]$RepoOwner  = "zhangtianhai2017",
+    [string]$RepoName   = "Test-",
+    [string]$Branch     = "claude-relay",
+    [string]$RelayDir   = (Join-Path (Get-Location).Path ".relay-clone"),
     [string]$WorkDir    = (Get-Location).Path,
-    [string]$LogFile    = (Join-Path (Get-Location).Path "agent.log"),
-    [int]   $PullTimeoutSec = 40,
-    [int]   $RetryDelaySec  = 5
+    [int]   $PollSec    = 5
 )
 
-if (-not $RelayUrl)   { throw "RelayUrl missing (set RELAY_URL or -RelayUrl)" }
-if (-not $AgentToken) { throw "AgentToken missing (set AGENT_TOKEN or -AgentToken)" }
+$ErrorActionPreference = "Continue"
+$RepoUrl = "https://github.com/$RepoOwner/$RepoName.git"
+$LogFile = Join-Path $WorkDir "agent.log"
+$UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 
 function Log {
     param([string]$Msg)
@@ -34,42 +34,66 @@ function Log {
     try { Add-Content -Path $LogFile -Value $line -Encoding UTF8 } catch {}
 }
 
-# Tmp dir inside the work dir — avoids %TEMP% on locked-down profiles.
-$TmpDir = Join-Path $WorkDir ".agent-tmp"
-if (-not (Test-Path $TmpDir)) { New-Item -ItemType Directory -Path $TmpDir | Out-Null }
+# ---- one-time clone of the relay branch -------------------------------------
+if (-not (Test-Path (Join-Path $RelayDir ".git"))) {
+    Log "first run — cloning $RepoUrl ($Branch) into $RelayDir"
+    git clone --branch $Branch --single-branch --depth 50 $RepoUrl $RelayDir
+    if ($LASTEXITCODE -ne 0) {
+        Log "FATAL: clone failed. Is git installed and is the network OK?"
+        exit 1
+    }
+    Push-Location $RelayDir
+    git config user.email "agent@local"
+    git config user.name  "relay-agent"
+    Pop-Location
+}
 
-Log "agent start  relay=$RelayUrl  workdir=$WorkDir  logfile=$LogFile"
+# ---- main loop --------------------------------------------------------------
+$tmpDir = Join-Path $WorkDir ".agent-tmp"
+if (-not (Test-Path $tmpDir)) { New-Item -ItemType Directory -Path $tmpDir | Out-Null }
+
+Log "agent ready — polling $RepoUrl branch=$Branch every ${PollSec}s"
 Log "press Ctrl+C to stop"
 
-$headers = @{ "X-Token" = $AgentToken }
-
-# Fake a Chrome UA so Aliyun WAF / CDN doesn't block as "non-browser".
-# In PS 5.1 the User-Agent header MUST go via -UserAgent, not -Headers.
-$UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-
 while ($true) {
-    # ---- pull (server long-polls up to 30s) ------------------------------
-    $job = $null
+    Push-Location $RelayDir
+
+    # --- pull latest ---
+    git fetch origin $Branch --quiet 2>$null
+    git reset --hard "origin/$Branch" --quiet 2>$null
+
+    # --- read inbox & outbox ---
+    $inbox  = $null
+    $outbox = $null
     try {
-        $job = Invoke-RestMethod -Uri "$RelayUrl`?action=pull" `
-            -Headers $headers -UserAgent $UA `
-            -Method Get -TimeoutSec $PullTimeoutSec
-    } catch {
-        Log "pull error: $($_.Exception.Message) — retry in ${RetryDelaySec}s"
-        Start-Sleep -Seconds $RetryDelaySec
+        if (Test-Path inbox.json)  { $inbox  = Get-Content inbox.json  -Raw -Encoding UTF8 | ConvertFrom-Json }
+        if (Test-Path outbox.json) { $outbox = Get-Content outbox.json -Raw -Encoding UTF8 | ConvertFrom-Json }
+    } catch { Log "JSON parse error: $($_.Exception.Message)" }
+
+    # --- decide: is there a new command? ---
+    $newJob = $false
+    if ($inbox -and $inbox.id -and $inbox.id.Length -gt 0) {
+        if (-not ($outbox -and $outbox.id -eq $inbox.id)) {
+            $newJob = $true
+        }
+    }
+
+    if (-not $newJob) {
+        Pop-Location
+        Start-Sleep -Seconds $PollSec
         continue
     }
 
-    if (-not $job -or -not $job.id) { continue }   # empty queue
+    # --- execute ---
+    $jobId = $inbox.id
+    $scriptText = [string]$inbox.script
+    $timeoutSec = if ($inbox.timeout) { [int]$inbox.timeout } else { 600 }
+    Log "executing $jobId  script.length=$($scriptText.Length)  timeout=${timeoutSec}s"
 
-    $jobId = $job.id
-    $scriptLen = $job.script.Length
-    Log "running $jobId  script.length=$scriptLen"
-
-    $tmpScript = Join-Path $TmpDir "$jobId.ps1"
-    $stdoutFile = Join-Path $TmpDir "$jobId.out"
-    $stderrFile = Join-Path $TmpDir "$jobId.err"
-    Set-Content -Path $tmpScript -Value $job.script -Encoding UTF8
+    $tmpScript  = Join-Path $tmpDir "$jobId.ps1"
+    $stdoutFile = Join-Path $tmpDir "$jobId.out"
+    $stderrFile = Join-Path $tmpDir "$jobId.err"
+    Set-Content -Path $tmpScript -Value $scriptText -Encoding UTF8
 
     $proc = $null
     try {
@@ -85,7 +109,6 @@ while ($true) {
 
     $exit = -1
     if ($proc) {
-        $timeoutSec = if ($job.timeout) { [int]$job.timeout } else { 600 }
         $finished = $proc.WaitForExit($timeoutSec * 1000)
         if (-not $finished) {
             try { $proc.Kill() } catch {}
@@ -96,40 +119,58 @@ while ($true) {
         }
     }
 
-    $stdout = ""
-    $stderr = ""
+    $stdout = ""; $stderr = ""
     if (Test-Path $stdoutFile) { $stdout = (Get-Content $stdoutFile -Raw); if (-not $stdout) { $stdout = "" } }
     if (Test-Path $stderrFile) { $stderr = (Get-Content $stderrFile -Raw); if (-not $stderr) { $stderr = "" } }
     Remove-Item -Force -ErrorAction SilentlyContinue $tmpScript, $stdoutFile, $stderrFile
 
-    $cap = 1000000
-    if ($stdout.Length -gt $cap) { $stdout = $stdout.Substring(0, $cap) + "`n[truncated]" }
-    if ($stderr.Length -gt $cap) { $stderr = $stderr.Substring(0, $cap) + "`n[truncated]" }
+    # cap each at 200 KB so commits don't blow up; tail kept (more useful for error diag)
+    $cap = 200000
+    if ($stdout.Length -gt $cap) { $stdout = "[truncated]`n" + $stdout.Substring($stdout.Length - $cap) }
+    if ($stderr.Length -gt $cap) { $stderr = "[truncated]`n" + $stderr.Substring($stderr.Length - $cap) }
 
-    $body = @{
-        id     = $jobId
-        stdout = $stdout
-        stderr = $stderr
-        exit   = $exit
-    } | ConvertTo-Json -Depth 3 -Compress
+    $result = [ordered]@{
+        id           = $jobId
+        stdout       = $stdout
+        stderr       = $stderr
+        exit         = $exit
+        completed_at = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+    }
+    $resultJson = $result | ConvertTo-Json -Depth 3 -Compress
+    Set-Content -Path outbox.json -Value $resultJson -Encoding UTF8
 
-    # ---- POST result, retry briefly on transient failure -----------------
-    $reported = $false
-    for ($attempt = 1; $attempt -le 3; $attempt++) {
-        try {
-            Invoke-RestMethod -Uri "$RelayUrl`?action=result" `
-                -Headers $headers -UserAgent $UA -Method Post `
-                -ContentType "application/json" -Body $body -TimeoutSec 30 | Out-Null
-            $reported = $true
+    # --- commit + push (retry on non-ff) ---
+    $pushed = $false
+    for ($attempt = 1; $attempt -le 5; $attempt++) {
+        git add outbox.json --quiet
+        git commit -m "relay-agent: result $jobId" --quiet 2>&1 | Out-Null
+        git push origin $Branch 2>&1 | Tee-Object -Variable pushOut | Out-Null
+        if ($LASTEXITCODE -eq 0) { $pushed = $true; break }
+
+        $msg = ($pushOut -join " ")
+        if ($msg -match "could not read Username|Authentication|denied|403|401") {
+            Log "PUSH AUTH FAILED — see agent.log + on-screen instructions below"
+            Log "fix: run once interactively to cache credentials:"
+            Log "  cd $RelayDir"
+            Log "  git push origin $Branch"
+            Log "  (a popup or prompt should ask for your GitHub login)"
+            Log "  after success, restart this agent."
             break
-        } catch {
-            Log "result POST attempt $attempt failed: $($_.Exception.Message)"
-            Start-Sleep -Seconds $attempt
         }
+
+        # non-ff: someone (claude) pushed a new inbox. fetch + replay our outbox change.
+        Log "push non-ff (attempt $attempt) — rebasing on remote"
+        git fetch origin $Branch --quiet
+        git reset --hard "origin/$Branch" --quiet
+        Set-Content -Path outbox.json -Value $resultJson -Encoding UTF8
     }
-    if ($reported) {
-        Log "reported $jobId  exit=$exit  stdout.len=$($stdout.Length)  stderr.len=$($stderr.Length)"
+
+    if ($pushed) {
+        Log "completed $jobId  exit=$exit  stdout.len=$($stdout.Length)  stderr.len=$($stderr.Length)  -> pushed"
     } else {
-        Log "GIVING UP on $jobId after 3 POST attempts — result lost"
+        Log "FAILED to push $jobId — will retry on next loop"
     }
+
+    Pop-Location
+    Start-Sleep -Seconds $PollSec
 }
