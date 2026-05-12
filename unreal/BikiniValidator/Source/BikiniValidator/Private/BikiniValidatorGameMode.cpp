@@ -22,11 +22,9 @@ ABikiniValidatorGameMode::ABikiniValidatorGameMode()
 {
 	BaseRawUrl = TEXT("https://raw.githubusercontent.com/zhangtianhai2017/Test-/claude/bikini-variation-algorithm-Dv5q5/assets/glb/");
 
-	// Override these via editor on the GameMode default object after dropping
-	// the user's MetaHuman asset into Content/MetaHuman/.
-	// Example values:
-	//   MetaHumanBPPath       = FSoftObjectPath("/Game/MetaHuman/Ada/BP_Ada.BP_Ada_C");
-	//   MetaHumanSkeletonPath = FSoftObjectPath("/Game/MetaHuman/Ada/Female_Skeleton.Female_Skeleton");
+	MetaHumanBPPath = FSoftObjectPath(TEXT("/Game/MetaHumans/NPC_swim_G_34/BP_NPC_swim_G_34.BP_NPC_swim_G_34_C"));
+	// MetaHumanSkeletonPath left empty — resolved automatically from the
+	// spawned body mesh in SpawnMetaHuman().
 
 	DefaultPawnClass = AOrbitPawn::StaticClass();
 }
