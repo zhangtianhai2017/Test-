@@ -5,3 +5,7 @@ __pycache__/
 # generated body-skin pickle (developer-local; regenerate via
 # `python3 tools/bake_body_assets.py <body.glb>`)
 assets/glb/_body_skin.pkl
+
+# relay deploy file with real tokens baked in — never commit
+server/relay-deploy.jsp
+agent.log
