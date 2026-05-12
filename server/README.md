@@ -51,32 +51,55 @@ curl http://your-host/relay.jsp?action=ping
 
 ### 3. Windows: start the agent
 
+**Easy way** (no admin needed):
+
+1. Edit `server/start-agent.bat`, fill in `RELAY_URL` and the
+   `AGENT_TOKEN` from step 1.
+2. Double-click `start-agent.bat`. The window stays open, logs to
+   `agent.log` next to the batch.
+
+**Manual way**:
+
 ```powershell
-$env:RELAY_URL   = "http://your-host/relay.jsp"
-$env:AGENT_TOKEN = "<agent token from step 1>"
-cd C:\work\2026\Claude\test-     # whatever working dir you want
-.\server\agent.ps1
-# leave running; commands execute as they arrive
+cd C:\work\2026\Claude\test-
+powershell -NoProfile -ExecutionPolicy Bypass -File .\server\agent.ps1 `
+    -RelayUrl http://your-host/relay.jsp `
+    -AgentToken "<agent token from step 1>"
 ```
 
-To run as a Windows service: install [nssm](https://nssm.cc/) and
-`nssm install RelayAgent powershell.exe -File C:\…\agent.ps1`.
+`-ExecutionPolicy Bypass` is the no-admin workaround for a locked-down
+`Get-ExecutionPolicy`. It only applies to this one invocation; nothing
+is written to registry.
+
+To run as a service: install [nssm](https://nssm.cc/) and
+`nssm install RelayAgent powershell.exe ...`. (Requires admin.)
 
 ### 4. Operator (Claude sandbox)
 
-Claude `curl`s the relay with the OPERATOR_TOKEN — no client install
-needed:
+Easiest: `server/relay_send.sh` — pipes stdin → enqueue → polls result.
 
 ```bash
-# push a command
-curl -sS -X POST "http://your-host/relay.jsp?action=enqueue" \
-  -H "X-Token: $OPERATOR_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"id":"job-001","script":"git status; (Get-Date).ToString()","timeout":30}'
+export RELAY_URL=http://your-host/relay.jsp
+export OPERATOR_TOKEN="<operator token from step 1>"
 
-# wait for result (long-polls up to 60s server-side, repeat if "ready":false)
-curl -sS "http://your-host/relay.jsp?action=result&id=job-001" \
-  -H "X-Token: $OPERATOR_TOKEN"
+echo 'git status; (Get-Date).ToString()' | ./server/relay_send.sh
+# prints:
+#   ---STDOUT---
+#   On branch claude/...
+#   2026-05-12 14:21:33
+#   ---STDERR---
+#   ---EXIT---
+#   0
+```
+
+Raw curl works too:
+
+```bash
+curl -sS -X POST "$RELAY_URL?action=enqueue" \
+    -H "X-Token: $OPERATOR_TOKEN" -H "Content-Type: application/json" \
+    -d '{"id":"job-001","script":"git status","timeout":30}'
+
+curl -sS "$RELAY_URL?action=result&id=job-001" -H "X-Token: $OPERATOR_TOKEN"
 ```
 
 ## Security
