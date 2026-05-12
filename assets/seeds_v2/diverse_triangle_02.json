@@ -1,0 +1,148 @@
+{
+  "meta": {
+    "name": "diverse_triangle_02",
+    "source_views": {},
+    "analysis_notes": "Auto-synthesized via diverse_seeds.py (rng=42, archetype=triangle_string_halter, pattern=tie_dye, fabric_source=amni_soul, style_archetype=italian_luxe). Selected by fitness \u00d7 diversity from 80-sample stratified random pool.",
+    "confidence": {
+      "shape": 0.6,
+      "color": 0.6,
+      "pattern": 0.6,
+      "fabric": 0.6,
+      "hardware": 0.6,
+      "style_archetype": 0.6
+    },
+    "migrated_to_v2": "2026-04-29"
+  },
+  "genome": {
+    "pattern": "tie_dye",
+    "top_center_v": 0.71,
+    "top_half_v": 0.2131543122670404,
+    "top_half_u": 0.26520041475040135,
+    "top_inner_u": 0.095,
+    "top_apex_lift": 0.20525718711173388,
+    "top_underband_dip": 0.6771810408901346,
+    "top_back_coverage": 0.08651487597299913,
+    "top_neck_strap": 0.6130987329428929,
+    "top_shoulder_strap": 0.16674899092796142,
+    "bot_front_top_v": 0.45999999999999996,
+    "bot_front_half_u": 0.6116777657259501,
+    "bot_front_leg_curve": 0.9872330636315043,
+    "bot_back_top_v": 0.6539763177107326,
+    "bot_back_half_u": 0.04,
+    "bot_tie_dangle": 0.8171041351154616,
+    "hue": 0.5337515008799911,
+    "saturation": 0.5623209903211002,
+    "lightness": 0.5675720015708416,
+    "secondary_hue": 0.13429111439336772,
+    "secondary_saturation": 0.11542867041910221,
+    "secondary_lightness": 0.10703597770941764,
+    "pattern_scale": 0.6614506383981672,
+    "pattern_angle": 0.2723482123148163,
+    "trim_color_mode": 0.6048298270302239,
+    "fabric_sheen": 0.7176121871387979,
+    "fabric_metallic": 0.22911879054735382,
+    "fabric_opacity": 0.6342379588850797,
+    "fabric_weight": 0.2639839016304094,
+    "fabric_weave": "velvet",
+    "palette_preset": "future_dusk",
+    "fabric_source": "amni_soul",
+    "biodegradable": 0.0,
+    "single_material": 0.0,
+    "has_oring": 1.0,
+    "oring_size": 0.45403431047073006,
+    "has_bow": 1.0,
+    "bow_size": 0.27668022397225167,
+    "has_fringe": 1.0,
+    "fringe_length": 0.7711192230196271,
+    "has_beads": 0.0,
+    "has_shell": 0.0,
+    "style_archetype": "italian_luxe",
+    "hardware_metal": "gold"
+  },
+  "outfit": {
+    "archetype": "triangle_string_halter",
+    "slot_assignments": [
+      {
+        "slot_name": "cup",
+        "library_id": "CUP_TRIANGLE_L",
+        "local_params": {
+          "half_u": 0.236,
+          "half_v": 0.118,
+          "inner_u": 0.095,
+          "apex_lift": 0.20525718711173388,
+          "underband_dip": 0.1
+        }
+      },
+      {
+        "slot_name": "bottom_front",
+        "library_id": "BOT_THONG_M",
+        "local_params": {
+          "front_top_v": 0.32,
+          "front_half_u": 0.32,
+          "front_leg_curve": 0.8,
+          "back_top_v": 0.3,
+          "back_half_u": 0.06
+        }
+      },
+      {
+        "slot_name": "halter_strap",
+        "library_id": "STR_HALTER_5MM",
+        "local_params": {
+          "length_cm": 55.0
+        }
+      },
+      {
+        "slot_name": "side_tie",
+        "library_id": "STR_TIE_RIBBON_15MM",
+        "local_params": {
+          "length_cm": 22.0
+        }
+      },
+      {
+        "slot_name": "oring",
+        "library_id": "HW_OR_18MM_SILVER",
+        "local_params": {}
+      },
+      {
+        "slot_name": "primary_fabric",
+        "library_id": "F_VIRGIN_VELVET",
+        "local_params": {}
+      },
+      {
+        "slot_name": "seam_type",
+        "library_id": "S_OVERLOCK_4THREAD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_BOW_CHIFFON_30MM",
+        "local_params": {
+          "size_cm": 2.1067208958890067
+        }
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_FRINGE_BEADED_80MM",
+        "local_params": {
+          "length_cm": 7.940073007176644
+        }
+      }
+    ],
+    "global_design": {
+      "hue": 0.6275006003519964,
+      "saturation": 0.5428177782577981,
+      "lightness": 0.4190288006283367,
+      "secondary_hue": 0.13429111439336772,
+      "secondary_saturation": 0.11542867041910221,
+      "secondary_lightness": 0.10703597770941764,
+      "pattern_overlay": "floral",
+      "pattern_scale": 0.7101527872791753,
+      "pattern_angle": 0.2723482123148163,
+      "palette_preset": "future_dusk"
+    }
+  },
+  "outfit_validation": {
+    "valid": true,
+    "warnings": []
+  }
+}

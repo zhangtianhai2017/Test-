@@ -1,0 +1,148 @@
+{
+  "meta": {
+    "name": "diverse_triangle_03",
+    "source_views": {},
+    "analysis_notes": "Auto-synthesized via diverse_seeds.py (rng=42, archetype=triangle_string_halter, pattern=polka, fabric_source=amni_soul, style_archetype=boho_cultgaia). Selected by fitness \u00d7 diversity from 80-sample stratified random pool.",
+    "confidence": {
+      "shape": 0.6,
+      "color": 0.6,
+      "pattern": 0.6,
+      "fabric": 0.6,
+      "hardware": 0.6,
+      "style_archetype": 0.6
+    },
+    "migrated_to_v2": "2026-04-29"
+  },
+  "genome": {
+    "pattern": "polka",
+    "top_center_v": 0.71,
+    "top_half_v": 0.8955779401398597,
+    "top_half_u": 0.45845802854414863,
+    "top_inner_u": 0.095,
+    "top_apex_lift": 0.5807706273762658,
+    "top_underband_dip": 0.5054277638607758,
+    "top_back_coverage": 0.13469882240588457,
+    "top_neck_strap": 0.7077405156935169,
+    "top_shoulder_strap": 0.1183791526672553,
+    "bot_front_top_v": 0.45999999999999996,
+    "bot_front_half_u": 0.662443928153949,
+    "bot_front_leg_curve": 0.13070828644016186,
+    "bot_back_top_v": 0.36,
+    "bot_back_half_u": 0.8509137057886191,
+    "bot_tie_dangle": 0.9260419517816366,
+    "hue": 0.40853148076333556,
+    "saturation": 0.5651274783227624,
+    "lightness": 0.43172528238036034,
+    "secondary_hue": 0.45275785231557386,
+    "secondary_saturation": 0.2336112266383128,
+    "secondary_lightness": 0.9435546860300945,
+    "pattern_scale": 0.13611184641671903,
+    "pattern_angle": 0.7701466201596561,
+    "trim_color_mode": 0.10897283371843802,
+    "fabric_sheen": 0.10565775010269118,
+    "fabric_metallic": 0.4495667477403217,
+    "fabric_opacity": 0.3140332878121178,
+    "fabric_weight": 0.12073673707190558,
+    "fabric_weave": "crochet",
+    "palette_preset": "aquatic_awe",
+    "fabric_source": "amni_soul",
+    "biodegradable": 1.0,
+    "single_material": 0.0,
+    "has_oring": 1.0,
+    "oring_size": 0.46334659505641396,
+    "has_bow": 0.0,
+    "bow_size": 0.09042088804852488,
+    "has_fringe": 1.0,
+    "fringe_length": 0.5493967422982604,
+    "has_beads": 1.0,
+    "has_shell": 1.0,
+    "style_archetype": "boho_cultgaia",
+    "hardware_metal": "chrome"
+  },
+  "outfit": {
+    "archetype": "triangle_string_halter",
+    "slot_assignments": [
+      {
+        "slot_name": "cup",
+        "library_id": "CUP_TRIANGLE_L",
+        "local_params": {
+          "half_u": 0.236,
+          "half_v": 0.118,
+          "inner_u": 0.095,
+          "apex_lift": 0.3,
+          "underband_dip": 0.1
+        }
+      },
+      {
+        "slot_name": "bottom_front",
+        "library_id": "BOT_THONG_S",
+        "local_params": {
+          "front_top_v": 0.32,
+          "front_half_u": 0.272,
+          "front_leg_curve": 0.5,
+          "back_top_v": 0.3,
+          "back_half_u": 0.14
+        }
+      },
+      {
+        "slot_name": "halter_strap",
+        "library_id": "STR_HALTER_5MM",
+        "local_params": {
+          "length_cm": 55.0
+        }
+      },
+      {
+        "slot_name": "side_tie",
+        "library_id": "STR_TIE_RIBBON_15MM",
+        "local_params": {
+          "length_cm": 22.0
+        }
+      },
+      {
+        "slot_name": "oring",
+        "library_id": "HW_OR_18MM_SILVER",
+        "local_params": {}
+      },
+      {
+        "slot_name": "primary_fabric",
+        "library_id": "F_CROCHET_COTTON",
+        "local_params": {}
+      },
+      {
+        "slot_name": "seam_type",
+        "library_id": "S_OVERLOCK_4THREAD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_SHELL_TROCHUS_25MM",
+        "local_params": {
+          "size_cm": 2.5
+        }
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_BEADS_OVAL_8MM",
+        "local_params": {
+          "count": 12.0
+        }
+      }
+    ],
+    "global_design": {
+      "hue": 0.4113356665374004,
+      "saturation": 0.6437229460980973,
+      "lightness": 0.4507105508284649,
+      "secondary_hue": 0.45275785231557386,
+      "secondary_saturation": 0.2336112266383128,
+      "secondary_lightness": 0.9435546860300945,
+      "pattern_overlay": "polka",
+      "pattern_scale": 0.13611184641671903,
+      "pattern_angle": 0.7701466201596561,
+      "palette_preset": "aquatic_awe"
+    }
+  },
+  "outfit_validation": {
+    "valid": true,
+    "warnings": []
+  }
+}

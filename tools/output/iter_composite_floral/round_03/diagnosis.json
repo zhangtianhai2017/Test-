@@ -1,0 +1,12 @@
+{
+  "delta": {
+    "weave_intensity": -0.4,
+    "cup_extra_cm": -0.16,
+    "strap_radius_scale": 0.1,
+    "genome_patch": {
+      "pattern_scale": 0.2,
+      "top_back_coverage": -0.05
+    }
+  },
+  "unresolved": []
+}

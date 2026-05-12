@@ -1,0 +1,52 @@
+{
+  "iteration": 5,
+  "seed": "composite_floral",
+  "global_quality": 0.74,
+  "issues": [
+    {
+      "id": "I1",
+      "view": "01_front",
+      "region": "torso_silhouette",
+      "category": "fabric_feel",
+      "severity": "med",
+      "evidence": "Whole garment still feels skin-tight — fabric wrapped flush against the body. Real one-piece Lycra has a tiny bit of stand-off, more visible at the chest sides and hip. Push shell_offset higher.",
+      "fix_hint": "increase_shell_offset"
+    },
+    {
+      "id": "I2",
+      "view": "02_three_quarter",
+      "region": "right_hip",
+      "category": "hip_bulge",
+      "severity": "med",
+      "evidence": "Hip ridge still slightly visible. Continue narrowing back coverage.",
+      "fix_hint": "narrow_back_coverage"
+    },
+    {
+      "id": "I3",
+      "view": "06_hip_close",
+      "region": "leg_opening",
+      "category": "leg_opening_curve",
+      "severity": "low",
+      "evidence": "Front panel between legs is visible but the leg opening curve doesn't read as a finished hem. Could use slightly thicker binding.",
+      "fix_hint": "thicken_binding"
+    },
+    {
+      "id": "I4",
+      "view": "08_shoulder_top",
+      "region": "left_shoulder_strap",
+      "category": "strap_position",
+      "severity": "low",
+      "evidence": "Strap visible but quite narrow. Already at 1.2× so don't push much further.",
+      "fix_hint": "thicken_strap"
+    },
+    {
+      "id": "I5",
+      "view": "05_chest_close",
+      "region": "front_panel_pattern",
+      "category": "pattern_size",
+      "severity": "low",
+      "evidence": "Pattern at near-max scale — accept as is.",
+      "fix_hint": "other"
+    }
+  ]
+}

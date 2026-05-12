@@ -1,0 +1,134 @@
+{
+  "meta": {
+    "name": "diverse_one_18",
+    "source_views": {},
+    "analysis_notes": "Auto-synthesized via diverse_seeds.py (rng=42, archetype=one_piece_maillot, pattern=tie_dye, fabric_source=amni_soul, style_archetype=italian_luxe). Selected by fitness \u00d7 diversity from 80-sample stratified random pool.",
+    "confidence": {
+      "shape": 0.6,
+      "color": 0.6,
+      "pattern": 0.6,
+      "fabric": 0.6,
+      "hardware": 0.6,
+      "style_archetype": 0.6
+    },
+    "migrated_to_v2": "2026-04-29"
+  },
+  "genome": {
+    "pattern": "tie_dye",
+    "top_center_v": 0.79,
+    "top_half_v": 0.9862557925465316,
+    "top_half_u": 0.24689535644320448,
+    "top_inner_u": 0.095,
+    "top_apex_lift": 0.12876467478738274,
+    "top_underband_dip": 0.9810110249927598,
+    "top_back_coverage": 0.9568437218450072,
+    "top_neck_strap": 0.43133575917855516,
+    "top_shoulder_strap": 0.4519508243247264,
+    "bot_front_top_v": 0.45999999999999996,
+    "bot_front_half_u": 0.22843521408422013,
+    "bot_front_leg_curve": 0.6040915863798888,
+    "bot_back_top_v": 0.7201062466825752,
+    "bot_back_half_u": 0.7175645359020268,
+    "bot_tie_dangle": 0.6449659614003673,
+    "hue": 0.311629130307071,
+    "saturation": 0.43530368301148936,
+    "lightness": 0.7261145742807789,
+    "secondary_hue": 0.5742591532812521,
+    "secondary_saturation": 0.05320145532666787,
+    "secondary_lightness": 0.6188059407313984,
+    "pattern_scale": 0.6362098259179169,
+    "pattern_angle": 0.4361842503000628,
+    "trim_color_mode": 0.953164011208628,
+    "fabric_sheen": 0.17134118096616247,
+    "fabric_metallic": 0.3894814282790625,
+    "fabric_opacity": 0.5589960414936958,
+    "fabric_weight": 0.057545765458357545,
+    "fabric_weave": "shiny_knit",
+    "palette_preset": "ethereal_highlight",
+    "fabric_source": "amni_soul",
+    "biodegradable": 0.0,
+    "single_material": 1.0,
+    "has_oring": 1.0,
+    "oring_size": 0.7194031544736439,
+    "has_bow": 0.0,
+    "bow_size": 0.7188687941140709,
+    "has_fringe": 1.0,
+    "fringe_length": 0.9473511270920107,
+    "has_beads": 0.0,
+    "has_shell": 0.0,
+    "style_archetype": "italian_luxe",
+    "hardware_metal": "gold"
+  },
+  "outfit": {
+    "archetype": "one_piece_maillot",
+    "slot_assignments": [
+      {
+        "slot_name": "cup",
+        "library_id": "CUP_BALCONETTE_L",
+        "local_params": {
+          "half_u": 0.24689535644320448,
+          "half_v": 0.118,
+          "inner_u": 0.095,
+          "apex_lift": 0.1,
+          "underband_dip": 0.05
+        }
+      },
+      {
+        "slot_name": "bottom_front",
+        "library_id": "BOT_HIGHWAIST_M",
+        "local_params": {
+          "front_top_v": 0.45999999999999996,
+          "front_half_u": 0.46,
+          "front_leg_curve": 0.5,
+          "back_top_v": 0.55,
+          "back_half_u": 0.46
+        }
+      },
+      {
+        "slot_name": "shoulder_strap",
+        "library_id": "STR_SHOULDER_PADDED_20MM",
+        "local_params": {
+          "length_cm": 32.0
+        }
+      },
+      {
+        "slot_name": "oring",
+        "library_id": "HW_OR_18MM_SILVER",
+        "local_params": {}
+      },
+      {
+        "slot_name": "primary_fabric",
+        "library_id": "F_MISSONI_SHINY_KNIT",
+        "local_params": {}
+      },
+      {
+        "slot_name": "seam_type",
+        "library_id": "S_OVERLOCK_4THREAD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_FRINGE_BEADED_80MM",
+        "local_params": {
+          "length_cm": 9.526160143828097
+        }
+      }
+    ],
+    "global_design": {
+      "hue": 0.21465165212282838,
+      "saturation": 0.38195466294206815,
+      "lightness": 0.8304458297123116,
+      "secondary_hue": 0.5742591532812521,
+      "secondary_saturation": 0.05320145532666787,
+      "secondary_lightness": 0.6188059407313984,
+      "pattern_overlay": "floral",
+      "pattern_scale": 0.6987944216630626,
+      "pattern_angle": 0.4361842503000628,
+      "palette_preset": "ethereal_highlight"
+    }
+  },
+  "outfit_validation": {
+    "valid": true,
+    "warnings": []
+  }
+}

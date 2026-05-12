@@ -1,0 +1,52 @@
+{
+  "iteration": 2,
+  "seed": "composite_floral",
+  "global_quality": 0.62,
+  "issues": [
+    {
+      "id": "I1",
+      "view": "01_front",
+      "region": "torso_full",
+      "category": "fabric_artifact",
+      "severity": "high",
+      "evidence": "Fabric still reads as a busy striated grain even with wrinkles at 0. The weave shading + fabric normal map are creating a dominant texture that overwhelms the floral pattern. Real swim Lycra has very subtle grain.",
+      "fix_hint": "less_weave_grain"
+    },
+    {
+      "id": "I2",
+      "view": "05_chest_close",
+      "region": "both_cups",
+      "category": "cup_too_voluminous",
+      "severity": "med",
+      "evidence": "Cups still read as pushed-up — pillow domes on each breast. A monokini one-piece would have a flatter chest panel.",
+      "fix_hint": "decrease_cup_dome"
+    },
+    {
+      "id": "I3",
+      "view": "05_chest_close",
+      "region": "neckline_edge",
+      "category": "binding_too_thin",
+      "severity": "med",
+      "evidence": "Binding rim now visible but still thin. A real 1\" FOE finish reads as a clear band.",
+      "fix_hint": "thicken_binding"
+    },
+    {
+      "id": "I4",
+      "view": "05_chest_close",
+      "region": "front_panel_pattern",
+      "category": "pattern_unrecognizable",
+      "severity": "med",
+      "evidence": "Pattern still looks like grain not leaves. Need to push pattern_scale higher and the weave reduction together.",
+      "fix_hint": "scale_pattern_up"
+    },
+    {
+      "id": "I5",
+      "view": "04_back",
+      "region": "lower_back_hip",
+      "category": "hip_bulge",
+      "severity": "low",
+      "evidence": "Slight horizontal ridge at the hip in back view — back panel terminates with a visible ledge rather than a smooth curve.",
+      "fix_hint": "narrow_back_coverage"
+    }
+  ]
+}

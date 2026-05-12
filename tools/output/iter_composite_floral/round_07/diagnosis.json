@@ -1,0 +1,26 @@
+{
+  "delta": {
+    "min_offset_cm": 0.1,
+    "weave_intensity": -0.2
+  },
+  "unresolved": [
+    {
+      "id": "I2",
+      "view": "05_chest_close",
+      "region": "front_panel",
+      "category": "pattern_size",
+      "severity": "low",
+      "evidence": "Pattern is fully readable. Done with scale.",
+      "fix_hint": "other"
+    },
+    {
+      "id": "I4",
+      "view": "08_shoulder_top",
+      "region": "shoulder_strap",
+      "category": "strap_thickness",
+      "severity": "low",
+      "evidence": "Straps reading well, hold.",
+      "fix_hint": "other"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+[
+  {
+    "id": "I5",
+    "view": "03_side_left",
+    "region": "side_silhouette",
+    "category": "fabric_feel",
+    "severity": "low",
+    "evidence": "Side silhouette looks clean \u2014 no notable jagged edges.",
+    "fix_hint": "other"
+  }
+]

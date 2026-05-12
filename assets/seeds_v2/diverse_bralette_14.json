@@ -1,0 +1,134 @@
+{
+  "meta": {
+    "name": "diverse_bralette_14",
+    "source_views": {},
+    "analysis_notes": "Auto-synthesized via diverse_seeds.py (rng=42, archetype=bralette_shoulder_strap, pattern=chevron, fabric_source=qnova, style_archetype=brazilian). Selected by fitness \u00d7 diversity from 80-sample stratified random pool.",
+    "confidence": {
+      "shape": 0.6,
+      "color": 0.6,
+      "pattern": 0.6,
+      "fabric": 0.6,
+      "hardware": 0.6,
+      "style_archetype": 0.6
+    },
+    "migrated_to_v2": "2026-04-29"
+  },
+  "genome": {
+    "pattern": "chevron",
+    "top_center_v": 0.7770455708659328,
+    "top_half_v": 0.706809801518452,
+    "top_half_u": 0.3148099250515737,
+    "top_inner_u": 0.095,
+    "top_apex_lift": 0.4333776243063717,
+    "top_underband_dip": 0.9323680006347871,
+    "top_back_coverage": 0.2972166489092638,
+    "top_neck_strap": 0.04762907980799525,
+    "top_shoulder_strap": 0.8945008642625778,
+    "bot_front_top_v": 0.45999999999999996,
+    "bot_front_half_u": 0.4829080894271758,
+    "bot_front_leg_curve": 0.4285362837995004,
+    "bot_back_top_v": 0.6344971554524083,
+    "bot_back_half_u": 0.047586764713087516,
+    "bot_tie_dangle": 0.1368746726687503,
+    "hue": 0.46848362276588323,
+    "saturation": 0.7472997495883118,
+    "lightness": 0.49420257359163533,
+    "secondary_hue": 0.2652860467889563,
+    "secondary_saturation": 0.15143310639640062,
+    "secondary_lightness": 0.813868851863629,
+    "pattern_scale": 0.7335606850439786,
+    "pattern_angle": 0.28259967365705907,
+    "trim_color_mode": 0.19857296820560633,
+    "fabric_sheen": 0.696638776435854,
+    "fabric_metallic": 0.9508327582203315,
+    "fabric_opacity": 0.8571567961818247,
+    "fabric_weight": 0.7494459764226457,
+    "fabric_weave": "velvet",
+    "palette_preset": "aquatic_awe",
+    "fabric_source": "qnova",
+    "biodegradable": 0.0,
+    "single_material": 1.0,
+    "has_oring": 1.0,
+    "oring_size": 0.20854697160415725,
+    "has_bow": 0.0,
+    "bow_size": 0.41815934842811264,
+    "has_fringe": 1.0,
+    "fringe_length": 0.38029022984971383,
+    "has_beads": 0.0,
+    "has_shell": 0.0,
+    "style_archetype": "brazilian",
+    "hardware_metal": "gold"
+  },
+  "outfit": {
+    "archetype": "bralette_shoulder_strap",
+    "slot_assignments": [
+      {
+        "slot_name": "cup",
+        "library_id": "CUP_BALCONETTE_L",
+        "local_params": {
+          "half_u": 0.28319999999999995,
+          "half_v": 0.118,
+          "inner_u": 0.095,
+          "apex_lift": 0.1,
+          "underband_dip": 0.05
+        }
+      },
+      {
+        "slot_name": "bottom_front",
+        "library_id": "BOT_THONG_M",
+        "local_params": {
+          "front_top_v": 0.32,
+          "front_half_u": 0.3053086402422291,
+          "front_leg_curve": 0.6053413277097752,
+          "back_top_v": 0.3,
+          "back_half_u": 0.06541404412088939
+        }
+      },
+      {
+        "slot_name": "shoulder_strap",
+        "library_id": "STR_SHOULDER_PADDED_20MM",
+        "local_params": {
+          "length_cm": 30.0
+        }
+      },
+      {
+        "slot_name": "oring",
+        "library_id": "HW_OR_12MM_GOLD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "primary_fabric",
+        "library_id": "F_VIRGIN_VELVET",
+        "local_params": {}
+      },
+      {
+        "slot_name": "seam_type",
+        "library_id": "S_OVERLOCK_4THREAD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_FRINGE_BEADED_80MM",
+        "local_params": {
+          "length_cm": 5.0
+        }
+      }
+    ],
+    "global_design": {
+      "hue": 0.5053934491063533,
+      "saturation": 0.7535139549258961,
+      "lightness": 0.46195646324649436,
+      "secondary_hue": 0.2652860467889563,
+      "secondary_saturation": 0.15143310639640062,
+      "secondary_lightness": 0.813868851863629,
+      "pattern_overlay": "chevron",
+      "pattern_scale": 0.7335606850439786,
+      "pattern_angle": 0.28259967365705907,
+      "palette_preset": "aquatic_awe"
+    }
+  },
+  "outfit_validation": {
+    "valid": true,
+    "warnings": []
+  }
+}

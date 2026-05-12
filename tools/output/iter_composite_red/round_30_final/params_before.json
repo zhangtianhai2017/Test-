@@ -1,0 +1,1 @@
+{"smooth_iters": 27, "boundary_snap": 0.95, "min_offset_cm": 0.45, "cup_extra_cm": 0.03, "shell_offset_cm": 0.45, "binding_thickness_cm": 0.80, "binding_offset_cm": 0.05, "wrinkle_amp_scale": 0.0, "strap_radius_scale": 1.30, "weave_intensity": 0.0, "cup_dome_depth_cm": 1.5, "side_seam_overlay": true, "boundary_topstitch": true, "lining_hint": true, "genome_patch": {}}

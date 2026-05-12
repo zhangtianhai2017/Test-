@@ -1,0 +1,52 @@
+{
+  "iteration": 1,
+  "seed": "composite_floral",
+  "global_quality": 0.58,
+  "issues": [
+    {
+      "id": "I1",
+      "view": "01_front",
+      "region": "torso_full",
+      "category": "fabric_artifact",
+      "severity": "high",
+      "evidence": "Wrinkle texture still dominates. The whole torso looks like crinkled foil — the round-0 less_wrinkles -0.6 was not enough. A real one-piece in fitted Lycra reads as smooth.",
+      "fix_hint": "less_wrinkles"
+    },
+    {
+      "id": "I2",
+      "view": "05_chest_close",
+      "region": "both_cups",
+      "category": "cup_too_voluminous",
+      "severity": "med",
+      "evidence": "After +0.30 cm cup_extra in round 0, cups are now over-domed for a one-piece — they read as pushed-up bra cups, not the unsupported chest panel a monokini has. Step back from the increase.",
+      "fix_hint": "decrease_cup_dome"
+    },
+    {
+      "id": "I3",
+      "view": "02_three_quarter",
+      "region": "right_hip",
+      "category": "hip_bulge",
+      "severity": "med",
+      "evidence": "Visible bulge on the side of the hip — fabric appears to extend laterally beyond the body silhouette.",
+      "fix_hint": "narrow_back_coverage"
+    },
+    {
+      "id": "I4",
+      "view": "05_chest_close",
+      "region": "neckline_edge",
+      "category": "binding_too_thin",
+      "severity": "low",
+      "evidence": "Binding rim slightly more visible after round 0's +0.10 but still thin for an FOE finish.",
+      "fix_hint": "thicken_binding"
+    },
+    {
+      "id": "I5",
+      "view": "05_chest_close",
+      "region": "fabric_pattern",
+      "category": "pattern_unrecognizable",
+      "severity": "med",
+      "evidence": "The monstera leaf pattern reads as horizontal/vertical stripes — partly from cylindrical UV warping, partly from wrinkle interference. Once wrinkles drop the pattern should reveal itself.",
+      "fix_hint": "scale_pattern_up"
+    }
+  ]
+}

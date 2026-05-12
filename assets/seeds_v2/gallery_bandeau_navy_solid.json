@@ -1,0 +1,122 @@
+{
+  "meta": {
+    "name": "gallery_bandeau_navy_solid",
+    "source_views": {},
+    "analysis_notes": "Synthetic gallery seed. archetype=bandeau_back_band, pieces=9, connectors=2, accessories=0.",
+    "confidence": {
+      "shape": 1.0,
+      "color": 1.0,
+      "pattern": 1.0,
+      "fabric": 0.8,
+      "hardware": 0.8,
+      "style_archetype": 1.0
+    },
+    "migrated_to_v2": "2026-04-29"
+  },
+  "genome": {
+    "pattern": "solid",
+    "top_center_v": 0.74,
+    "top_half_v": 0.09,
+    "top_half_u": 0.22,
+    "top_inner_u": 0.0,
+    "top_apex_lift": 0.049999999999999864,
+    "top_underband_dip": 0.05,
+    "top_back_coverage": 0.55,
+    "top_neck_strap": 0.0,
+    "top_shoulder_strap": 0.0,
+    "bot_front_top_v": 0.45999999999999996,
+    "bot_front_half_u": 0.18,
+    "bot_front_leg_curve": 0.65,
+    "bot_back_top_v": 0.36,
+    "bot_back_half_u": 0.16,
+    "bot_tie_dangle": 0.2,
+    "hue": 0.62,
+    "saturation": 0.365,
+    "lightness": 0.27249999999999996,
+    "secondary_hue": 0.5,
+    "secondary_saturation": 0.4,
+    "secondary_lightness": 0.4,
+    "pattern_scale": 0.5,
+    "pattern_angle": 0.0,
+    "trim_color_mode": 0.3,
+    "fabric_sheen": 0.27999999999999997,
+    "fabric_metallic": 0.0,
+    "fabric_opacity": 1.0,
+    "fabric_weight": 0.65,
+    "fabric_weave": "plain",
+    "palette_preset": "free",
+    "fabric_source": "econyl",
+    "biodegradable": 0.0,
+    "single_material": 1.0,
+    "has_oring": 0.0,
+    "oring_size": 0.4,
+    "has_bow": 0.0,
+    "bow_size": 0.3,
+    "has_fringe": 0.0,
+    "fringe_length": 0.2,
+    "has_beads": 0.0,
+    "has_shell": 0.0,
+    "style_archetype": "scandi_minimal",
+    "hardware_metal": "none"
+  },
+  "outfit": {
+    "archetype": "bandeau_back_band",
+    "slot_assignments": [
+      {
+        "slot_name": "cup",
+        "library_id": "CUP_BANDEAU_L",
+        "local_params": {
+          "half_u": 0.236,
+          "half_v": 0.0944,
+          "inner_u": 0.0,
+          "apex_lift": 0.049999999999999864,
+          "underband_dip": 0.05
+        }
+      },
+      {
+        "slot_name": "bottom_front",
+        "library_id": "BOT_HIGHWAIST_M",
+        "local_params": {
+          "front_top_v": 0.45999999999999996,
+          "front_half_u": 0.46,
+          "front_leg_curve": 0.5,
+          "back_top_v": 0.4,
+          "back_half_u": 0.34
+        }
+      },
+      {
+        "slot_name": "back_band",
+        "library_id": "STR_BACKBAND_PLAIN",
+        "local_params": {
+          "height_cm": 3.5
+        }
+      },
+      {
+        "slot_name": "primary_fabric",
+        "library_id": "F_ECONYL_PLAIN_HEAVY",
+        "local_params": {}
+      },
+      {
+        "slot_name": "seam_type",
+        "library_id": "S_OVERLOCK_4THREAD",
+        "local_params": {}
+      }
+    ],
+    "global_design": {
+      "hue": 0.62,
+      "saturation": 0.19174999999999998,
+      "lightness": 0.260125,
+      "secondary_hue": 0.5,
+      "secondary_saturation": 0.4,
+      "secondary_lightness": 0.4,
+      "pattern_overlay": "solid",
+      "pattern_scale": 0.5,
+      "pattern_angle": 0.0,
+      "palette_preset": "free"
+    }
+  },
+  "outfit_validation": {
+    "valid": true,
+    "warnings": []
+  }
+}

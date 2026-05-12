@@ -1,0 +1,136 @@
+{
+  "meta": {
+    "name": "diverse_bralette_13",
+    "source_views": {},
+    "analysis_notes": "Auto-synthesized via diverse_seeds.py (rng=42, archetype=bralette_shoulder_strap, pattern=solid, fabric_source=cotton_blend, style_archetype=spanish_mediterranean). Selected by fitness \u00d7 diversity from 80-sample stratified random pool.",
+    "confidence": {
+      "shape": 0.6,
+      "color": 0.6,
+      "pattern": 0.6,
+      "fabric": 0.6,
+      "hardware": 0.6,
+      "style_archetype": 0.6
+    },
+    "migrated_to_v2": "2026-04-29"
+  },
+  "genome": {
+    "pattern": "solid",
+    "top_center_v": 0.71,
+    "top_half_v": 0.09000000000000008,
+    "top_half_u": 0.8310679928489868,
+    "top_inner_u": 0.08164948698112162,
+    "top_apex_lift": 0.0,
+    "top_underband_dip": 0.26666666666666694,
+    "top_back_coverage": 0.342033719453455,
+    "top_neck_strap": 0.07911750566053828,
+    "top_shoulder_strap": 0.9320680175336278,
+    "bot_front_top_v": 0.544847152346723,
+    "bot_front_half_u": 0.7225574205617382,
+    "bot_front_leg_curve": 0.44397363648859334,
+    "bot_back_top_v": 0.644847152346723,
+    "bot_back_half_u": 0.04,
+    "bot_tie_dangle": 0.11126666632210713,
+    "hue": 0.01040014376795502,
+    "saturation": 0.39227109235725693,
+    "lightness": 0.7397512477875048,
+    "secondary_hue": 0.17358020322989987,
+    "secondary_saturation": 0.16034878798475538,
+    "secondary_lightness": 0.3963906901529438,
+    "pattern_scale": 0.4236207655065025,
+    "pattern_angle": 0.948241963058535,
+    "trim_color_mode": 0.4542965110701018,
+    "fabric_sheen": 0.7114067660981285,
+    "fabric_metallic": 0.2580543601449595,
+    "fabric_opacity": 0.5720651336153778,
+    "fabric_weight": 0.30603395930940513,
+    "fabric_weave": "shiny_knit",
+    "palette_preset": "transcendent_pink",
+    "fabric_source": "cotton_blend",
+    "biodegradable": 0.0,
+    "single_material": 1.0,
+    "has_oring": 0.0,
+    "oring_size": 0.09193652511761363,
+    "has_bow": 1.0,
+    "bow_size": 0.9510730365301173,
+    "has_fringe": 1.0,
+    "fringe_length": 0.48268109074659415,
+    "has_beads": 0.0,
+    "has_shell": 0.0,
+    "style_archetype": "spanish_mediterranean",
+    "hardware_metal": "none"
+  },
+  "outfit": {
+    "archetype": "bralette_shoulder_strap",
+    "slot_assignments": [
+      {
+        "slot_name": "cup",
+        "library_id": "CUP_BALCONETTE_L",
+        "local_params": {
+          "half_u": 0.28319999999999995,
+          "half_v": 0.09000000000000008,
+          "inner_u": 0.08164948698112162,
+          "apex_lift": 0.0,
+          "underband_dip": 0.05
+        }
+      },
+      {
+        "slot_name": "bottom_front",
+        "library_id": "BOT_THONG_M",
+        "local_params": {
+          "front_top_v": 0.32,
+          "front_half_u": 0.32,
+          "front_leg_curve": 0.5,
+          "back_top_v": 0.3,
+          "back_half_u": 0.06
+        }
+      },
+      {
+        "slot_name": "shoulder_strap",
+        "library_id": "STR_SHOULDER_PADDED_20MM",
+        "local_params": {
+          "length_cm": 30.0
+        }
+      },
+      {
+        "slot_name": "primary_fabric",
+        "library_id": "F_MISSONI_SHINY_KNIT",
+        "local_params": {}
+      },
+      {
+        "slot_name": "seam_type",
+        "library_id": "S_OVERLOCK_4THREAD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_BOW_CHIFFON_30MM",
+        "local_params": {
+          "size_cm": 4.804292146120469
+        }
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_FRINGE_BEADED_80MM",
+        "local_params": {
+          "length_cm": 5.677358417523707
+        }
+      }
+    ],
+    "global_design": {
+      "hue": 0.0014720258782319126,
+      "saturation": 0.3116087966243063,
+      "lightness": 0.7641552246017509,
+      "secondary_hue": 0.17358020322989987,
+      "secondary_saturation": 0.16034878798475538,
+      "secondary_lightness": 0.3963906901529438,
+      "pattern_overlay": "solid",
+      "pattern_scale": 0.4236207655065025,
+      "pattern_angle": 0.948241963058535,
+      "palette_preset": "transcendent_pink"
+    }
+  },
+  "outfit_validation": {
+    "valid": true,
+    "warnings": []
+  }
+}

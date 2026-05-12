@@ -1,0 +1,15 @@
+# UE generated
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+*.sln
+*.suo
+.vs/
+.vscode/
+.idea/
+
+# User-supplied MetaHuman assets — drop locally, do not commit
+Content/MetaHuman/*
+!Content/MetaHuman/.gitkeep
+!Content/MetaHuman/README.md

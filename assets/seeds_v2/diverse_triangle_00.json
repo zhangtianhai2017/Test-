@@ -1,0 +1,143 @@
+{
+  "meta": {
+    "name": "diverse_triangle_00",
+    "source_views": {},
+    "analysis_notes": "Auto-synthesized via diverse_seeds.py (rng=42, archetype=triangle_string_halter, pattern=stripe, fabric_source=virgin, style_archetype=avantgarde_cutout). Selected by fitness \u00d7 diversity from 80-sample stratified random pool.",
+    "confidence": {
+      "shape": 0.6,
+      "color": 0.6,
+      "pattern": 0.6,
+      "fabric": 0.6,
+      "hardware": 0.6,
+      "style_archetype": 0.6
+    },
+    "migrated_to_v2": "2026-04-29"
+  },
+  "genome": {
+    "pattern": "stripe",
+    "top_center_v": 0.71,
+    "top_half_v": 0.2791122463092105,
+    "top_half_u": 0.26423959530939556,
+    "top_inner_u": 0.07609288497566137,
+    "top_apex_lift": 0.3151870771820174,
+    "top_underband_dip": 0.005645136017820129,
+    "top_back_coverage": 0.1842728383949759,
+    "top_neck_strap": 0.924997780188339,
+    "top_shoulder_strap": 0.03109465303892869,
+    "bot_front_top_v": 0.45999999999999996,
+    "bot_front_half_u": 0.5968803320143776,
+    "bot_front_leg_curve": 0.7736609498588879,
+    "bot_back_top_v": 0.8286282384591551,
+    "bot_back_half_u": 0.8431399811945126,
+    "bot_tie_dangle": 0.30115481831543844,
+    "hue": 0.897963272966972,
+    "saturation": 0.33845566022932105,
+    "lightness": 0.539152318191622,
+    "secondary_hue": 0.7076815613944754,
+    "secondary_saturation": 0.5253950671848804,
+    "secondary_lightness": 0.9569877176275037,
+    "pattern_scale": 0.5206062873317038,
+    "pattern_angle": 0.7862582393373575,
+    "trim_color_mode": 0.5942167216328461,
+    "fabric_sheen": 0.7118860697870417,
+    "fabric_metallic": 0.40341706642467934,
+    "fabric_opacity": 0.34940295086203565,
+    "fabric_weight": 0.8833967388671174,
+    "fabric_weave": "ribbed",
+    "palette_preset": "transcendent_pink",
+    "fabric_source": "virgin",
+    "biodegradable": 1.0,
+    "single_material": 0.0,
+    "has_oring": 0.0,
+    "oring_size": 0.9503082763601518,
+    "has_bow": 0.0,
+    "bow_size": 0.4748571887361338,
+    "has_fringe": 1.0,
+    "fringe_length": 0.7521337567354232,
+    "has_beads": 1.0,
+    "has_shell": 0.0,
+    "style_archetype": "avantgarde_cutout",
+    "hardware_metal": "none"
+  },
+  "outfit": {
+    "archetype": "triangle_string_halter",
+    "slot_assignments": [
+      {
+        "slot_name": "cup",
+        "library_id": "CUP_TRIANGLE_L",
+        "local_params": {
+          "half_u": 0.236,
+          "half_v": 0.118,
+          "inner_u": 0.07609288497566137,
+          "apex_lift": 0.3,
+          "underband_dip": 0.005645136017820129
+        }
+      },
+      {
+        "slot_name": "bottom_front",
+        "library_id": "BOT_THONG_S",
+        "local_params": {
+          "front_top_v": 0.32,
+          "front_half_u": 0.272,
+          "front_leg_curve": 0.7736609498588879,
+          "back_top_v": 0.3,
+          "back_half_u": 0.14
+        }
+      },
+      {
+        "slot_name": "halter_strap",
+        "library_id": "STR_HALTER_5MM",
+        "local_params": {
+          "length_cm": 55.0
+        }
+      },
+      {
+        "slot_name": "side_tie",
+        "library_id": "STR_TIE_CORD_5MM",
+        "local_params": {
+          "length_cm": 22.0
+        }
+      },
+      {
+        "slot_name": "primary_fabric",
+        "library_id": "F_AMNI_SOUL_RIBBED",
+        "local_params": {}
+      },
+      {
+        "slot_name": "seam_type",
+        "library_id": "S_OVERLOCK_4THREAD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_BEADS_OVAL_8MM",
+        "local_params": {
+          "count": 12.0
+        }
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_FRINGE_BEADED_80MM",
+        "local_params": {
+          "length_cm": 7.769203810618809
+        }
+      }
+    ],
+    "global_design": {
+      "hue": 0.9411853091867888,
+      "saturation": 0.25538226409172843,
+      "lightness": 0.7256609272766488,
+      "secondary_hue": 0.7076815613944754,
+      "secondary_saturation": 0.5253950671848804,
+      "secondary_lightness": 0.9569877176275037,
+      "pattern_overlay": "stripe",
+      "pattern_scale": 0.5206062873317038,
+      "pattern_angle": 0.7862582393373575,
+      "palette_preset": "transcendent_pink"
+    }
+  },
+  "outfit_validation": {
+    "valid": true,
+    "warnings": []
+  }
+}

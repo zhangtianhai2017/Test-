@@ -1,0 +1,21 @@
+{
+  "delta": {
+    "weave_intensity": -0.4,
+    "shell_offset_cm": 0.05,
+    "binding_thickness_cm": 0.05,
+    "genome_patch": {
+      "bot_front_half_u": 0.02
+    }
+  },
+  "unresolved": [
+    {
+      "id": "I5",
+      "view": "03_side_left",
+      "region": "side_silhouette",
+      "category": "fabric_feel",
+      "severity": "low",
+      "evidence": "Side silhouette looks clean \u2014 no notable jagged edges.",
+      "fix_hint": "other"
+    }
+  ]
+}

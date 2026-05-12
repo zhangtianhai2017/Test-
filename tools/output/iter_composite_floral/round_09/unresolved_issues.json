@@ -1,0 +1,47 @@
+[
+  {
+    "id": "I1",
+    "view": "01_front",
+    "region": "torso_full",
+    "category": "fabric_feel",
+    "severity": "low",
+    "evidence": "Reads as a one-piece swimsuit. Fabric stand-off and silhouette all read well now.",
+    "fix_hint": "other"
+  },
+  {
+    "id": "I2",
+    "view": "05_chest_close",
+    "region": "neckline",
+    "category": "binding_visibility",
+    "severity": "low",
+    "evidence": "FOE binding now reads clearly at the neckline.",
+    "fix_hint": "other"
+  },
+  {
+    "id": "I3",
+    "view": "05_chest_close",
+    "region": "both_cups",
+    "category": "cup_body_coupling",
+    "severity": "med",
+    "evidence": "Persistent issue \u2014 body-coupled cup. Logged as known limitation requiring code change (analytic cup template) rather than further param tuning.",
+    "fix_hint": "other"
+  },
+  {
+    "id": "I4",
+    "view": "04_back",
+    "region": "back_panel",
+    "category": "fabric_feel",
+    "severity": "low",
+    "evidence": "Back coverage looks clean after the rounds 1-5 narrowing.",
+    "fix_hint": "other"
+  },
+  {
+    "id": "I5",
+    "view": "06_hip_close",
+    "region": "front_panel",
+    "category": "fabric_feel",
+    "severity": "low",
+    "evidence": "Front panel between legs reads as fabric.",
+    "fix_hint": "other"
+  }
+]

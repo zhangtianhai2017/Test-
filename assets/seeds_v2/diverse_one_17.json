@@ -1,0 +1,127 @@
+{
+  "meta": {
+    "name": "diverse_one_17",
+    "source_views": {},
+    "analysis_notes": "Auto-synthesized via diverse_seeds.py (rng=42, archetype=one_piece_maillot, pattern=stripe, fabric_source=econyl, style_archetype=retro_missoni). Selected by fitness \u00d7 diversity from 80-sample stratified random pool.",
+    "confidence": {
+      "shape": 0.6,
+      "color": 0.6,
+      "pattern": 0.6,
+      "fabric": 0.6,
+      "hardware": 0.6,
+      "style_archetype": 0.6
+    },
+    "migrated_to_v2": "2026-04-29"
+  },
+  "genome": {
+    "pattern": "stripe",
+    "top_center_v": 0.79,
+    "top_half_v": 0.6647023138228251,
+    "top_half_u": 0.47462551594769187,
+    "top_inner_u": 0.095,
+    "top_apex_lift": 0.24323195894521643,
+    "top_underband_dip": 0.9278677618170751,
+    "top_back_coverage": 0.8275054546013637,
+    "top_neck_strap": 0.020492884052515203,
+    "top_shoulder_strap": 0.08205865168496662,
+    "bot_front_top_v": 0.45999999999999996,
+    "bot_front_half_u": 0.1917910227683643,
+    "bot_front_leg_curve": 0.6598619669416579,
+    "bot_back_top_v": 0.5459188921251659,
+    "bot_back_half_u": 0.5573684741780659,
+    "bot_tie_dangle": 0.4778797407956338,
+    "hue": 0.07834614989160937,
+    "saturation": 0.14234507828408072,
+    "lightness": 0.7728482044138186,
+    "secondary_hue": 0.11584982692946921,
+    "secondary_saturation": 0.03975576335376718,
+    "secondary_lightness": 0.2024472664847018,
+    "pattern_scale": 0.382654397114714,
+    "pattern_angle": 0.7466421477606437,
+    "trim_color_mode": 0.39070975788826956,
+    "fabric_sheen": 0.46983635199813023,
+    "fabric_metallic": 0.5101960285610488,
+    "fabric_opacity": 0.012165420597438303,
+    "fabric_weight": 0.524563123776847,
+    "fabric_weave": "ribbed",
+    "palette_preset": "ethereal_highlight",
+    "fabric_source": "econyl",
+    "biodegradable": 0.0,
+    "single_material": 1.0,
+    "has_oring": 0.0,
+    "oring_size": 0.8114617402632668,
+    "has_bow": 0.0,
+    "bow_size": 0.2436761473162895,
+    "has_fringe": 0.0,
+    "fringe_length": 0.21356105199953168,
+    "has_beads": 1.0,
+    "has_shell": 0.0,
+    "style_archetype": "retro_missoni",
+    "hardware_metal": "none"
+  },
+  "outfit": {
+    "archetype": "one_piece_maillot",
+    "slot_assignments": [
+      {
+        "slot_name": "cup",
+        "library_id": "CUP_BALCONETTE_L",
+        "local_params": {
+          "half_u": 0.28319999999999995,
+          "half_v": 0.118,
+          "inner_u": 0.095,
+          "apex_lift": 0.1,
+          "underband_dip": 0.05
+        }
+      },
+      {
+        "slot_name": "bottom_front",
+        "library_id": "BOT_HIGHWAIST_M",
+        "local_params": {
+          "front_top_v": 0.45999999999999996,
+          "front_half_u": 0.46,
+          "front_leg_curve": 0.5,
+          "back_top_v": 0.5459188921251659,
+          "back_half_u": 0.46
+        }
+      },
+      {
+        "slot_name": "underbust",
+        "library_id": "STR_FOE_15MM",
+        "local_params": {}
+      },
+      {
+        "slot_name": "primary_fabric",
+        "library_id": "F_MISSONI_SHINY_KNIT",
+        "local_params": {}
+      },
+      {
+        "slot_name": "seam_type",
+        "library_id": "S_OVERLOCK_4THREAD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_BEADS_OVAL_8MM",
+        "local_params": {
+          "count": 12.0
+        }
+      }
+    ],
+    "global_design": {
+      "hue": 0.12133845995664375,
+      "saturation": 0.1889380313136323,
+      "lightness": 0.8491392817655274,
+      "secondary_hue": 0.11584982692946921,
+      "secondary_saturation": 0.03975576335376718,
+      "secondary_lightness": 0.2024472664847018,
+      "pattern_overlay": "stripe",
+      "pattern_scale": 0.4196944787016213,
+      "pattern_angle": 0.7466421477606437,
+      "palette_preset": "ethereal_highlight"
+    }
+  },
+  "outfit_validation": {
+    "valid": true,
+    "warnings": []
+  }
+}

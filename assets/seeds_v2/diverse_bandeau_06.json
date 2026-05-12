@@ -1,0 +1,129 @@
+{
+  "meta": {
+    "name": "diverse_bandeau_06",
+    "source_views": {},
+    "analysis_notes": "Auto-synthesized via diverse_seeds.py (rng=42, archetype=bandeau_back_band, pattern=floral, fabric_source=cotton_blend, style_archetype=retro_missoni). Selected by fitness \u00d7 diversity from 80-sample stratified random pool.",
+    "confidence": {
+      "shape": 0.6,
+      "color": 0.6,
+      "pattern": 0.6,
+      "fabric": 0.6,
+      "hardware": 0.6,
+      "style_archetype": 0.6
+    },
+    "migrated_to_v2": "2026-04-29"
+  },
+  "genome": {
+    "pattern": "floral",
+    "top_center_v": 0.79,
+    "top_half_v": 0.2997353342941135,
+    "top_half_u": 0.22766079958373497,
+    "top_inner_u": 0.027182357103988565,
+    "top_apex_lift": 0.48289222382352226,
+    "top_underband_dip": 0.699117780980378,
+    "top_back_coverage": 0.6153373665718294,
+    "top_neck_strap": 0.13726768718391427,
+    "top_shoulder_strap": 0.198057851328384,
+    "bot_front_top_v": 0.45999999999999996,
+    "bot_front_half_u": 0.611490756172103,
+    "bot_front_leg_curve": 0.510423879356663,
+    "bot_back_top_v": 0.8476367453303612,
+    "bot_back_half_u": 0.8525051794512917,
+    "bot_tie_dangle": 0.06241055853085875,
+    "hue": 0.6784302780296956,
+    "saturation": 0.43269616514671416,
+    "lightness": 0.2523373256425682,
+    "secondary_hue": 0.5600302578564977,
+    "secondary_saturation": 0.9786962297502505,
+    "secondary_lightness": 0.10969831691121934,
+    "pattern_scale": 0.3744941608574677,
+    "pattern_angle": 0.031184742117234765,
+    "trim_color_mode": 0.43171550111637913,
+    "fabric_sheen": 0.5680737435625549,
+    "fabric_metallic": 0.6252143034199424,
+    "fabric_opacity": 0.7117736517100752,
+    "fabric_weight": 0.4060326545057076,
+    "fabric_weave": "shiny_knit",
+    "palette_preset": "aquatic_awe",
+    "fabric_source": "cotton_blend",
+    "biodegradable": 1.0,
+    "single_material": 1.0,
+    "has_oring": 0.0,
+    "oring_size": 0.1390688656883451,
+    "has_bow": 1.0,
+    "bow_size": 0.8433276707267913,
+    "has_fringe": 0.0,
+    "fringe_length": 0.41723549480935396,
+    "has_beads": 0.0,
+    "has_shell": 0.0,
+    "style_archetype": "retro_missoni",
+    "hardware_metal": "none"
+  },
+  "outfit": {
+    "archetype": "bandeau_back_band",
+    "slot_assignments": [
+      {
+        "slot_name": "cup",
+        "library_id": "CUP_BANDEAU_L",
+        "local_params": {
+          "half_u": 0.236,
+          "half_v": 0.14159999999999998,
+          "inner_u": 0.027182357103988565,
+          "apex_lift": 0.05,
+          "underband_dip": 0.05
+        }
+      },
+      {
+        "slot_name": "bottom_front",
+        "library_id": "BOT_HIGHWAIST_M",
+        "local_params": {
+          "front_top_v": 0.45999999999999996,
+          "front_half_u": 0.58,
+          "front_leg_curve": 0.5,
+          "back_top_v": 0.55,
+          "back_half_u": 0.46
+        }
+      },
+      {
+        "slot_name": "back_band",
+        "library_id": "STR_BACKBAND_PLAIN",
+        "local_params": {
+          "height_cm": 3.5
+        }
+      },
+      {
+        "slot_name": "primary_fabric",
+        "library_id": "F_MISSONI_SHINY_KNIT",
+        "local_params": {}
+      },
+      {
+        "slot_name": "seam_type",
+        "library_id": "S_OVERLOCK_4THREAD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_BOW_CHIFFON_30MM",
+        "local_params": {
+          "size_cm": 4.3733106829071655
+        }
+      }
+    ],
+    "global_design": {
+      "hue": 0.5893721112118783,
+      "saturation": 0.6050784660586856,
+      "lightness": 0.35293493025702727,
+      "secondary_hue": 0.5600302578564977,
+      "secondary_saturation": 0.9786962297502505,
+      "secondary_lightness": 0.10969831691121934,
+      "pattern_overlay": "floral",
+      "pattern_scale": 0.4160223723858605,
+      "pattern_angle": 0.031184742117234765,
+      "palette_preset": "aquatic_awe"
+    }
+  },
+  "outfit_validation": {
+    "valid": true,
+    "warnings": []
+  }
+}

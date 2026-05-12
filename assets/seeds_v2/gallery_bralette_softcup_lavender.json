@@ -1,0 +1,129 @@
+{
+  "meta": {
+    "name": "gallery_bralette_softcup_lavender",
+    "source_views": {},
+    "analysis_notes": "Synthetic gallery seed. archetype=bralette_shoulder_strap, pieces=8, connectors=3, accessories=1.",
+    "confidence": {
+      "shape": 1.0,
+      "color": 1.0,
+      "pattern": 1.0,
+      "fabric": 0.8,
+      "hardware": 0.8,
+      "style_archetype": 1.0
+    },
+    "migrated_to_v2": "2026-04-29"
+  },
+  "genome": {
+    "pattern": "solid",
+    "top_center_v": 0.74,
+    "top_half_v": 0.12,
+    "top_half_u": 0.21,
+    "top_inner_u": 0.095,
+    "top_apex_lift": 0.09999999999999991,
+    "top_underband_dip": 0.05,
+    "top_back_coverage": 0.4,
+    "top_neck_strap": 0.0,
+    "top_shoulder_strap": 0.65,
+    "bot_front_top_v": 0.45999999999999996,
+    "bot_front_half_u": 0.18,
+    "bot_front_leg_curve": 0.65,
+    "bot_back_top_v": 0.36,
+    "bot_back_half_u": 0.12,
+    "bot_tie_dangle": 0.2,
+    "hue": 0.78,
+    "saturation": 0.35,
+    "lightness": 0.802,
+    "secondary_hue": 0.5,
+    "secondary_saturation": 0.4,
+    "secondary_lightness": 0.4,
+    "pattern_scale": 0.5,
+    "pattern_angle": 0.0,
+    "trim_color_mode": 0.3,
+    "fabric_sheen": 0.4,
+    "fabric_metallic": 0.0,
+    "fabric_opacity": 1.0,
+    "fabric_weight": 0.45,
+    "fabric_weave": "ribbed",
+    "palette_preset": "free",
+    "fabric_source": "econyl",
+    "biodegradable": 0.0,
+    "single_material": 1.0,
+    "has_oring": 0.0,
+    "oring_size": 0.4,
+    "has_bow": 1.0,
+    "bow_size": 0.4375,
+    "has_fringe": 0.0,
+    "fringe_length": 0.2,
+    "has_beads": 0.0,
+    "has_shell": 0.0,
+    "style_archetype": "korean_feminine",
+    "hardware_metal": "none"
+  },
+  "outfit": {
+    "archetype": "bralette_shoulder_strap",
+    "slot_assignments": [
+      {
+        "slot_name": "cup",
+        "library_id": "CUP_BALCONETTE_L",
+        "local_params": {
+          "half_u": 0.21,
+          "half_v": 0.118,
+          "inner_u": 0.095,
+          "apex_lift": 0.09999999999999991,
+          "underband_dip": 0.05
+        }
+      },
+      {
+        "slot_name": "bottom_front",
+        "library_id": "BOT_CHEEKY_M",
+        "local_params": {
+          "front_top_v": 0.34,
+          "front_half_u": 0.34,
+          "front_leg_curve": 0.65,
+          "back_top_v": 0.32,
+          "back_half_u": 0.18
+        }
+      },
+      {
+        "slot_name": "shoulder_strap",
+        "library_id": "STR_SHOULDER_WOVEN_15MM",
+        "local_params": {
+          "length_cm": 30.0
+        }
+      },
+      {
+        "slot_name": "primary_fabric",
+        "library_id": "F_QNOVA_RIBBED",
+        "local_params": {}
+      },
+      {
+        "slot_name": "seam_type",
+        "library_id": "S_OVERLOCK_4THREAD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_BOW_CHIFFON_30MM",
+        "local_params": {
+          "size_cm": 2.9975
+        }
+      }
+    ],
+    "global_design": {
+      "hue": 0.894,
+      "saturation": 0.26,
+      "lightness": 0.8347600000000001,
+      "secondary_hue": 0.5,
+      "secondary_saturation": 0.4,
+      "secondary_lightness": 0.4,
+      "pattern_overlay": "polka",
+      "pattern_scale": 0.5,
+      "pattern_angle": 0.0,
+      "palette_preset": "transcendent_pink"
+    }
+  },
+  "outfit_validation": {
+    "valid": true,
+    "warnings": []
+  }
+}

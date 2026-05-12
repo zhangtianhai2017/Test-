@@ -1,0 +1,141 @@
+{
+  "meta": {
+    "name": "diverse_bralette_12",
+    "source_views": {},
+    "analysis_notes": "Auto-synthesized via diverse_seeds.py (rng=42, archetype=bralette_shoulder_strap, pattern=herringbone, fabric_source=amni_soul, style_archetype=retro_missoni). Selected by fitness \u00d7 diversity from 80-sample stratified random pool.",
+    "confidence": {
+      "shape": 0.6,
+      "color": 0.6,
+      "pattern": 0.6,
+      "fabric": 0.6,
+      "hardware": 0.6,
+      "style_archetype": 0.6
+    },
+    "migrated_to_v2": "2026-04-29"
+  },
+  "genome": {
+    "pattern": "herringbone",
+    "top_center_v": 0.79,
+    "top_half_v": 0.4360619896103184,
+    "top_half_u": 0.9463456749911766,
+    "top_inner_u": 0.095,
+    "top_apex_lift": 0.2500931484472715,
+    "top_underband_dip": 0.19787644361747392,
+    "top_back_coverage": 0.5538107333048765,
+    "top_neck_strap": 0.10760942021133313,
+    "top_shoulder_strap": 0.9366549546829541,
+    "bot_front_top_v": 0.45999999999999996,
+    "bot_front_half_u": 0.7931532320860688,
+    "bot_front_leg_curve": 0.5875788875787342,
+    "bot_back_top_v": 0.36,
+    "bot_back_half_u": 0.2058318030369436,
+    "bot_tie_dangle": 0.7220603487479075,
+    "hue": 0.5873886685456553,
+    "saturation": 0.47974638266294545,
+    "lightness": 0.4305319135996082,
+    "secondary_hue": 0.27167392384925626,
+    "secondary_saturation": 0.3187486873783988,
+    "secondary_lightness": 0.1075591117687199,
+    "pattern_scale": 0.41987063156955573,
+    "pattern_angle": 0.1997207743461581,
+    "trim_color_mode": 0.3529155058708823,
+    "fabric_sheen": 0.7065526049935393,
+    "fabric_metallic": 0.8193416898270417,
+    "fabric_opacity": 0.4494033840838748,
+    "fabric_weight": 0.889449686063528,
+    "fabric_weave": "shiny_knit",
+    "palette_preset": "future_dusk",
+    "fabric_source": "amni_soul",
+    "biodegradable": 1.0,
+    "single_material": 1.0,
+    "has_oring": 1.0,
+    "oring_size": 0.603882095416534,
+    "has_bow": 1.0,
+    "bow_size": 0.950378082432935,
+    "has_fringe": 0.0,
+    "fringe_length": 0.398306668027788,
+    "has_beads": 1.0,
+    "has_shell": 0.0,
+    "style_archetype": "retro_missoni",
+    "hardware_metal": "silver"
+  },
+  "outfit": {
+    "archetype": "bralette_shoulder_strap",
+    "slot_assignments": [
+      {
+        "slot_name": "cup",
+        "library_id": "CUP_BALCONETTE_L",
+        "local_params": {
+          "half_u": 0.28319999999999995,
+          "half_v": 0.118,
+          "inner_u": 0.095,
+          "apex_lift": 0.1,
+          "underband_dip": 0.05
+        }
+      },
+      {
+        "slot_name": "bottom_front",
+        "library_id": "BOT_HIGHWAIST_M",
+        "local_params": {
+          "front_top_v": 0.45999999999999996,
+          "front_half_u": 0.58,
+          "front_leg_curve": 0.5,
+          "back_top_v": 0.4,
+          "back_half_u": 0.34
+        }
+      },
+      {
+        "slot_name": "shoulder_strap",
+        "library_id": "STR_SHOULDER_PADDED_20MM",
+        "local_params": {
+          "length_cm": 30.0
+        }
+      },
+      {
+        "slot_name": "oring",
+        "library_id": "HW_OR_18MM_SILVER",
+        "local_params": {}
+      },
+      {
+        "slot_name": "primary_fabric",
+        "library_id": "F_MISSONI_SHINY_KNIT",
+        "local_params": {}
+      },
+      {
+        "slot_name": "seam_type",
+        "library_id": "S_OVERLOCK_4THREAD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_BOW_CHIFFON_30MM",
+        "local_params": {
+          "size_cm": 4.8015123297317395
+        }
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_BEADS_OVAL_8MM",
+        "local_params": {
+          "count": 12.0
+        }
+      }
+    ],
+    "global_design": {
+      "hue": 0.648955467418262,
+      "saturation": 0.46189855306517824,
+      "lightness": 0.36421276543984327,
+      "secondary_hue": 0.27167392384925626,
+      "secondary_saturation": 0.3187486873783988,
+      "secondary_lightness": 0.1075591117687199,
+      "pattern_overlay": "herringbone",
+      "pattern_scale": 0.4364417842063001,
+      "pattern_angle": 0.1997207743461581,
+      "palette_preset": "future_dusk"
+    }
+  },
+  "outfit_validation": {
+    "valid": true,
+    "warnings": []
+  }
+}

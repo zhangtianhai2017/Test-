@@ -1,0 +1,758 @@
+{
+  "trajectories": {
+    "triangle_string_halter": {
+      "mean": [
+        0.7950065362432241,
+        0.8090860487656351,
+        0.8133046895026128,
+        0.8206241510575019,
+        0.8166886469149619,
+        0.8149125798548749,
+        0.8269165691007592,
+        0.8322129196756336,
+        0.8325144055301525,
+        0.8318573583398965,
+        0.841912979431626,
+        0.8500103432526256,
+        0.8551208585122927
+      ],
+      "max": [
+        0.8277985362850125,
+        0.8321767475416523,
+        0.8364761355751001,
+        0.8364761355751001,
+        0.8364761355751001,
+        0.8394590142319779,
+        0.8438179989698611,
+        0.8456824054390039,
+        0.850122086279398,
+        0.8530906840699323,
+        0.8732131377251607,
+        0.8852063250415466,
+        0.8877081308703563
+      ]
+    },
+    "bandeau_back_band": {
+      "mean": [
+        0.7912417541150311,
+        0.8160628438047975,
+        0.8269164981181445,
+        0.8376961240985488,
+        0.8451108189649259,
+        0.8526277716799372,
+        0.8532528252448796,
+        0.8523684417754012,
+        0.8564824987356113,
+        0.8569615494196491,
+        0.8724597245036805,
+        0.8608268313686029,
+        0.8683732380201457
+      ],
+      "max": [
+        0.837540591413046,
+        0.8445552075670852,
+        0.8649316771649291,
+        0.8649316771649291,
+        0.8807367576539669,
+        0.8807367576539669,
+        0.8807367576539669,
+        0.8807367576539669,
+        0.8827871104104619,
+        0.8837367199793866,
+        0.8881511700494058,
+        0.8881511700494058,
+        0.8881511700494058
+      ]
+    },
+    "bralette_shoulder_strap": {
+      "mean": [
+        0.8232037537752326,
+        0.8200519596568668,
+        0.8335403079057319,
+        0.8283136524479933,
+        0.8366319094864234,
+        0.8451673133191845,
+        0.8575126720959798,
+        0.8618278156803253,
+        0.8798850449276218,
+        0.8915839034907342,
+        0.8987118534141902,
+        0.9059492157066666,
+        0.9059122946279045
+      ],
+      "max": [
+        0.870100733858785,
+        0.870100733858785,
+        0.8935521330134102,
+        0.8935521330134102,
+        0.8937275730838627,
+        0.8959202573447886,
+        0.8998057530919636,
+        0.9101326831383088,
+        0.9101326831383088,
+        0.928482251327365,
+        0.9345608771485878,
+        0.9345608771485878,
+        0.9390639110919423
+      ]
+    },
+    "one_piece_maillot": {
+      "mean": [
+        0.7878794271865883,
+        0.808636011890995,
+        0.8275339006385745,
+        0.8367037484417879,
+        0.8343400280986893,
+        0.8386105788798602,
+        0.8438121489027554,
+        0.8621115244113042,
+        0.871558750903161,
+        0.8708078377805292,
+        0.8719861352316401,
+        0.8727948381468547,
+        0.8807984393795572
+      ],
+      "max": [
+        0.8453579096585155,
+        0.8525435390713612,
+        0.8525435390713612,
+        0.8574251071815029,
+        0.8574251071815029,
+        0.8645407779199146,
+        0.8856890166436007,
+        0.8929999841292559,
+        0.8970973415701184,
+        0.8970973415701184,
+        0.8970973415701184,
+        0.9014017921689454,
+        0.9014017921689454
+      ]
+    }
+  },
+  "results": [
+    {
+      "name": "triangle_string_halter__top1",
+      "archetype": "triangle_string_halter",
+      "rank": 1,
+      "overall": 0.888,
+      "overall_outfit": 0.877,
+      "overall_v1": 0.843,
+      "v1_with_garment": 0.891,
+      "axes": {
+        "slot_richness": 0.909,
+        "library_diversity": 1.0,
+        "compatibility_strength": 0.7,
+        "anatomy_coverage": 0.7,
+        "palette_coherence": 0.95,
+        "manufacturing_realism": 1.0
+      },
+      "slots": [
+        [
+          "cup",
+          "CUP_TRIANGLE_L"
+        ],
+        [
+          "bottom_front",
+          "BOT_THONG_S"
+        ],
+        [
+          "bottom_back",
+          "BOT_THONG_M"
+        ],
+        [
+          "halter_strap",
+          "STR_HALTER_3MM"
+        ],
+        [
+          "side_tie",
+          "STR_TIE_CORD_3MM"
+        ],
+        [
+          "primary_fabric",
+          "F_AMNI_SOUL_RIBBED"
+        ],
+        [
+          "seam_type",
+          "S_FLATLOCK"
+        ]
+      ]
+    },
+    {
+      "name": "triangle_string_halter__top2",
+      "archetype": "triangle_string_halter",
+      "rank": 2,
+      "overall": 0.888,
+      "overall_outfit": 0.852,
+      "overall_v1": 0.865,
+      "v1_with_garment": 0.905,
+      "axes": {
+        "slot_richness": 0.909,
+        "library_diversity": 1.0,
+        "compatibility_strength": 0.7,
+        "anatomy_coverage": 0.7,
+        "palette_coherence": 0.8,
+        "manufacturing_realism": 1.0
+      },
+      "slots": [
+        [
+          "cup",
+          "CUP_TRIANGLE_L"
+        ],
+        [
+          "bottom_front",
+          "BOT_THONG_S"
+        ],
+        [
+          "bottom_back",
+          "BOT_THONG_M"
+        ],
+        [
+          "halter_strap",
+          "STR_HALTER_3MM"
+        ],
+        [
+          "side_tie",
+          "STR_TIE_CORD_3MM"
+        ],
+        [
+          "primary_fabric",
+          "F_AMNI_SOUL_RIBBED"
+        ],
+        [
+          "seam_type",
+          "S_FLATLOCK"
+        ]
+      ]
+    },
+    {
+      "name": "triangle_string_halter__top3",
+      "archetype": "triangle_string_halter",
+      "rank": 3,
+      "overall": 0.885,
+      "overall_outfit": 0.877,
+      "overall_v1": 0.837,
+      "v1_with_garment": 0.887,
+      "axes": {
+        "slot_richness": 0.909,
+        "library_diversity": 1.0,
+        "compatibility_strength": 0.7,
+        "anatomy_coverage": 0.7,
+        "palette_coherence": 0.95,
+        "manufacturing_realism": 1.0
+      },
+      "slots": [
+        [
+          "cup",
+          "CUP_TRIANGLE_L"
+        ],
+        [
+          "bottom_front",
+          "BOT_THONG_S"
+        ],
+        [
+          "bottom_back",
+          "BOT_THONG_M"
+        ],
+        [
+          "halter_strap",
+          "STR_HALTER_3MM"
+        ],
+        [
+          "side_tie",
+          "STR_TIE_CORD_3MM"
+        ],
+        [
+          "primary_fabric",
+          "F_AMNI_SOUL_RIBBED"
+        ],
+        [
+          "seam_type",
+          "S_FLATLOCK"
+        ]
+      ]
+    },
+    {
+      "name": "bandeau_back_band__top1",
+      "archetype": "bandeau_back_band",
+      "rank": 1,
+      "overall": 0.888,
+      "overall_outfit": 0.868,
+      "overall_v1": 0.852,
+      "v1_with_garment": 0.897,
+      "axes": {
+        "slot_richness": 0.556,
+        "library_diversity": 1.0,
+        "compatibility_strength": 0.7,
+        "anatomy_coverage": 1.0,
+        "palette_coherence": 0.95,
+        "manufacturing_realism": 1.0
+      },
+      "slots": [
+        [
+          "cup",
+          "CUP_BALCONETTE_L"
+        ],
+        [
+          "bottom_front",
+          "BOT_HIGHWAIST_S"
+        ],
+        [
+          "bottom_back",
+          "BOT_CHEEKY_M"
+        ],
+        [
+          "back_band",
+          "STR_BACKBAND_PLAIN"
+        ],
+        [
+          "primary_fabric",
+          "F_AMNI_SOUL_RIBBED"
+        ],
+        [
+          "seam_type",
+          "S_FLATLOCK"
+        ],
+        [
+          "body_jewelry",
+          "BJ_BRACELET_CHAIN_GOLD"
+        ],
+        [
+          "body_jewelry",
+          "BJ_BODY_CHAIN_WAIST"
+        ]
+      ]
+    },
+    {
+      "name": "bandeau_back_band__top2",
+      "archetype": "bandeau_back_band",
+      "rank": 2,
+      "overall": 0.887,
+      "overall_outfit": 0.868,
+      "overall_v1": 0.85,
+      "v1_with_garment": 0.895,
+      "axes": {
+        "slot_richness": 0.556,
+        "library_diversity": 1.0,
+        "compatibility_strength": 0.7,
+        "anatomy_coverage": 1.0,
+        "palette_coherence": 0.95,
+        "manufacturing_realism": 1.0
+      },
+      "slots": [
+        [
+          "cup",
+          "CUP_BANDEAU_S"
+        ],
+        [
+          "bottom_front",
+          "BOT_BRIEF_M"
+        ],
+        [
+          "bottom_back",
+          "BOT_CHEEKY_S"
+        ],
+        [
+          "back_band",
+          "STR_BACKBAND_PLAIN"
+        ],
+        [
+          "primary_fabric",
+          "F_AMNI_SOUL_RIBBED"
+        ],
+        [
+          "seam_type",
+          "S_FLATLOCK"
+        ],
+        [
+          "body_jewelry",
+          "BJ_BRACELET_CHAIN_GOLD"
+        ],
+        [
+          "body_jewelry",
+          "BJ_BODY_CHAIN_WAIST"
+        ]
+      ]
+    },
+    {
+      "name": "bandeau_back_band__top3",
+      "archetype": "bandeau_back_band",
+      "rank": 3,
+      "overall": 0.887,
+      "overall_outfit": 0.851,
+      "overall_v1": 0.864,
+      "v1_with_garment": 0.904,
+      "axes": {
+        "slot_richness": 0.556,
+        "library_diversity": 1.0,
+        "compatibility_strength": 0.7,
+        "anatomy_coverage": 1.0,
+        "palette_coherence": 0.85,
+        "manufacturing_realism": 1.0
+      },
+      "slots": [
+        [
+          "cup",
+          "CUP_BANDEAU_S"
+        ],
+        [
+          "bottom_front",
+          "BOT_BRIEF_M"
+        ],
+        [
+          "bottom_back",
+          "BOT_CHEEKY_M"
+        ],
+        [
+          "back_band",
+          "STR_BACKBAND_PLAIN"
+        ],
+        [
+          "primary_fabric",
+          "F_AMNI_SOUL_RIBBED"
+        ],
+        [
+          "seam_type",
+          "S_FLATLOCK"
+        ],
+        [
+          "body_jewelry",
+          "BJ_BRACELET_CHAIN_GOLD"
+        ],
+        [
+          "body_jewelry",
+          "BJ_EARRING_STUD_PEARL"
+        ]
+      ]
+    },
+    {
+      "name": "bralette_shoulder_strap__top1",
+      "archetype": "bralette_shoulder_strap",
+      "rank": 1,
+      "overall": 0.939,
+      "overall_outfit": 0.927,
+      "overall_v1": 0.928,
+      "v1_with_garment": 0.945,
+      "axes": {
+        "slot_richness": 0.909,
+        "library_diversity": 1.0,
+        "compatibility_strength": 0.7,
+        "anatomy_coverage": 1.0,
+        "palette_coherence": 0.95,
+        "manufacturing_realism": 1.0
+      },
+      "slots": [
+        [
+          "cup",
+          "CUP_BRAZILIAN_M"
+        ],
+        [
+          "bottom_front",
+          "BOT_HIGHWAIST_S"
+        ],
+        [
+          "bottom_back",
+          "BOT_BRIEF_M"
+        ],
+        [
+          "shoulder_strap",
+          "STR_SHOULDER_WOVEN_15MM"
+        ],
+        [
+          "slider",
+          "HW_SLIDER_10MM_NICKEL"
+        ],
+        [
+          "primary_fabric",
+          "F_AMNI_SOUL_RIBBED"
+        ],
+        [
+          "accessory",
+          "ACC_FRINGE_RAW_60MM"
+        ],
+        [
+          "accessory",
+          "ACC_BOW_CHIFFON_30MM"
+        ]
+      ]
+    },
+    {
+      "name": "bralette_shoulder_strap__top2",
+      "archetype": "bralette_shoulder_strap",
+      "rank": 2,
+      "overall": 0.935,
+      "overall_outfit": 0.927,
+      "overall_v1": 0.916,
+      "v1_with_garment": 0.938,
+      "axes": {
+        "slot_richness": 0.909,
+        "library_diversity": 1.0,
+        "compatibility_strength": 0.7,
+        "anatomy_coverage": 1.0,
+        "palette_coherence": 0.95,
+        "manufacturing_realism": 1.0
+      },
+      "slots": [
+        [
+          "cup",
+          "CUP_BRAZILIAN_M"
+        ],
+        [
+          "bottom_front",
+          "BOT_HIGHWAIST_S"
+        ],
+        [
+          "bottom_back",
+          "BOT_BRIEF_M"
+        ],
+        [
+          "shoulder_strap",
+          "STR_SHOULDER_WOVEN_15MM"
+        ],
+        [
+          "slider",
+          "HW_SLIDER_20MM_GOLD"
+        ],
+        [
+          "primary_fabric",
+          "F_AMNI_SOUL_RIBBED"
+        ],
+        [
+          "accessory",
+          "ACC_TASSEL_SILK_50MM"
+        ],
+        [
+          "accessory",
+          "ACC_BOW_CHIFFON_30MM"
+        ]
+      ]
+    },
+    {
+      "name": "bralette_shoulder_strap__top3",
+      "archetype": "bralette_shoulder_strap",
+      "rank": 3,
+      "overall": 0.932,
+      "overall_outfit": 0.927,
+      "overall_v1": 0.909,
+      "v1_with_garment": 0.933,
+      "axes": {
+        "slot_richness": 0.909,
+        "library_diversity": 1.0,
+        "compatibility_strength": 0.7,
+        "anatomy_coverage": 1.0,
+        "palette_coherence": 0.95,
+        "manufacturing_realism": 1.0
+      },
+      "slots": [
+        [
+          "cup",
+          "CUP_BRAZILIAN_M"
+        ],
+        [
+          "bottom_front",
+          "BOT_HIGHWAIST_S"
+        ],
+        [
+          "bottom_back",
+          "BOT_BRIEF_M"
+        ],
+        [
+          "shoulder_strap",
+          "STR_SHOULDER_WOVEN_15MM"
+        ],
+        [
+          "slider",
+          "HW_SLIDER_10MM_NICKEL"
+        ],
+        [
+          "primary_fabric",
+          "F_AMNI_SOUL_RIBBED"
+        ],
+        [
+          "accessory",
+          "ACC_TASSEL_SILK_50MM"
+        ],
+        [
+          "accessory",
+          "ACC_BOW_CHIFFON_30MM"
+        ]
+      ]
+    },
+    {
+      "name": "one_piece_maillot__top1",
+      "archetype": "one_piece_maillot",
+      "rank": 1,
+      "overall": 0.901,
+      "overall_outfit": 0.881,
+      "overall_v1": 0.873,
+      "v1_with_garment": 0.91,
+      "axes": {
+        "slot_richness": 0.635,
+        "library_diversity": 1.0,
+        "compatibility_strength": 0.7,
+        "anatomy_coverage": 1.0,
+        "palette_coherence": 0.95,
+        "manufacturing_realism": 1.0
+      },
+      "slots": [
+        [
+          "cup",
+          "CUP_TRIANGLE_M"
+        ],
+        [
+          "bottom_front",
+          "BOT_HIGHWAIST_S"
+        ],
+        [
+          "bottom_back",
+          "BOT_BRIEF_S"
+        ],
+        [
+          "shoulder_strap",
+          "STR_HALTER_3MM"
+        ],
+        [
+          "primary_fabric",
+          "F_AMNI_SOUL_RIBBED"
+        ],
+        [
+          "seam_type",
+          "S_OVERLOCK_4THREAD"
+        ],
+        [
+          "accessory",
+          "ACC_FRINGE_BEADED_80MM"
+        ],
+        [
+          "accessory",
+          "ACC_BEADS_SMALL_4MM"
+        ],
+        [
+          "body_jewelry",
+          "BJ_BODY_CHAIN_WAIST"
+        ],
+        [
+          "body_jewelry",
+          "BJ_EARRING_DROP_GOLD"
+        ]
+      ]
+    },
+    {
+      "name": "one_piece_maillot__top2",
+      "archetype": "one_piece_maillot",
+      "rank": 2,
+      "overall": 0.898,
+      "overall_outfit": 0.881,
+      "overall_v1": 0.865,
+      "v1_with_garment": 0.905,
+      "axes": {
+        "slot_richness": 0.635,
+        "library_diversity": 1.0,
+        "compatibility_strength": 0.7,
+        "anatomy_coverage": 1.0,
+        "palette_coherence": 0.95,
+        "manufacturing_realism": 1.0
+      },
+      "slots": [
+        [
+          "cup",
+          "CUP_TRIANGLE_M"
+        ],
+        [
+          "bottom_front",
+          "BOT_HIGHWAIST_S"
+        ],
+        [
+          "bottom_back",
+          "BOT_BRAZILIAN_S"
+        ],
+        [
+          "shoulder_strap",
+          "STR_HALTER_3MM"
+        ],
+        [
+          "primary_fabric",
+          "F_AMNI_SOUL_RIBBED"
+        ],
+        [
+          "seam_type",
+          "S_OVERLOCK_4THREAD"
+        ],
+        [
+          "accessory",
+          "ACC_FRINGE_BEADED_80MM"
+        ],
+        [
+          "accessory",
+          "ACC_BEADS_SMALL_4MM"
+        ],
+        [
+          "body_jewelry",
+          "BJ_BODY_CHAIN_WAIST"
+        ],
+        [
+          "body_jewelry",
+          "BJ_ANKLET_CHAIN"
+        ]
+      ]
+    },
+    {
+      "name": "one_piece_maillot__top3",
+      "archetype": "one_piece_maillot",
+      "rank": 3,
+      "overall": 0.898,
+      "overall_outfit": 0.881,
+      "overall_v1": 0.865,
+      "v1_with_garment": 0.905,
+      "axes": {
+        "slot_richness": 0.635,
+        "library_diversity": 1.0,
+        "compatibility_strength": 0.7,
+        "anatomy_coverage": 1.0,
+        "palette_coherence": 0.95,
+        "manufacturing_realism": 1.0
+      },
+      "slots": [
+        [
+          "cup",
+          "CUP_TRIANGLE_M"
+        ],
+        [
+          "bottom_front",
+          "BOT_HIGHWAIST_S"
+        ],
+        [
+          "bottom_back",
+          "BOT_CHEEKY_M"
+        ],
+        [
+          "shoulder_strap",
+          "STR_HALTER_3MM"
+        ],
+        [
+          "primary_fabric",
+          "F_AMNI_SOUL_RIBBED"
+        ],
+        [
+          "seam_type",
+          "S_OVERLOCK_4THREAD"
+        ],
+        [
+          "accessory",
+          "ACC_PENDANT_DROP_15MM_GOLD"
+        ],
+        [
+          "accessory",
+          "ACC_BOW_CHIFFON_30MM"
+        ],
+        [
+          "body_jewelry",
+          "BJ_EARRING_STUD_PEARL"
+        ],
+        [
+          "body_jewelry",
+          "BJ_ANKLET_CHAIN"
+        ]
+      ]
+    }
+  ]
+}

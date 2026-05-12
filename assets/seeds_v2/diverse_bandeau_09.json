@@ -1,0 +1,129 @@
+{
+  "meta": {
+    "name": "diverse_bandeau_09",
+    "source_views": {},
+    "analysis_notes": "Auto-synthesized via diverse_seeds.py (rng=42, archetype=bandeau_back_band, pattern=ombre, fabric_source=virgin, style_archetype=free). Selected by fitness \u00d7 diversity from 80-sample stratified random pool.",
+    "confidence": {
+      "shape": 0.6,
+      "color": 0.6,
+      "pattern": 0.6,
+      "fabric": 0.6,
+      "hardware": 0.6,
+      "style_archetype": 0.6
+    },
+    "migrated_to_v2": "2026-04-29"
+  },
+  "genome": {
+    "pattern": "ombre",
+    "top_center_v": 0.71,
+    "top_half_v": 0.5764033519912521,
+    "top_half_u": 0.2131953411088186,
+    "top_inner_u": 0.01071395483400738,
+    "top_apex_lift": 0.6483002857650626,
+    "top_underband_dip": 0.8891405945519951,
+    "top_back_coverage": 0.4350822221371281,
+    "top_neck_strap": 0.09340450347099208,
+    "top_shoulder_strap": 0.12923596254999056,
+    "bot_front_top_v": 0.45999999999999996,
+    "bot_front_half_u": 0.4362300039887944,
+    "bot_front_leg_curve": 0.16133343642958087,
+    "bot_back_top_v": 0.7262091352954603,
+    "bot_back_half_u": 0.4692404370296551,
+    "bot_tie_dangle": 0.4381106885679298,
+    "hue": 0.6170543780914018,
+    "saturation": 0.5769571929168515,
+    "lightness": 0.46598963373647034,
+    "secondary_hue": 0.9217355966724464,
+    "secondary_saturation": 0.8534537914579148,
+    "secondary_lightness": 0.715199162490354,
+    "pattern_scale": 0.46846728124587655,
+    "pattern_angle": 0.8831733934089097,
+    "trim_color_mode": 0.7229950033976523,
+    "fabric_sheen": 0.39037123292538045,
+    "fabric_metallic": 0.4168610783895905,
+    "fabric_opacity": 0.9411969905578143,
+    "fabric_weight": 0.652500187863295,
+    "fabric_weave": "mesh",
+    "palette_preset": "future_dusk",
+    "fabric_source": "virgin",
+    "biodegradable": 1.0,
+    "single_material": 1.0,
+    "has_oring": 0.0,
+    "oring_size": 0.16202575431646682,
+    "has_bow": 0.0,
+    "bow_size": 0.6906975489054196,
+    "has_fringe": 1.0,
+    "fringe_length": 0.4828897649727505,
+    "has_beads": 0.0,
+    "has_shell": 0.0,
+    "style_archetype": "free",
+    "hardware_metal": "none"
+  },
+  "outfit": {
+    "archetype": "bandeau_back_band",
+    "slot_assignments": [
+      {
+        "slot_name": "cup",
+        "library_id": "CUP_BANDEAU_L",
+        "local_params": {
+          "half_u": 0.236,
+          "half_v": 0.14159999999999998,
+          "inner_u": 0.01071395483400738,
+          "apex_lift": 0.05,
+          "underband_dip": 0.05
+        }
+      },
+      {
+        "slot_name": "bottom_front",
+        "library_id": "BOT_HIGHWAIST_M",
+        "local_params": {
+          "front_top_v": 0.45999999999999996,
+          "front_half_u": 0.46,
+          "front_leg_curve": 0.3,
+          "back_top_v": 0.55,
+          "back_half_u": 0.46
+        }
+      },
+      {
+        "slot_name": "back_band",
+        "library_id": "STR_BACKBAND_PLAIN",
+        "local_params": {
+          "height_cm": 3.5
+        }
+      },
+      {
+        "slot_name": "primary_fabric",
+        "library_id": "F_MESH_OUTER",
+        "local_params": {}
+      },
+      {
+        "slot_name": "seam_type",
+        "library_id": "S_OVERLOCK_4THREAD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_FRINGE_BEADED_80MM",
+        "local_params": {
+          "length_cm": 5.346007884754754
+        }
+      }
+    ],
+    "global_design": {
+      "hue": 0.6608217512365607,
+      "saturation": 0.5007828771667406,
+      "lightness": 0.37839585349458815,
+      "secondary_hue": 0.9217355966724464,
+      "secondary_saturation": 0.8534537914579148,
+      "secondary_lightness": 0.715199162490354,
+      "pattern_overlay": "ombre",
+      "pattern_scale": 0.46846728124587655,
+      "pattern_angle": 0.8831733934089097,
+      "palette_preset": "future_dusk"
+    }
+  },
+  "outfit_validation": {
+    "valid": true,
+    "warnings": []
+  }
+}

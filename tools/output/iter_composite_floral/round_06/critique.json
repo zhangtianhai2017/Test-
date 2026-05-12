@@ -1,0 +1,52 @@
+{
+  "iteration": 6,
+  "seed": "composite_floral",
+  "global_quality": 0.78,
+  "issues": [
+    {
+      "id": "I1",
+      "view": "05_chest_close",
+      "region": "fabric_grain",
+      "category": "fabric_feel",
+      "severity": "med",
+      "evidence": "Some residual grain still visible. A touch more weave reduction would push the look fully smooth.",
+      "fix_hint": "less_weave_grain"
+    },
+    {
+      "id": "I2",
+      "view": "01_front",
+      "region": "torso_full",
+      "category": "fabric_feel",
+      "severity": "low",
+      "evidence": "Round 5's shell_offset bump helped the stand-off look. One more small bump.",
+      "fix_hint": "increase_shell_offset"
+    },
+    {
+      "id": "I3",
+      "view": "05_chest_close",
+      "region": "neckline_edge",
+      "category": "binding_visibility",
+      "severity": "low",
+      "evidence": "Binding now reads clearly. Final small thicken to lock in the FOE look.",
+      "fix_hint": "thicken_binding"
+    },
+    {
+      "id": "I4",
+      "view": "06_hip_close",
+      "region": "front_panel_width",
+      "category": "panel_width",
+      "severity": "low",
+      "evidence": "Front panel between legs is narrow — for a sporty one-piece this is fine but slightly more width would feel more like a real swimsuit cut.",
+      "fix_hint": "widen_front_panel"
+    },
+    {
+      "id": "I5",
+      "view": "03_side_left",
+      "region": "side_silhouette",
+      "category": "fabric_feel",
+      "severity": "low",
+      "evidence": "Side silhouette looks clean — no notable jagged edges.",
+      "fix_hint": "other"
+    }
+  ]
+}

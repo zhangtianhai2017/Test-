@@ -1,0 +1,141 @@
+{
+  "meta": {
+    "name": "diverse_triangle_01",
+    "source_views": {},
+    "analysis_notes": "Auto-synthesized via diverse_seeds.py (rng=42, archetype=triangle_string_halter, pattern=leopard, fabric_source=econyl, style_archetype=hunzag_crinkle). Selected by fitness \u00d7 diversity from 80-sample stratified random pool.",
+    "confidence": {
+      "shape": 0.6,
+      "color": 0.6,
+      "pattern": 0.6,
+      "fabric": 0.6,
+      "hardware": 0.6,
+      "style_archetype": 0.6
+    },
+    "migrated_to_v2": "2026-04-29"
+  },
+  "genome": {
+    "pattern": "leopard",
+    "top_center_v": 0.71,
+    "top_half_v": 0.2095070307714877,
+    "top_half_u": 0.26697782204911336,
+    "top_inner_u": 0.095,
+    "top_apex_lift": 0.19917838461914603,
+    "top_underband_dip": 0.6091310056669882,
+    "top_back_coverage": 0.05080495667565746,
+    "top_neck_strap": 0.8416507191801397,
+    "top_shoulder_strap": 0.03268049875238568,
+    "bot_front_top_v": 0.45999999999999996,
+    "bot_front_half_u": 0.9895233506365952,
+    "bot_front_leg_curve": 0.6399997598540929,
+    "bot_back_top_v": 0.5569497437746462,
+    "bot_back_half_u": 0.6846142509898746,
+    "bot_tie_dangle": 0.8428519201898096,
+    "hue": 0.00039996461849800546,
+    "saturation": 0.28727214213646785,
+    "lightness": 0.5528400975616151,
+    "secondary_hue": 0.3154530480590819,
+    "secondary_saturation": 0.26774087597570273,
+    "secondary_lightness": 0.21098284358632646,
+    "pattern_scale": 0.9429097143350544,
+    "pattern_angle": 0.8763676264726689,
+    "trim_color_mode": 0.3146778807984779,
+    "fabric_sheen": 0.65543866529488,
+    "fabric_metallic": 0.39563190106066426,
+    "fabric_opacity": 0.9145475897405435,
+    "fabric_weight": 0.3989833336643295,
+    "fabric_weave": "crinkle",
+    "palette_preset": "ethereal_highlight",
+    "fabric_source": "econyl",
+    "biodegradable": 1.0,
+    "single_material": 0.0,
+    "has_oring": 1.0,
+    "oring_size": 0.26274160852293527,
+    "has_bow": 0.0,
+    "bow_size": 0.897822883602477,
+    "has_fringe": 0.0,
+    "fringe_length": 0.21932075915728333,
+    "has_beads": 0.0,
+    "has_shell": 1.0,
+    "style_archetype": "hunzag_crinkle",
+    "hardware_metal": "chrome"
+  },
+  "outfit": {
+    "archetype": "triangle_string_halter",
+    "slot_assignments": [
+      {
+        "slot_name": "cup",
+        "library_id": "CUP_TRIANGLE_L",
+        "local_params": {
+          "half_u": 0.236,
+          "half_v": 0.118,
+          "inner_u": 0.095,
+          "apex_lift": 0.19917838461914603,
+          "underband_dip": 0.1
+        }
+      },
+      {
+        "slot_name": "bottom_front",
+        "library_id": "BOT_THONG_S",
+        "local_params": {
+          "front_top_v": 0.32,
+          "front_half_u": 0.272,
+          "front_leg_curve": 0.6399997598540929,
+          "back_top_v": 0.3,
+          "back_half_u": 0.14
+        }
+      },
+      {
+        "slot_name": "halter_strap",
+        "library_id": "STR_HALTER_5MM",
+        "local_params": {
+          "length_cm": 55.0
+        }
+      },
+      {
+        "slot_name": "side_tie",
+        "library_id": "STR_TIE_RIBBON_15MM",
+        "local_params": {
+          "length_cm": 22.0
+        }
+      },
+      {
+        "slot_name": "oring",
+        "library_id": "HW_OR_12MM_GOLD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "primary_fabric",
+        "library_id": "F_HUNZA_CRINKLE",
+        "local_params": {}
+      },
+      {
+        "slot_name": "seam_type",
+        "library_id": "S_OVERLOCK_4THREAD",
+        "local_params": {}
+      },
+      {
+        "slot_name": "accessory",
+        "library_id": "ACC_SHELL_TROCHUS_25MM",
+        "local_params": {
+          "size_cm": 2.5
+        }
+      }
+    ],
+    "global_design": {
+      "hue": 0.09015998584739919,
+      "saturation": 0.3377089855845642,
+      "lightness": 0.7611360390246461,
+      "secondary_hue": 0.3154530480590819,
+      "secondary_saturation": 0.26774087597570273,
+      "secondary_lightness": 0.21098284358632646,
+      "pattern_overlay": "solid",
+      "pattern_scale": 0.9429097143350544,
+      "pattern_angle": 0.8763676264726689,
+      "palette_preset": "ethereal_highlight"
+    }
+  },
+  "outfit_validation": {
+    "valid": true,
+    "warnings": []
+  }
+}

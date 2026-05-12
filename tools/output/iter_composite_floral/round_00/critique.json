@@ -1,0 +1,61 @@
+{
+  "iteration": 0,
+  "seed": "composite_floral",
+  "global_quality": 0.55,
+  "issues": [
+    {
+      "id": "I1",
+      "view": "05_chest_close",
+      "region": "both_cups",
+      "category": "nipple_show",
+      "severity": "high",
+      "evidence": "Clear breast-shaped bulges visible through the fabric — the polish helped but the cup is still tracking body curvature. Real molded foam cup would be a smoother dome.",
+      "fix_hint": "increase_cup_dome"
+    },
+    {
+      "id": "I2",
+      "view": "01_front",
+      "region": "torso_full",
+      "category": "fabric_artifact",
+      "severity": "high",
+      "evidence": "Fabric looks heavily crinkled / corrugated all over the torso. Real swim Lycra is smooth not foil-like. The wrinkle amplitude is way too high for a fitted one-piece.",
+      "fix_hint": "less_wrinkles"
+    },
+    {
+      "id": "I3",
+      "view": "05_chest_close",
+      "region": "neckline_edge",
+      "category": "binding_too_thin",
+      "severity": "med",
+      "evidence": "FOE binding is barely visible at the V neckline. Real fold-over elastic at 1\" reads as a clear 4 mm finished edge.",
+      "fix_hint": "thicken_binding"
+    },
+    {
+      "id": "I4",
+      "view": "01_front",
+      "region": "chest_cups",
+      "category": "edge_jagged",
+      "severity": "med",
+      "evidence": "Cup edges still show some tessellation steps despite polish — boundary_snap could go higher.",
+      "fix_hint": "increase_boundary_snap"
+    },
+    {
+      "id": "I5",
+      "view": "05_chest_close",
+      "region": "front_panel_pattern",
+      "category": "pattern_too_busy",
+      "severity": "low",
+      "evidence": "The monstera leaf pattern reads as small vertical stripes rather than recognizable leaves. Larger motif scale would look more like the source reference.",
+      "fix_hint": "scale_pattern_up"
+    },
+    {
+      "id": "I6",
+      "view": "03_side_left",
+      "region": "side_chest",
+      "category": "nipple_show",
+      "severity": "med",
+      "evidence": "Breast profile in side view is still visibly skin-conforming rather than a clean cup silhouette.",
+      "fix_hint": "more_smooth_iters"
+    }
+  ]
+}

@@ -1,0 +1,482 @@
+[
+  {
+    "name": "tieside_00__bot_BRAZILIAN_S__tie_TIE_RIBBON_15MM",
+    "rng_seed": 2026000,
+    "bottom": "BOT_BRAZILIAN_S",
+    "side_tie": "STR_TIE_RIBBON_15MM",
+    "cup": "CUP_BRAZILIAN_M",
+    "dangle": 0.666,
+    "composite": 0.745,
+    "outfit_native": 0.86,
+    "slots": [
+      [
+        "cup",
+        "CUP_BRAZILIAN_M"
+      ],
+      [
+        "bottom_front",
+        "BOT_BRAZILIAN_S"
+      ],
+      [
+        "bottom_back",
+        "BOT_BRAZILIAN_M"
+      ],
+      [
+        "halter_strap",
+        "STR_HALTER_5MM"
+      ],
+      [
+        "primary_fabric",
+        "F_MISSONI_SHINY_KNIT"
+      ],
+      [
+        "seam_type",
+        "S_BARTACK"
+      ],
+      [
+        "side_tie",
+        "STR_TIE_RIBBON_15MM"
+      ]
+    ]
+  },
+  {
+    "name": "tieside_01__bot_BRAZILIAN_M__tie_TIE_CORD_5MM",
+    "rng_seed": 2026001,
+    "bottom": "BOT_BRAZILIAN_M",
+    "side_tie": "STR_TIE_CORD_5MM",
+    "cup": "CUP_TRIANGLE_S",
+    "dangle": 0.912,
+    "composite": 0.754,
+    "outfit_native": 0.859,
+    "slots": [
+      [
+        "cup",
+        "CUP_TRIANGLE_S"
+      ],
+      [
+        "bottom_front",
+        "BOT_BRAZILIAN_M"
+      ],
+      [
+        "halter_strap",
+        "STR_HALTER_5MM"
+      ],
+      [
+        "side_tie",
+        "STR_TIE_CORD_5MM"
+      ],
+      [
+        "primary_fabric",
+        "F_MESH_OUTER"
+      ],
+      [
+        "body_jewelry",
+        "BJ_ANKLET_CHARM_BEACH"
+      ]
+    ]
+  },
+  {
+    "name": "tieside_02__bot_BRAZILIAN_S__tie_TIE_RIBBON_15MM",
+    "rng_seed": 2026002,
+    "bottom": "BOT_BRAZILIAN_S",
+    "side_tie": "STR_TIE_RIBBON_15MM",
+    "cup": "CUP_TRIANGLE_S",
+    "dangle": 0.836,
+    "composite": 0.823,
+    "outfit_native": 0.809,
+    "slots": [
+      [
+        "cup",
+        "CUP_TRIANGLE_S"
+      ],
+      [
+        "bottom_front",
+        "BOT_BRAZILIAN_S"
+      ],
+      [
+        "halter_strap",
+        "STR_HALTER_3MM"
+      ],
+      [
+        "primary_fabric",
+        "F_BIOPOLYMER_PLAIN"
+      ],
+      [
+        "seam_type",
+        "S_OVERLOCK_4THREAD"
+      ],
+      [
+        "side_tie",
+        "STR_TIE_RIBBON_15MM"
+      ]
+    ]
+  },
+  {
+    "name": "tieside_03__bot_BRAZILIAN_M__tie_TIE_CORD_3MM",
+    "rng_seed": 2026003,
+    "bottom": "BOT_BRAZILIAN_M",
+    "side_tie": "STR_TIE_CORD_3MM",
+    "cup": "CUP_BRAZILIAN_S",
+    "dangle": 0.926,
+    "composite": 0.762,
+    "outfit_native": 0.811,
+    "slots": [
+      [
+        "cup",
+        "CUP_BRAZILIAN_S"
+      ],
+      [
+        "bottom_front",
+        "BOT_BRAZILIAN_M"
+      ],
+      [
+        "bottom_back",
+        "BOT_BRAZILIAN_M"
+      ],
+      [
+        "halter_strap",
+        "STR_HALTER_5MM"
+      ],
+      [
+        "oring",
+        "HW_OR_12MM_ROSEGOLD"
+      ],
+      [
+        "primary_fabric",
+        "F_MESH_OUTER"
+      ],
+      [
+        "seam_type",
+        "S_FOE_BIND_25MM"
+      ],
+      [
+        "side_tie",
+        "STR_TIE_CORD_3MM"
+      ]
+    ]
+  },
+  {
+    "name": "tieside_04__bot_BRAZILIAN_M__tie_TIE_RIBBON_15MM",
+    "rng_seed": 2026004,
+    "bottom": "BOT_BRAZILIAN_M",
+    "side_tie": "STR_TIE_RIBBON_15MM",
+    "cup": "CUP_TRIANGLE_L",
+    "dangle": 0.846,
+    "composite": 0.822,
+    "outfit_native": 0.882,
+    "slots": [
+      [
+        "cup",
+        "CUP_TRIANGLE_L"
+      ],
+      [
+        "bottom_front",
+        "BOT_BRAZILIAN_M"
+      ],
+      [
+        "halter_strap",
+        "STR_HALTER_3MM"
+      ],
+      [
+        "oring",
+        "HW_OR_8MM_GOLD"
+      ],
+      [
+        "primary_fabric",
+        "F_CROCHET_COTTON"
+      ],
+      [
+        "seam_type",
+        "S_OVERLOCK_4THREAD"
+      ],
+      [
+        "accessory",
+        "ACC_BEADS_SMALL_4MM"
+      ],
+      [
+        "accessory",
+        "ACC_PENDANT_DROP_15MM_GOLD"
+      ],
+      [
+        "side_tie",
+        "STR_TIE_RIBBON_15MM"
+      ]
+    ]
+  },
+  {
+    "name": "tieside_05__bot_BRAZILIAN_M__tie_TIE_CORD_3MM",
+    "rng_seed": 2026005,
+    "bottom": "BOT_BRAZILIAN_M",
+    "side_tie": "STR_TIE_CORD_3MM",
+    "cup": "CUP_BRAZILIAN_S",
+    "dangle": 0.663,
+    "composite": 0.801,
+    "outfit_native": 0.82,
+    "slots": [
+      [
+        "cup",
+        "CUP_BRAZILIAN_S"
+      ],
+      [
+        "bottom_front",
+        "BOT_BRAZILIAN_M"
+      ],
+      [
+        "bottom_back",
+        "BOT_BRAZILIAN_S"
+      ],
+      [
+        "halter_strap",
+        "STR_HALTER_5MM"
+      ],
+      [
+        "oring",
+        "HW_OR_8MM_GOLD"
+      ],
+      [
+        "primary_fabric",
+        "F_QNOVA_RIBBED"
+      ],
+      [
+        "seam_type",
+        "S_BARTACK"
+      ],
+      [
+        "body_jewelry",
+        "BJ_EARRING_STUD_PEARL"
+      ],
+      [
+        "body_jewelry",
+        "BJ_EARRING_DROP_GOLD"
+      ],
+      [
+        "side_tie",
+        "STR_TIE_CORD_3MM"
+      ]
+    ]
+  },
+  {
+    "name": "tieside_06__bot_BRAZILIAN_M__tie_TIE_CORD_3MM",
+    "rng_seed": 2026006,
+    "bottom": "BOT_BRAZILIAN_M",
+    "side_tie": "STR_TIE_CORD_3MM",
+    "cup": "CUP_BRAZILIAN_L",
+    "dangle": 0.834,
+    "composite": 0.778,
+    "outfit_native": 0.86,
+    "slots": [
+      [
+        "cup",
+        "CUP_BRAZILIAN_L"
+      ],
+      [
+        "bottom_front",
+        "BOT_BRAZILIAN_M"
+      ],
+      [
+        "bottom_back",
+        "BOT_CHEEKY_S"
+      ],
+      [
+        "halter_strap",
+        "STR_HALTER_5MM"
+      ],
+      [
+        "side_tie",
+        "STR_TIE_CORD_3MM"
+      ],
+      [
+        "oring",
+        "HW_OR_18MM_SILVER"
+      ],
+      [
+        "primary_fabric",
+        "F_MISSONI_SHINY_KNIT"
+      ]
+    ]
+  },
+  {
+    "name": "tieside_07__bot_BRAZILIAN_S__tie_TIE_RIBBON_15MM",
+    "rng_seed": 2026007,
+    "bottom": "BOT_BRAZILIAN_S",
+    "side_tie": "STR_TIE_RIBBON_15MM",
+    "cup": "CUP_TRIANGLE_L",
+    "dangle": 0.67,
+    "composite": 0.796,
+    "outfit_native": 0.809,
+    "slots": [
+      [
+        "cup",
+        "CUP_TRIANGLE_L"
+      ],
+      [
+        "bottom_front",
+        "BOT_BRAZILIAN_S"
+      ],
+      [
+        "halter_strap",
+        "STR_HALTER_5MM"
+      ],
+      [
+        "side_tie",
+        "STR_TIE_RIBBON_15MM"
+      ],
+      [
+        "oring",
+        "HW_OR_8MM_GOLD"
+      ],
+      [
+        "primary_fabric",
+        "F_QNOVA_RIBBED"
+      ]
+    ]
+  },
+  {
+    "name": "tieside_08__bot_BRAZILIAN_S__tie_TIE_RIBBON_15MM",
+    "rng_seed": 2026008,
+    "bottom": "BOT_BRAZILIAN_S",
+    "side_tie": "STR_TIE_RIBBON_15MM",
+    "cup": "CUP_BRAZILIAN_M",
+    "dangle": 0.83,
+    "composite": 0.757,
+    "outfit_native": 0.809,
+    "slots": [
+      [
+        "cup",
+        "CUP_BRAZILIAN_M"
+      ],
+      [
+        "bottom_front",
+        "BOT_BRAZILIAN_S"
+      ],
+      [
+        "halter_strap",
+        "STR_HALTER_3MM"
+      ],
+      [
+        "primary_fabric",
+        "F_MESH_OUTER"
+      ],
+      [
+        "seam_type",
+        "S_COVERSTITCH_3NEEDLE"
+      ],
+      [
+        "side_tie",
+        "STR_TIE_RIBBON_15MM"
+      ]
+    ]
+  },
+  {
+    "name": "tieside_09__bot_BRAZILIAN_S__tie_TIE_CORD_3MM",
+    "rng_seed": 2026009,
+    "bottom": "BOT_BRAZILIAN_S",
+    "side_tie": "STR_TIE_CORD_3MM",
+    "cup": "CUP_BRAZILIAN_L",
+    "dangle": 0.941,
+    "composite": 0.772,
+    "outfit_native": 0.86,
+    "slots": [
+      [
+        "cup",
+        "CUP_BRAZILIAN_L"
+      ],
+      [
+        "bottom_front",
+        "BOT_BRAZILIAN_S"
+      ],
+      [
+        "halter_strap",
+        "STR_HALTER_5MM"
+      ],
+      [
+        "oring",
+        "HW_OR_12MM_ROSEGOLD"
+      ],
+      [
+        "primary_fabric",
+        "F_MESH_OUTER"
+      ],
+      [
+        "seam_type",
+        "S_FOE_BIND_25MM"
+      ],
+      [
+        "side_tie",
+        "STR_TIE_CORD_3MM"
+      ]
+    ]
+  },
+  {
+    "name": "tieside_10__bot_BRAZILIAN_S__tie_TIE_RIBBON_15MM",
+    "rng_seed": 2026010,
+    "bottom": "BOT_BRAZILIAN_S",
+    "side_tie": "STR_TIE_RIBBON_15MM",
+    "cup": "CUP_TRIANGLE_M",
+    "dangle": 0.73,
+    "composite": 0.802,
+    "outfit_native": 0.86,
+    "slots": [
+      [
+        "cup",
+        "CUP_TRIANGLE_M"
+      ],
+      [
+        "bottom_front",
+        "BOT_BRAZILIAN_S"
+      ],
+      [
+        "bottom_back",
+        "BOT_CHEEKY_M"
+      ],
+      [
+        "halter_strap",
+        "STR_HALTER_5MM"
+      ],
+      [
+        "oring",
+        "HW_OR_8MM_GOLD"
+      ],
+      [
+        "primary_fabric",
+        "F_ECONYL_PLAIN_LIGHT"
+      ],
+      [
+        "side_tie",
+        "STR_TIE_RIBBON_15MM"
+      ]
+    ]
+  },
+  {
+    "name": "tieside_11__bot_BRAZILIAN_S__tie_TIE_RIBBON_15MM",
+    "rng_seed": 2026011,
+    "bottom": "BOT_BRAZILIAN_S",
+    "side_tie": "STR_TIE_RIBBON_15MM",
+    "cup": "CUP_BRAZILIAN_M",
+    "dangle": 0.754,
+    "composite": 0.811,
+    "outfit_native": 0.759,
+    "slots": [
+      [
+        "cup",
+        "CUP_BRAZILIAN_M"
+      ],
+      [
+        "bottom_front",
+        "BOT_BRAZILIAN_S"
+      ],
+      [
+        "halter_strap",
+        "STR_HALTER_5MM"
+      ],
+      [
+        "primary_fabric",
+        "F_BIOPOLYMER_PLAIN"
+      ],
+      [
+        "side_tie",
+        "STR_TIE_RIBBON_15MM"
+      ]
+    ]
+  }
+]

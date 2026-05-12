@@ -1,0 +1,160 @@
+<!doctype html><html><head><meta charset='utf-8'><title>0918_bodymapping_legs_fixed — 2026-04-29</title><style>
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                Helvetica, Arial, sans-serif;
+  margin: 0; padding: 0; background: #14161c; color: #d8dde8;
+}
+header {
+  position: sticky; top: 0; z-index: 10;
+  background: #1d2030; border-bottom: 1px solid #2a2f44;
+  padding: 14px 22px;
+}
+header h1 { margin: 0; font-size: 20px; color: #ffd166; font-weight: 600; }
+header .crumbs a { color: #99c2ff; text-decoration: none; }
+header .crumbs { font-size: 12px; opacity: 0.8; margin-top: 4px; }
+
+.summary {
+  margin: 22px; padding: 14px; background: #1d2030; border-radius: 8px;
+  border: 1px solid #2a2f44; font-size: 13px;
+}
+.summary table { width: 100%; border-collapse: collapse; }
+.summary th, .summary td {
+  padding: 6px 8px; text-align: left;
+  border-bottom: 1px solid #2a2f44;
+}
+.summary th { color: #99c2ff; font-weight: 500; font-size: 11px;
+  text-transform: uppercase; letter-spacing: 0.04em; }
+.summary tr:last-child td { border-bottom: none; }
+
+.section { margin: 22px; }
+.section h2 { color: #88e0a0; font-size: 16px; font-weight: 500;
+  margin: 14px 0 10px 0; }
+
+.cards { display: grid; gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); }
+.card {
+  background: #1d2030; border: 1px solid #2a2f44; border-radius: 8px;
+  padding: 12px; overflow: hidden;
+}
+.card h3 { margin: 0 0 4px 0; font-size: 14px; color: #e8f0ff; }
+.card .meta { font-size: 11px; color: #8090b0; margin-bottom: 8px; }
+.card .meta b { color: #ffe399; font-weight: 600; }
+.thumbs { display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 4px; }
+.thumbs a { display: block; }
+.thumbs img {
+  width: 100%; height: 110px; object-fit: cover;
+  background: #0c0e16; border-radius: 4px;
+  border: 1px solid #2a2f44;
+  cursor: pointer; transition: transform 0.1s;
+}
+.thumbs img:hover { transform: scale(1.05); border-color: #99c2ff; }
+.thumbs span { display: block; font-size: 9px; color: #6b7895;
+  text-align: center; margin-top: 2px; }
+
+#lightbox {
+  display: none; position: fixed; inset: 0;
+  background: rgba(8, 10, 16, 0.95); z-index: 100;
+  align-items: center; justify-content: center; padding: 30px;
+  cursor: pointer;
+}
+#lightbox.show { display: flex; }
+#lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain;
+  border-radius: 8px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7); }
+#lightbox .lb-cap { position: absolute; bottom: 20px; left: 0; right: 0;
+  text-align: center; color: #d8dde8; font-size: 13px; }
+
+.report {
+  margin: 22px; padding: 14px;
+  background: #181b25; border: 1px solid #2a2f44; border-radius: 8px;
+  font-family: ui-monospace, SF Mono, Consolas, monospace;
+  font-size: 12px; white-space: pre-wrap; word-break: break-word;
+  color: #c0c8d8; max-height: 320px; overflow: auto;
+}
+
+a { color: #99c2ff; }
+</style></head><body><header><h1>0918_bodymapping_legs_fixed</h1><div class='crumbs'><a href='../index.html'>2026-04-29</a> &rsaquo; 0918_bodymapping_legs_fixed</div></header><div class='summary'><table><tr><th>seeds</th><th>images</th><th>folder</th></tr><tr><td>4</td><td>33</td><td><code>/home/user/Test-/tools/output/2026-04-29/0918_bodymapping_legs_fixed</code></td></tr></table></div><div class='section'><h2>Top-level images</h2><div class='cards'><div class='card'><h3>headline.png</h3><a href='headline.png'><img src='headline.png' style='width:100%;max-height:480px;object-fit:contain;'/></a></div></div></div><div class='section'><h2>Seeds (4)</h2><div class='cards'><div class='card'><h3>composite_floral</h3><div class='meta'>style=boho_cultgaia  pattern=floral  src=biopolymer  weave=plain</div><div class='thumbs'><a onclick="showLB('renders/composite_floral/01_front.png', 'composite_floral / 01_front'); return false;" href='renders/composite_floral/01_front.png'><img loading='lazy' src='renders/composite_floral/01_front.png' alt='01_front'/><span>01_front</span></a><a onclick="showLB('renders/composite_floral/02_three_quarter.png', 'composite_floral / 02_three_quarter'); return false;" href='renders/composite_floral/02_three_quarter.png'><img loading='lazy' src='renders/composite_floral/02_three_quarter.png' alt='02_three_quarter'/><span>02_three_quarter</span></a><a onclick="showLB('renders/composite_floral/03_side_left.png', 'composite_floral / 03_side_left'); return false;" href='renders/composite_floral/03_side_left.png'><img loading='lazy' src='renders/composite_floral/03_side_left.png' alt='03_side_left'/><span>03_side_left</span></a><a onclick="showLB('renders/composite_floral/04_back.png', 'composite_floral / 04_back'); return false;" href='renders/composite_floral/04_back.png'><img loading='lazy' src='renders/composite_floral/04_back.png' alt='04_back'/><span>04_back</span></a><a onclick="showLB('renders/composite_floral/05_chest_close.png', 'composite_floral / 05_chest_close'); return false;" href='renders/composite_floral/05_chest_close.png'><img loading='lazy' src='renders/composite_floral/05_chest_close.png' alt='05_chest_close'/><span>05_chest_close</span></a><a onclick="showLB('renders/composite_floral/06_hip_close.png', 'composite_floral / 06_hip_close'); return false;" href='renders/composite_floral/06_hip_close.png'><img loading='lazy' src='renders/composite_floral/06_hip_close.png' alt='06_hip_close'/><span>06_hip_close</span></a><a onclick="showLB('renders/composite_floral/07_neck_top.png', 'composite_floral / 07_neck_top'); return false;" href='renders/composite_floral/07_neck_top.png'><img loading='lazy' src='renders/composite_floral/07_neck_top.png' alt='07_neck_top'/><span>07_neck_top</span></a><a onclick="showLB('renders/composite_floral/08_shoulder_top.png', 'composite_floral / 08_shoulder_top'); return false;" href='renders/composite_floral/08_shoulder_top.png'><img loading='lazy' src='renders/composite_floral/08_shoulder_top.png' alt='08_shoulder_top'/><span>08_shoulder_top</span></a></div></div><div class='card'><h3>composite_red</h3><div class='meta'>style=brazilian  pattern=solid  src=econyl  weave=plain</div><div class='thumbs'><a onclick="showLB('renders/composite_red/01_front.png', 'composite_red / 01_front'); return false;" href='renders/composite_red/01_front.png'><img loading='lazy' src='renders/composite_red/01_front.png' alt='01_front'/><span>01_front</span></a><a onclick="showLB('renders/composite_red/02_three_quarter.png', 'composite_red / 02_three_quarter'); return false;" href='renders/composite_red/02_three_quarter.png'><img loading='lazy' src='renders/composite_red/02_three_quarter.png' alt='02_three_quarter'/><span>02_three_quarter</span></a><a onclick="showLB('renders/composite_red/03_side_left.png', 'composite_red / 03_side_left'); return false;" href='renders/composite_red/03_side_left.png'><img loading='lazy' src='renders/composite_red/03_side_left.png' alt='03_side_left'/><span>03_side_left</span></a><a onclick="showLB('renders/composite_red/04_back.png', 'composite_red / 04_back'); return false;" href='renders/composite_red/04_back.png'><img loading='lazy' src='renders/composite_red/04_back.png' alt='04_back'/><span>04_back</span></a><a onclick="showLB('renders/composite_red/05_chest_close.png', 'composite_red / 05_chest_close'); return false;" href='renders/composite_red/05_chest_close.png'><img loading='lazy' src='renders/composite_red/05_chest_close.png' alt='05_chest_close'/><span>05_chest_close</span></a><a onclick="showLB('renders/composite_red/06_hip_close.png', 'composite_red / 06_hip_close'); return false;" href='renders/composite_red/06_hip_close.png'><img loading='lazy' src='renders/composite_red/06_hip_close.png' alt='06_hip_close'/><span>06_hip_close</span></a><a onclick="showLB('renders/composite_red/07_neck_top.png', 'composite_red / 07_neck_top'); return false;" href='renders/composite_red/07_neck_top.png'><img loading='lazy' src='renders/composite_red/07_neck_top.png' alt='07_neck_top'/><span>07_neck_top</span></a><a onclick="showLB('renders/composite_red/08_shoulder_top.png', 'composite_red / 08_shoulder_top'); return false;" href='renders/composite_red/08_shoulder_top.png'><img loading='lazy' src='renders/composite_red/08_shoulder_top.png' alt='08_shoulder_top'/><span>08_shoulder_top</span></a></div></div><div class='card'><h3>diverse_triangle_03</h3><div class='meta'>style=boho_cultgaia  pattern=polka  src=amni_soul  weave=crochet</div><div class='thumbs'><a onclick="showLB('renders/diverse_triangle_03/01_front.png', 'diverse_triangle_03 / 01_front'); return false;" href='renders/diverse_triangle_03/01_front.png'><img loading='lazy' src='renders/diverse_triangle_03/01_front.png' alt='01_front'/><span>01_front</span></a><a onclick="showLB('renders/diverse_triangle_03/02_three_quarter.png', 'diverse_triangle_03 / 02_three_quarter'); return false;" href='renders/diverse_triangle_03/02_three_quarter.png'><img loading='lazy' src='renders/diverse_triangle_03/02_three_quarter.png' alt='02_three_quarter'/><span>02_three_quarter</span></a><a onclick="showLB('renders/diverse_triangle_03/03_side_left.png', 'diverse_triangle_03 / 03_side_left'); return false;" href='renders/diverse_triangle_03/03_side_left.png'><img loading='lazy' src='renders/diverse_triangle_03/03_side_left.png' alt='03_side_left'/><span>03_side_left</span></a><a onclick="showLB('renders/diverse_triangle_03/04_back.png', 'diverse_triangle_03 / 04_back'); return false;" href='renders/diverse_triangle_03/04_back.png'><img loading='lazy' src='renders/diverse_triangle_03/04_back.png' alt='04_back'/><span>04_back</span></a><a onclick="showLB('renders/diverse_triangle_03/05_chest_close.png', 'diverse_triangle_03 / 05_chest_close'); return false;" href='renders/diverse_triangle_03/05_chest_close.png'><img loading='lazy' src='renders/diverse_triangle_03/05_chest_close.png' alt='05_chest_close'/><span>05_chest_close</span></a><a onclick="showLB('renders/diverse_triangle_03/06_hip_close.png', 'diverse_triangle_03 / 06_hip_close'); return false;" href='renders/diverse_triangle_03/06_hip_close.png'><img loading='lazy' src='renders/diverse_triangle_03/06_hip_close.png' alt='06_hip_close'/><span>06_hip_close</span></a><a onclick="showLB('renders/diverse_triangle_03/07_neck_top.png', 'diverse_triangle_03 / 07_neck_top'); return false;" href='renders/diverse_triangle_03/07_neck_top.png'><img loading='lazy' src='renders/diverse_triangle_03/07_neck_top.png' alt='07_neck_top'/><span>07_neck_top</span></a><a onclick="showLB('renders/diverse_triangle_03/08_shoulder_top.png', 'diverse_triangle_03 / 08_shoulder_top'); return false;" href='renders/diverse_triangle_03/08_shoulder_top.png'><img loading='lazy' src='renders/diverse_triangle_03/08_shoulder_top.png' alt='08_shoulder_top'/><span>08_shoulder_top</span></a></div></div><div class='card'><h3>swimsuit_2</h3><div class='meta'>style=brazilian  pattern=solid  src=econyl  weave=plain</div><div class='thumbs'><a onclick="showLB('renders/swimsuit_2/01_front.png', 'swimsuit_2 / 01_front'); return false;" href='renders/swimsuit_2/01_front.png'><img loading='lazy' src='renders/swimsuit_2/01_front.png' alt='01_front'/><span>01_front</span></a><a onclick="showLB('renders/swimsuit_2/02_three_quarter.png', 'swimsuit_2 / 02_three_quarter'); return false;" href='renders/swimsuit_2/02_three_quarter.png'><img loading='lazy' src='renders/swimsuit_2/02_three_quarter.png' alt='02_three_quarter'/><span>02_three_quarter</span></a><a onclick="showLB('renders/swimsuit_2/03_side_left.png', 'swimsuit_2 / 03_side_left'); return false;" href='renders/swimsuit_2/03_side_left.png'><img loading='lazy' src='renders/swimsuit_2/03_side_left.png' alt='03_side_left'/><span>03_side_left</span></a><a onclick="showLB('renders/swimsuit_2/04_back.png', 'swimsuit_2 / 04_back'); return false;" href='renders/swimsuit_2/04_back.png'><img loading='lazy' src='renders/swimsuit_2/04_back.png' alt='04_back'/><span>04_back</span></a><a onclick="showLB('renders/swimsuit_2/05_chest_close.png', 'swimsuit_2 / 05_chest_close'); return false;" href='renders/swimsuit_2/05_chest_close.png'><img loading='lazy' src='renders/swimsuit_2/05_chest_close.png' alt='05_chest_close'/><span>05_chest_close</span></a><a onclick="showLB('renders/swimsuit_2/06_hip_close.png', 'swimsuit_2 / 06_hip_close'); return false;" href='renders/swimsuit_2/06_hip_close.png'><img loading='lazy' src='renders/swimsuit_2/06_hip_close.png' alt='06_hip_close'/><span>06_hip_close</span></a><a onclick="showLB('renders/swimsuit_2/07_neck_top.png', 'swimsuit_2 / 07_neck_top'); return false;" href='renders/swimsuit_2/07_neck_top.png'><img loading='lazy' src='renders/swimsuit_2/07_neck_top.png' alt='07_neck_top'/><span>07_neck_top</span></a><a onclick="showLB('renders/swimsuit_2/08_shoulder_top.png', 'swimsuit_2 / 08_shoulder_top'); return false;" href='renders/swimsuit_2/08_shoulder_top.png'><img loading='lazy' src='renders/swimsuit_2/08_shoulder_top.png' alt='08_shoulder_top'/><span>08_shoulder_top</span></a></div></div></div></div><div class='section'><h2>report.md</h2><div class='report'># BodyMapping latent space — legs no longer covered by bottom panel
+
+Cascaded architecture committed:
+
+    Genome  →  Garment  →  BodyDeployment  →  rendered mesh
+
+The leg-fabric bug is now caught at the **BodyDeployment** layer (third
+in the cascade). No render-time patch — the constraint lives entirely in
+the latent state.
+
+## What changed
+
+- `tools/anatomy.py`:
+  - `BodyRegion` dataclass + `body_regions(landmarks)` returning 10 named
+    regions (legs / arms / head / neck / chest / pelvis with front/back/
+    side variants).
+  - `classify_point(x,y,z, regions, max_torso_radius)` — returns the
+    region a 3D point falls into, "arms" when it's outside the torso
+    radius, "outside" when none match.
+  - `y_pelvis` — was hardcoded `y_lo + 0.30 * H` (mid-thigh on this
+    standing-pose mesh); now derived from the body topology by walking
+    Y up from the feet and finding the first prominent torso-width
+    peak (the actual hip ridge).
+
+- `tools/garment_state.py`:
+  - `BodyMapping` per piece (covers_regions, must_clear, contact_kind),
+    with `DEFAULT_MAPPING_BY_ROLE` providing the role→mapping table.
+  - `BodyDeployment` — third-layer dataclass holding piece_mappings,
+    resolved 3D anchors, valid_connector_ids / valid_accessory_ids,
+    cached anatomy + classify_xyz closure.
+  - `deploy_to_body(garment, body_mesh)` — cascades Garment to a
+    body-specific BodyDeployment. Resolves every Connector/Accessory
+    attachment to a 3D point on the body. Components without resolved
+    attachments get filtered out (accountability rule: nothing
+    renders that the latent state didn't claim).
+  - `validate_deployment(garment, deployment)` — entry point for
+    deployment-level validation (warnings already captured by
+    deploy_to_body).
+
+- `tools/render3d_uv.py`:
+  - `build_fabric_shell` accepts `body_deployment=None`. When supplied,
+    it computes the intersection of must_clear across all pieces and
+    rejects any triangle whose centroid classifies into one of those
+    regions (=legs/arms/head/neck for v1 bikini).
+  - `build_strap_meshes` (and `_build_strap_meshes_garment`) accept
+    `body_deployment=None`. When supplied, only connectors / accessories
+    in `valid_connector_ids` / `valid_accessory_ids` are built. The
+    rest are dropped — they had no resolved attachment so they're not
+    really there.
+
+- `tools/iter/capture.py`:
+  - Builds the BodyDeployment once per render and threads it into
+    both `build_fabric_shell` and `build_strap_meshes`.
+
+## Validation
+
+`diverse_triangle_03` was the worst offender — fabric covered both legs
+down to mid-shin. After this commit:
+
+- shell Y range: 46.9..146 → constrained by must_clear=legs to torso-only
+- the rendered front view shows the bikini terminating at the hip, with
+  legs entirely uncovered.
+
+## Files
+
+- `headline.png` — before / after side-by-side on diverse_triangle_03
+- `renders/diverse_triangle_03/` — 8-view set with the fix applied
+- `renders/composite_red/`, `renders/swimsuit_2/`,
+  `renders/composite_floral/` — regression check against the original
+  seeds (no visual regression).
+</div></div><div id='lightbox' onclick='hideLB()'><img src=''/><div class='lb-cap'></div></div><script>
+function showLB(src, cap) {
+  var lb = document.getElementById('lightbox');
+  lb.querySelector('img').src = src;
+  lb.querySelector('.lb-cap').textContent = cap || '';
+  lb.classList.add('show');
+}
+function hideLB() {
+  document.getElementById('lightbox').classList.remove('show');
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') hideLB();
+});
+</script></body></html>

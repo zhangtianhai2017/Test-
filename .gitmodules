@@ -1,0 +1,3 @@
+[submodule "unreal/BikiniValidator/Plugins/glTFRuntime"]
+	path = unreal/BikiniValidator/Plugins/glTFRuntime
+	url = https://github.com/rdeioris/glTFRuntime.git
