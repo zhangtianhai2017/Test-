@@ -104,7 +104,14 @@ while ($true) {
     $tmpScript  = Join-Path $tmpDir "$jobId.ps1"
     $stdoutFile = Join-Path $tmpDir "$jobId.out"
     $stderrFile = Join-Path $tmpDir "$jobId.err"
-    Set-Content -Path $tmpScript -Value $scriptText -Encoding UTF8
+    # Force the child to emit UTF-8 so we can read it back unambiguously.
+    $header = @"
+chcp 65001 > `$null
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new(`$false)
+`$OutputEncoding = [System.Text.UTF8Encoding]::new(`$false)
+
+"@
+    Set-Content -Path $tmpScript -Value ($header + $scriptText) -Encoding UTF8
 
     $proc = $null
     try {
@@ -131,10 +138,9 @@ while ($true) {
     }
 
     $stdout = ""; $stderr = ""
-    # powershell.exe writes its stdout in the system ANSI codepage (CP936
-    # on Chinese Windows), not UTF-8. Use Encoding::Default to match.
-    if (Test-Path $stdoutFile) { $stdout = [IO.File]::ReadAllText($stdoutFile, [System.Text.Encoding]::Default) }
-    if (Test-Path $stderrFile) { $stderr = [IO.File]::ReadAllText($stderrFile, [System.Text.Encoding]::Default) }
+    # child was forced to UTF-8 via chcp 65001 + [Console]::OutputEncoding header.
+    if (Test-Path $stdoutFile) { $stdout = [IO.File]::ReadAllText($stdoutFile, [System.Text.UTF8Encoding]::new($false)) }
+    if (Test-Path $stderrFile) { $stderr = [IO.File]::ReadAllText($stderrFile, [System.Text.UTF8Encoding]::new($false)) }
     if ($null -eq $stdout) { $stdout = "" }
     if ($null -eq $stderr) { $stderr = "" }
     Remove-Item -Force -ErrorAction SilentlyContinue $tmpScript, $stdoutFile, $stderrFile
