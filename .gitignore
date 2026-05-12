@@ -9,3 +9,6 @@ assets/glb/_body_skin.pkl
 # relay deploy file with real tokens baked in — never commit
 server/relay-deploy.jsp
 agent.log
+
+# transient MetaHuman body export — source for bake, not committed
+/body.glb
