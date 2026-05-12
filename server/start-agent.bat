@@ -1,19 +1,21 @@
 @echo off
-REM start-agent.bat — double-click to launch the relay agent.
-REM
-REM Edit the two values below once, then double-click this file.
-REM Logs go to .\agent.log in this directory.
-REM
-REM No admin needed. Uses -ExecutionPolicy Bypass at invoke time so
-REM the system policy doesn't block agent.ps1.
+setlocal
 
-set RELAY_URL=http://YOUR-SERVER/relay.jsp
-set AGENT_TOKEN=PASTE-AGENT-TOKEN-HERE
+REM start-agent.bat - double-click to launch the relay agent.
+REM
+REM Edit the two SET lines below to your values, then save and run.
+REM Pure ASCII only - do not save this file as UTF-8 with BOM or UTF-16.
+REM Notepad's default ANSI encoding is fine; VS Code: bottom right
+REM corner -> change encoding to "Save with Encoding: Windows 1252"
+REM or "GB2312".
 
-REM Optional: change working dir (default = this batch's dir).
+set "RELAY_URL=http://YOUR-SERVER/relay.jsp"
+set "AGENT_TOKEN=PASTE-AGENT-TOKEN-HERE"
+
+REM Working directory passed to executed scripts. Default: parent of this .bat.
 cd /d "%~dp0\.."
 
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0agent.ps1"
 
-REM If the agent ever exits cleanly, pause so you can read the last line.
 pause
+endlocal
