@@ -62,11 +62,20 @@ def main():
     task.set_editor_property("prompt", False)
     task.set_editor_property("replace_identical", True)
 
-    # Try glTF first (built-in glTFExporter plugin must be enabled).
+    # glTF Exporter plugin defaults already export skinning + textures for
+    # SkeletalMesh. Different UE versions expose different option names; we
+    # set what we can via try/except and leave others as default.
     options = unreal.GLTFExportOptions()
-    options.set_editor_property("export_vertex_colors", True)
-    options.set_editor_property("export_vertex_skin_weights", True)
-    options.set_editor_property("export_textures", True)
+    for prop, val in [
+        ("export_vertex_colors",      True),
+        ("export_vertex_skin_weights",True),
+        ("export_textures",           True),
+        ("export_uniform_scale",      1.0),
+    ]:
+        try:
+            options.set_editor_property(prop, val)
+        except Exception as exc:
+            unreal.log_warning(f"option {prop}: skipped ({exc})")
     task.set_editor_property("options", options)
 
     ok = unreal.Exporter.run_asset_export_task(task)
