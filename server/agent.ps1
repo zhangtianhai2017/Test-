@@ -43,12 +43,17 @@ Log "press Ctrl+C to stop"
 
 $headers = @{ "X-Token" = $AgentToken }
 
+# Fake a Chrome UA so Aliyun WAF / CDN doesn't block as "non-browser".
+# In PS 5.1 the User-Agent header MUST go via -UserAgent, not -Headers.
+$UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+
 while ($true) {
     # ---- pull (server long-polls up to 30s) ------------------------------
     $job = $null
     try {
         $job = Invoke-RestMethod -Uri "$RelayUrl`?action=pull" `
-            -Headers $headers -Method Get -TimeoutSec $PullTimeoutSec
+            -Headers $headers -UserAgent $UA `
+            -Method Get -TimeoutSec $PullTimeoutSec
     } catch {
         Log "pull error: $($_.Exception.Message) — retry in ${RetryDelaySec}s"
         Start-Sleep -Seconds $RetryDelaySec
@@ -113,8 +118,8 @@ while ($true) {
     for ($attempt = 1; $attempt -le 3; $attempt++) {
         try {
             Invoke-RestMethod -Uri "$RelayUrl`?action=result" `
-                -Headers $headers -Method Post -ContentType "application/json" `
-                -Body $body -TimeoutSec 30 | Out-Null
+                -Headers $headers -UserAgent $UA -Method Post `
+                -ContentType "application/json" -Body $body -TimeoutSec 30 | Out-Null
             $reported = $true
             break
         } catch {
