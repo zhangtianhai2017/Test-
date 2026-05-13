@@ -1,0 +1,74 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_M",
+      "local_params": {
+        "half_u": 0.22,
+        "half_v": 0.12,
+        "inner_u": 0.04,
+        "apex_lift": 0.006945964025206379,
+        "underband_dip": 0.021333587074316724,
+        "dome_depth_cm": 1.264297456563996
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.52,
+        "front_leg_curve": 0.4486471539067509,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 3.72243194740403
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 26.5966235149962
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ECONYL_PLAIN_LIGHT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.6948051189259421,
+    "saturation": 0.5559573626596686,
+    "lightness": 0.6801921014727,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.5,
+    "palette_preset": "free",
+    "secondary_hue": 0.1948051189259421,
+    "secondary_saturation": 0.3,
+    "secondary_lightness": 0.5
+  },
+  "source_seed": "random_M080_05_bandeau_back_band",
+  "variant_index": 14,
+  "modesty": {
+    "bottom_coverage_strict": 0.8,
+    "cup_coverage_strict": 0.8
+  }
+}

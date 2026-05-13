@@ -1,0 +1,73 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_L",
+      "local_params": {
+        "half_u": 0.2596,
+        "half_v": 0.14159999999999998,
+        "inner_u": 0.04,
+        "apex_lift": 0.06045127491839039,
+        "underband_dip": 0.006737724264111839,
+        "dome_depth_cm": 1.3183740431212887
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.52,
+        "front_leg_curve": 0.42597518426842,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.442,
+        "front_leg_curve": 0.36642432853495177,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 3.511972161655457
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_QNOVA_RIBBED",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.1539987333448265,
+    "saturation": 0.8055439476140215,
+    "lightness": 0.5886766137908176,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.5,
+    "palette_preset": "free",
+    "secondary_hue": 0.6539987333448265,
+    "secondary_saturation": 0.3,
+    "secondary_lightness": 0.5
+  },
+  "source_seed": "random_M080_00_bandeau_back_band",
+  "variant_index": 18,
+  "modesty": {
+    "bottom_coverage_strict": 0.8,
+    "cup_coverage_strict": 0.8
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_M",
+      "local_params": {
+        "half_u": 0.22,
+        "half_v": 0.12,
+        "inner_u": 0.04,
+        "apex_lift": 0.03288478185769341,
+        "underband_dip": 0.014462662853357056,
+        "dome_depth_cm": 1.6877291235275758
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.58,
+        "front_leg_curve": 0.369073794999293,
+        "back_top_v": 0.55,
+        "back_half_u": 0.46
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.58,
+        "front_leg_curve": 0.32848853481010104,
+        "back_top_v": 0.55,
+        "back_half_u": 0.46
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 35.08133974791167
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BIOPOLYMER_PLAIN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.22904202694055753,
+    "saturation": 0.924983254473402,
+    "lightness": 0.6408431199264943,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.5,
+    "palette_preset": "free",
+    "secondary_hue": 0.7290420269405575,
+    "secondary_saturation": 0.3,
+    "secondary_lightness": 0.5
+  },
+  "source_seed": "random_M080_03_bralette_shoulder_strap",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.8,
+    "cup_coverage_strict": 0.8
+  }
+}

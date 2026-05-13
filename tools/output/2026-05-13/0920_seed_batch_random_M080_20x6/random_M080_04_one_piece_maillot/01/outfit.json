@@ -1,0 +1,62 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_S",
+      "local_params": {
+        "half_u": 0.187,
+        "half_v": 0.102,
+        "inner_u": 0.04,
+        "apex_lift": 0.053442743665461666,
+        "underband_dip": 0.01829267676748143,
+        "dome_depth_cm": 1.43266614905062
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.49299999999999994,
+        "front_leg_curve": 0.433908645433998,
+        "back_top_v": 0.55,
+        "back_half_u": 0.391
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 20.030241229762364
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BIOPOLYMER_PLAIN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.264804308614076,
+    "saturation": 0.5802227310535071,
+    "lightness": 0.5121186224442724,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.5,
+    "palette_preset": "free",
+    "secondary_hue": 0.764804308614076,
+    "secondary_saturation": 0.3,
+    "secondary_lightness": 0.5
+  },
+  "source_seed": "random_M080_04_one_piece_maillot",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.8,
+    "cup_coverage_strict": 0.8
+  }
+}

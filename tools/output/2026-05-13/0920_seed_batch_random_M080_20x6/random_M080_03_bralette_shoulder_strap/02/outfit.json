@@ -1,0 +1,86 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_L",
+      "local_params": {
+        "half_u": 0.2596,
+        "half_v": 0.14159999999999998,
+        "inner_u": 0.04,
+        "apex_lift": 0.025849941984777598,
+        "underband_dip": 0.02952748095271318,
+        "dome_depth_cm": 1.1345060382168253
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.52,
+        "front_leg_curve": 0.3154474714869308,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 36.202453652661355
+      }
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_15MM_NICKEL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BIOPOLYMER_PLAIN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_TROCHUS_25MM",
+      "local_params": {
+        "size_cm": 1.8942389345860056
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_OVAL_8MM",
+      "local_params": {
+        "count": 12.587284545795818
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.22904202694055753,
+    "saturation": 0.924983254473402,
+    "lightness": 0.6408431199264943,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.5,
+    "palette_preset": "free",
+    "secondary_hue": 0.7290420269405575,
+    "secondary_saturation": 0.3,
+    "secondary_lightness": 0.5
+  },
+  "source_seed": "random_M080_03_bralette_shoulder_strap",
+  "variant_index": 2,
+  "modesty": {
+    "bottom_coverage_strict": 0.8,
+    "cup_coverage_strict": 0.8
+  }
+}

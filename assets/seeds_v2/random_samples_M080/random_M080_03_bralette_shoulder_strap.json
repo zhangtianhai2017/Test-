@@ -1,0 +1,71 @@
+{
+  "schema_version": "v2",
+  "outfit_id": "random_M080_03_bralette_shoulder_strap",
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": {
+    "cup": {
+      "library_id": "CUP_FOAM_MOLDED_L",
+      "local_params": {
+        "half_u": 0.2596,
+        "half_v": 0.14159999999999998,
+        "inner_u": 0.04,
+        "apex_lift": 0.013611025869671875,
+        "underband_dip": 0.02598544498011934,
+        "dome_depth_cm": 1.5786672051258952
+      }
+    },
+    "bottom_front": {
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.442,
+        "front_leg_curve": 0.47824230779215154,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    "bottom_back": {
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.442,
+        "front_leg_curve": 0.4691714652773857,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    "shoulder_strap": {
+      "library_id": "STR_SHOULDER_WOVEN_15MM",
+      "local_params": {
+        "length_cm": 35.95798576829057
+      }
+    },
+    "primary_fabric": {
+      "library_id": "F_MESH_OUTER",
+      "local_params": {}
+    },
+    "lining_fabric": {
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    }
+  },
+  "global_design": {
+    "primary_color": "#b8f84e",
+    "secondary_color": "#7559a5",
+    "pattern": "solid",
+    "pattern_scale": 0.5,
+    "_hsl": {
+      "hue": 0.22904202694055753,
+      "saturation": 0.924983254473402,
+      "lightness": 0.6408431199264943
+    }
+  },
+  "modesty": {
+    "bottom_coverage_strict": 0.8,
+    "cup_coverage_strict": 0.8
+  },
+  "generator": {
+    "master_rng_seed": 20260513,
+    "seed_index": 3
+  }
+}

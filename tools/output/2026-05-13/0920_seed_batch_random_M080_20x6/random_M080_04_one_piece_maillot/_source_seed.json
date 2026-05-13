@@ -1,0 +1,65 @@
+{
+  "schema_version": "v2",
+  "outfit_id": "random_M080_04_one_piece_maillot",
+  "archetype": "one_piece_maillot",
+  "slot_assignments": {
+    "cup": {
+      "library_id": "CUP_FOAM_MOLDED_M",
+      "local_params": {
+        "half_u": 0.22,
+        "half_v": 0.12,
+        "inner_u": 0.04,
+        "apex_lift": 0.0072161296058719775,
+        "underband_dip": 0.018024923930076327,
+        "dome_depth_cm": 1.5484884739374545
+      }
+    },
+    "bottom_front": {
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.52,
+        "front_leg_curve": 0.31723882715202484,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    "underbust": {
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    "hip_strap": {
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 18.516221663748066
+      }
+    },
+    "primary_fabric": {
+      "library_id": "F_MISSONI_SHINY_KNIT",
+      "local_params": {}
+    },
+    "lining_fabric": {
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    }
+  },
+  "global_design": {
+    "primary_color": "#75ca3a",
+    "secondary_color": "#8659a5",
+    "pattern": "solid",
+    "pattern_scale": 0.5,
+    "_hsl": {
+      "hue": 0.264804308614076,
+      "saturation": 0.5802227310535071,
+      "lightness": 0.5121186224442724
+    }
+  },
+  "modesty": {
+    "bottom_coverage_strict": 0.8,
+    "cup_coverage_strict": 0.8
+  },
+  "generator": {
+    "master_rng_seed": 20260513,
+    "seed_index": 4
+  }
+}

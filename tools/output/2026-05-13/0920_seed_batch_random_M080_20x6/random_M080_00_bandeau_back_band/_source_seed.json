@@ -1,0 +1,81 @@
+{
+  "schema_version": "v2",
+  "outfit_id": "random_M080_00_bandeau_back_band",
+  "archetype": "bandeau_back_band",
+  "slot_assignments": {
+    "cup": {
+      "library_id": "CUP_FOAM_MOLDED_L",
+      "local_params": {
+        "half_u": 0.2596,
+        "half_v": 0.14159999999999998,
+        "inner_u": 0.04,
+        "apex_lift": 0.06404191579945792,
+        "underband_dip": 0.002760366635568695,
+        "dome_depth_cm": 1.8154618824948228
+      }
+    },
+    "bottom_front": {
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.58,
+        "front_leg_curve": 0.46170837112223995,
+        "back_top_v": 0.55,
+        "back_half_u": 0.46
+      }
+    },
+    "bottom_back": {
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.49299999999999994,
+        "front_leg_curve": 0.3707813255239555,
+        "back_top_v": 0.55,
+        "back_half_u": 0.391
+      }
+    },
+    "back_band": {
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 5.654687481034631
+      }
+    },
+    "primary_fabric": {
+      "library_id": "F_CROCHET_COTTON",
+      "local_params": {}
+    },
+    "lining_fabric": {
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    },
+    "seam_type": {
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    },
+    "accessory": {
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 6.228248871766367
+      }
+    }
+  },
+  "global_design": {
+    "primary_color": "#eadd41",
+    "secondary_color": "#595fa5",
+    "pattern": "solid",
+    "pattern_scale": 0.5,
+    "_hsl": {
+      "hue": 0.1539987333448265,
+      "saturation": 0.8055439476140215,
+      "lightness": 0.5886766137908176
+    }
+  },
+  "modesty": {
+    "bottom_coverage_strict": 0.8,
+    "cup_coverage_strict": 0.8
+  },
+  "generator": {
+    "master_rng_seed": 20260513,
+    "seed_index": 0
+  }
+}
