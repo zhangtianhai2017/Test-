@@ -1,0 +1,72 @@
+{
+  "schema_version": "v2",
+  "outfit_id": "random_M080_02_triangle_string_halter",
+  "archetype": "triangle_string_halter",
+  "slot_assignments": {
+    "cup": {
+      "library_id": "CUP_BRAZILIAN_M",
+      "local_params": {
+        "half_u": 0.16,
+        "half_v": 0.08,
+        "inner_u": 0.06,
+        "apex_lift": 0.11092005485647644,
+        "underband_dip": 0.0008094434951373319
+      }
+    },
+    "bottom_front": {
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.42,
+        "front_leg_curve": 0.7266655258510483,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    "halter_strap": {
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 49.23747697589673
+      }
+    },
+    "side_tie": {
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 33.64289141007063
+      }
+    },
+    "primary_fabric": {
+      "library_id": "F_VIRGIN_VELVET",
+      "local_params": {}
+    },
+    "seam_type": {
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    },
+    "body_jewelry": {
+      "library_id": "BJ_NECKLACE_CHOKER_GOLD",
+      "local_params": {
+        "width_cm": 1.487959677577467
+      }
+    }
+  },
+  "global_design": {
+    "primary_color": "#67cd88",
+    "secondary_color": "#a5598c",
+    "pattern": "solid",
+    "pattern_scale": 0.5,
+    "_hsl": {
+      "hue": 0.3877672193957322,
+      "saturation": 0.5033789582201278,
+      "lightness": 0.60565034469343
+    }
+  },
+  "modesty": {
+    "bottom_coverage_strict": 0.8,
+    "cup_coverage_strict": 0.8
+  },
+  "generator": {
+    "master_rng_seed": 20260513,
+    "seed_index": 2
+  }
+}
