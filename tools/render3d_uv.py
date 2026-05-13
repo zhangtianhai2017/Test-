@@ -1062,13 +1062,36 @@ def build_fabric_shell(body_mesh: o3d.geometry.TriangleMesh, body_uvs: np.ndarra
     pts_g = body_uvs.copy()
     pts_g[:, 0] = pts_g[:, 0] * 2.0 - 1.0
 
+    # Shrink each polygon inward by SHELL_UV_MARGIN before the test.
+    # The cylindrical UV unwrap places the armpit body triangles at the
+    # same u-range as a wide cup's outer edge, and contains_points has
+    # no tolerance — without this margin, ~15% of outputs picked up
+    # armpit triangles and produced a fabric "bridge" from chest side
+    # to inner upper arm. Scaling toward centroid pulls the long-axis
+    # outer vertices in by MORE than the margin, which is exactly the
+    # u-axis edge that bleeds into the armpit.
+    SHELL_UV_MARGIN = 0.02
+
+    def _shrink_poly(p_np):
+        if len(p_np) < 3:
+            return p_np
+        c = p_np.mean(axis=0)
+        v = p_np - c
+        mean_r = float(np.linalg.norm(v, axis=1).mean())
+        if mean_r < 1e-6:
+            return p_np
+        scale = max(0.0, 1.0 - SHELL_UV_MARGIN / mean_r)
+        return c + v * scale
+
     # A triangle is "fabric" if ALL THREE of its per-vertex UVs are inside
     # at least one polygon. We union the results across polygons.
     inside_any = np.zeros(len(pts_g), dtype=bool)
     for poly in polys_uv:
         if len(poly) < 3:
             continue
-        path = Path(np.asarray(poly, dtype=np.float32))
+        p = np.asarray(poly, dtype=np.float32)
+        p = _shrink_poly(p)
+        path = Path(p)
         inside_any |= path.contains_points(pts_g)
 
     tri_inside = inside_any.reshape(-1, 3).all(axis=1)
