@@ -1,0 +1,30 @@
+{
+  "schema_version": "v2",
+  "outfit_id": "diverse_04_one_piece_asymmetric",
+  "archetype": "one_piece_maillot",
+  "slot_assignments": {
+    "torso_shell": {
+      "library_id": "cup_piece.maillot_full_torso",
+      "local_params": {
+        "neckline_style": "asymmetric_one_shoulder",
+        "neckline_drop": 0.55, "side_cutout_height": 0.4, "side_cutout_width": 0.25,
+        "back_drop": 0.65, "leg_opening_height": 0.78, "torso_compression": 0.4
+      }
+    },
+    "shoulder_strap_left": {"library_id": "strap_piece.wide_panel", "local_params": {"width_mm": 45, "elasticity": 0.3}},
+    "shoulder_strap_right": null,
+    "back_strap": null,
+    "halter_strap": null,
+    "center_accessory": {
+      "library_id": "hardware.metal_ring",
+      "local_params": {"diameter_mm": 35, "finish": "brushed_gold", "ring_style": "o_ring"},
+      "anatomy_hints": ["waist_left_side"]
+    },
+    "hip_strap": null
+  },
+  "global_design": {
+    "fabric": "fabric.lycra_shine", "primary_color": "#0d2818", "secondary_color": null,
+    "pattern": "solid", "stitch_color_match": true, "seam_type_default": "seam_type.bound"
+  },
+  "modesty": {"bottom_coverage_strict": 1.0, "cup_coverage_strict": 0.9}
+}
