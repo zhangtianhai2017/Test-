@@ -1,0 +1,92 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.11648682495120335,
+        "half_v": 0.0580680035756296,
+        "inner_u": 0.11688117801165702,
+        "apex_lift": 0.03190237710579805,
+        "underband_dip": 0.03832305851790549
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.27819270266645374,
+        "front_half_u": 0.29133891477545315,
+        "front_leg_curve": 0.6082867398387677,
+        "back_top_v": 0.306511283708333,
+        "back_half_u": 0.217352239332633
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 57.72435906170567
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 26.6215855405756
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_8MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ECONYL_PLAIN_LIGHT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_COWRIE_20MM",
+      "local_params": {
+        "size_cm": 2.0298254176849992
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_BEADED",
+      "local_params": {
+        "diameter_cm": 6.3448914586622935
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_CHOKER_GOLD",
+      "local_params": {
+        "width_cm": 1.1135203514723682
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_WAIST",
+      "local_params": {
+        "length_cm": 84.55362003276754
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.08212560386473432,
+    "saturation": 0.6,
+    "lightness": 0.45098039215686275,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.4,
+    "palette_preset": "free",
+    "secondary_hue": 0.06976744186046512,
+    "secondary_saturation": 0.5443037974683544,
+    "secondary_lightness": 0.15490196078431373
+  },
+  "source_seed": "05_retro_fringe_jeweled",
+  "variant_index": 18
+}

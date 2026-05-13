@@ -1,0 +1,59 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.13156293082107845,
+        "half_v": 0.05841500487828545,
+        "inner_u": 0.11459350440509997,
+        "apex_lift": 0.25420837521956413,
+        "underband_dip": 0.0635039196809563
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.2711395287208933,
+        "front_half_u": 0.40159110816031907,
+        "front_leg_curve": 0.7401918156416504,
+        "back_top_v": 0.2766644405346468,
+        "back_half_u": 0.2197835178748132
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 57.147739832073306
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 21.450915060722167
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ECONYL_PLAIN_HEAVY",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.08212560386473432,
+    "saturation": 0.6,
+    "lightness": 0.45098039215686275,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.4,
+    "palette_preset": "free",
+    "secondary_hue": 0.06976744186046512,
+    "secondary_saturation": 0.5443037974683544,
+    "secondary_lightness": 0.15490196078431373
+  },
+  "source_seed": "05_retro_fringe_jeweled",
+  "variant_index": 10
+}

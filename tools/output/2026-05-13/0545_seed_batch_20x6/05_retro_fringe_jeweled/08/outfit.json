@@ -1,0 +1,75 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.09908716321578068,
+        "half_v": 0.06286279707727818,
+        "inner_u": 0.08110642237310271,
+        "apex_lift": 0.13466364209264273,
+        "underband_dip": 0.06711492195163161
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.3236923407534931,
+        "front_half_u": 0.35382866941313745,
+        "front_leg_curve": 0.6026344718770542,
+        "back_top_v": 0.28542319092229695,
+        "back_half_u": 0.1898092258495949
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.2883844996105672,
+        "front_half_u": 0.31274805731871297,
+        "front_leg_curve": 0.5187337377455925,
+        "back_top_v": 0.3052567160152956,
+        "back_half_u": 0.1835338111423061
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 63.697787357821724
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 26.563566842419185
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ECONYL_PLAIN_LIGHT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.08212560386473432,
+    "saturation": 0.6,
+    "lightness": 0.45098039215686275,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.4,
+    "palette_preset": "free",
+    "secondary_hue": 0.06976744186046512,
+    "secondary_saturation": 0.5443037974683544,
+    "secondary_lightness": 0.15490196078431373
+  },
+  "source_seed": "05_retro_fringe_jeweled",
+  "variant_index": 8
+}

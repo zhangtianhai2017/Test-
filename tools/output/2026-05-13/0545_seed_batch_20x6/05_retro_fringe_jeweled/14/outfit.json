@@ -1,0 +1,76 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.14742302747944327,
+        "half_v": 0.08353749699635041,
+        "inner_u": 0.07431643992093255,
+        "apex_lift": 0.23715799416627473,
+        "underband_dip": 0.033698831138990276
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.3184395646044874,
+        "front_half_u": 0.39695316481259607,
+        "front_leg_curve": 0.6835193016190902,
+        "back_top_v": 0.29464861761886996,
+        "back_half_u": 0.21749203100857575
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 58.879035514665134
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_ROSEGOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HUNZA_CRINKLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_SMALL_4MM",
+      "local_params": {
+        "count": 22.657041307406374
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 5.0893408660053465
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.08212560386473432,
+    "saturation": 0.6,
+    "lightness": 0.45098039215686275,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.4,
+    "palette_preset": "free",
+    "secondary_hue": 0.06976744186046512,
+    "secondary_saturation": 0.5443037974683544,
+    "secondary_lightness": 0.15490196078431373
+  },
+  "source_seed": "05_retro_fringe_jeweled",
+  "variant_index": 14
+}

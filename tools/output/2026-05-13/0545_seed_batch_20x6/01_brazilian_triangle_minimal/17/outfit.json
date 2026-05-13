@@ -1,0 +1,67 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.10076744395270226,
+        "half_v": 0.08081833798738572,
+        "inner_u": 0.06133029616431181,
+        "apex_lift": 0.013533502951304465,
+        "underband_dip": 0.07140517634105159
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.22108428290566573,
+        "front_half_u": 0.2701626278646722,
+        "front_leg_curve": 0.5637164518366593,
+        "back_top_v": 0.2680546055776193,
+        "back_half_u": 0.12779272532715782
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.28686926561824255,
+        "front_half_u": 0.30368666846361314,
+        "front_leg_curve": 0.7550910841275111,
+        "back_top_v": 0.26732843547874335,
+        "back_half_u": 0.16505041667285866
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 50.46559359396768
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 27.025415832942407
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_QNOVA_RIBBED",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.0,
+    "saturation": 0.0,
+    "lightness": 0.06274509803921569,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.5,
+    "palette_preset": "free"
+  },
+  "source_seed": "01_brazilian_triangle_minimal",
+  "variant_index": 17
+}

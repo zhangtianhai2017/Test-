@@ -1,0 +1,83 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_L",
+      "local_params": {
+        "half_u": 0.19031813953398613,
+        "half_v": 0.0802941381217566,
+        "inner_u": 0.11180704129132644,
+        "apex_lift": 0.15067000313673096,
+        "underband_dip": 0.00022004001641174887
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.24605917413681622,
+        "front_half_u": 0.33297560786203684,
+        "front_leg_curve": 0.6708209555896976,
+        "back_top_v": 0.2465882242467979,
+        "back_half_u": 0.202629710279204
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 53.25942574776392
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 27.009768469859697
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_ROSEGOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MESH_OUTER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_CHAIN_GOLD",
+      "local_params": {
+        "diameter_cm": 6.359882010081871
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHAIN",
+      "local_params": {
+        "diameter_cm": 9.588872941638213
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.08212560386473432,
+    "saturation": 0.6,
+    "lightness": 0.45098039215686275,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.4,
+    "palette_preset": "free",
+    "secondary_hue": 0.06976744186046512,
+    "secondary_saturation": 0.5443037974683544,
+    "secondary_lightness": 0.15490196078431373
+  },
+  "source_seed": "05_retro_fringe_jeweled",
+  "variant_index": 13
+}

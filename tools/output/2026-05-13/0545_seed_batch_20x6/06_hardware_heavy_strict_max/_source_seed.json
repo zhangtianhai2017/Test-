@@ -1,0 +1,146 @@
+{
+  "schema_version": "v2",
+  "outfit_id": "diverse_06_hardware_heavy_strict_max",
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": {
+    "left_cup": {
+      "library_id": "cup_piece.balconette_structured",
+      "local_params": {
+        "cup_depth": 0.7,
+        "underbust_arc": 0.95,
+        "neckline_height": 0.5,
+        "padding": 0.6,
+        "wire_present": true
+      }
+    },
+    "right_cup": {
+      "library_id": "cup_piece.balconette_structured",
+      "local_params": {
+        "cup_depth": 0.7,
+        "underbust_arc": 0.95,
+        "neckline_height": 0.5,
+        "padding": 0.6,
+        "wire_present": true
+      },
+      "mirror_of": "left_cup"
+    },
+    "shoulder_strap_left": {
+      "library_id": "strap_piece.medium_adjustable",
+      "local_params": {
+        "width_mm": 12,
+        "elasticity": 0.4
+      }
+    },
+    "shoulder_strap_right": {
+      "library_id": "strap_piece.medium_adjustable",
+      "local_params": {
+        "width_mm": 12,
+        "elasticity": 0.4
+      },
+      "mirror_of": "shoulder_strap_left"
+    },
+    "left_shoulder_adjuster": {
+      "library_id": "hardware.adjuster_slider",
+      "local_params": {
+        "slider_style": "figure_8",
+        "count": 1
+      },
+      "anatomy_hints": [
+        "shoulder_left_front"
+      ]
+    },
+    "right_shoulder_adjuster": {
+      "library_id": "hardware.adjuster_slider",
+      "local_params": {
+        "slider_style": "figure_8",
+        "count": 1
+      },
+      "anatomy_hints": [
+        "shoulder_right_front"
+      ]
+    },
+    "back_band": {
+      "library_id": "strap_piece.elastic_back_band",
+      "local_params": {
+        "width_mm": 22,
+        "tension": 0.75
+      }
+    },
+    "back_closure": {
+      "library_id": "hardware.hook_eye_closure",
+      "local_params": {
+        "rows": 3,
+        "columns": 3,
+        "finish": "matte_black"
+      },
+      "anatomy_hints": [
+        "spine_upper"
+      ]
+    },
+    "center_accessory": {
+      "library_id": "hardware.metal_ring",
+      "local_params": {
+        "diameter_mm": 18,
+        "finish": "matte_black",
+        "ring_style": "d_ring"
+      },
+      "anatomy_hints": [
+        "sternum_mid"
+      ]
+    },
+    "bottom": {
+      "library_id": "bottom_piece.full_coverage_brief",
+      "local_params": {
+        "front_half_u": 0.6,
+        "rise_height": 0.78,
+        "leg_opening_angle": 0.25,
+        "gusset_width": 0.16,
+        "waistband_width_mm": 26
+      }
+    },
+    "left_hip_buckle": {
+      "library_id": "hardware.side_buckle",
+      "local_params": {
+        "width_mm": 28,
+        "finish": "matte_black"
+      },
+      "anatomy_hints": [
+        "hip_left"
+      ]
+    },
+    "right_hip_buckle": {
+      "library_id": "hardware.side_buckle",
+      "local_params": {
+        "width_mm": 28,
+        "finish": "matte_black"
+      },
+      "anatomy_hints": [
+        "hip_right"
+      ]
+    },
+    "hip_strap": {
+      "library_id": "strap_piece.medium_adjustable",
+      "local_params": {
+        "width_mm": 14,
+        "elasticity": 0.5
+      },
+      "anatomy_hints": [
+        "hip_left",
+        "hip_right"
+      ]
+    }
+  },
+  "global_design": {
+    "fabric": "fabric.neoprene",
+    "primary_color": "#1a1a1a",
+    "secondary_color": "#5e5e5e",
+    "pattern": "color_block_panel",
+    "stitch_color_match": false,
+    "stitch_color": "#5e5e5e",
+    "seam_type_default": "seam_type.bound"
+  },
+  "modesty": {
+    "bottom_coverage_strict": 1.0,
+    "cup_coverage_strict": 1.0
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.08985132709820726,
+        "half_v": 0.05264583282776412,
+        "inner_u": 0.13177619348232988,
+        "apex_lift": 0.1756227173329373,
+        "underband_dip": 0.07901758042004717
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.30691363873853106,
+        "front_half_u": 0.21803596844680337,
+        "front_leg_curve": 0.5530035370819779,
+        "back_top_v": 0.28844705101858986,
+        "back_half_u": 0.08033133898978587
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.29861588486042734,
+        "front_half_u": 0.28896297039029345,
+        "front_leg_curve": 0.5621509841721571,
+        "back_top_v": 0.27844631667622044,
+        "back_half_u": 0.15691581486995873
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 57.503544163516636
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 26.78113187654229
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MISSONI_SHINY_KNIT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_BEADED_80MM",
+      "local_params": {
+        "length_cm": 10.053763364768828
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_TROCHUS_25MM",
+      "local_params": {
+        "size_cm": 2.7979773936056445
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHARM_BEACH",
+      "local_params": {
+        "diameter_cm": 9.663730415649642
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHAIN",
+      "local_params": {
+        "diameter_cm": 8.945459625583558
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.0,
+    "saturation": 0.0,
+    "lightness": 0.06274509803921569,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.5,
+    "palette_preset": "free"
+  },
+  "source_seed": "01_brazilian_triangle_minimal",
+  "variant_index": 15
+}

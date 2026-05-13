@@ -1,0 +1,61 @@
+{
+  "schema_version": "v2",
+  "outfit_id": "diverse_02_bandeau_highwaist_print",
+  "archetype": "bandeau_back_band",
+  "slot_assignments": {
+    "bandeau_top": {
+      "library_id": "cup_piece.bandeau_continuous",
+      "local_params": {
+        "band_height": 0.55,
+        "center_notch_depth": 0.0,
+        "lining_thickness": 0.4,
+        "shirring_intensity": 0.6
+      }
+    },
+    "back_band": {
+      "library_id": "strap_piece.elastic_back_band",
+      "local_params": {
+        "width_mm": 18.0,
+        "tension": 0.7
+      }
+    },
+    "halter_strap": null,
+    "shoulder_strap_left": null,
+    "shoulder_strap_right": null,
+    "bottom": {
+      "library_id": "bottom_piece.highwaist_brief",
+      "local_params": {
+        "front_half_u": 0.55,
+        "rise_height": 0.92,
+        "leg_opening_angle": 0.45,
+        "gusset_width": 0.12,
+        "waistband_width_mm": 28
+      }
+    },
+    "center_accessory": {
+      "library_id": "accessory.fabric_bow",
+      "local_params": {
+        "size_scale": 0.6,
+        "loop_count": 2
+      },
+      "anatomy_hints": [
+        "sternum_mid"
+      ]
+    },
+    "hip_strap": null
+  },
+  "global_design": {
+    "fabric": "fabric.cotton_blend",
+    "primary_color": "#d9264a",
+    "secondary_color": "#fff5e1",
+    "pattern": "polka_dot",
+    "pattern_scale": 0.25,
+    "stitch_color_match": false,
+    "stitch_color": "#fff5e1",
+    "seam_type_default": "seam_type.coverstitch"
+  },
+  "modesty": {
+    "bottom_coverage_strict": 0.85,
+    "cup_coverage_strict": 0.8
+  }
+}

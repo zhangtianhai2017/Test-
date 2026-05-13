@@ -1,0 +1,61 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.1885953621877327,
+        "half_v": 0.06961208404930427,
+        "inner_u": 0.08691302810345891,
+        "apex_lift": 0.25272927309976567,
+        "underband_dip": 0.0032932745890696235
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.30746857530504923,
+        "front_half_u": 0.3450363719647975,
+        "front_leg_curve": 0.6593203645379103,
+        "back_top_v": 0.3170842739310894,
+        "back_half_u": 0.18589880258275193
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 63.51484018955094
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_AMNI_SOUL_RIBBED",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_COVERSTITCH_3NEEDLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHAIN",
+      "local_params": {
+        "diameter_cm": 9.234440462236421
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.0,
+    "saturation": 0.0,
+    "lightness": 0.06274509803921569,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.5,
+    "palette_preset": "free"
+  },
+  "source_seed": "01_brazilian_triangle_minimal",
+  "variant_index": 5
+}

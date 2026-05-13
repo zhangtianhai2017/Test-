@@ -1,0 +1,94 @@
+{
+  "schema_version": "v2",
+  "outfit_id": "diverse_03_sport_bralette_buckled",
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": {
+    "left_cup": {
+      "library_id": "cup_piece.bralette_molded",
+      "local_params": {
+        "cup_depth": 0.55,
+        "underbust_arc": 0.7,
+        "neckline_height": 0.62,
+        "padding": 0.5
+      }
+    },
+    "right_cup": {
+      "library_id": "cup_piece.bralette_molded",
+      "local_params": {
+        "cup_depth": 0.55,
+        "underbust_arc": 0.7,
+        "neckline_height": 0.62,
+        "padding": 0.5
+      },
+      "mirror_of": "left_cup"
+    },
+    "shoulder_strap_left": {
+      "library_id": "strap_piece.racerback_wide",
+      "local_params": {
+        "width_mm": 22,
+        "elasticity": 0.6
+      }
+    },
+    "shoulder_strap_right": {
+      "library_id": "strap_piece.racerback_wide",
+      "local_params": {
+        "width_mm": 22,
+        "elasticity": 0.6
+      },
+      "mirror_of": "shoulder_strap_left"
+    },
+    "back_band": {
+      "library_id": "strap_piece.elastic_back_band",
+      "local_params": {
+        "width_mm": 25,
+        "tension": 0.85
+      }
+    },
+    "back_closure": {
+      "library_id": "hardware.adjuster_slider",
+      "local_params": {
+        "slider_style": "ladder_lock",
+        "count": 2
+      },
+      "anatomy_hints": [
+        "scapula_left",
+        "scapula_right"
+      ]
+    },
+    "bottom": {
+      "library_id": "bottom_piece.sport_brief",
+      "local_params": {
+        "front_half_u": 0.48,
+        "rise_height": 0.65,
+        "leg_opening_angle": 0.3,
+        "gusset_width": 0.14,
+        "waistband_width_mm": 22
+      }
+    },
+    "hip_strap": {
+      "library_id": "strap_piece.elastic_back_band",
+      "local_params": {
+        "width_mm": 22,
+        "tension": 0.7
+      },
+      "anatomy_hints": [
+        "hip_left",
+        "hip_right"
+      ]
+    },
+    "center_accessory": null
+  },
+  "global_design": {
+    "fabric": "fabric.sport_compression",
+    "primary_color": "#0a0a0a",
+    "secondary_color": "#2bd4a0",
+    "pattern": "color_block_panel",
+    "stitch_color_match": false,
+    "stitch_color": "#2bd4a0",
+    "seam_type_default": "seam_type.flatlock"
+  },
+  "modesty": {
+    "bottom_coverage_strict": 0.7,
+    "cup_coverage_strict": 0.85
+  }
+}

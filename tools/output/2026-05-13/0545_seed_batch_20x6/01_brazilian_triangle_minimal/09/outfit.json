@@ -1,0 +1,74 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.14161493193476055,
+        "half_v": 0.08567683503751834,
+        "inner_u": 0.09241601970114369,
+        "apex_lift": 0.28647755748271003,
+        "underband_dip": 0.047931854116771214
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.27566681274833493,
+        "front_half_u": 0.34059400412336766,
+        "front_leg_curve": 0.6968424595069371,
+        "back_top_v": 0.30194519155729976,
+        "back_half_u": 0.24093702176721513
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.2319590169010847,
+        "front_half_u": 0.19246680592245027,
+        "front_leg_curve": 0.7202755934489677,
+        "back_top_v": 0.26389164188530523,
+        "back_half_u": 0.13425860451670227
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 62.19793084264511
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_CROCHET_COTTON",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_TROCHUS_25MM",
+      "local_params": {
+        "size_cm": 2.0408093198528627
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_CHIFFON_30MM",
+      "local_params": {
+        "size_cm": 3.4909892584951305
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.0,
+    "saturation": 0.0,
+    "lightness": 0.06274509803921569,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.5,
+    "palette_preset": "free"
+  },
+  "source_seed": "01_brazilian_triangle_minimal",
+  "variant_index": 9
+}

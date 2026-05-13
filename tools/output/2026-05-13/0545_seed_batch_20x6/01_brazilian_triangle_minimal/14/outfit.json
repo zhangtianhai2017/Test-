@@ -1,0 +1,60 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.1689476499565713,
+        "half_v": 0.059761936253506676,
+        "inner_u": 0.058294372496141764,
+        "apex_lift": 0.2567176046541915,
+        "underband_dip": 0.003578481883347795
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.2417762188685857,
+        "front_half_u": 0.32859174869601315,
+        "front_leg_curve": 0.6276430956312293,
+        "back_top_v": 0.23771842357639278,
+        "back_half_u": 0.11228041383605994
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.3038888830050889,
+        "front_half_u": 0.23464475264179185,
+        "front_leg_curve": 0.5699353844599403,
+        "back_top_v": 0.22899943442479762,
+        "back_half_u": 0.13672688224444685
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 47.15398655563898
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ECONYL_PLAIN_HEAVY",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.0,
+    "saturation": 0.0,
+    "lightness": 0.06274509803921569,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.5,
+    "palette_preset": "free"
+  },
+  "source_seed": "01_brazilian_triangle_minimal",
+  "variant_index": 14
+}

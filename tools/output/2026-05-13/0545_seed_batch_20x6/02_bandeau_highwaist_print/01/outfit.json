@@ -1,0 +1,58 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_M",
+      "local_params": {
+        "half_u": 0.22,
+        "half_v": 0.12,
+        "inner_u": 0.04,
+        "apex_lift": 0.02133306212302214,
+        "underband_dip": 0.010847818411448745,
+        "dome_depth_cm": 1.1072973717077286
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.52,
+        "front_leg_curve": 0.3667579736146005,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 4.493723593508517
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ECONYL_PLAIN_HEAVY",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.9664804469273743,
+    "saturation": 0.7019607843137254,
+    "lightness": 0.5,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.25,
+    "palette_preset": "free",
+    "secondary_hue": 0.11111111111111116,
+    "secondary_saturation": 1.0,
+    "secondary_lightness": 0.9411764705882353
+  },
+  "source_seed": "02_bandeau_highwaist_print",
+  "variant_index": 1
+}

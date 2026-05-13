@@ -1,0 +1,83 @@
+{
+  "schema_version": "v2",
+  "outfit_id": "diverse_01_brazilian_triangle_minimal",
+  "archetype": "triangle_string_halter",
+  "slot_assignments": {
+    "left_cup": {
+      "library_id": "cup_piece.brazilian_triangle_small",
+      "local_params": {
+        "size_scale": 0.85,
+        "tip_sharpness": 0.8,
+        "edge_curve": 0.1,
+        "padding": 0.0
+      }
+    },
+    "right_cup": {
+      "library_id": "cup_piece.brazilian_triangle_small",
+      "local_params": {
+        "size_scale": 0.85,
+        "tip_sharpness": 0.8,
+        "edge_curve": 0.1,
+        "padding": 0.0
+      },
+      "mirror_of": "left_cup"
+    },
+    "halter_strap": {
+      "library_id": "strap_piece.thin_cord_tie",
+      "local_params": {
+        "width_mm": 3.0,
+        "tie_style": "knot"
+      }
+    },
+    "back_strap": {
+      "library_id": "strap_piece.thin_cord_tie",
+      "local_params": {
+        "width_mm": 3.0,
+        "tie_style": "knot"
+      }
+    },
+    "bottom": {
+      "library_id": "bottom_piece.tieside_brief",
+      "local_params": {
+        "front_half_u": 0.3,
+        "rise_height": 0.38,
+        "side_tie_height": 0.52,
+        "gusset_width": 0.07
+      }
+    },
+    "left_side_tie": {
+      "library_id": "hardware.cord_tie",
+      "local_params": {
+        "dangle_length_mm": 50,
+        "knot_style": "knot"
+      },
+      "anatomy_hints": [
+        "hip_left"
+      ]
+    },
+    "right_side_tie": {
+      "library_id": "hardware.cord_tie",
+      "local_params": {
+        "dangle_length_mm": 50,
+        "knot_style": "knot"
+      },
+      "anatomy_hints": [
+        "hip_right"
+      ]
+    },
+    "hip_strap": null,
+    "center_accessory": null
+  },
+  "global_design": {
+    "fabric": "fabric.lycra_matte",
+    "primary_color": "#101010",
+    "secondary_color": null,
+    "pattern": "solid",
+    "stitch_color_match": true,
+    "seam_type_default": "seam_type.flatlock"
+  },
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

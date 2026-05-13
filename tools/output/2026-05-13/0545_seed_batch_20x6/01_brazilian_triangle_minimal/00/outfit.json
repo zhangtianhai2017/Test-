@@ -1,0 +1,67 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_M",
+      "local_params": {
+        "half_u": 0.13585191358957563,
+        "half_v": 0.08746765964233878,
+        "inner_u": 0.059445470091554486,
+        "apex_lift": 0.04195483965418668,
+        "underband_dip": 0.09620674223705736
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.30375365916075525,
+        "front_half_u": 0.3080101302111711,
+        "front_leg_curve": 0.6799079868536767,
+        "back_top_v": 0.3033649138310985,
+        "back_half_u": 0.18753957907757035
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.2556039904867352,
+        "front_half_u": 0.2063258947755263,
+        "front_leg_curve": 0.6733712718147767,
+        "back_top_v": 0.23723560921306383,
+        "back_half_u": 0.10305096422574508
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 45.35126360387792
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_CROCHET_COTTON",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_TASSEL_SILK_50MM",
+      "local_params": {
+        "length_cm": 5.405133876520222
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.0,
+    "saturation": 0.0,
+    "lightness": 0.06274509803921569,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.5,
+    "palette_preset": "free"
+  },
+  "source_seed": "01_brazilian_triangle_minimal",
+  "variant_index": 0
+}

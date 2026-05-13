@@ -1,0 +1,65 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_M",
+      "local_params": {
+        "half_u": 0.08566485361251035,
+        "half_v": 0.04667537602860053,
+        "inner_u": 0.08096917928429695,
+        "apex_lift": 0.2224871709209123,
+        "underband_dip": 0.03597197340810758
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.21862535660459118,
+        "front_half_u": 0.3030283940487592,
+        "front_leg_curve": 0.5677899014065921,
+        "back_top_v": 0.2926906711583385,
+        "back_half_u": 0.12083056030467162
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.252715184304183,
+        "front_half_u": 0.3410122941387609,
+        "front_leg_curve": 0.5443323081546991,
+        "back_top_v": 0.2978904078434377,
+        "back_half_u": 0.18129498517235743
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 43.37315087286681
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ECONYL_PLAIN_LIGHT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_COVERSTITCH_3NEEDLE",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.0,
+    "saturation": 0.0,
+    "lightness": 0.06274509803921569,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.5,
+    "palette_preset": "free"
+  },
+  "source_seed": "01_brazilian_triangle_minimal",
+  "variant_index": 12
+}

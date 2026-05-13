@@ -1,0 +1,88 @@
+{
+  "schema_version": "v2",
+  "outfit_id": "diverse_05_retro_fringe_jeweled",
+  "archetype": "triangle_string_halter",
+  "slot_assignments": {
+    "left_cup": {
+      "library_id": "cup_piece.triangle_fringed",
+      "local_params": {
+        "size_scale": 1.05,
+        "fringe_length_mm": 80,
+        "fringe_density": 0.8,
+        "fringe_curl": 0.2
+      }
+    },
+    "right_cup": {
+      "library_id": "cup_piece.triangle_fringed",
+      "local_params": {
+        "size_scale": 1.05,
+        "fringe_length_mm": 80,
+        "fringe_density": 0.8,
+        "fringe_curl": 0.2
+      },
+      "mirror_of": "left_cup"
+    },
+    "halter_strap": {
+      "library_id": "strap_piece.beaded_chain",
+      "local_params": {
+        "bead_diameter_mm": 4,
+        "bead_spacing_mm": 6,
+        "finish": "antique_brass"
+      }
+    },
+    "back_strap": {
+      "library_id": "strap_piece.thin_cord_tie",
+      "local_params": {
+        "width_mm": 3,
+        "tie_style": "long_dangle"
+      }
+    },
+    "bottom": {
+      "library_id": "bottom_piece.highwaist_brief",
+      "local_params": {
+        "front_half_u": 0.5,
+        "rise_height": 0.88,
+        "leg_opening_angle": 0.5,
+        "gusset_width": 0.1,
+        "waistband_width_mm": 32
+      }
+    },
+    "body_jewelry_belly": {
+      "library_id": "body_jewelry.belly_chain",
+      "local_params": {
+        "drape_count": 2,
+        "pendant_style": "coin_cluster",
+        "finish": "antique_brass"
+      },
+      "anatomy_hints": [
+        "navel",
+        "hip_left",
+        "hip_right"
+      ]
+    },
+    "center_accessory": {
+      "library_id": "accessory.fabric_knot",
+      "local_params": {
+        "size_scale": 0.45,
+        "twist_count": 1
+      },
+      "anatomy_hints": [
+        "sternum_mid"
+      ]
+    },
+    "hip_strap": null
+  },
+  "global_design": {
+    "fabric": "fabric.crochet_open",
+    "primary_color": "#b8722e",
+    "secondary_color": "#3d2412",
+    "pattern": "crochet_lattice",
+    "pattern_scale": 0.4,
+    "stitch_color_match": true,
+    "seam_type_default": "seam_type.merrow"
+  },
+  "modesty": {
+    "bottom_coverage_strict": 0.6,
+    "cup_coverage_strict": 0.35
+  }
+}
