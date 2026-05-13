@@ -177,7 +177,26 @@ def _scan_task(task_dir: str) -> dict:
                                             "pngs": pngs})
         elif os.path.isdir(full):
             pngs = sorted(glob.glob(os.path.join(full, "*.png")))
-            if pngs:
+            sub_dirs = sorted(d for d in os.listdir(full)
+                              if os.path.isdir(os.path.join(full, d)))
+            sub_dirs_with_pngs = [
+                d for d in sub_dirs
+                if glob.glob(os.path.join(full, d, "*.png"))
+            ]
+            if sub_dirs_with_pngs:
+                # 2-level layout (e.g. <seed>/<NN>/*.png). Treat any PNGs
+                # directly under <seed>/ (like a per-seed contact.png) as
+                # a stand-alone first card, then enumerate variants.
+                for p in pngs:
+                    out["seeds"].append({
+                        "name": f"{entry}/{os.path.basename(p)[:-4]}",
+                        "dir": full, "pngs": [p]})
+                for sub in sub_dirs_with_pngs:
+                    sub_path = os.path.join(full, sub)
+                    sub_pngs = sorted(glob.glob(os.path.join(sub_path, "*.png")))
+                    out["seeds"].append({"name": f"{entry}/{sub}",
+                                          "dir": sub_path, "pngs": sub_pngs})
+            elif pngs:
                 out["seeds"].append({"name": entry, "dir": full, "pngs": pngs})
     return out
 
