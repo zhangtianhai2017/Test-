@@ -1,12 +1,17 @@
 {
-  "version": 1,
-  "branch": "claude/bikini-variation-algorithm-Dv5q5",
-  "skeleton": "/Game/MetaHuman/Mannequin/SK_Body",
+  "version": 2,
+  "skeleton": "MetaHuman UE5.6 Body",
+  "unitScale": "cm",
+  "forwardAxis": "+Y",
+  "ueImportSettings": {
+    "SceneScale": 1.0,
+    "ForwardAxis": "Y",
+    "note": "Output already in cm. Disable glTFRuntime SceneScale=0.1."
+  },
   "outfits": [
     {
-      "seed": "composite_floral",
       "file": "composite_floral.glb",
-      "archetype": "one_piece_maillot",
+      "displayName": "Composite Floral",
       "slots": [
         {
           "name": "cup",
@@ -37,13 +42,17 @@
           "library_id": "ACC_BEADS_OVAL_8MM"
         }
       ],
-      "kb": 2876,
-      "vertex_count": 43564
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "one_piece_maillot",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 43564,
+      "sizeKb": 2809
     },
     {
-      "seed": "composite_red",
       "file": "composite_red.glb",
-      "archetype": "triangle_string_halter",
+      "displayName": "Composite Red",
       "slots": [
         {
           "name": "cup",
@@ -70,13 +79,17 @@
           "library_id": "S_OVERLOCK_4THREAD"
         }
       ],
-      "kb": 464,
-      "vertex_count": 5992
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "triangle_string_halter",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 5992,
+      "sizeKb": 397
     },
     {
-      "seed": "diverse_bandeau_05",
       "file": "diverse_bandeau_05.glb",
-      "archetype": "bandeau_back_band",
+      "displayName": "Diverse Bandeau 05",
       "slots": [
         {
           "name": "cup",
@@ -111,13 +124,17 @@
           "library_id": "ACC_BEADS_OVAL_8MM"
         }
       ],
-      "kb": 3533,
-      "vertex_count": 54814
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "bandeau_back_band",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 54814,
+      "sizeKb": 3466
     },
     {
-      "seed": "diverse_bandeau_06",
       "file": "diverse_bandeau_06.glb",
-      "archetype": "bandeau_back_band",
+      "displayName": "Diverse Bandeau 06",
       "slots": [
         {
           "name": "cup",
@@ -144,13 +161,17 @@
           "library_id": "ACC_BOW_CHIFFON_30MM"
         }
       ],
-      "kb": 2805,
-      "vertex_count": 45375
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "bandeau_back_band",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 45375,
+      "sizeKb": 2738
     },
     {
-      "seed": "diverse_bandeau_07",
       "file": "diverse_bandeau_07.glb",
-      "archetype": "bandeau_back_band",
+      "displayName": "Diverse Bandeau 07",
       "slots": [
         {
           "name": "cup",
@@ -181,13 +202,17 @@
           "library_id": "ACC_BEADS_OVAL_8MM"
         }
       ],
-      "kb": 2818,
-      "vertex_count": 42969
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "bandeau_back_band",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 42969,
+      "sizeKb": 2751
     },
     {
-      "seed": "diverse_bandeau_08",
       "file": "diverse_bandeau_08.glb",
-      "archetype": "bandeau_back_band",
+      "displayName": "Diverse Bandeau 08",
       "slots": [
         {
           "name": "cup",
@@ -222,13 +247,17 @@
           "library_id": "ACC_FRINGE_BEADED_80MM"
         }
       ],
-      "kb": 2491,
-      "vertex_count": 39892
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "bandeau_back_band",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 39892,
+      "sizeKb": 2424
     },
     {
-      "seed": "diverse_bandeau_09",
       "file": "diverse_bandeau_09.glb",
-      "archetype": "bandeau_back_band",
+      "displayName": "Diverse Bandeau 09",
       "slots": [
         {
           "name": "cup",
@@ -255,13 +284,17 @@
           "library_id": "ACC_FRINGE_BEADED_80MM"
         }
       ],
-      "kb": 2055,
-      "vertex_count": 32935
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "bandeau_back_band",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 32935,
+      "sizeKb": 1988
     },
     {
-      "seed": "diverse_bralette_10",
       "file": "diverse_bralette_10.glb",
-      "archetype": "bralette_shoulder_strap",
+      "displayName": "Diverse Bralette 10",
       "slots": [
         {
           "name": "cup",
@@ -284,13 +317,17 @@
           "library_id": "S_OVERLOCK_4THREAD"
         }
       ],
-      "kb": 1465,
-      "vertex_count": 22825
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "bralette_shoulder_strap",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 22825,
+      "sizeKb": 1398
     },
     {
-      "seed": "diverse_bralette_11",
       "file": "diverse_bralette_11.glb",
-      "archetype": "bralette_shoulder_strap",
+      "displayName": "Diverse Bralette 11",
       "slots": [
         {
           "name": "cup",
@@ -325,13 +362,17 @@
           "library_id": "ACC_BEADS_OVAL_8MM"
         }
       ],
-      "kb": 2331,
-      "vertex_count": 34163
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "bralette_shoulder_strap",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 34163,
+      "sizeKb": 2264
     },
     {
-      "seed": "diverse_bralette_12",
       "file": "diverse_bralette_12.glb",
-      "archetype": "bralette_shoulder_strap",
+      "displayName": "Diverse Bralette 12",
       "slots": [
         {
           "name": "cup",
@@ -366,13 +407,17 @@
           "library_id": "ACC_BEADS_OVAL_8MM"
         }
       ],
-      "kb": 3549,
-      "vertex_count": 55076
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "bralette_shoulder_strap",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 55076,
+      "sizeKb": 3482
     },
     {
-      "seed": "diverse_bralette_13",
       "file": "diverse_bralette_13.glb",
-      "archetype": "bralette_shoulder_strap",
+      "displayName": "Diverse Bralette 13",
       "slots": [
         {
           "name": "cup",
@@ -403,13 +448,17 @@
           "library_id": "ACC_FRINGE_BEADED_80MM"
         }
       ],
-      "kb": 1684,
-      "vertex_count": 26303
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "bralette_shoulder_strap",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 26303,
+      "sizeKb": 1617
     },
     {
-      "seed": "diverse_bralette_14",
       "file": "diverse_bralette_14.glb",
-      "archetype": "bralette_shoulder_strap",
+      "displayName": "Diverse Bralette 14",
       "slots": [
         {
           "name": "cup",
@@ -440,13 +489,17 @@
           "library_id": "ACC_FRINGE_BEADED_80MM"
         }
       ],
-      "kb": 2415,
-      "vertex_count": 38915
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "bralette_shoulder_strap",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 38915,
+      "sizeKb": 2348
     },
     {
-      "seed": "diverse_one_15",
       "file": "diverse_one_15.glb",
-      "archetype": "one_piece_maillot",
+      "displayName": "Diverse One 15",
       "slots": [
         {
           "name": "cup",
@@ -473,13 +526,17 @@
           "library_id": "ACC_BOW_CHIFFON_30MM"
         }
       ],
-      "kb": 2538,
-      "vertex_count": 40783
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "one_piece_maillot",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 40783,
+      "sizeKb": 2471
     },
     {
-      "seed": "diverse_one_16",
       "file": "diverse_one_16.glb",
-      "archetype": "one_piece_maillot",
+      "displayName": "Diverse One 16",
       "slots": [
         {
           "name": "cup",
@@ -514,13 +571,17 @@
           "library_id": "ACC_BEADS_OVAL_8MM"
         }
       ],
-      "kb": 6407,
-      "vertex_count": 103816
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "one_piece_maillot",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 103816,
+      "sizeKb": 6340
     },
     {
-      "seed": "diverse_one_17",
       "file": "diverse_one_17.glb",
-      "archetype": "one_piece_maillot",
+      "displayName": "Diverse One 17",
       "slots": [
         {
           "name": "cup",
@@ -547,13 +608,17 @@
           "library_id": "ACC_BEADS_OVAL_8MM"
         }
       ],
-      "kb": 3418,
-      "vertex_count": 53392
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "one_piece_maillot",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 53392,
+      "sizeKb": 3350
     },
     {
-      "seed": "diverse_one_18",
       "file": "diverse_one_18.glb",
-      "archetype": "one_piece_maillot",
+      "displayName": "Diverse One 18",
       "slots": [
         {
           "name": "cup",
@@ -584,13 +649,17 @@
           "library_id": "ACC_FRINGE_BEADED_80MM"
         }
       ],
-      "kb": 4876,
-      "vertex_count": 80738
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "one_piece_maillot",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 80738,
+      "sizeKb": 4809
     },
     {
-      "seed": "diverse_one_19",
       "file": "diverse_one_19.glb",
-      "archetype": "one_piece_maillot",
+      "displayName": "Diverse One 19",
       "slots": [
         {
           "name": "cup",
@@ -621,13 +690,17 @@
           "library_id": "ACC_BEADS_OVAL_8MM"
         }
       ],
-      "kb": 3401,
-      "vertex_count": 52696
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "one_piece_maillot",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 52696,
+      "sizeKb": 3334
     },
     {
-      "seed": "diverse_triangle_00",
       "file": "diverse_triangle_00.glb",
-      "archetype": "triangle_string_halter",
+      "displayName": "Diverse Triangle 00",
       "slots": [
         {
           "name": "cup",
@@ -662,13 +735,17 @@
           "library_id": "ACC_FRINGE_BEADED_80MM"
         }
       ],
-      "kb": 3470,
-      "vertex_count": 54102
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "triangle_string_halter",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 54102,
+      "sizeKb": 3403
     },
     {
-      "seed": "diverse_triangle_01",
       "file": "diverse_triangle_01.glb",
-      "archetype": "triangle_string_halter",
+      "displayName": "Diverse Triangle 01",
       "slots": [
         {
           "name": "cup",
@@ -703,13 +780,17 @@
           "library_id": "ACC_SHELL_TROCHUS_25MM"
         }
       ],
-      "kb": 2176,
-      "vertex_count": 34762
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "triangle_string_halter",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 34762,
+      "sizeKb": 2109
     },
     {
-      "seed": "diverse_triangle_02",
       "file": "diverse_triangle_02.glb",
-      "archetype": "triangle_string_halter",
+      "displayName": "Diverse Triangle 02",
       "slots": [
         {
           "name": "cup",
@@ -748,13 +829,17 @@
           "library_id": "ACC_FRINGE_BEADED_80MM"
         }
       ],
-      "kb": 1635,
-      "vertex_count": 25319
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "triangle_string_halter",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 25319,
+      "sizeKb": 1568
     },
     {
-      "seed": "diverse_triangle_03",
       "file": "diverse_triangle_03.glb",
-      "archetype": "triangle_string_halter",
+      "displayName": "Diverse Triangle 03",
       "slots": [
         {
           "name": "cup",
@@ -793,13 +878,17 @@
           "library_id": "ACC_BEADS_OVAL_8MM"
         }
       ],
-      "kb": 6398,
-      "vertex_count": 103570
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "triangle_string_halter",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 103570,
+      "sizeKb": 6331
     },
     {
-      "seed": "diverse_triangle_04",
       "file": "diverse_triangle_04.glb",
-      "archetype": "triangle_string_halter",
+      "displayName": "Diverse Triangle 04",
       "slots": [
         {
           "name": "cup",
@@ -826,13 +915,17 @@
           "library_id": "S_OVERLOCK_4THREAD"
         }
       ],
-      "kb": 2921,
-      "vertex_count": 47817
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "triangle_string_halter",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 47817,
+      "sizeKb": 2854
     },
     {
-      "seed": "gallery_bandeau_crinkle_aqua",
       "file": "gallery_bandeau_crinkle_aqua.glb",
-      "archetype": "bandeau_back_band",
+      "displayName": "Gallery Bandeau Crinkle Aqua",
       "slots": [
         {
           "name": "cup",
@@ -855,13 +948,17 @@
           "library_id": "S_OVERLOCK_4THREAD"
         }
       ],
-      "kb": 1002,
-      "vertex_count": 15187
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "bandeau_back_band",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 15187,
+      "sizeKb": 935
     },
     {
-      "seed": "gallery_bandeau_navy_solid",
       "file": "gallery_bandeau_navy_solid.glb",
-      "archetype": "bandeau_back_band",
+      "displayName": "Gallery Bandeau Navy Solid",
       "slots": [
         {
           "name": "cup",
@@ -884,13 +981,17 @@
           "library_id": "S_OVERLOCK_4THREAD"
         }
       ],
-      "kb": 912,
-      "vertex_count": 13664
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "bandeau_back_band",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 13664,
+      "sizeKb": 845
     },
     {
-      "seed": "gallery_bandeau_velvet_burgundy",
       "file": "gallery_bandeau_velvet_burgundy.glb",
-      "archetype": "bandeau_back_band",
+      "displayName": "Gallery Bandeau Velvet Burgundy",
       "slots": [
         {
           "name": "cup",
@@ -921,13 +1022,17 @@
           "library_id": "ACC_BOW_CHIFFON_30MM"
         }
       ],
-      "kb": 1185,
-      "vertex_count": 17933
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "bandeau_back_band",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 17933,
+      "sizeKb": 1118
     },
     {
-      "seed": "gallery_bralette_chromat_red",
       "file": "gallery_bralette_chromat_red.glb",
-      "archetype": "bralette_shoulder_strap",
+      "displayName": "Gallery Bralette Chromat Red",
       "slots": [
         {
           "name": "cup",
@@ -954,13 +1059,17 @@
           "library_id": "S_OVERLOCK_4THREAD"
         }
       ],
-      "kb": 1141,
-      "vertex_count": 17373
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "bralette_shoulder_strap",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 17373,
+      "sizeKb": 1074
     },
     {
-      "seed": "gallery_bralette_softcup_lavender",
       "file": "gallery_bralette_softcup_lavender.glb",
-      "archetype": "bralette_shoulder_strap",
+      "displayName": "Gallery Bralette Softcup Lavender",
       "slots": [
         {
           "name": "cup",
@@ -987,13 +1096,17 @@
           "library_id": "ACC_BOW_CHIFFON_30MM"
         }
       ],
-      "kb": 920,
-      "vertex_count": 13347
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "bralette_shoulder_strap",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 13347,
+      "sizeKb": 853
     },
     {
-      "seed": "gallery_bralette_sport_white",
       "file": "gallery_bralette_sport_white.glb",
-      "archetype": "one_piece_maillot",
+      "displayName": "Gallery Bralette Sport White",
       "slots": [
         {
           "name": "cup",
@@ -1016,13 +1129,17 @@
           "library_id": "S_OVERLOCK_4THREAD"
         }
       ],
-      "kb": 1379,
-      "vertex_count": 21395
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "one_piece_maillot",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 21395,
+      "sizeKb": 1312
     },
     {
-      "seed": "gallery_onepiece_classic_black",
       "file": "gallery_onepiece_classic_black.glb",
-      "archetype": "one_piece_maillot",
+      "displayName": "Gallery Onepiece Classic Black",
       "slots": [
         {
           "name": "cup",
@@ -1045,13 +1162,17 @@
           "library_id": "S_OVERLOCK_4THREAD"
         }
       ],
-      "kb": 1959,
-      "vertex_count": 31339
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "one_piece_maillot",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 31339,
+      "sizeKb": 1892
     },
     {
-      "seed": "gallery_onepiece_floral_emerald",
       "file": "gallery_onepiece_floral_emerald.glb",
-      "archetype": "one_piece_maillot",
+      "displayName": "Gallery Onepiece Floral Emerald",
       "slots": [
         {
           "name": "cup",
@@ -1082,13 +1203,17 @@
           "library_id": "ACC_BEADS_OVAL_8MM"
         }
       ],
-      "kb": 2862,
-      "vertex_count": 43318
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "one_piece_maillot",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 43318,
+      "sizeKb": 2795
     },
     {
-      "seed": "gallery_onepiece_halter_terracotta",
       "file": "gallery_onepiece_halter_terracotta.glb",
-      "archetype": "one_piece_maillot",
+      "displayName": "Gallery Onepiece Halter Terracotta",
       "slots": [
         {
           "name": "cup",
@@ -1115,13 +1240,17 @@
           "library_id": "ACC_FRINGE_BEADED_80MM"
         }
       ],
-      "kb": 1742,
-      "vertex_count": 27521
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "one_piece_maillot",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 27521,
+      "sizeKb": 1675
     },
     {
-      "seed": "gallery_triangle_aquamarine",
       "file": "gallery_triangle_aquamarine.glb",
-      "archetype": "triangle_string_halter",
+      "displayName": "Gallery Triangle Aquamarine",
       "slots": [
         {
           "name": "cup",
@@ -1148,13 +1277,17 @@
           "library_id": "S_OVERLOCK_4THREAD"
         }
       ],
-      "kb": 532,
-      "vertex_count": 7131
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "triangle_string_halter",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 7131,
+      "sizeKb": 465
     },
     {
-      "seed": "gallery_triangle_chevron_yellow",
       "file": "gallery_triangle_chevron_yellow.glb",
-      "archetype": "triangle_string_halter",
+      "displayName": "Gallery Triangle Chevron Yellow",
       "slots": [
         {
           "name": "cup",
@@ -1185,13 +1318,17 @@
           "library_id": "S_OVERLOCK_4THREAD"
         }
       ],
-      "kb": 517,
-      "vertex_count": 6820
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "triangle_string_halter",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 6820,
+      "sizeKb": 450
     },
     {
-      "seed": "gallery_triangle_floral_pink",
       "file": "gallery_triangle_floral_pink.glb",
-      "archetype": "triangle_string_halter",
+      "displayName": "Gallery Triangle Floral Pink",
       "slots": [
         {
           "name": "cup",
@@ -1226,13 +1363,17 @@
           "library_id": "ACC_BEADS_OVAL_8MM"
         }
       ],
-      "kb": 1328,
-      "vertex_count": 17308
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "triangle_string_halter",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 17308,
+      "sizeKb": 1261
     },
     {
-      "seed": "swimsuit_2",
       "file": "swimsuit_2.glb",
-      "archetype": "triangle_string_halter",
+      "displayName": "Swimsuit 2",
       "slots": [
         {
           "name": "cup",
@@ -1259,13 +1400,17 @@
           "library_id": "S_OVERLOCK_4THREAD"
         }
       ],
-      "kb": 464,
-      "vertex_count": 5992
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "triangle_string_halter",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 5992,
+      "sizeKb": 397
     },
     {
-      "seed": "synthetic_bandeau",
       "file": "synthetic_bandeau.glb",
-      "archetype": "bandeau_back_band",
+      "displayName": "Synthetic Bandeau",
       "slots": [
         {
           "name": "cup",
@@ -1296,13 +1441,17 @@
           "library_id": "ACC_BEADS_OVAL_8MM"
         }
       ],
-      "kb": 2695,
-      "vertex_count": 40601
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "bandeau_back_band",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 40601,
+      "sizeKb": 2628
     },
     {
-      "seed": "synthetic_bralette",
       "file": "synthetic_bralette.glb",
-      "archetype": "bralette_shoulder_strap",
+      "displayName": "Synthetic Bralette",
       "slots": [
         {
           "name": "cup",
@@ -1333,8 +1482,13 @@
           "library_id": "ACC_FRINGE_BEADED_80MM"
         }
       ],
-      "kb": 577,
-      "vertex_count": 7850
+      "skeleton": "MetaHuman UE5.6 Body",
+      "archetype": "bralette_shoulder_strap",
+      "unitScale": "cm",
+      "forwardAxis": "+Y",
+      "boneCount": 70,
+      "vertexCount": 7850,
+      "sizeKb": 510
     }
   ]
 }

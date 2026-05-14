@@ -335,12 +335,17 @@ def bake_one(seed_path: str, body_mesh, body_skin: dict, out_dir: str, verbose: 
     )
     out_path = os.path.join(out_dir, name + ".glb")
     size = write_skinned_glb(out_path, V, F, UV, N, joints, weights, albedo, body_skin, g)
+    # Refit to the UE 5.6 MetaHuman Body deliverable spec
+    # (whitelist of 70 stable deform bones, cm scale, +Y forward,
+    #  proper inverseBindMatrices for the kept set, asset.extras tags).
+    from refit_metahuman_glb import refit as _refit
+    refit_info = _refit(out_path, verbose=False)
     entry = {
         "seed": name, "file": name + ".glb",
         "archetype": seed.get("outfit", {}).get("archetype", ""),
         "slots": [{"name": s["slot_name"], "library_id": s["library_id"]}
                   for s in seed.get("outfit", {}).get("slot_assignments", [])],
-        "kb": size // 1024,
+        "kb": refit_info["size_kb"],
         "vertex_count": int(V.shape[0]),
     }
     if verbose:
@@ -382,14 +387,14 @@ def main():
         except Exception as exc:
             print(f"  SKIP {p}: {exc}")
 
-    manifest = {
-        "version": 1,
-        "branch": os.environ.get("GIT_BRANCH", "claude/bikini-variation-algorithm-Dv5q5"),
-        "skeleton": "/Game/MetaHuman/Mannequin/SK_Body",
-        "outfits": entries,
+    # Manifest follows the v2 deliverable schema (see refit_metahuman_glb).
+    from refit_metahuman_glb import build_manifest, _seed_v2_slots, _seed_v2_archetype, _pretty_display_name
+    refit_results = {
+        e["seed"]: {"file": e["file"], "bone_count_after": 70,
+                    "vertex_count": e["vertex_count"], "size_kb": e["kb"]}
+        for e in entries
     }
-    with open(os.path.join(args.out_dir, "manifest.json"), "w") as f:
-        json.dump(manifest, f, indent=2)
+    build_manifest(refit_results, os.path.join(args.out_dir, "manifest.json"))
     print(f"baked {len(entries)} outfits in {time.time()-t0:.1f}s -> {args.out_dir}/")
 
 
