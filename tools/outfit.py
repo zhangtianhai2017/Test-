@@ -82,6 +82,23 @@ class Outfit:
 # Random sampling — pick one legal entry per required slot
 # ---------------------------------------------------------------------------
 
+
+def _push_to_extreme(entry: LibraryEntry, lp: dict, rng: random.Random) -> dict:
+    """For "exaggerated" variants, push every numeric local_param toward
+    one of its schema bounds so the output explores the design space's
+    edges instead of clustering near the default.  Stays inside the
+    entry's schema (still L1-bounded — see notes in random_outfit on the
+    template-escape roadmap)."""
+    schema = entry.local_params_schema or {}
+    out = dict(lp)
+    for name, (lo, hi, _default) in schema.items():
+        t = rng.choices([0.10, 0.90], weights=[0.5, 0.5])[0]
+        jitter = rng.uniform(-0.05, 0.05)
+        t = max(0.0, min(1.0, t + jitter))
+        out[name] = lo + t * (hi - lo)
+    return out
+
+
 def _pin_to_max_coverage(entry: LibraryEntry, lp: dict) -> dict:
     """At bottom strict=1, force front_top_v / front_half_u / back_top_v
     / back_half_u to schema MAX (most coverage)."""
@@ -228,9 +245,32 @@ def random_outfit(archetype: str, rng: Optional[random.Random] = None,
                 local_params=req_entry.sample_local_params(rng)))
         selected_ids.add(req_id)
 
-    # Random global_design
-    # symmetry: binary — 70% perfect mirror, 30% dramatic asymmetric.
-    # No middle ground (a small skew reads as a construction defect).
+    # ----- Shape mode roll -----
+    # "extreme" — push numeric local_params toward the entry's schema
+    #             bounds.  Still bounded by the library schema (L1).
+    # "free"    — uniform sample inside the entry's schema (current
+    #             baseline).
+    # NOTE: a "wide_form" mode that escapes the library schema entirely
+    # (L1+L2 escape — allows hybrid geometry across cup families,
+    # negative inner_u, deep apex, etc.) is the next planned step.
+    # Held off here until the strategic direction is confirmed.
+    shape_roll = rng.random()
+    if shape_roll < 0.40:
+        shape_mode = "extreme"
+    else:
+        shape_mode = "free"
+
+    if shape_mode == "extreme":
+        for sa in assignments:
+            e = LIBRARY.get(sa.library_id)
+            if e is None or not e.local_params_schema:
+                continue
+            if sa.slot_name == "cup" or sa.slot_name.startswith("bottom"):
+                sa.local_params = _push_to_extreme(e, sa.local_params, rng)
+
+    # ----- Symmetry roll -----
+    # Binary — 70% perfect mirror, 30% dramatic asymmetric.  No middle
+    # ground (a small skew reads as a construction defect).
     if rng.random() < 0.30:
         symmetry_mode, asym_amount = "dramatic_asym", 0.5 + 0.5 * rng.random()
     else:
@@ -256,6 +296,7 @@ def random_outfit(archetype: str, rng: Optional[random.Random] = None,
         "asym_amount":    asym_amount,
         "geom_aesthetic": geom_choice,
         "geom_ratio_pull": geom_pull,
+        "shape_mode":     shape_mode,
     }
     return Outfit(archetype=archetype, slot_assignments=assignments,
                     global_design=global_design)

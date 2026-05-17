@@ -32,20 +32,26 @@ import library as lib
 import batch_from_diverse_seeds as B   # reuse make_contact_sheet
 
 
-N_PER_SEED = 15
-RNG_MASTER = 20260518   # bumped so the Batch-3 symmetry/geom samples vary
+N_PER_SEED = 10
+RNG_MASTER = 20260519
+BOTTOM_STRICT = 0.95   # user-requested: bottoms pinned to full coverage
 
-# 8 (archetype, modesty) cells, ordered so the contact sheet reads
-# left→right by archetype and top→bottom by modesty.
+# 12 (archetype, cup_strict) cells -- bottom_strict always 0.95.  10
+# variants per cell = 120 total.  Cup modesty varies so the cup pool
+# isn't filtered to one geometry family per cell.
 SEED_SPEC: list[tuple[str, float]] = [
-    ("triangle_string_halter",  0.30),
-    ("triangle_string_halter",  0.70),
-    ("bandeau_back_band",       0.30),
-    ("bandeau_back_band",       0.70),
-    ("bralette_shoulder_strap", 0.30),
-    ("bralette_shoulder_strap", 0.70),
-    ("one_piece_maillot",       0.30),
-    ("one_piece_maillot",       0.70),
+    ("triangle_string_halter",  0.20),
+    ("triangle_string_halter",  0.50),
+    ("triangle_string_halter",  0.80),
+    ("bandeau_back_band",       0.20),
+    ("bandeau_back_band",       0.50),
+    ("bandeau_back_band",       0.80),
+    ("bralette_shoulder_strap", 0.20),
+    ("bralette_shoulder_strap", 0.50),
+    ("bralette_shoulder_strap", 0.80),
+    ("one_piece_maillot",       0.20),
+    ("one_piece_maillot",       0.50),
+    ("one_piece_maillot",       0.80),
 ]
 
 
