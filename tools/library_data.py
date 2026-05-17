@@ -1006,6 +1006,41 @@ for _fid, _e in FABRICS.items():
         object.__setattr__(_e, "edge_finish_policy", "selvedge_only")
 
 
+# ---------------------------------------------------------------------------
+# Plug the historical "center_v = 0.74" template leak.
+#
+# `outfit.outfit_to_genome` does `cup_p.get("center_v", 0.74)`.  No
+# cup entry's local_params_schema declared `center_v`, so 100% of
+# generated cups inherited the fallback 0.74 -- which happens to be
+# swimsuit_2's cup vertical centre.  Result: every one of 240 batch
+# variants had cups at the SAME vertical position.
+#
+# Fix by giving every cup an explicit center_v range tied to its
+# geometry kind, so each variant samples its own centre.
+# ---------------------------------------------------------------------------
+
+def _center_v_range_for(entry: LibraryEntry) -> tuple[float, float, float]:
+    """(lo, hi, default) for cup_piece center_v based on geometry kind."""
+    g = entry.geometry_kind
+    if g == "molded_foam":
+        return (0.69, 0.79, 0.74)
+    if g == "softcup_squareneck":
+        return (0.66, 0.82, 0.74)
+    if g == "bandeau_unified":
+        return (0.70, 0.78, 0.74)
+    if g in ("triangle", "brazilian"):
+        return (0.70, 0.83, 0.76)
+    if g == "balconette":
+        return (0.68, 0.78, 0.73)
+    return (0.68, 0.80, 0.74)
+
+for _cup in CUP_PIECES.values():
+    if "center_v" not in _cup.local_params_schema:
+        _new_schema = dict(_cup.local_params_schema)
+        _new_schema["center_v"] = _center_v_range_for(_cup)
+        _cup.local_params_schema = _new_schema
+
+
 def entries_by_kind(kind: str) -> list[LibraryEntry]:
     return [e for e in LIBRARY.values() if e.kind == kind]
 

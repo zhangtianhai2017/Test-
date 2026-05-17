@@ -1062,33 +1062,20 @@ def build_fabric_shell(body_mesh: o3d.geometry.TriangleMesh, body_uvs: np.ndarra
     pts_g = body_uvs.copy()
     pts_g[:, 0] = pts_g[:, 0] * 2.0 - 1.0
 
-    # Shrink CUP polygons inward by SHELL_UV_MARGIN before the test.
-    # The cylindrical UV unwrap places the armpit body triangles at the
-    # same u-range as a wide cup's outer edge, and contains_points has
-    # no tolerance — without this margin, ~15% of outputs picked up
-    # armpit triangles and produced a fabric "bridge" from chest side
-    # to inner upper arm.
-    #
-    # IMPORTANT: only applied to polygons whose centroid sits in the
-    # upper-body band (v > 0.55).  Bottom panels lie in v < 0.50 and
-    # already have to fight the body deployment must_clear filter for
-    # legs; shrinking them too makes narrow thongs / brazilian bottoms
-    # disappear from the render entirely.
-    SHELL_UV_MARGIN = 0.02
-    CUP_V_THRESHOLD = 0.55   # polygons centred above this get the shrink
-
-    def _shrink_poly_if_cup(p_np):
-        if len(p_np) < 3:
-            return p_np
-        c = p_np.mean(axis=0)
-        if c[1] < CUP_V_THRESHOLD:
-            return p_np                    # bottom / side-tie: no shrink
-        v = p_np - c
-        mean_r = float(np.linalg.norm(v, axis=1).mean())
-        if mean_r < 1e-6:
-            return p_np
-        scale = max(0.0, 1.0 - SHELL_UV_MARGIN / mean_r)
-        return c + v * scale
+    # Mandatory anatomy filter — runs BEFORE the polygon test so no
+    # polygon (no matter how wide it is in UV) can ever collect a
+    # triangle whose vertices live in arms, legs, head, or neck.
+    # This replaces the earlier SHELL_UV_MARGIN / CUP_V_THRESHOLD
+    # heuristics (those were band-aids on the polygon side; this is
+    # the structural fix on the candidate-set side).  Identical bug
+    # pattern manifested as the armpit-to-side-chest bridge AND the
+    # inner-knee bridge -- both vanish here.
+    from anatomy import detect as _detect_anatomy_for_classifier
+    from body_region_classifier import (classify_vertices,
+                                          classify_triangles_strict)
+    _LM_for_filter = _detect_anatomy_for_classifier(body_mesh)
+    _vert_regions = classify_vertices(V, _LM_for_filter)
+    _torso_tri_mask = classify_triangles_strict(_vert_regions, T)
 
     # A triangle is "fabric" if ALL THREE of its per-vertex UVs are inside
     # at least one polygon. We union the results across polygons.
@@ -1097,11 +1084,13 @@ def build_fabric_shell(body_mesh: o3d.geometry.TriangleMesh, body_uvs: np.ndarra
         if len(poly) < 3:
             continue
         p = np.asarray(poly, dtype=np.float32)
-        p = _shrink_poly_if_cup(p)
         path = Path(p)
         inside_any |= path.contains_points(pts_g)
 
     tri_inside = inside_any.reshape(-1, 3).all(axis=1)
+    # Enforce the anatomy classifier as a hard intersection -- triangles
+    # outside the torso region are unconditionally rejected.
+    tri_inside &= _torso_tri_mask
 
     # Also require the triangle's centroid to be on the torso, not on an
     # arm. On this T-pose mesh torso stays under r_xz ~18 cm; arms run out
