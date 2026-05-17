@@ -1,0 +1,64 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_L",
+      "local_params": {
+        "half_u": 0.2919099080832336,
+        "half_v": 0.10123744365488588,
+        "inner_u": 0.034400235822992634,
+        "apex_lift": -0.08142823990523965,
+        "underband_dip": -0.018077932655231832
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.31879473818168347,
+        "front_half_u": 0.42330964939459254,
+        "front_leg_curve": 0.3075364960651419,
+        "back_top_v": 0.32223457130249517,
+        "back_half_u": 0.41775919402849376
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.4168131246954361,
+        "front_half_u": 0.44693746419998864,
+        "front_leg_curve": 0.30468227400371845,
+        "back_top_v": 0.5419849080632633,
+        "back_half_u": 0.3661221322332601
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 3.251116805344573
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TERRY_KNIT",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.13214626672278584,
+    "saturation": 0.7589733114470197,
+    "lightness": 0.39907741344719094,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.46361207298846074,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 13,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

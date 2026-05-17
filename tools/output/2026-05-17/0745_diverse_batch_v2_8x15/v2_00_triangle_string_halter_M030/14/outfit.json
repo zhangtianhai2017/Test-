@@ -1,0 +1,85 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.13413001592256302,
+        "half_v": 0.056588984426824834,
+        "inner_u": 0.08703232225964536,
+        "apex_lift": 0.18059559168079287,
+        "underband_dip": 0.07202476071809379
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.25611346261195067,
+        "front_half_u": 0.41024513202151186,
+        "front_leg_curve": 0.6467848871608709,
+        "back_top_v": 0.30578647695701167,
+        "back_half_u": 0.18301911519524058
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.3040705081688054,
+        "front_half_u": 0.19016906776487597,
+        "front_leg_curve": 0.5260532933433606,
+        "back_top_v": 0.2541849738563513,
+        "back_half_u": 0.08021106368565681
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 57.48258969125655
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TERRY_KNIT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_CHIFFON_30MM",
+      "local_params": {
+        "size_cm": 4.226015194567099
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_DROP_GOLD",
+      "local_params": {
+        "length_cm": 2.814118783551213
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_BELLY",
+      "local_params": {
+        "length_cm": 70.9168107804788
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.3056267404046522,
+    "saturation": 0.6852791758611084,
+    "lightness": 0.3373202018227744,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.2022886575499365,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 14,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

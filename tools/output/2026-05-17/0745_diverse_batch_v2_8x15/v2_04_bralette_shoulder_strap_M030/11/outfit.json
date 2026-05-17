@@ -1,0 +1,105 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_M",
+      "local_params": {
+        "half_u": 0.21792221123294667,
+        "half_v": 0.08894403422208519,
+        "inner_u": 0.09681325281251213,
+        "apex_lift": 0.0016594671218139873,
+        "underband_dip": 0.04178091657944387
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.3008889231573048,
+        "front_half_u": 0.3198149269897065,
+        "front_leg_curve": 0.5294960611481602,
+        "back_top_v": 0.2860436306907603,
+        "back_half_u": 0.2079491726661259
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 33.24207345416451
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_15MM",
+      "local_params": {
+        "length_cm": 13.22278269721159
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MACRAME_COTTON",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_BIOPOLYMER_PLAIN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_SMALL_4MM",
+      "local_params": {
+        "count": 17.145030141813578
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 4.416706477812176
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_DROP_GOLD",
+      "local_params": {
+        "length_cm": 1.5065253233608262
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_BEADED",
+      "local_params": {
+        "diameter_cm": 6.9662610613086775
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_PENDANT_SHELL",
+      "local_params": {
+        "chain_length_cm": 54.847013585650586
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.9376576346367317,
+    "saturation": 0.8190608228497458,
+    "lightness": 0.6605442634128725,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.5508004232579035,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_M030",
+  "variant_index": 11,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

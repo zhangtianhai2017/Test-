@@ -1,0 +1,65 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.12747673197862983,
+        "half_v": 0.06504151913915175,
+        "inner_u": 0.10839730240748606,
+        "apex_lift": 0.15187202031176797,
+        "underband_dip": 0.015931843491295342
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.27647477912081614,
+        "front_half_u": 0.24802965478657912,
+        "front_leg_curve": 0.5738393587036384,
+        "back_top_v": 0.2236221444050729,
+        "back_half_u": 0.10956177064012665
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 68.48893150115136
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_NEOPRENE_2MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_OVAL_8MM",
+      "local_params": {
+        "count": 6.467606629788064
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.26562674040465223,
+    "saturation": 0.6404698765614674,
+    "lightness": 0.42791418340917997,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.2661142647616387,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 9,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

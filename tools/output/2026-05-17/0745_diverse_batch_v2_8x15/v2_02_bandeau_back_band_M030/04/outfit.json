@@ -1,0 +1,71 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_S",
+      "local_params": {
+        "half_u": 0.19178250166534044,
+        "half_v": 0.07064122233247565,
+        "inner_u": 0.025322427638963908,
+        "apex_lift": 0.01622405673751416,
+        "underband_dip": -0.08412174098322636
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.32415978913153104,
+        "front_half_u": 0.31376016234568604,
+        "front_leg_curve": 0.6863523501156458,
+        "back_top_v": 0.314536273767261,
+        "back_half_u": 0.20499218935528932
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.3044961319297791,
+        "front_half_u": 0.33561219120621577,
+        "front_leg_curve": 0.5248222945942091,
+        "back_top_v": 0.28862912270524993,
+        "back_half_u": 0.25876992967222745
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 4.2643452517475655
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 22.895669273845535
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_CROCHET_COTTON",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.06014626672278586,
+    "saturation": 0.8191895844568784,
+    "lightness": 0.39231057274352144,
+    "pattern_overlay": "polka",
+    "pattern_scale": 0.6185343493964547,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 4,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

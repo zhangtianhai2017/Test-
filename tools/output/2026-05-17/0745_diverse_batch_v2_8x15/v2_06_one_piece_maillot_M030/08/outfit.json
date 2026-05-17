@@ -1,0 +1,74 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.09445730769123001,
+        "half_v": 0.084500980197494,
+        "inner_u": 0.10017538687732125,
+        "apex_lift": 0.2527069936396329,
+        "underband_dip": 0.031764061044303474
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.31648175190986383,
+        "front_half_u": 0.39590902904241376,
+        "front_leg_curve": 0.522187178184718,
+        "back_top_v": 0.29034162955625725,
+        "back_half_u": 0.20143374412192744
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.32650518416605034,
+        "front_half_u": 0.3271062332143224,
+        "front_leg_curve": 0.6496898959847274,
+        "back_top_v": 0.26626670235671634,
+        "back_half_u": 0.18792198122467943
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_10MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 25.105083599997027
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TERRY_KNIT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.09717388983481084,
+    "saturation": 0.8204959079593824,
+    "lightness": 0.32954731637517565,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.5600274002076714,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

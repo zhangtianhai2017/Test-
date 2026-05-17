@@ -1,0 +1,89 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.08213356338128683,
+        "half_v": 0.04742124861810304,
+        "inner_u": 0.1068207770447829,
+        "apex_lift": 0.18038021746589533,
+        "underband_dip": 0.06543176924443109
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.4614351036294667,
+        "front_half_u": 0.41015771993679734,
+        "front_leg_curve": 0.3564368674582321,
+        "back_top_v": 0.4074311107245886,
+        "back_half_u": 0.2990959893075655
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 31.3385926334104
+      }
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_15MM_NICKEL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_COMPRESSION_SPORT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_MACRAME_COTTON",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_WAIST",
+      "local_params": {
+        "length_cm": 69.34864886398702
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_BELLY",
+      "local_params": {
+        "length_cm": 84.12055453976869
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_STUD_PEARL",
+      "local_params": {
+        "size_cm": 0.7459345514096617
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.9216576346367317,
+    "saturation": 0.8059558961577099,
+    "lightness": 0.5851181728949302,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.4679247257804072,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_M030",
+  "variant_index": 9,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

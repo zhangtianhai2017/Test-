@@ -1,0 +1,53 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_L",
+      "local_params": {
+        "half_u": 0.20587261848578542,
+        "half_v": 0.10251026494557536,
+        "inner_u": 0.08250851124738136,
+        "apex_lift": -0.027689205525684938,
+        "underband_dip": -0.01970979356758238
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.23450817503241597,
+        "front_half_u": 0.29859011487854603,
+        "front_leg_curve": 0.7973524457365745,
+        "back_top_v": 0.27809553499596584,
+        "back_half_u": 0.16458672176018224
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 4.5372928467150855
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HEMP_BLEND",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.10814626672278585,
+    "saturation": 0.8097713112425529,
+    "lightness": 0.43529939992048566,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.20803609107921223,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 10,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

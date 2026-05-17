@@ -1,0 +1,102 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_M",
+      "local_params": {
+        "half_u": 0.15793113166179634,
+        "half_v": 0.059673666543381236,
+        "inner_u": 0.07854544392946132,
+        "apex_lift": 0.11903141951962387,
+        "underband_dip": 0.07402279343543913
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.260981909608892,
+        "front_half_u": 0.2961811957035778,
+        "front_leg_curve": 0.5368426179452692,
+        "back_top_v": 0.27522104079648885,
+        "back_half_u": 0.2596128020421888
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.2675572357502435,
+        "front_half_u": 0.21788854849028094,
+        "front_leg_curve": 0.7635349690299429,
+        "back_top_v": 0.29434638533510193,
+        "back_half_u": 0.08057176455505953
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 45.104863998776665
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 28.936682966401072
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_ROSEGOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_VIRGIN_VELVET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_BEADED_80MM",
+      "local_params": {
+        "length_cm": 9.267339570597947
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_SATIN_40MM",
+      "local_params": {
+        "size_cm": 3.7168770408761587
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_CHAIN_GOLD",
+      "local_params": {
+        "diameter_cm": 5.5822609103750365
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.2416267404046522,
+    "saturation": 0.7132711223708266,
+    "lightness": 0.37908307116177303,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.5473525831015165,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 6,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

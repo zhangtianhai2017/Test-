@@ -1,0 +1,65 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_M",
+      "local_params": {
+        "half_u": 0.13619862559020315,
+        "half_v": 0.06823421584504272,
+        "inner_u": 0.093309776006185,
+        "apex_lift": 0.27911968202006665,
+        "underband_dip": 0.06891300276835613
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.2559459649323994,
+        "front_half_u": 0.369349810893027,
+        "front_leg_curve": 0.7002374382282223,
+        "back_top_v": 0.3090047921249255,
+        "back_half_u": 0.24744485092631907
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 48.982396179473305
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_TASSEL_SILK_50MM",
+      "local_params": {
+        "length_cm": 3.8757479935530164
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.20162674040465223,
+    "saturation": 0.6275474709256526,
+    "lightness": 0.3703321691130934,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.4313118441718098,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_M",
+      "local_params": {
+        "half_u": 0.19689641858280196,
+        "half_v": 0.09494645840783947,
+        "inner_u": 0.047432907236041634,
+        "apex_lift": 0.06854366570996341,
+        "underband_dip": -0.04138186523255845
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.24939428414689377,
+        "front_half_u": 0.4090259470305132,
+        "front_leg_curve": 0.738665617006536,
+        "back_top_v": 0.30767607230765864,
+        "back_half_u": 0.20813230866268856
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.5479269435025673,
+        "front_half_u": 0.39602778638257885,
+        "front_leg_curve": 0.31021751395753455,
+        "back_top_v": 0.4681367439313141,
+        "back_half_u": 0.32165838228364235
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_BAND_SPORT_25MM",
+      "local_params": {
+        "length_cm": 8.087284854969221
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_WAFFLE_HONEYCOMB",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_HEMP_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_TASSEL_SILK_50MM",
+      "local_params": {
+        "length_cm": 5.744271273066933
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_TROCHUS_25MM",
+      "local_params": {
+        "size_cm": 2.251097470290629
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.06517388983481084,
+    "saturation": 0.7827891953178969,
+    "lightness": 0.41274359556404666,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.2806803861075905,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 4,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

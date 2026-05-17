@@ -1,0 +1,76 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.1390598214625985,
+        "half_v": 0.05907864201339983,
+        "inner_u": 0.13661410616479414,
+        "apex_lift": 0.196369583468007,
+        "underband_dip": 0.07599572020290293
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.20180850608042,
+        "front_half_u": 0.2614122609113528,
+        "front_leg_curve": 0.7454638891247044,
+        "back_top_v": 0.20257424113324035,
+        "back_half_u": 0.10585459912604597
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.22873887236341997,
+        "front_half_u": 0.2759341064635018,
+        "front_leg_curve": 0.6440961917317568,
+        "back_top_v": 0.26960284085768754,
+        "back_half_u": 0.12190682640480693
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 51.714890394017424
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_WAFFLE_HONEYCOMB",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_TASSEL_SILK_50MM",
+      "local_params": {
+        "length_cm": 4.495625754866639
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.2736267404046522,
+    "saturation": 0.6785736796124038,
+    "lightness": 0.45714408580022814,
+    "pattern_overlay": "stripe",
+    "pattern_scale": 0.40145090157834784,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 10,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

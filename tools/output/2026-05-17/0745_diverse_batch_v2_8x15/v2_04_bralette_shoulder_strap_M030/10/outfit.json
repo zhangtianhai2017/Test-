@@ -1,0 +1,65 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_L",
+      "local_params": {
+        "half_u": 0.264242590275584,
+        "half_v": 0.08488521597815642,
+        "inner_u": 0.08065238282492561,
+        "apex_lift": -0.04542824576589881,
+        "underband_dip": -0.010273381975218987
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.23546208079569456,
+        "front_half_u": 0.2594555710175178,
+        "front_leg_curve": 0.5473573786800728,
+        "back_top_v": 0.2558161254815681,
+        "back_half_u": 0.10582120408501636
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_10MM",
+      "local_params": {
+        "length_cm": 35.26133158238922
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 27.5152203967858
+      }
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_15MM_NICKEL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEQUIN_DENSE",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.9296576346367317,
+    "saturation": 0.7489867467448958,
+    "lightness": 0.4909771794098978,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.4273936924767249,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_M030",
+  "variant_index": 10,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

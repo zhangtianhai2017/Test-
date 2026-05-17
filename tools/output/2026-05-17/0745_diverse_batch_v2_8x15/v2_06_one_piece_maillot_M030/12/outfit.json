@@ -1,0 +1,70 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.14714995455674545,
+        "half_v": 0.071991837643612,
+        "inner_u": 0.0784796968103585,
+        "apex_lift": 0.16330778656178227,
+        "underband_dip": 0.05680317452398276
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.27327165435064826,
+        "front_half_u": 0.30452175053242975,
+        "front_leg_curve": 0.6846436982391981,
+        "back_top_v": 0.24513007253618857,
+        "back_half_u": 0.13877052535148168
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_8MM",
+      "local_params": {
+        "length_cm": 13.885526671039498
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MUSHROOM_LEATHER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_MESH_OUTER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_SMALL_4MM",
+      "local_params": {
+        "count": 29.902229280099103
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.12917388983481085,
+    "saturation": 0.8726111861979612,
+    "lightness": 0.4799873060588883,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.20795684492836378,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 12,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_L",
+      "local_params": {
+        "half_u": 0.28243268796230303,
+        "half_v": 0.07847256499985074,
+        "inner_u": 0.06298625842560152,
+        "apex_lift": 0.014147063344593758,
+        "underband_dip": -0.01681361488231694
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.24056018061773463,
+        "front_half_u": 0.3489781812006053,
+        "front_leg_curve": 0.5973952989122417,
+        "back_top_v": 0.27032566986112466,
+        "back_half_u": 0.14264596817545422
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 37.985051425992665
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_20MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_MESH_OUTER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.8576576346367317,
+    "saturation": 0.7368845666432158,
+    "lightness": 0.521132959384821,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.5761285435427044,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_M030",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

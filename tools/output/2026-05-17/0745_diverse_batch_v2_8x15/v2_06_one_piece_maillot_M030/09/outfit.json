@@ -1,0 +1,67 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_M",
+      "local_params": {
+        "half_u": 0.19432539914863214,
+        "half_v": 0.07855217041946114,
+        "inner_u": 0.0943285440053082,
+        "apex_lift": 0.09320170023465406,
+        "underband_dip": -0.026188844772297295
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.3053735178782571,
+        "front_half_u": 0.4153054567873951,
+        "front_leg_curve": 0.5315615164578692,
+        "back_top_v": 0.2459826006773788,
+        "back_half_u": 0.23929516403285395
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.2887923014614099,
+        "front_half_u": 0.2699398480623824,
+        "front_leg_curve": 0.7286027755205482,
+        "back_top_v": 0.2502820873379364,
+        "back_half_u": 0.10063778567667171
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ECONYL_PLAIN_HEAVY",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_MACRAME_COTTON",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.10517388983481084,
+    "saturation": 0.8274821565322741,
+    "lightness": 0.44716111680415893,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.37874709592179157,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 9,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

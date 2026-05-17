@@ -1,0 +1,95 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_L",
+      "local_params": {
+        "half_u": 0.2801862162496774,
+        "half_v": 0.1137544490850044,
+        "inner_u": 0.006289587026542667,
+        "apex_lift": -0.024483620120496444,
+        "underband_dip": -0.07796429447559419
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.38649434188173026,
+        "front_half_u": 0.4584561883426893,
+        "front_leg_curve": 0.35001517755536354,
+        "back_top_v": 0.36435305693852493,
+        "back_half_u": 0.4077564582093011
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.311877397169438,
+        "front_half_u": 0.2141774074897882,
+        "front_leg_curve": 0.5951389663499261,
+        "back_top_v": 0.25434825448251097,
+        "back_half_u": 0.06325154538233749
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 3.913855667051086
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 23.980522260007795
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEERSUCKER_STRIPE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_COMPRESSION_SPORT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_COVERSTITCH_3NEEDLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_TROCHUS_25MM",
+      "local_params": {
+        "size_cm": 2.7798371146795855
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_PENDANT_DROP_15MM_GOLD",
+      "local_params": {
+        "size_cm": 1.0641349974737078
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.08414626672278586,
+    "saturation": 0.7319885223659377,
+    "lightness": 0.5114325556521063,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.6838290671553724,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 7,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

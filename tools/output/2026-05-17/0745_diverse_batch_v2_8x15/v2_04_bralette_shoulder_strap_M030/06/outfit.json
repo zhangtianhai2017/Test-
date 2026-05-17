@@ -1,0 +1,76 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_M",
+      "local_params": {
+        "half_u": 0.20807135737570875,
+        "half_v": 0.07535588507305091,
+        "inner_u": 0.05982654931822241,
+        "apex_lift": 0.06652887508611721,
+        "underband_dip": -0.0418362870058316
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.25541548025138444,
+        "front_half_u": 0.2993048352420068,
+        "front_leg_curve": 0.5994510916171704,
+        "back_top_v": 0.26117088921502624,
+        "back_half_u": 0.24474281376229903
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.33207356894838697,
+        "front_half_u": 0.3161429839220565,
+        "front_leg_curve": 0.6142186331283617,
+        "back_top_v": 0.2535266464340115,
+        "back_half_u": 0.1975830307878409
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_10MM",
+      "local_params": {
+        "length_cm": 31.49301839677767
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_15MM",
+      "local_params": {
+        "length_cm": 13.565001626971634
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BIOPOLYMER_PLAIN",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.8976576346367318,
+    "saturation": 0.8430808186818656,
+    "lightness": 0.5957969207974306,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.2776033444399534,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_M030",
+  "variant_index": 6,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

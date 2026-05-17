@@ -1,0 +1,91 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_M",
+      "local_params": {
+        "half_u": 0.19408348267599557,
+        "half_v": 0.05462737763546166,
+        "inner_u": 0.06258314344092136,
+        "apex_lift": 0.2614914239213204,
+        "underband_dip": 0.007135961868110364
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.2783744840037019,
+        "front_half_u": 0.2846876683764584,
+        "front_leg_curve": 0.6004324039410596,
+        "back_top_v": 0.233836837921329,
+        "back_half_u": 0.16946853808357087
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 35.75926298904025
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_10MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_AMNI_SOUL_RIBBED",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_AMNI_SOUL_RIBBED",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_TASSEL_SILK_50MM",
+      "local_params": {
+        "length_cm": 4.250265464010717
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_STUD_PEARL",
+      "local_params": {
+        "size_cm": 0.6669063063209777
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_BELLY",
+      "local_params": {
+        "length_cm": 84.67400675231467
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHAIN",
+      "local_params": {
+        "diameter_cm": 8.103555880724901
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.041173889834810844,
+    "saturation": 0.7924897228416239,
+    "lightness": 0.3778626559789836,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.639891364947405,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

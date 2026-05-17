@@ -1,0 +1,104 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_S",
+      "local_params": {
+        "half_u": 0.18601578969177757,
+        "half_v": 0.07463639192084391,
+        "inner_u": 0.07217864520900297,
+        "apex_lift": 0.014074625759890755,
+        "underband_dip": -0.015386974494263593
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.3888852032548623,
+        "front_half_u": 0.49039707395136534,
+        "front_leg_curve": 0.42586165827098943,
+        "back_top_v": 0.313002737965685,
+        "back_half_u": 0.40007405257099193
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.2787484798383451,
+        "front_half_u": 0.3145657587216851,
+        "front_leg_curve": 0.6995624874624535,
+        "back_top_v": 0.2488738350421556,
+        "back_half_u": 0.1695890190181425
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 2.5408521012139653
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_BAND_SPORT_25MM",
+      "local_params": {
+        "length_cm": 11.303326603418848
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MESH_OUTER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_PENDANT_DROP_15MM_GOLD",
+      "local_params": {
+        "size_cm": 1.9031002283457572
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_CHIFFON_30MM",
+      "local_params": {
+        "size_cm": 4.864446997908143
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_PENDANT_SHELL",
+      "local_params": {
+        "chain_length_cm": 42.50801667307858
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHARM_BEACH",
+      "local_params": {
+        "diameter_cm": 9.375576537275178
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.03614626672278586,
+    "saturation": 0.7996360889538464,
+    "lightness": 0.4415688450512138,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.3189248333999982,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

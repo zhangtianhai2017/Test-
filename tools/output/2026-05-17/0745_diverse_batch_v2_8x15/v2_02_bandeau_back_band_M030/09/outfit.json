@@ -1,0 +1,53 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_L",
+      "local_params": {
+        "half_u": 0.23867713030867999,
+        "half_v": 0.1349071826972057,
+        "inner_u": 0.005565788767806752,
+        "apex_lift": -0.017329951450488726,
+        "underband_dip": -0.03442898904794468
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.3327971215543134,
+        "front_half_u": 0.3438914385481613,
+        "front_leg_curve": 0.5803228116619523,
+        "back_top_v": 0.2593687864288974,
+        "back_half_u": 0.21881843266541673
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 4.875668473460876
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_NEOPRENE_2MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.10014626672278586,
+    "saturation": 0.8504361945938019,
+    "lightness": 0.47224074304302854,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.6377327105642185,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 9,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_M",
+      "local_params": {
+        "half_u": 0.1886567300300511,
+        "half_v": 0.0855665221413581,
+        "inner_u": 0.05881366712998909,
+        "apex_lift": 0.009731152378640738,
+        "underband_dip": 0.07100418926815691
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.3110391171223587,
+        "front_half_u": 0.2819967083350892,
+        "front_leg_curve": 0.6916608488521511,
+        "back_top_v": 0.20628818565078966,
+        "back_half_u": 0.13085807645943787
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 60.31674864234782
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 31.52691169592977
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_18MM_SILVER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MACRAME_COTTON",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.2976267404046522,
+    "saturation": 0.6729899820458568,
+    "lightness": 0.28991788172098926,
+    "pattern_overlay": "checker",
+    "pattern_scale": 0.551949915885338,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 13,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

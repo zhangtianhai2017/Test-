@@ -1,0 +1,77 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_L",
+      "local_params": {
+        "half_u": 0.28169459261170027,
+        "half_v": 0.11163075105749957,
+        "inner_u": 0.056421908288377814,
+        "apex_lift": 0.001509822816335639,
+        "underband_dip": 0.0015659258454527522
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.2555675154837445,
+        "front_half_u": 0.29857246406862165,
+        "front_leg_curve": 0.5065029691589067,
+        "back_top_v": 0.2779885136745176,
+        "back_half_u": 0.197828645199592
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_10MM",
+      "local_params": {
+        "length_cm": 24.882154434756984
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_BAND_SPORT_25MM",
+      "local_params": {
+        "length_cm": 12.818461130713743
+      }
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_15MM_NICKEL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_COVERSTITCH_3NEEDLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_BEADED_80MM",
+      "local_params": {
+        "length_cm": 11.685252382457545
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.8816576346367317,
+    "saturation": 0.7481761536003105,
+    "lightness": 0.5285009807950819,
+    "pattern_overlay": "stripe",
+    "pattern_scale": 0.7106220096762885,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_M030",
+  "variant_index": 4,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

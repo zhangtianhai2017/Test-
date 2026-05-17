@@ -1,0 +1,72 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_S",
+      "local_params": {
+        "half_u": 0.18879738235761118,
+        "half_v": 0.06903039247025823,
+        "inner_u": 0.06655533631793946,
+        "apex_lift": 0.08866015328569742,
+        "underband_dip": 0.0498322637291289
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.33848763847675234,
+        "front_half_u": 0.35815217940291155,
+        "front_leg_curve": 0.6782105684421499,
+        "back_top_v": 0.24026039757005788,
+        "back_half_u": 0.20805627611372307
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 25.46029616129467
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TERRY_KNIT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_WAFFLE_HONEYCOMB",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_OVAL_8MM",
+      "local_params": {
+        "count": 10.733348559740378
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 7.470684050909336
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.11317388983481083,
+    "saturation": 0.8740357569148419,
+    "lightness": 0.43361545979385974,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.7030978423541576,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 10,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_M",
+      "local_params": {
+        "half_u": 0.2276170804544891,
+        "half_v": 0.06927132978097379,
+        "inner_u": 0.05355932838077533,
+        "apex_lift": -0.02389383112359862,
+        "underband_dip": -0.033300496853443086
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.36247747625513876,
+        "front_half_u": 0.4445582159052465,
+        "front_leg_curve": 0.45652831549503325,
+        "back_top_v": 0.33593653765273496,
+        "back_half_u": 0.31799920905376294
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_10MM",
+      "local_params": {
+        "length_cm": 25.513820504253633
+      }
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_15MM_NICKEL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HUNZA_CRINKLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_SMALL_4MM",
+      "local_params": {
+        "count": 9.982796548050015
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_TASSEL_SILK_50MM",
+      "local_params": {
+        "length_cm": 4.358071852310813
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.9456576346367317,
+    "saturation": 0.7905400040687084,
+    "lightness": 0.532229150611184,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.8682148534594645,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_M030",
+  "variant_index": 12,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

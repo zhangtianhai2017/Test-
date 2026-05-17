@@ -1,0 +1,76 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_M",
+      "local_params": {
+        "half_u": 0.14787719916680325,
+        "half_v": 0.07816227053066918,
+        "inner_u": 0.10013376444996615,
+        "apex_lift": 0.26589913545369337,
+        "underband_dip": 0.06543903801424265
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.2813495429885626,
+        "front_half_u": 0.24190576952017548,
+        "front_leg_curve": 0.5647458397234152,
+        "back_top_v": 0.22844474358920736,
+        "back_half_u": 0.1743596481799805
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.4672441606011407,
+        "front_half_u": 0.5112776886189571,
+        "front_leg_curve": 0.30334843165451003,
+        "back_top_v": 0.46191570062274884,
+        "back_half_u": 0.4201533375740072
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_15MM",
+      "local_params": {
+        "length_cm": 28.278449013886963
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_10MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 24.928202597892476
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_CUTOUT_JERSEY",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.07317388983481084,
+    "saturation": 0.7673706667377718,
+    "lightness": 0.473269890807087,
+    "pattern_overlay": "polka",
+    "pattern_scale": 0.3180290801733471,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 5,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

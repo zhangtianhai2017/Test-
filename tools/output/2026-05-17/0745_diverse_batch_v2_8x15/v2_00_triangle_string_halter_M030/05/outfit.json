@@ -1,0 +1,81 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_M",
+      "local_params": {
+        "half_u": 0.09100621580490632,
+        "half_v": 0.06903839563020597,
+        "inner_u": 0.08938313335397799,
+        "apex_lift": 0.2878194255542953,
+        "underband_dip": 0.043062814768134554
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.26443784615077,
+        "front_half_u": 0.22636712188748523,
+        "front_leg_curve": 0.5597607423315532,
+        "back_top_v": 0.2122471513049752,
+        "back_half_u": 0.07010649388106421
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.25091968459226116,
+        "front_half_u": 0.29806894757629054,
+        "front_leg_curve": 0.681603613998943,
+        "back_top_v": 0.27561427853810183,
+        "back_half_u": 0.24161394782339857
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 49.18902258127917
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 23.019615181687026
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_8MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ECONYL_PLAIN_LIGHT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.2336267404046522,
+    "saturation": 0.6506127671940531,
+    "lightness": 0.3610931219314695,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.7838993443219506,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 5,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_L",
+      "local_params": {
+        "half_u": 0.23267298715254134,
+        "half_v": 0.1110984482361137,
+        "inner_u": 0.07843830511069955,
+        "apex_lift": 0.1457430477064344,
+        "underband_dip": 0.029425399009911337
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.27094754161026885,
+        "front_half_u": 0.29030198867857965,
+        "front_leg_curve": 0.6862558437422801,
+        "back_top_v": 0.24140208461045792,
+        "back_half_u": 0.14864149124322223
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.3017834376003656,
+        "front_half_u": 0.3423655493381649,
+        "front_leg_curve": 0.6978477516017354,
+        "back_top_v": 0.28531344418308746,
+        "back_half_u": 0.21459237140010348
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 58.2251358082079
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 23.523507532645933
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_ROSEGOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_AMNI_SOUL_RIBBED",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.22562674040465222,
+    "saturation": 0.6994973636608014,
+    "lightness": 0.37002900565971913,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.5093885972192903,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 4,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

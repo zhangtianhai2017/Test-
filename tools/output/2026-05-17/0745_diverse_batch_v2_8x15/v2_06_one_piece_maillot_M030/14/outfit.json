@@ -1,0 +1,63 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_S",
+      "local_params": {
+        "half_u": 0.18551229309680634,
+        "half_v": 0.0788199518243469,
+        "inner_u": 0.07202831914692848,
+        "apex_lift": 0.06262677963016455,
+        "underband_dip": 0.015698910549352824
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.5431323898544861,
+        "front_half_u": 0.5451225340525415,
+        "front_leg_curve": 0.43919957796742115,
+        "back_top_v": 0.47630229691125475,
+        "back_half_u": 0.36984423523314913
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_BAND_SPORT_25MM",
+      "local_params": {
+        "length_cm": 12.520851199593064
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HEMP_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.14517388983481083,
+    "saturation": 0.8467595864183982,
+    "lightness": 0.44185918314350253,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.6797374688270705,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 14,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

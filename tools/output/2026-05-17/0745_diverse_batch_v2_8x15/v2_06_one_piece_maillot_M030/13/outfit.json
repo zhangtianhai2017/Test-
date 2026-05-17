@@ -1,0 +1,72 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_S",
+      "local_params": {
+        "half_u": 0.1637931464145222,
+        "half_v": 0.05868642644852048,
+        "inner_u": 0.07683756072925034,
+        "apex_lift": 0.0031785129428575226,
+        "underband_dip": -0.019021145924510742
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.33101483572370854,
+        "front_half_u": 0.3430400570827425,
+        "front_leg_curve": 0.5278751720321724,
+        "back_top_v": 0.2596876047092212,
+        "back_half_u": 0.22155062002395642
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_AMNI_SOUL_RIBBED",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_BEADED_80MM",
+      "local_params": {
+        "length_cm": 5.6227997321365955
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 4.708890761329805
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHAIN",
+      "local_params": {
+        "diameter_cm": 8.976820126940346
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.13717388983481082,
+    "saturation": 0.8737736352288823,
+    "lightness": 0.3521618854141157,
+    "pattern_overlay": "polka",
+    "pattern_scale": 0.421754447594466,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 13,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

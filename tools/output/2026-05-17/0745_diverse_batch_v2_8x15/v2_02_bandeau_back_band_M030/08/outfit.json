@@ -1,0 +1,71 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_M",
+      "local_params": {
+        "half_u": 0.23221085258113433,
+        "half_v": 0.0782810940672024,
+        "inner_u": 0.07106123605976314,
+        "apex_lift": -0.011986436875360482,
+        "underband_dip": 0.040000956001390545
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.3181527969295058,
+        "front_half_u": 0.31233681489740855,
+        "front_leg_curve": 0.5280597673266254,
+        "back_top_v": 0.3098781730207027,
+        "back_half_u": 0.1834861819451737
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.36530407716904456,
+        "front_half_u": 0.5126310945162768,
+        "front_leg_curve": 0.5401948498076197,
+        "back_top_v": 0.37899606324285295,
+        "back_half_u": 0.3086569506867533
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 5.121379930818085
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_15MM",
+      "local_params": {
+        "length_cm": 8.651463816111338
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MUSHROOM_LEATHER",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.09214626672278586,
+    "saturation": 0.7907671628636953,
+    "lightness": 0.537742607702081,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.5461710097822943,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.1422212742501916,
+        "half_v": 0.060254289437099776,
+        "inner_u": 0.11672247946680493,
+        "apex_lift": 0.28713579395749544,
+        "underband_dip": 0.042324683922974074
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.22052994320436184,
+        "front_half_u": 0.27045479324363975,
+        "front_leg_curve": 0.5790453978815042,
+        "back_top_v": 0.23349324400625115,
+        "back_half_u": 0.12881308177696643
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 59.1591814579576
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ALGAE_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_COWRIE_20MM",
+      "local_params": {
+        "size_cm": 1.487545705337188
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_SATIN_40MM",
+      "local_params": {
+        "size_cm": 3.6863149172955882
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.2896267404046522,
+    "saturation": 0.699901736600213,
+    "lightness": 0.3276033795532936,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.4492369241032901,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 12,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.07071917192172258,
+        "half_v": 0.06784164213618535,
+        "inner_u": 0.06819640547217845,
+        "apex_lift": 0.15620537048116334,
+        "underband_dip": 0.07330405627048096
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.2831064437696579,
+        "front_half_u": 0.23311987758078306,
+        "front_leg_curve": 0.6245929107120495,
+        "back_top_v": 0.24790057314569477,
+        "back_half_u": 0.09337305188674022
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 36.729805958226116
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_15MM_NICKEL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_QNOVA_RIBBED",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.9056576346367318,
+    "saturation": 0.8444436122017218,
+    "lightness": 0.5292244469143293,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.32137608685066155,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_M030",
+  "variant_index": 7,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_S",
+      "local_params": {
+        "half_u": 0.19766729986195045,
+        "half_v": 0.08230630695790492,
+        "inner_u": 0.060243003858323464,
+        "apex_lift": 0.09509572526584568,
+        "underband_dip": 0.026308617839487514
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.37166453143894557,
+        "front_half_u": 0.504334260239284,
+        "front_leg_curve": 0.4998565405886553,
+        "back_top_v": 0.3568366453903046,
+        "back_half_u": 0.3241690302187267
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_8MM",
+      "local_params": {
+        "length_cm": 11.739776502369452
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BRODERIE_ANGLAISE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.033173889834810844,
+    "saturation": 0.7754410280765724,
+    "lightness": 0.48772442215332296,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.8563329232116843,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 0,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

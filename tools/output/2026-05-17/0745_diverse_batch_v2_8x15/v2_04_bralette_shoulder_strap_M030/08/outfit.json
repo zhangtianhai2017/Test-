@@ -1,0 +1,86 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.08526532402060709,
+        "half_v": 0.049295523577314565,
+        "inner_u": 0.10615657615858057,
+        "apex_lift": 0.11779664941780124,
+        "underband_dip": 0.01073351117962746
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.2766341531213448,
+        "front_half_u": 0.3016051313185178,
+        "front_leg_curve": 0.5654833134824914,
+        "back_top_v": 0.2516189591183906,
+        "back_half_u": 0.15479322763344683
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.2878925346446661,
+        "front_half_u": 0.36771107628396893,
+        "front_leg_curve": 0.6767478675698575,
+        "back_top_v": 0.2726677768447648,
+        "back_half_u": 0.23059989571732964
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_10MM",
+      "local_params": {
+        "length_cm": 30.653850648556837
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 15.798915214171906
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TULLE_NET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_MESH_OUTER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.9136576346367318,
+    "saturation": 0.8234408962197717,
+    "lightness": 0.5584670737459925,
+    "pattern_overlay": "polka",
+    "pattern_scale": 0.6758152348187215,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_M030",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

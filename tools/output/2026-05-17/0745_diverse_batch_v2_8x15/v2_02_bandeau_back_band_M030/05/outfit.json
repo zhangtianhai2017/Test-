@@ -1,0 +1,74 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_L",
+      "local_params": {
+        "half_u": 0.27277070967472195,
+        "half_v": 0.09347339445103428,
+        "inner_u": 0.06077429865240763,
+        "apex_lift": -0.02547886006932518,
+        "underband_dip": -0.03199995303917948
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.2765358852816234,
+        "front_half_u": 0.31318869079183587,
+        "front_leg_curve": 0.5798592662739489,
+        "back_top_v": 0.26964239754051383,
+        "back_half_u": 0.24202462811725406
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.5171419570654853,
+        "front_half_u": 0.4878818786063271,
+        "front_leg_curve": 0.3762368228929077,
+        "back_top_v": 0.42542570412185043,
+        "back_half_u": 0.3819145729677429
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 4.903677404947816
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SLUB_LINEN_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_QNOVA_RIBBED",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.06814626672278586,
+    "saturation": 0.870754962388162,
+    "lightness": 0.4681092686558516,
+    "pattern_overlay": "polka",
+    "pattern_scale": 0.53193127336022,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 5,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_S",
+      "local_params": {
+        "half_u": 0.21901226264117454,
+        "half_v": 0.0696834057438219,
+        "inner_u": 0.018504966621345008,
+        "apex_lift": -0.04359638623046045,
+        "underband_dip": 0.04832690332752285
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.2913799758181084,
+        "front_half_u": 0.2667593509677302,
+        "front_leg_curve": 0.6288486518446375,
+        "back_top_v": 0.2339504747585333,
+        "back_half_u": 0.1375015270333124
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.499565476981029,
+        "front_half_u": 0.431554938007428,
+        "front_leg_curve": 0.4651153875311732,
+        "back_top_v": 0.4605819917492936,
+        "back_half_u": 0.34971903343991656
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 5.400630950483089
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MESH_OUTER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_NEOPRENE_1MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_PENDANT_SHELL",
+      "local_params": {
+        "chain_length_cm": 53.25175610572239
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.11614626672278586,
+    "saturation": 0.8063127670996278,
+    "lightness": 0.40986238808739195,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.38818330912948196,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 11,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

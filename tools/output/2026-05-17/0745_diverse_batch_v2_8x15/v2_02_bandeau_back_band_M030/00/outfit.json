@@ -1,0 +1,95 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_S",
+      "local_params": {
+        "half_u": 0.14087585225333235,
+        "half_v": 0.06192477741674199,
+        "inner_u": 0.08324255068912859,
+        "apex_lift": -0.029044393119920287,
+        "underband_dip": -0.02612140949762808
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.21640070949132814,
+        "front_half_u": 0.3161730071695723,
+        "front_leg_curve": 0.7882066358237683,
+        "back_top_v": 0.24455365780850463,
+        "back_half_u": 0.06702197916607334
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.22691036101604212,
+        "front_half_u": 0.24648923801388703,
+        "front_leg_curve": 0.5822334565979914,
+        "back_top_v": 0.25183643302185876,
+        "back_half_u": 0.10445581507867069
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 4.065695787941584
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_8MM",
+      "local_params": {
+        "length_cm": 11.827937879066186
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ALGAE_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_BRODERIE_ANGLAISE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_BEADED_80MM",
+      "local_params": {
+        "length_cm": 9.590421783033559
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_SMALL_4MM",
+      "local_params": {
+        "count": 8.738899712729005
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.028146266722785862,
+    "saturation": 0.7365282638588311,
+    "lightness": 0.41532154563136126,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.254076687664153,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 0,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

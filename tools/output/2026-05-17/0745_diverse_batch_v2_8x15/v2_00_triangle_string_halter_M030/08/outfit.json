@@ -1,0 +1,63 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.10651785176681984,
+        "half_v": 0.06966344839781496,
+        "inner_u": 0.1300416197964641,
+        "apex_lift": 0.27688417515878927,
+        "underband_dip": 0.023858717810815777
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.2989705996401605,
+        "front_half_u": 0.23151824745238728,
+        "front_leg_curve": 0.620996128635772,
+        "back_top_v": 0.26311763881641587,
+        "back_half_u": 0.09937830727947378
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 52.25084249951327
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_ROSEGOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TULLE_NET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_COVERSTITCH_3NEEDLE",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.2576267404046522,
+    "saturation": 0.6887408948771782,
+    "lightness": 0.28749126323153784,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.59816248243335,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

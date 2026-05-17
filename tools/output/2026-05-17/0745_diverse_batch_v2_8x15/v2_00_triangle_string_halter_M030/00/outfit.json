@@ -1,0 +1,65 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.14862322300367464,
+        "half_v": 0.09366282975995543,
+        "inner_u": 0.08079561198435363,
+        "apex_lift": 0.2964567374582223,
+        "underband_dip": 0.07704989889028767
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.27217361577283505,
+        "front_half_u": 0.19480155973365573,
+        "front_leg_curve": 0.7354970513127345,
+        "back_top_v": 0.26978817716297093,
+        "back_half_u": 0.061455062952884526
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 44.946813736571805
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 23.480113848414835
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MESH_OUTER",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.19362674040465222,
+    "saturation": 0.6832223141184117,
+    "lightness": 0.4134881044612757,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.587485286216517,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 0,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

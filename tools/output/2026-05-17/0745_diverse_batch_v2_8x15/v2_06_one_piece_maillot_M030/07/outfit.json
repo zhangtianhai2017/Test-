@@ -1,0 +1,67 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_M",
+      "local_params": {
+        "half_u": 0.17116632113774077,
+        "half_v": 0.07293058093412184,
+        "inner_u": 0.08454981144896626,
+        "apex_lift": 0.06497123893257967,
+        "underband_dip": -0.016383098016164326
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.30068410956334646,
+        "front_half_u": 0.4366235034380072,
+        "front_leg_curve": 0.47508528498368374,
+        "back_top_v": 0.3387439327761466,
+        "back_half_u": 0.32502178444956575
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.3527603150496961,
+        "front_half_u": 0.4699656908719225,
+        "front_leg_curve": 0.34603515515250505,
+        "back_top_v": 0.3493623386706858,
+        "back_half_u": 0.3106287907323487
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEERSUCKER_STRIPE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_MACRAME_COTTON",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.08917388983481084,
+    "saturation": 0.8831647236909286,
+    "lightness": 0.5023221689424697,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.5592791946159882,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 7,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

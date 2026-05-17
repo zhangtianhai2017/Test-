@@ -1,0 +1,76 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.08874885305792292,
+        "half_v": 0.06493585586210193,
+        "inner_u": 0.08871669785672849,
+        "apex_lift": 0.12863646086611627,
+        "underband_dip": 0.023927120731027242
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.4554571766132719,
+        "front_half_u": 0.5314988713698329,
+        "front_leg_curve": 0.3553370156207687,
+        "back_top_v": 0.4991266340800347,
+        "back_half_u": 0.40155001450465855
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.44474054756416415,
+        "front_half_u": 0.4157411190188508,
+        "front_leg_curve": 0.31391044349138797,
+        "back_top_v": 0.5132725774459449,
+        "back_half_u": 0.3765464853169823
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 29.86403144665048
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_8MM",
+      "local_params": {
+        "length_cm": 10.246408660661428
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_NEOPRENE_2MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_SEQUIN_DENSE",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.12117388983481084,
+    "saturation": 0.8005035062292007,
+    "lightness": 0.43926462908146197,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.5275941999254372,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 11,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

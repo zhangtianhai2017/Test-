@@ -1,0 +1,76 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_M",
+      "local_params": {
+        "half_u": 0.14065268323936375,
+        "half_v": 0.04825214553337029,
+        "inner_u": 0.10312498205659668,
+        "apex_lift": 0.12285721736167186,
+        "underband_dip": 0.07385987479774342
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.2960744347922089,
+        "front_half_u": 0.3382395289599461,
+        "front_leg_curve": 0.5568595829437357,
+        "back_top_v": 0.2714134718542845,
+        "back_half_u": 0.18192146277991447
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.3132458364550788,
+        "front_half_u": 0.24719946514199492,
+        "front_leg_curve": 0.6999375582539165,
+        "back_top_v": 0.2670603170167214,
+        "back_half_u": 0.1002333653750704
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 54.976087546295666
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 34.94703742451554
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HUNZA_CRINKLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.20962674040465223,
+    "saturation": 0.6369715504326576,
+    "lightness": 0.41980627260936704,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.7136394256703427,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 2,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

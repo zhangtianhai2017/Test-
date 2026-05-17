@@ -1,0 +1,56 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.08101418743725386,
+        "half_v": 0.04156624066960885,
+        "inner_u": 0.11228402547587166,
+        "apex_lift": 0.20150129218015153,
+        "underband_dip": 0.07204223666681535
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.3504676882488182,
+        "front_half_u": 0.4433004048342484,
+        "front_leg_curve": 0.40684409230861207,
+        "back_top_v": 0.34774539801842785,
+        "back_half_u": 0.31493521449667594
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_COMPRESSION_SPORT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_COVERSTITCH_3NEEDLE",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.08117388983481084,
+    "saturation": 0.7669635926815203,
+    "lightness": 0.34155675326059065,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.898003517136958,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 6,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

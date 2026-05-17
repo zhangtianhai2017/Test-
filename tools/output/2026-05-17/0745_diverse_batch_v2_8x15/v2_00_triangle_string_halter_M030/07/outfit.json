@@ -1,0 +1,69 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_L",
+      "local_params": {
+        "half_u": 0.2058580992268258,
+        "half_v": 0.05984740169809221,
+        "inner_u": 0.12145066437155633,
+        "apex_lift": 0.012064500687522805,
+        "underband_dip": 0.09422691864558545
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.3115713633501324,
+        "front_half_u": 0.22441493255495748,
+        "front_leg_curve": 0.6260101573385042,
+        "back_top_v": 0.25387749846051777,
+        "back_half_u": 0.13017452542552885
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.30630391074870417,
+        "front_half_u": 0.269697831001704,
+        "front_leg_curve": 0.5825164124639367,
+        "back_top_v": 0.2663222892604249,
+        "back_half_u": 0.11748306862529358
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 52.21399907667753
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_COMPRESSION_SPORT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.24962674040465221,
+    "saturation": 0.5880441452180967,
+    "lightness": 0.3312491859262694,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.8453183487895009,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 7,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

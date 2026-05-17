@@ -1,0 +1,71 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_M",
+      "local_params": {
+        "half_u": 0.19954208673019336,
+        "half_v": 0.09464858671086433,
+        "inner_u": 0.044020434629717095,
+        "apex_lift": 0.06901830888852431,
+        "underband_dip": -0.03267893950836166
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.26832039211347086,
+        "front_half_u": 0.31466513944849556,
+        "front_leg_curve": 0.6928882612165247,
+        "back_top_v": 0.29878963019933624,
+        "back_half_u": 0.2395518290433617
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.27134084411150455,
+        "front_half_u": 0.33450790385587836,
+        "front_leg_curve": 0.7401033821091574,
+        "back_top_v": 0.2758533257211816,
+        "back_half_u": 0.14148026316007617
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 5.876879709121839
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_BAND_SPORT_25MM",
+      "local_params": {
+        "length_cm": 12.319329007158498
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_WAFFLE_HONEYCOMB",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.04414626672278586,
+    "saturation": 0.7785681935782393,
+    "lightness": 0.539164409327438,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.7921558920288654,
+    "palette_preset": "free"
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 2,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

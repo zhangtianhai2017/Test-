@@ -6,7 +6,7 @@ Click into any day folder below — GitHub renders its README.md automatically. 
 
 ## By day
 
-- [`2026-05-17/`](2026-05-17/README.md) — 1 tasks
+- [`2026-05-17/`](2026-05-17/README.md) — 2 tasks
 - [`2026-05-13/`](2026-05-13/README.md) — 3 tasks
 - [`2026-05-09/`](2026-05-09/README.md) — 3 tasks
 - [`2026-05-08/`](2026-05-08/README.md) — 10 tasks
