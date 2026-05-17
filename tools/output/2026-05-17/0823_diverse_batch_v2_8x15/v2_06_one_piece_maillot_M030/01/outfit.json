@@ -1,0 +1,90 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.16293520468144612,
+        "half_v": 0.06283735484472038,
+        "inner_u": 0.10470912406354005,
+        "apex_lift": 0.15392949588650556,
+        "underband_dip": 0.0018305404743169263
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.2949868188983192,
+        "front_half_u": 0.3335344182883495,
+        "front_leg_curve": 0.5506714970896778,
+        "back_top_v": 0.25585349193465046,
+        "back_half_u": 0.10156926084300491
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.32799610001375623,
+        "front_half_u": 0.4613758395555768,
+        "front_leg_curve": 0.4876841518793998,
+        "back_top_v": 0.3267473410250943,
+        "back_half_u": 0.30817816001737247
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_10MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_VIRGIN_VELVET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_HUNZA_CRINKLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_CHOKER_GOLD",
+      "local_params": {
+        "width_cm": 1.2039126423960917
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_DROP_GOLD",
+      "local_params": {
+        "length_cm": 3.6419980898958193
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.02594906410363395,
+    "saturation": 0.7295867047017901,
+    "lightness": 0.6727669010330547,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.8014325515625003,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

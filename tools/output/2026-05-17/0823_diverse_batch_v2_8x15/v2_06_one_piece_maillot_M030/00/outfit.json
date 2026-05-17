@@ -1,0 +1,71 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.1306857087544408,
+        "half_v": 0.05045363445320765,
+        "inner_u": 0.07074736507669381,
+        "apex_lift": 0.12904624726316957,
+        "underband_dip": 0.055511230912490564
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.37851742296099633,
+        "front_half_u": 0.43001979945647567,
+        "front_leg_curve": 0.4319160453006947,
+        "back_top_v": 0.3417204944687941,
+        "back_half_u": 0.34850123414722534
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_10MM",
+      "local_params": {
+        "length_cm": 30.844938775718482
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_BAND_SPORT_25MM",
+      "local_params": {
+        "length_cm": 11.300960473347326
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TERRY_KNIT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_BELLY",
+      "local_params": {
+        "length_cm": 59.98701629260705
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.01794906410363395,
+    "saturation": 0.6805473964518365,
+    "lightness": 0.6441082152770268,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.8046000383718221,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 0,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.1597984854474819,
+        "half_v": 0.050824180062391644,
+        "inner_u": 0.15126919309878184,
+        "apex_lift": 0.16443623031776036,
+        "underband_dip": 0.022384288184913517
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.31936361417524467,
+        "front_half_u": 0.296851773836112,
+        "front_leg_curve": 0.5109874456090323,
+        "back_top_v": 0.2950339447052981,
+        "back_half_u": 0.22504749373597865
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.23967150589633948,
+        "front_half_u": 0.2226656148310253,
+        "front_leg_curve": 0.6438670624986352,
+        "back_top_v": 0.25548621780470754,
+        "back_half_u": 0.0951489507387299
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 63.206241253685775
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_8MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FOIL_COATED_GOLD",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.04322765297049336,
+    "saturation": 0.623075607514814,
+    "lightness": 0.6610958725993292,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.20071328810298875,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

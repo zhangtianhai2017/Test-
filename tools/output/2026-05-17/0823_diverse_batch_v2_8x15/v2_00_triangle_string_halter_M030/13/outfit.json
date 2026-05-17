@@ -1,0 +1,68 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.10640726876227155,
+        "half_v": 0.034061040125156115,
+        "inner_u": 0.10340918816654274,
+        "apex_lift": 0.16123710834090563,
+        "underband_dip": 0.0481310489115479
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.21426275152304516,
+        "front_half_u": 0.31040929601394796,
+        "front_leg_curve": 0.699357525836784,
+        "back_top_v": 0.27083293036354206,
+        "back_half_u": 0.07067315462070456
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.23064961866510184,
+        "front_half_u": 0.285221031508891,
+        "front_leg_curve": 0.5530943395203984,
+        "back_top_v": 0.2772333206777647,
+        "back_half_u": 0.17923326442586884
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 54.867783793598456
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEQUIN_DENSE",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.0832276529704934,
+    "saturation": 0.6404446834382104,
+    "lightness": 0.5679690889204024,
+    "pattern_overlay": "polka",
+    "pattern_scale": 0.41876507450806555,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 13,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

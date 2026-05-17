@@ -1,0 +1,62 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_M",
+      "local_params": {
+        "half_u": 0.21017479945901288,
+        "half_v": 0.09350054896868662,
+        "inner_u": 0.03431612708800613,
+        "apex_lift": -0.049191942758983684,
+        "underband_dip": -0.03878721285285396
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.35573526612277945,
+        "front_half_u": 0.4304694712940925,
+        "front_leg_curve": 0.3141603764573459,
+        "back_top_v": 0.34129025582084116,
+        "back_half_u": 0.3574491014076892
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 3.9756997978816555
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_MACRAME_COTTON",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.7683607993546988,
+    "saturation": 0.6829963673648353,
+    "lightness": 0.4136779209485882,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.7533671903450936,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

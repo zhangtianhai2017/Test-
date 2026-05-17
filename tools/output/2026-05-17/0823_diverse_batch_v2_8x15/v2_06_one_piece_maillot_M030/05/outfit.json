@@ -1,0 +1,68 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.14905321942011973,
+        "half_v": 0.04737476264331907,
+        "inner_u": 0.15598383119328413,
+        "apex_lift": 0.2307090289706627,
+        "underband_dip": 0.09879679300126352
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.3987949579744797,
+        "front_half_u": 0.45237364608110175,
+        "front_leg_curve": 0.5336387417918631,
+        "back_top_v": 0.3193055828159166,
+        "back_half_u": 0.3677218335042896
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.5176354270153165,
+        "front_half_u": 0.5126429820438965,
+        "front_leg_curve": 0.4709241398628867,
+        "back_top_v": 0.42325645168810977,
+        "back_half_u": 0.34951123010178614
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 25.24828382236454
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FISHNET_OPEN",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.05794906410363394,
+    "saturation": 0.6758888929801479,
+    "lightness": 0.6199364761122583,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.8636780247626152,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 5,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

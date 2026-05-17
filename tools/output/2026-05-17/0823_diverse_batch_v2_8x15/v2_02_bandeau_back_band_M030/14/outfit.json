@@ -1,0 +1,73 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_M",
+      "local_params": {
+        "half_u": 0.2467476202851076,
+        "half_v": 0.11645656186539283,
+        "inner_u": 0.004727162287104845,
+        "apex_lift": -0.03820342953648354,
+        "underband_dip": -0.03106625493539647
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.48335972345378203,
+        "front_half_u": 0.5082959758145995,
+        "front_leg_curve": 0.4900618748745985,
+        "back_top_v": 0.5239079120329088,
+        "back_half_u": 0.3492229807926177
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.221891552830258,
+        "front_half_u": 0.33650636785573607,
+        "front_leg_curve": 0.6874853980118959,
+        "back_top_v": 0.2459619233824587,
+        "back_half_u": 0.15879268725031725
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 4.3338840191982815
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.8723607993546988,
+    "saturation": 0.7423225495232544,
+    "lightness": 0.37470368784955077,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.5201079953400753,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 14,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

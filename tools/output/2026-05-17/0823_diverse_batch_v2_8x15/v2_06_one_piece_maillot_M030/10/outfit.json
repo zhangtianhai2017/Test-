@@ -1,0 +1,71 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.11432934878247852,
+        "half_v": 0.06403544548113774,
+        "inner_u": 0.06003609036862707,
+        "apex_lift": 0.15742689352102746,
+        "underband_dip": 0.014018218002355578
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.24639463929505223,
+        "front_half_u": 0.3503009958793287,
+        "front_leg_curve": 0.6662143206607924,
+        "back_top_v": 0.2268707805217537,
+        "back_half_u": 0.13101424037941398
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.24447733287137746,
+        "front_half_u": 0.36031511923354154,
+        "front_leg_curve": 0.5151551982209486,
+        "back_top_v": 0.25202698926056327,
+        "back_half_u": 0.24826939359107347
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TERRY_KNIT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_AMNI_SOUL_RIBBED",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.09794906410363394,
+    "saturation": 0.762775604223867,
+    "lightness": 0.562741174642567,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.8313247784249904,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 10,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

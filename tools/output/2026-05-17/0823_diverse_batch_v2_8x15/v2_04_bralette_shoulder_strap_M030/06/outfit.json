@@ -1,0 +1,67 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.07220083745035659,
+        "half_v": 0.048493328146801316,
+        "inner_u": 0.07701414149198638,
+        "apex_lift": 0.245364961059175,
+        "underband_dip": 0.02512972925764835
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.45426699453605257,
+        "front_half_u": 0.43895220627844406,
+        "front_leg_curve": 0.3204984559668305,
+        "back_top_v": 0.471559821671843,
+        "back_half_u": 0.3402228130916415
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 24.387513813925462
+      }
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_15MM_NICKEL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_COVERSTITCH_3NEEDLE",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.29689401328564796,
+    "saturation": 0.47152665244481246,
+    "lightness": 0.6222870488224213,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.4961545802603862,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_M030",
+  "variant_index": 6,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

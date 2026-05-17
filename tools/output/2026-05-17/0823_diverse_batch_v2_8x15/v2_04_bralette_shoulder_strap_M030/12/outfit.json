@@ -1,0 +1,67 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_L",
+      "local_params": {
+        "half_u": 0.19817036377180297,
+        "half_v": 0.08651996129111496,
+        "inner_u": 0.13962198895096373,
+        "apex_lift": 0.12155982403410567,
+        "underband_dip": 0.053830872872037354
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.2775159947275664,
+        "front_half_u": 0.3229186525328321,
+        "front_leg_curve": 0.5587262316737566,
+        "back_top_v": 0.2442627774364204,
+        "back_half_u": 0.2189814219260167
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 24.13174769430556
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ECONYL_PLAIN_HEAVY",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_SEQUIN_DENSE",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.34489401328564795,
+    "saturation": 0.4908520533851979,
+    "lightness": 0.5958101909931213,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.3803690384797037,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.8209371714629559,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_M030",
+  "variant_index": 12,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

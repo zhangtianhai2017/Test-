@@ -1,0 +1,73 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_L",
+      "local_params": {
+        "half_u": 0.29744700420500425,
+        "half_v": 0.12868391628227244,
+        "inner_u": 0.021111634691914755,
+        "apex_lift": -0.07805010896904463,
+        "underband_dip": -0.03141070433439688
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.31997057053255734,
+        "front_half_u": 0.30345322966296706,
+        "front_leg_curve": 0.6222958319560692,
+        "back_top_v": 0.28250831192791725,
+        "back_half_u": 0.06586832925545709
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.49192706417871196,
+        "front_half_u": 0.4805449066682923,
+        "front_leg_curve": 0.4844546006726075,
+        "back_top_v": 0.4437391084351378,
+        "back_half_u": 0.38258373845452776
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 5.236333329523809
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MISSONI_SHINY_KNIT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.8243607993546989,
+    "saturation": 0.7526281376689451,
+    "lightness": 0.3475318218285158,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.24963704052037972,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_M",
+      "local_params": {
+        "half_u": 0.16260015261283972,
+        "half_v": 0.06593255459219353,
+        "inner_u": 0.08049055685655601,
+        "apex_lift": -0.040853773622404915,
+        "underband_dip": 0.02005716820492344
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.2381646998682601,
+        "front_half_u": 0.29578122129119555,
+        "front_leg_curve": 0.7772526902216349,
+        "back_top_v": 0.22750121185243127,
+        "back_half_u": 0.11820499388387445
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.2650769788484446,
+        "front_half_u": 0.3492586234028093,
+        "front_leg_curve": 0.6664161136636265,
+        "back_top_v": 0.2270126713742227,
+        "back_half_u": 0.11822625562092101
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 4.196911771511851
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 23.487822628245357
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MACRAME_COTTON",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_OVAL_8MM",
+      "local_params": {
+        "count": 14.089568434933353
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_CHIFFON_30MM",
+      "local_params": {
+        "size_cm": 4.915315545830359
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.7603607993546988,
+    "saturation": 0.6914766695473726,
+    "lightness": 0.2873823754732574,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.2692089410992389,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 0,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

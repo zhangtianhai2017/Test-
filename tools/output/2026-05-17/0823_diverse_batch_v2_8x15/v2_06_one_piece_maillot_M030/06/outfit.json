@@ -1,0 +1,64 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_M",
+      "local_params": {
+        "half_u": 0.12227875362973142,
+        "half_v": 0.07007171538637173,
+        "inner_u": 0.1188994581414171,
+        "apex_lift": 0.2037152490550522,
+        "underband_dip": 0.0630951765918706
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.29170210376293393,
+        "front_half_u": 0.34461156268640597,
+        "front_leg_curve": 0.7555597317456725,
+        "back_top_v": 0.2711673628881404,
+        "back_half_u": 0.14614608047713223
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_COMPRESSION_SPORT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_CHIFFON_30MM",
+      "local_params": {
+        "size_cm": 4.346038772668466
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_COWRIE_20MM",
+      "local_params": {
+        "size_cm": 1.9945341928087772
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.06594906410363395,
+    "saturation": 0.7395833561602906,
+    "lightness": 0.6720636316971824,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.732397577123685,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 6,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

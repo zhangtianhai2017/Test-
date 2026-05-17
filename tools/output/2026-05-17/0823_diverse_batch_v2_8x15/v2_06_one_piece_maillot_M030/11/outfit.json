@@ -1,0 +1,67 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.15286612364437357,
+        "half_v": 0.07830862938373875,
+        "inner_u": 0.05309993168843983,
+        "apex_lift": 0.16914961265616307,
+        "underband_dip": 0.09151242911636585
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.33763951041097795,
+        "front_half_u": 0.32518286170077404,
+        "front_leg_curve": 0.5410686190494634,
+        "back_top_v": 0.25281948745628935,
+        "back_half_u": 0.20602789746270356
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 22.8382659580827
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HUNZA_CRINKLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_NEOPRENE_2MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.10594906410363394,
+    "saturation": 0.7363019903010428,
+    "lightness": 0.6068808896371962,
+    "pattern_overlay": "stripe",
+    "pattern_scale": 0.6492799082565066,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 11,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

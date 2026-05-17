@@ -1,0 +1,75 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.1888,
+        "half_v": 0.0944,
+        "inner_u": 0.06,
+        "apex_lift": 0.1731275357638187,
+        "underband_dip": 0.011147424732487563
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.6360384230725742,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.5310889019838497,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 56.618494390517725
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 22.251052529482003
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_CROCHET_COTTON",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.20809202981773262,
+    "saturation": 0.8510559020801275,
+    "lightness": 0.5543433686294031,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.27657730765368477,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85
+  },
+  "source_seed": "v2_01_triangle_string_halter_M070",
+  "variant_index": 7,
+  "modesty": {
+    "bottom_coverage_strict": 0.7,
+    "cup_coverage_strict": 0.7
+  }
+}

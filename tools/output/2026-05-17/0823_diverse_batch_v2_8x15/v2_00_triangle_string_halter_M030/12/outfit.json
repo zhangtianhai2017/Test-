@@ -1,0 +1,85 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.13560391851959852,
+        "half_v": 0.07685051926560571,
+        "inner_u": 0.10247860732985084,
+        "apex_lift": 0.20940010789267313,
+        "underband_dip": 0.09082584464333376
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.3154281311369942,
+        "front_half_u": 0.31516083893314567,
+        "front_leg_curve": 0.6086913247570263,
+        "back_top_v": 0.30061212200334186,
+        "back_half_u": 0.19752909577685512
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.2034027881124991,
+        "front_half_u": 0.2922564587111496,
+        "front_leg_curve": 0.5582086287330777,
+        "back_top_v": 0.2530763020051508,
+        "back_half_u": 0.0747960046724506
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 43.52486131388133
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_ROSEGOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_LACE_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_OVAL_8MM",
+      "local_params": {
+        "count": 9.61899378487367
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.07522765297049339,
+    "saturation": 0.5902024972653477,
+    "lightness": 0.5349140154105945,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.5401770492233658,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.9744925752364826,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 12,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

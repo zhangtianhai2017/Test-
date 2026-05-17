@@ -1,0 +1,113 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.13159842932835,
+        "half_v": 0.044065365800878144,
+        "inner_u": 0.0856716681837091,
+        "apex_lift": 0.182308089262794,
+        "underband_dip": 0.02246018501517149
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.22255217792792648,
+        "front_half_u": 0.34359293864264545,
+        "front_leg_curve": 0.7890918531201118,
+        "back_top_v": 0.24407876305342868,
+        "back_half_u": 0.16768910231454456
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.3911211490804824,
+        "front_half_u": 0.4147509760568428,
+        "front_leg_curve": 0.49244364921436384,
+        "back_top_v": 0.31986608834280206,
+        "back_half_u": 0.3110907392103789
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_15MM",
+      "local_params": {
+        "length_cm": 33.15889612459028
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 26.525135575023555
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FISHNET_OPEN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_CROCHET_COTTON",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_TROCHUS_25MM",
+      "local_params": {
+        "size_cm": 1.820688536458147
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_OVAL_8MM",
+      "local_params": {
+        "count": 6.4252916980608425
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_CHAIN_GOLD",
+      "local_params": {
+        "diameter_cm": 5.962066548001088
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_CHOKER_GOLD",
+      "local_params": {
+        "width_cm": 0.38784735117345814
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.272894013285648,
+    "saturation": 0.5191281182198884,
+    "lightness": 0.5875197299421743,
+    "pattern_overlay": "stripe",
+    "pattern_scale": 0.281810343765184,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_M030",
+  "variant_index": 3,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

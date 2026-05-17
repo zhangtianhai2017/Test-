@@ -1,0 +1,75 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_M",
+      "local_params": {
+        "half_u": 0.19546577542671542,
+        "half_v": 0.06400141236377858,
+        "inner_u": 0.04953750634977198,
+        "apex_lift": -0.04808029264283983,
+        "underband_dip": 0.04051606648035844
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.33306162306561793,
+        "front_half_u": 0.41715442643678013,
+        "front_leg_curve": 0.3066698378314913,
+        "back_top_v": 0.3319887797796403,
+        "back_half_u": 0.41393325872434894
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.28934831611264183,
+        "front_half_u": 0.2956459804071493,
+        "front_leg_curve": 0.5784222022805325,
+        "back_top_v": 0.30587790634657197,
+        "back_half_u": 0.20282121250034307
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 5.643698022921342
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MUSHROOM_LEATHER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_DROP_GOLD",
+      "local_params": {
+        "length_cm": 2.480811091009757
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.8323607993546988,
+    "saturation": 0.687741624063912,
+    "lightness": 0.25930465440507733,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.42971786808079204,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 9,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

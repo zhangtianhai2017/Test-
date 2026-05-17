@@ -1,0 +1,78 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.13514008348761222,
+        "half_v": 0.058135382792921596,
+        "inner_u": 0.10425830727874524,
+        "apex_lift": 0.10820605668132961,
+        "underband_dip": 0.012965014422790482
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.2204803428469877,
+        "front_half_u": 0.3571779372559522,
+        "front_leg_curve": 0.7413940144326125,
+        "back_top_v": 0.27164763631831845,
+        "back_half_u": 0.13836589032562632
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.2422548064672519,
+        "front_half_u": 0.3281712348173293,
+        "front_leg_curve": 0.7136853410312195,
+        "back_top_v": 0.26543606900176175,
+        "back_half_u": 0.2524046437688075
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 28.0887948025318
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_BRODERIE_ANGLAISE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.11394906410363395,
+    "saturation": 0.7532844004163873,
+    "lightness": 0.5698821093783706,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.8619662448670915,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 12,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

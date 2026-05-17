@@ -1,0 +1,81 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_L",
+      "local_params": {
+        "half_u": 0.23260189221302463,
+        "half_v": 0.09945060500921128,
+        "inner_u": 0.06976609263029553,
+        "apex_lift": 0.07179222904813898,
+        "underband_dip": -0.010680715885980671
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.3132608688626147,
+        "front_half_u": 0.4613750723376058,
+        "front_leg_curve": 0.4897608041117951,
+        "back_top_v": 0.3287303279857767,
+        "back_half_u": 0.37742781015206583
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_10MM",
+      "local_params": {
+        "length_cm": 24.26137677375128
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEQUIN_DENSE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_VIRGIN_VELVET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_DROP_GOLD",
+      "local_params": {
+        "length_cm": 2.3500608855166014
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_STUD_PEARL",
+      "local_params": {
+        "size_cm": 0.8061574359255004
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.32889401328564793,
+    "saturation": 0.4930193228017971,
+    "lightness": 0.5960488011644256,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.6250499931458782,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_M030",
+  "variant_index": 10,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

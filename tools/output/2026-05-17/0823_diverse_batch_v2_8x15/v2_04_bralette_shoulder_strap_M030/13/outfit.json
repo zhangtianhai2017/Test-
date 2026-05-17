@@ -1,0 +1,97 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_M",
+      "local_params": {
+        "half_u": 0.20055231792297643,
+        "half_v": 0.07241634513939083,
+        "inner_u": 0.061421569518005335,
+        "apex_lift": -0.02882209576112586,
+        "underband_dip": 0.03467516026282266
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.3604414080299734,
+        "front_half_u": 0.43776146820510975,
+        "front_leg_curve": 0.4199486005664198,
+        "back_top_v": 0.3311472802141385,
+        "back_half_u": 0.3241357032956848
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.543012503185861,
+        "front_half_u": 0.5539676883335908,
+        "front_leg_curve": 0.32600135455582047,
+        "back_top_v": 0.49748573597988355,
+        "back_half_u": 0.38465800404408296
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_10MM",
+      "local_params": {
+        "length_cm": 25.291434106854144
+      }
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_20MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FOIL_COATED_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_QNOVA_RIBBED",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_COWRIE_20MM",
+      "local_params": {
+        "size_cm": 1.5963435175926053
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_PENDANT_DROP_15MM_GOLD",
+      "local_params": {
+        "size_cm": 1.390605860518221
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.35289401328564796,
+    "saturation": 0.5195522971322567,
+    "lightness": 0.664010545611751,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.4858584438867356,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_M030",
+  "variant_index": 13,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

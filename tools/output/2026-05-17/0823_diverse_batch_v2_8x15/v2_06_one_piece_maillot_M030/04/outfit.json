@@ -1,0 +1,74 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.0825714159758307,
+        "half_v": 0.04520348919732725,
+        "inner_u": 0.10617119715813561,
+        "apex_lift": 0.2579612850225357,
+        "underband_dip": 0.03673872954003469
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.31271037516407496,
+        "front_half_u": 0.37376736887781103,
+        "front_leg_curve": 0.4628964548655581,
+        "back_top_v": 0.3677569318038457,
+        "back_half_u": 0.40823961721107804
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 36.30912131115073
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 26.661585941909294
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SLUB_LINEN_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_VIRGIN_VELVET",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.04994906410363395,
+    "saturation": 0.7392617735054309,
+    "lightness": 0.6119965916786949,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.8677872163948184,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 4,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

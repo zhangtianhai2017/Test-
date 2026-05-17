@@ -1,0 +1,76 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.11190714689054922,
+        "half_v": 0.07820487170029645,
+        "inner_u": 0.0625462848539592,
+        "apex_lift": 0.1405182578298087,
+        "underband_dip": 0.05552857250875898
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.26893042245055565,
+        "front_half_u": 0.19232523266478962,
+        "front_leg_curve": 0.6736144856257708,
+        "back_top_v": 0.21593394175675665,
+        "back_half_u": 0.12672330358190528
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 42.51512951138765
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_18MM_SILVER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_QNOVA_RIBBED",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_BEADED",
+      "local_params": {
+        "diameter_cm": 6.1008254329844505
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_WAIST",
+      "local_params": {
+        "length_cm": 88.6163145342602
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.9952276529704934,
+    "saturation": 0.6322033387245267,
+    "lightness": 0.5943840917666491,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.8782244372692245,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 2,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

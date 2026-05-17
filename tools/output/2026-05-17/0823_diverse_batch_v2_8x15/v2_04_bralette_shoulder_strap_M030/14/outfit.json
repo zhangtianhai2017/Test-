@@ -1,0 +1,67 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_M",
+      "local_params": {
+        "half_u": 0.15450487502158466,
+        "half_v": 0.07970303230032587,
+        "inner_u": 0.1422775623502015,
+        "apex_lift": 0.026600978527579467,
+        "underband_dip": 0.03367405368407559
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.2805713175989828,
+        "front_half_u": 0.3727900809694392,
+        "front_leg_curve": 0.7483480606634347,
+        "back_top_v": 0.2531322282068296,
+        "back_half_u": 0.23951488702885082
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 25.268907964437748
+      }
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_10MM_NICKEL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_NEOPRENE_2MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.36089401328564796,
+    "saturation": 0.5025388464273409,
+    "lightness": 0.5080627666305265,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.555776118469261,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_M030",
+  "variant_index": 14,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

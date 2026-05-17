@@ -1,0 +1,73 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.08004936308397348,
+        "half_v": 0.05653819703684432,
+        "inner_u": 0.11959921124732469,
+        "apex_lift": 0.24146343335338746,
+        "underband_dip": 0.008277968441445509
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.2891984665991892,
+        "front_half_u": 0.2598602176230553,
+        "front_leg_curve": 0.5371532947225556,
+        "back_top_v": 0.22427393234584944,
+        "back_half_u": 0.10344036051621769
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.2224628374056214,
+        "front_half_u": 0.273781191762034,
+        "front_leg_curve": 0.694941307755526,
+        "back_top_v": 0.27459819761159254,
+        "back_half_u": 0.1028965405804681
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 62.12442233615833
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_CROCHET_COTTON",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.9872276529704934,
+    "saturation": 0.5138416400396951,
+    "lightness": 0.5324247143862801,
+    "pattern_overlay": "polka",
+    "pattern_scale": 0.7677727630062983,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

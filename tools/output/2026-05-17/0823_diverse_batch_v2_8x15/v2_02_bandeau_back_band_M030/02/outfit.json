@@ -1,0 +1,69 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_S",
+      "local_params": {
+        "half_u": 0.1984323598138342,
+        "half_v": 0.09032823825054379,
+        "inner_u": 0.035074760642955366,
+        "apex_lift": -0.04946859593555667,
+        "underband_dip": -0.06682532744869878
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.3105235068671967,
+        "front_half_u": 0.4351341236502811,
+        "front_leg_curve": 0.3875181109978057,
+        "back_top_v": 0.36173595090157323,
+        "back_half_u": 0.3039236225160192
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 2.895379351592135
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FISHNET_OPEN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_SATIN_40MM",
+      "local_params": {
+        "size_cm": 3.334715133611712
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.7763607993546988,
+    "saturation": 0.6890089110800564,
+    "lightness": 0.3275441433346463,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.7137077406815018,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 2,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

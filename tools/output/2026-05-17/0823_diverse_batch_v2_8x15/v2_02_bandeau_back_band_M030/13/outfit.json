@@ -1,0 +1,83 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_M",
+      "local_params": {
+        "half_u": 0.21554797933389885,
+        "half_v": 0.08846050182124435,
+        "inner_u": 0.03949492519785002,
+        "apex_lift": 0.0499282275979383,
+        "underband_dip": -0.08524421538629426
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.2519488697392362,
+        "front_half_u": 0.2217712945494821,
+        "front_leg_curve": 0.7752570381214968,
+        "back_top_v": 0.24819014985296783,
+        "back_half_u": 0.08670922411118838
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 3.779158158560344
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_CUTOUT_JERSEY",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_CHIFFON_30MM",
+      "local_params": {
+        "size_cm": 3.285638858640784
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 5.161408297227218
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_BEADED",
+      "local_params": {
+        "diameter_cm": 5.626009217749591
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.8643607993546988,
+    "saturation": 0.6929525460691052,
+    "lightness": 0.31228199193242556,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.28859038458870157,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.6624762539782344,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 13,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

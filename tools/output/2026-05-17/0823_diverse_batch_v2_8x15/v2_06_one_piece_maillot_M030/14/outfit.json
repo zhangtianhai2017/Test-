@@ -1,0 +1,92 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_L",
+      "local_params": {
+        "half_u": 0.16168987566591075,
+        "half_v": 0.07877498224874972,
+        "inner_u": 0.09038268350322118,
+        "apex_lift": 0.11217647949854144,
+        "underband_dip": 0.029833553760309352
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.47944209016365297,
+        "front_half_u": 0.5104755359993051,
+        "front_leg_curve": 0.49270767088881917,
+        "back_top_v": 0.5301516968028706,
+        "back_half_u": 0.40274518596218534
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.2915345237551186,
+        "front_half_u": 0.33085140952603825,
+        "front_leg_curve": 0.6186531127224288,
+        "back_top_v": 0.2663580059787679,
+        "back_half_u": 0.2506633688160813
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 41.05839038899495
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 31.092520464084764
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ALGAE_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_NEOPRENE_2MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_TASSEL_SILK_50MM",
+      "local_params": {
+        "length_cm": 6.082546410523363
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.12994906410363394,
+    "saturation": 0.7283193890116412,
+    "lightness": 0.6079780933446137,
+    "pattern_overlay": "polka",
+    "pattern_scale": 0.5650903559934232,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 14,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.12771863411508974,
+        "half_v": 0.05773999466671559,
+        "inner_u": 0.08023782466743602,
+        "apex_lift": 0.16269370849738102,
+        "underband_dip": 0.009346231408993478
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.2650445748385732,
+        "front_half_u": 0.3140303403996807,
+        "front_leg_curve": 0.5980603441520111,
+        "back_top_v": 0.296107562071841,
+        "back_half_u": 0.21501724174656842
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 57.52434608024711
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_VIRGIN_VELVET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.06722765297049338,
+    "saturation": 0.5507000356967715,
+    "lightness": 0.6206049576079599,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.7391081356887961,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 11,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

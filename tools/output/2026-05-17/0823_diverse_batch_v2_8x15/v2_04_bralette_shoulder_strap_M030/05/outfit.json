@@ -1,0 +1,83 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_L",
+      "local_params": {
+        "half_u": 0.23416039211760734,
+        "half_v": 0.09121769900350496,
+        "inner_u": 0.0917642843264181,
+        "apex_lift": 0.009672226761527097,
+        "underband_dip": -0.025740042651561358
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.4886485837484877,
+        "front_half_u": 0.46068035300699134,
+        "front_leg_curve": 0.31776353426876963,
+        "back_top_v": 0.45551251423270955,
+        "back_half_u": 0.3178028163811034
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 27.254417303784038
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HUNZA_CRINKLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FISHNET_OPEN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_BEADED_80MM",
+      "local_params": {
+        "length_cm": 6.249766147752919
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_TROCHUS_25MM",
+      "local_params": {
+        "size_cm": 1.7560770109926196
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_STUD_PEARL",
+      "local_params": {
+        "size_cm": 0.5982141893775559
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.28889401328564795,
+    "saturation": 0.4658281485356208,
+    "lightness": 0.6533966231254938,
+    "pattern_overlay": "stripe",
+    "pattern_scale": 0.5736965022897177,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_M030",
+  "variant_index": 5,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

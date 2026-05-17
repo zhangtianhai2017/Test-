@@ -1,0 +1,80 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_L",
+      "local_params": {
+        "half_u": 0.12832825617524524,
+        "half_v": 0.11283452354642304,
+        "inner_u": 0.13064938882447416,
+        "apex_lift": 0.030556342537592596,
+        "underband_dip": 0.0736162295265912
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.2618385333154413,
+        "front_half_u": 0.2785891455475547,
+        "front_leg_curve": 0.6763644273807585,
+        "back_top_v": 0.22287173082073858,
+        "back_half_u": 0.15742536063659945
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.3783571086811752,
+        "front_half_u": 0.46063271375085635,
+        "front_leg_curve": 0.49410357207865463,
+        "back_top_v": 0.31405137509035136,
+        "back_half_u": 0.3789086676084896
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_15MM",
+      "local_params": {
+        "length_cm": 26.32056568827692
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 16.75345439557663
+      }
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_15MM_NICKEL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BIOPOLYMER_PLAIN",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.30489401328564797,
+    "saturation": 0.4340103942508137,
+    "lightness": 0.5554294955554251,
+    "pattern_overlay": "stripe",
+    "pattern_scale": 0.22754031890523346,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_M030",
+  "variant_index": 7,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

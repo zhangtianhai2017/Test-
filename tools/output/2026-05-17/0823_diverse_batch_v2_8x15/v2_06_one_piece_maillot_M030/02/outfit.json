@@ -1,0 +1,99 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_M",
+      "local_params": {
+        "half_u": 0.11104856011790194,
+        "half_v": 0.07634562823106775,
+        "inner_u": 0.059297900744399314,
+        "apex_lift": 0.13818479411364243,
+        "underband_dip": 0.08049028996914093
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.5461855410415314,
+        "front_half_u": 0.5014357817744811,
+        "front_leg_curve": 0.49392034851619593,
+        "back_top_v": 0.48284339177072344,
+        "back_half_u": 0.45473275593848417
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.42516399802514404,
+        "front_half_u": 0.5791787892197349,
+        "front_leg_curve": 0.49089528288313905,
+        "back_top_v": 0.4086690667725213,
+        "back_half_u": 0.3511083042983235
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 26.026605511167084
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_8MM",
+      "local_params": {
+        "length_cm": 9.136647319867686
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEERSUCKER_STRIPE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_MESH_OUTER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_COWRIE_20MM",
+      "local_params": {
+        "size_cm": 2.448563823168482
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_OVAL_8MM",
+      "local_params": {
+        "count": 12.376501537903545
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.03394906410363395,
+    "saturation": 0.7011348965286576,
+    "lightness": 0.6600721415903481,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.8934288580707848,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.6433165919227732,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 2,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

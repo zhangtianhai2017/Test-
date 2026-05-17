@@ -1,0 +1,85 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_S",
+      "local_params": {
+        "half_u": 0.17275469316509134,
+        "half_v": 0.09996674586114163,
+        "inner_u": 0.030472528928581794,
+        "apex_lift": 0.031519563913494836,
+        "underband_dip": 0.019166567106009988
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.30228407998043894,
+        "front_half_u": 0.3298390059721658,
+        "front_leg_curve": 0.6046951529316454,
+        "back_top_v": 0.31696991512705514,
+        "back_half_u": 0.21715952276644554
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 5.905745884689843
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 31.990240005323564
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_COMPRESSION_SPORT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_STUD_PEARL",
+      "local_params": {
+        "size_cm": 0.9241480246988546
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHARM_BEACH",
+      "local_params": {
+        "diameter_cm": 9.911353911686202
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_DROP_GOLD",
+      "local_params": {
+        "length_cm": 3.7314599913125797
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.8563607993546988,
+    "saturation": 0.7690667631945874,
+    "lightness": 0.4238670356892398,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.7423752447132952,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.8643113467209633,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 12,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

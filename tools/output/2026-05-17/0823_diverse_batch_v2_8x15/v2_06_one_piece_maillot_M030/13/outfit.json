@@ -1,0 +1,73 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_S",
+      "local_params": {
+        "half_u": 0.16564944312703608,
+        "half_v": 0.07201669605414326,
+        "inner_u": 0.08851128863560012,
+        "apex_lift": 0.044756946954306445,
+        "underband_dip": 0.03938858149168864
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.294730496150959,
+        "front_half_u": 0.3146002293472956,
+        "front_leg_curve": 0.5902927966512224,
+        "back_top_v": 0.22391856204055335,
+        "back_half_u": 0.1489914668849388
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.32442168006492833,
+        "front_half_u": 0.3233212575028945,
+        "front_leg_curve": 0.5627745472865194,
+        "back_top_v": 0.25943048943763436,
+        "back_half_u": 0.24016143267700224
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 58.72802888021788
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ALGAE_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.12194906410363394,
+    "saturation": 0.7126026685240564,
+    "lightness": 0.6896333333096236,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.5576046620316726,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.9586858214889957,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 13,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

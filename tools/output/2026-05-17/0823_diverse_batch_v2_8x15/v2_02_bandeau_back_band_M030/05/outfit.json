@@ -1,0 +1,78 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_L",
+      "local_params": {
+        "half_u": 0.28019167187396643,
+        "half_v": 0.08658844033922275,
+        "inner_u": 0.06339805535212084,
+        "apex_lift": 0.038104270159231,
+        "underband_dip": -0.020185916687251337
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.3181146249349094,
+        "front_half_u": 0.23981788394933432,
+        "front_leg_curve": 0.7198954506201416,
+        "back_top_v": 0.221070641966479,
+        "back_half_u": 0.06969580371137468
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.37200941326359477,
+        "front_half_u": 0.4872324215998892,
+        "front_leg_curve": 0.5109029006856791,
+        "back_top_v": 0.37088021365598595,
+        "back_half_u": 0.3893484288888778
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 4.87539223288686
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TULLE_NET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_HUNZA_CRINKLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.8003607993546988,
+    "saturation": 0.7230211546490289,
+    "lightness": 0.3305904152747382,
+    "pattern_overlay": "polka",
+    "pattern_scale": 0.8137290562683108,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.7649398975983555,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 5,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

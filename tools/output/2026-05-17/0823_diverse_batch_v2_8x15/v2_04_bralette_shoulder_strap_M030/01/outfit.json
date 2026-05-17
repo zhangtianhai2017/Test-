@@ -1,0 +1,73 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_S",
+      "local_params": {
+        "half_u": 0.1724136585131917,
+        "half_v": 0.058921399306839164,
+        "inner_u": 0.09986082173410372,
+        "apex_lift": 0.041707790316664606,
+        "underband_dip": 0.010942766639169862
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.20809218135002436,
+        "front_half_u": 0.2840371463297567,
+        "front_leg_curve": 0.7916983484658222,
+        "back_top_v": 0.28023137665812237,
+        "back_half_u": 0.09895776576965262
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.3619300899947557,
+        "front_half_u": 0.35726071594731335,
+        "front_leg_curve": 0.4471985365888248,
+        "back_top_v": 0.33169672664187827,
+        "back_half_u": 0.3030409004825534
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_15MM",
+      "local_params": {
+        "length_cm": 29.811939472040184
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BRODERIE_ANGLAISE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.256894013285648,
+    "saturation": 0.4647519049546588,
+    "lightness": 0.6503030276813664,
+    "pattern_overlay": "stripe",
+    "pattern_scale": 0.5045554777717054,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_M030",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

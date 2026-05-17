@@ -1,0 +1,76 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_M",
+      "local_params": {
+        "half_u": 0.19940401482883385,
+        "half_v": 0.08672608888516634,
+        "inner_u": 0.08089249739591545,
+        "apex_lift": 0.01818754100083427,
+        "underband_dip": 0.024661004186311276
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.28399564035671304,
+        "front_half_u": 0.343876761681169,
+        "front_leg_curve": 0.6875909471128833,
+        "back_top_v": 0.2595683231850267,
+        "back_half_u": 0.22954440246453425
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 55.33136643299713
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 22.891750754876178
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_8MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_CHIFFON_30MM",
+      "local_params": {
+        "size_cm": 4.24161749520609
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.051227652970493365,
+    "saturation": 0.5805334239346183,
+    "lightness": 0.6873925282182767,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.5112781463691807,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 9,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

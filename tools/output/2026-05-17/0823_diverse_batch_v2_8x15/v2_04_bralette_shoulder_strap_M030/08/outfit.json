@@ -1,0 +1,75 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.13447663330760906,
+        "half_v": 0.05150664001147394,
+        "inner_u": 0.1448684931592095,
+        "apex_lift": 0.1269947197978727,
+        "underband_dip": 0.03752897981301148
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.26688955936749725,
+        "front_half_u": 0.3598259835706298,
+        "front_leg_curve": 0.556231547960456,
+        "back_top_v": 0.24951209680067032,
+        "back_half_u": 0.20974052811966726
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.30789899306044277,
+        "front_half_u": 0.3979481086937629,
+        "front_leg_curve": 0.6414823931956758,
+        "back_top_v": 0.27486973606686527,
+        "back_half_u": 0.18675050362971934
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 33.187807285944366
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_BAND_SPORT_25MM",
+      "local_params": {
+        "length_cm": 8.302406547233126
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HUNZA_CRINKLE",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.312894013285648,
+    "saturation": 0.48116539929945124,
+    "lightness": 0.5643043053687066,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.38085386047966063,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.8252596334047965,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_M030",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_S",
+      "local_params": {
+        "half_u": 0.1803533892811563,
+        "half_v": 0.08032522885822134,
+        "inner_u": 0.018702416865064624,
+        "apex_lift": -0.08625103468773865,
+        "underband_dip": -0.017742731665478878
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.22292886331825906,
+        "front_half_u": 0.28824341716862417,
+        "front_leg_curve": 0.5954169213418183,
+        "back_top_v": 0.23901243594404945,
+        "back_half_u": 0.16330013097737325
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 4.709011702368011
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 28.72801109824556
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BIOPOLYMER_PLAIN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.8083607993546988,
+    "saturation": 0.7447569497408011,
+    "lightness": 0.3146151888493639,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.5496798154096376,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.7152486842400189,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 6,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

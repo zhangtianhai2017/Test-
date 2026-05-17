@@ -1,0 +1,78 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_S",
+      "local_params": {
+        "half_u": 0.18905907019777654,
+        "half_v": 0.08142629265412119,
+        "inner_u": 0.08020403426659212,
+        "apex_lift": -0.031548891455050666,
+        "underband_dip": -0.03644273092836271
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.28739154261917493,
+        "front_half_u": 0.23875341606021716,
+        "front_leg_curve": 0.782771024619894,
+        "back_top_v": 0.2512364605261564,
+        "back_half_u": 0.1099032594486479
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.26373129005633694,
+        "front_half_u": 0.2521764317939498,
+        "front_leg_curve": 0.6234605360471321,
+        "back_top_v": 0.27411386952651073,
+        "back_half_u": 0.16438288120789168
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 3.699805605857552
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MISSONI_SHINY_KNIT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_VIRGIN_VELVET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.8403607993546988,
+    "saturation": 0.7107315800365416,
+    "lightness": 0.40919812868159816,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.5411493203780762,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 10,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

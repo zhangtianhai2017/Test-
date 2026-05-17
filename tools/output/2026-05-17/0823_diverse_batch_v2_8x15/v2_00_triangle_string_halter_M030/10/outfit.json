@@ -1,0 +1,73 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_L",
+      "local_params": {
+        "half_u": 0.13735509403895027,
+        "half_v": 0.09946727600685104,
+        "inner_u": 0.05481663057270217,
+        "apex_lift": 0.030105256495359566,
+        "underband_dip": 0.030324089418462888
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.30134527124695576,
+        "front_half_u": 0.2287899743773513,
+        "front_leg_curve": 0.61216901469463,
+        "back_top_v": 0.21689547257124764,
+        "back_half_u": 0.08142322551866774
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.3047553743121506,
+        "front_half_u": 0.3369871945656971,
+        "front_leg_curve": 0.654834039402443,
+        "back_top_v": 0.2741261537701766,
+        "back_half_u": 0.22922835258300736
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 50.225786613268355
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_ROSEGOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TERRY_KNIT",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.05922765297049337,
+    "saturation": 0.5311440093437039,
+    "lightness": 0.6408229891107182,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.7100283572536106,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 10,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

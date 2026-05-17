@@ -1,0 +1,106 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_S",
+      "local_params": {
+        "half_u": 0.19080007586235476,
+        "half_v": 0.0723012888600236,
+        "inner_u": 0.03330727462971262,
+        "apex_lift": -0.0989420885745702,
+        "underband_dip": 0.044984021734538804
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.5389501897702655,
+        "front_half_u": 0.5221539897145463,
+        "front_leg_curve": 0.4885909140044413,
+        "back_top_v": 0.46502470533318385,
+        "back_half_u": 0.4120980511376372
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.2606947608363662,
+        "front_half_u": 0.3032038077769561,
+        "front_leg_curve": 0.6551983929186752,
+        "back_top_v": 0.26662408235095114,
+        "back_half_u": 0.14070717616321493
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 2.971339904519814
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 20.019132761168382
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SLUB_LINEN_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_NEOPRENE_1MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHARM_BEACH",
+      "local_params": {
+        "diameter_cm": 8.445330990860455
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_BELLY",
+      "local_params": {
+        "length_cm": 77.16749122782139
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_DROP_GOLD",
+      "local_params": {
+        "length_cm": 1.6217176271668976
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.8163607993546989,
+    "saturation": 0.7282111233252971,
+    "lightness": 0.3469550868817788,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.6308718015011573,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85
+  },
+  "source_seed": "v2_02_bandeau_back_band_M030",
+  "variant_index": 7,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

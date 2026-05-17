@@ -1,0 +1,101 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.10437155170010107,
+        "half_v": 0.05785203005350081,
+        "inner_u": 0.11635254173424642,
+        "apex_lift": 0.1282150921555559,
+        "underband_dip": 0.059873146152927006
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.335963371312706,
+        "front_half_u": 0.298762511839053,
+        "front_leg_curve": 0.5531671789898593,
+        "back_top_v": 0.3090664850027664,
+        "back_half_u": 0.19032639710264188
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.2990942183521629,
+        "front_half_u": 0.25459781323742264,
+        "front_leg_curve": 0.7410436995222807,
+        "back_top_v": 0.26643633536706124,
+        "back_half_u": 0.11321547709330082
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 48.06714970141199
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 29.076301192198635
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_8MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ECONYL_PLAIN_HEAVY",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 5.525969788110877
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_BELLY",
+      "local_params": {
+        "length_cm": 56.19349635091067
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_WAIST",
+      "local_params": {
+        "length_cm": 87.61075883995446
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.0912276529704934,
+    "saturation": 0.6457014855184907,
+    "lightness": 0.5946518094857229,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.8706599745674497,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.6901945296327014,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 14,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_L",
+      "local_params": {
+        "half_u": 0.18658142481558143,
+        "half_v": 0.06504151629675467,
+        "inner_u": 0.06826180400832368,
+        "apex_lift": 0.24578265803429036,
+        "underband_dip": 0.050667775096120075
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.2637069499916757,
+        "front_half_u": 0.3114689790384093,
+        "front_leg_curve": 0.6976518731739503,
+        "back_top_v": 0.25523568036935657,
+        "back_half_u": 0.13358335877031818
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.2556623824847146,
+        "front_half_u": 0.35412635103153056,
+        "front_leg_curve": 0.515171216717533,
+        "back_top_v": 0.24934712332186332,
+        "back_half_u": 0.2312704635214913
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 56.50867275557873
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TULLE_NET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_CHAIN_GOLD",
+      "local_params": {
+        "diameter_cm": 6.236937070095003
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_DROP_GOLD",
+      "local_params": {
+        "length_cm": 2.6864685254951777
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_STUD_PEARL",
+      "local_params": {
+        "size_cm": 0.9283315792623063
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.027227652970493343,
+    "saturation": 0.5010563402909919,
+    "lightness": 0.6769453840465822,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.6061945461287734,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0
+  },
+  "source_seed": "v2_00_triangle_string_halter_M030",
+  "variant_index": 6,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}

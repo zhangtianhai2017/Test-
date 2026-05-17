@@ -1,0 +1,62 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_M",
+      "local_params": {
+        "half_u": 0.22128428474850986,
+        "half_v": 0.08897034123583371,
+        "inner_u": 0.042363834310356785,
+        "apex_lift": -0.04357955531886936,
+        "underband_dip": -0.008004580634973404
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.2759423452846466,
+        "front_half_u": 0.28548665685271235,
+        "front_leg_curve": 0.5958109373609275,
+        "back_top_v": 0.26530147642292273,
+        "back_half_u": 0.16150701319313773
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_15MM",
+      "local_params": {
+        "length_cm": 13.090400205784515
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_WAFFLE_HONEYCOMB",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.08194906410363395,
+    "saturation": 0.6564477267694967,
+    "lightness": 0.5404216029145457,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.5794900151912701,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.7639861860734753,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85
+  },
+  "source_seed": "v2_06_one_piece_maillot_M030",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.3,
+    "cup_coverage_strict": 0.3
+  }
+}
