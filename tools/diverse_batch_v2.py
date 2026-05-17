@@ -32,26 +32,23 @@ import library as lib
 import batch_from_diverse_seeds as B   # reuse make_contact_sheet
 
 
-N_PER_SEED = 10
-RNG_MASTER = 20260519
-BOTTOM_STRICT = 0.95   # user-requested: bottoms pinned to full coverage
+N_PER_SEED = 15
+RNG_MASTER = 20260520
+BOTTOM_STRICT = 0.95   # both modesties pinned at 0.95 per user request
+CUP_STRICT    = 0.95
 
-# 12 (archetype, cup_strict) cells -- bottom_strict always 0.95.  10
-# variants per cell = 120 total.  Cup modesty varies so the cup pool
-# isn't filtered to one geometry family per cell.
-SEED_SPEC: list[tuple[str, float]] = [
-    ("triangle_string_halter",  0.20),
-    ("triangle_string_halter",  0.50),
-    ("triangle_string_halter",  0.80),
-    ("bandeau_back_band",       0.20),
-    ("bandeau_back_band",       0.50),
-    ("bandeau_back_band",       0.80),
-    ("bralette_shoulder_strap", 0.20),
-    ("bralette_shoulder_strap", 0.50),
-    ("bralette_shoulder_strap", 0.80),
-    ("one_piece_maillot",       0.20),
-    ("one_piece_maillot",       0.50),
-    ("one_piece_maillot",       0.80),
+# 8 cells: 4 archetypes x 2 RNG branches each.  All same modesty so
+# the 0.95 floor is uniform; variety inside a cell comes from random
+# library picks + free/extreme shape modes + new colour distribution.
+SEED_SPEC: list[tuple[str, int]] = [
+    ("triangle_string_halter",  0),
+    ("triangle_string_halter",  1),
+    ("bandeau_back_band",       0),
+    ("bandeau_back_band",       1),
+    ("bralette_shoulder_strap", 0),
+    ("bralette_shoulder_strap", 1),
+    ("one_piece_maillot",       0),
+    ("one_piece_maillot",       1),
 ]
 
 
@@ -69,21 +66,26 @@ def run() -> None:
     summary = []
     t_total = time.time()
 
-    for idx, (arch, modesty) in enumerate(SEED_SPEC):
-        sid = f"v2_{idx:02d}_{arch}_M{int(modesty*100):03d}"
+    for idx, (arch, branch) in enumerate(SEED_SPEC):
+        sid = f"v2_{idx:02d}_{arch}_b{branch}"
         seed_dir = os.path.join(out_root, sid)
         os.makedirs(seed_dir, exist_ok=True)
 
-        lib.set_bottom_coverage_strict(modesty)
-        lib.set_cup_coverage_strict(modesty)
+        # Both modesties hard-pinned at 0.95 per current user requirement.
+        lib.set_bottom_coverage_strict(BOTTOM_STRICT)
+        lib.set_cup_coverage_strict(CUP_STRICT)
 
         # Per-seed RNG branch off master so each cell is independent
         # but the master seed pins the whole batch.
         rng = random.Random(RNG_MASTER * 10007 + idx * 31)
-        # Pick a random colour palette anchor for this seed
+        # Wider colour anchor ranges -- previous batch's audit showed
+        # 88% vivid and 59% mid-lightness because the anchor was
+        # clamped into a narrow band; pulling these out fixes the skew.
         H = master.random()
-        S = 0.45 + master.random() * 0.45
-        L = 0.30 + master.random() * 0.40
+        # span the full perceptual saturation/lightness range so both
+        # ends (muted/vivid, dark/light) get representation
+        S = 0.15 + master.random() * 0.75    # 0.15 .. 0.90
+        L = 0.20 + master.random() * 0.65    # 0.20 .. 0.85
 
         t0 = time.time()
         n_ok = 0
@@ -91,15 +93,17 @@ def run() -> None:
         for i in range(N_PER_SEED):
             try:
                 o = random_outfit(arch, rng,
-                                    cup_strict=modesty,
-                                    bottom_strict=modesty)
+                                    cup_strict=CUP_STRICT,
+                                    bottom_strict=BOTTOM_STRICT)
             except TypeError:
                 # older random_outfit signature without modesty kwargs
                 o = random_outfit(arch, rng)
-            # Slight per-variant colour jitter so the batch reads varied
-            jH = (H + (i / N_PER_SEED) * 0.12) % 1.0
-            jS = max(0.20, min(0.95, S + (rng.random() - 0.5) * 0.15))
-            jL = max(0.25, min(0.75, L + (rng.random() - 0.5) * 0.18))
+            # Wider per-variant jitter -- and a chance to flip the
+            # variant into the opposite half of S/L space so the
+            # within-cell distribution covers both extremes.
+            jH = (H + (i / N_PER_SEED) * 0.18) % 1.0
+            jS = max(0.10, min(0.95, S + (rng.random() - 0.5) * 0.35))
+            jL = max(0.15, min(0.90, L + (rng.random() - 0.5) * 0.35))
             o.global_design["hue"] = jH
             o.global_design["saturation"] = jS
             o.global_design["lightness"] = jL
@@ -116,14 +120,14 @@ def run() -> None:
                     ],
                     "global_design": dict(o.global_design),
                     "source_seed": sid, "variant_index": i,
-                    "modesty": {"bottom_coverage_strict": modesty,
-                                "cup_coverage_strict": modesty},
+                    "modesty": {"bottom_coverage_strict": BOTTOM_STRICT,
+                                "cup_coverage_strict":    CUP_STRICT},
                 }, f, indent=2)
 
             p = IterParams()
             p.outfit = o
-            p.bottom_coverage_strict = modesty
-            p.cup_coverage_strict = modesty
+            p.bottom_coverage_strict = BOTTOM_STRICT
+            p.cup_coverage_strict = CUP_STRICT
             g = outfit_to_genome(o)
             try:
                 cap.render_views(g, p, sub, body_mesh=body)
@@ -139,7 +143,8 @@ def run() -> None:
         dt = time.time() - t0
         print(f"[{sid}]  rendered {n_ok}/{N_PER_SEED}  dt={dt:.1f}s")
         summary.append({
-            "seed": sid, "archetype": arch, "modesty": modesty,
+            "seed": sid, "archetype": arch,
+            "modesty": {"bottom": BOTTOM_STRICT, "cup": CUP_STRICT},
             "n_rendered": n_ok, "elapsed_s": round(dt, 1),
             "variants": variants,
         })
