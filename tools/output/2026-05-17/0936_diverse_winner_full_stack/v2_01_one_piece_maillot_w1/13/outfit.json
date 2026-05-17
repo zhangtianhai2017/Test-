@@ -1,0 +1,81 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_DEEP_V_M",
+      "local_params": {
+        "half_u": 0.21831946496062887,
+        "half_v": 0.12271521796195617,
+        "inner_u": 0.06481611181641837,
+        "apex_lift": 0.4161353829696744,
+        "underband_dip": 0.04366479018214389
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.41124243684237494,
+        "front_half_u": 0.47190500960689935,
+        "front_leg_curve": 0.4747272484142837,
+        "back_top_v": 0.5286118906708286,
+        "back_half_u": 0.44851473578440326
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.4082391817459324,
+        "front_half_u": 0.40287202502854613,
+        "front_leg_curve": 0.48785408693600535,
+        "back_top_v": 0.4076014605466836,
+        "back_half_u": 0.299981811537707
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_NEOPRENE_2MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_CHAIN_GOLD",
+      "local_params": {
+        "diameter_cm": 5.674213628856948
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_WAIST",
+      "local_params": {
+        "length_cm": 76.99573780693157
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.6875,
+    "saturation": 0.7947467601177601,
+    "lightness": 0.7999724260479967,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.24212740691560156,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.6515221144829382,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_01_one_piece_maillot_w1",
+  "variant_index": 13,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

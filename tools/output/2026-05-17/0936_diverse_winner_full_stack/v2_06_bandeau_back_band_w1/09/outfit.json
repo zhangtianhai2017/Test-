@@ -1,0 +1,76 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_COWL_M",
+      "local_params": {
+        "half_u": 0.1951577682536175,
+        "half_v": 0.1349442599199478,
+        "inner_u": 0.24596578085472975,
+        "apex_lift": 0.3852847772485792,
+        "underband_dip": 0.04779743830321401
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.31452201651988876,
+        "front_half_u": 0.5133432780113714,
+        "front_leg_curve": 0.5203955062103542,
+        "back_top_v": 0.30626958057027126,
+        "back_half_u": 0.3142042278710153
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.389155034494081,
+        "front_half_u": 0.4345865314882624,
+        "front_leg_curve": 0.33273666484781106,
+        "back_top_v": 0.30941595996160187,
+        "back_half_u": 0.31267953052346187
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 5.633257075983922
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEERSUCKER_STRIPE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_DROP_GOLD",
+      "local_params": {
+        "length_cm": 2.9685475223919657
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.0625,
+    "saturation": 0.21738831812690798,
+    "lightness": 0.46791542429426614,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.6758216273568991,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.6823049377445266,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_06_bandeau_back_band_w1",
+  "variant_index": 9,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

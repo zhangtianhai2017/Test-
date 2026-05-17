@@ -1,0 +1,95 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_COWL_S",
+      "local_params": {
+        "half_u": 0.16785193146462862,
+        "half_v": 0.06543743588081609,
+        "inner_u": 0.013548815824340962,
+        "apex_lift": 0.07126312497368285,
+        "underband_dip": 0.008157737023050463
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.5389764990642922,
+        "front_half_u": 0.39922900240965503,
+        "front_leg_curve": 0.3257378035629795,
+        "back_top_v": 0.42037343076144545,
+        "back_half_u": 0.3829849064793936
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.4134851706286363,
+        "front_half_u": 0.4873013891243764,
+        "front_leg_curve": 0.32171281893681697,
+        "back_top_v": 0.5326518710578056,
+        "back_half_u": 0.3031354586602443
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 4.306114182240574
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 29.39857267593245
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MISSONI_SHINY_KNIT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_SATIN_40MM",
+      "local_params": {
+        "size_cm": 3.61582638814068
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 7.11084326581465
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.1875,
+    "saturation": 0.7947467601177601,
+    "lightness": 0.46791542429426614,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.3655946659023374,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_06_bandeau_back_band_w1",
+  "variant_index": 2,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

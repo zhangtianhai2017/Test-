@@ -1,0 +1,102 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.13055454317058546,
+        "half_v": 0.06580254943139721,
+        "inner_u": 0.06500392705854893,
+        "apex_lift": 0.28719338309107345,
+        "underband_dip": 0.004400477981594696
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.3263883060682652,
+        "front_half_u": 0.34956302546145,
+        "front_leg_curve": 0.7190814336057529,
+        "back_top_v": 0.24919527921719337,
+        "back_half_u": 0.188558700423156
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.2463553440506999,
+        "front_half_u": 0.3483434188200444,
+        "front_leg_curve": 0.5332376898799892,
+        "back_top_v": 0.2513331403994116,
+        "back_half_u": 0.2536534923084587
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 65.55675941918035
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 29.818102588995576
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TULLE_NET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_CHAIN_GOLD",
+      "local_params": {
+        "diameter_cm": 6.7405326713091585
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_BEADED",
+      "local_params": {
+        "diameter_cm": 6.4507192198726715
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_DROP_GOLD",
+      "local_params": {
+        "length_cm": 3.1047553263693857
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.0625,
+    "saturation": 0.7947467601177601,
+    "lightness": 0.46791542429426614,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.3450239984038968,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_03_triangle_string_halter_w0",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

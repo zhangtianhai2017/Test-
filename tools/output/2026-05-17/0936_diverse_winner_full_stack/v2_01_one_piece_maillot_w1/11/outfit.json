@@ -1,0 +1,98 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_HIGH_NECK_S",
+      "local_params": {
+        "half_u": 0.1484080842226448,
+        "half_v": 0.08152860177315534,
+        "inner_u": 0.04518749841326783,
+        "apex_lift": -0.1435647791082066,
+        "underband_dip": 0.055915675175806444
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.385654981619444,
+        "front_half_u": 0.42691389798965806,
+        "front_leg_curve": 0.5362257412269669,
+        "back_top_v": 0.3714431075459856,
+        "back_half_u": 0.3117682331073582
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.3075215347645776,
+        "front_half_u": 0.42662370626767226,
+        "front_leg_curve": 0.3258323644563504,
+        "back_top_v": 0.31056512056012686,
+        "back_half_u": 0.31470198070749006
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_BEADED",
+      "local_params": {
+        "diameter_cm": 6.399362193762781
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_STUD_PEARL",
+      "local_params": {
+        "size_cm": 0.5202649154278753
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_CHOKER_GOLD",
+      "local_params": {
+        "width_cm": 1.3174844202563496
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.0625,
+    "saturation": 0.21738831812690798,
+    "lightness": 0.7999724260479967,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.8306343728522181,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_01_one_piece_maillot_w1",
+  "variant_index": 11,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

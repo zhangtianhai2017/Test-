@@ -1,0 +1,77 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.20790034342911093,
+        "half_v": 0.0876293805832218,
+        "inner_u": -0.05123474614126408,
+        "apex_lift": -0.13870216369459226,
+        "underband_dip": 0.05433165964876499
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.3315655464772143,
+        "front_half_u": 0.35029099425520716,
+        "front_leg_curve": 0.7198903750355778,
+        "back_top_v": 0.2503615172653165,
+        "back_half_u": 0.2542207917349859
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 56.460325319595555
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 31.177277478637443
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BIOPOLYMER_PLAIN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 4.542032871435262
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.0625,
+    "saturation": 0.21738831812690798,
+    "lightness": 0.20520661072905472,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.36918536248724226,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.833444552992848,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_03_triangle_string_halter_w0",
+  "variant_index": 11,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

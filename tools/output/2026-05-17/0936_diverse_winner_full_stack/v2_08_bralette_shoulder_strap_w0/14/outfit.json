@@ -1,0 +1,79 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_DEEP_V_S",
+      "local_params": {
+        "half_u": 0.18833181559806,
+        "half_v": 0.07503695251784874,
+        "inner_u": 0.12957558276188166,
+        "apex_lift": 0.4269879831450064,
+        "underband_dip": 0.04719224732277248
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.3066695613267393,
+        "front_half_u": 0.4276991026340788,
+        "front_leg_curve": 0.5156331605988549,
+        "back_top_v": 0.3087740226823924,
+        "back_half_u": 0.3151378279090571
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.3903226633343582,
+        "front_half_u": 0.36654755707325587,
+        "front_leg_curve": 0.32719543839457826,
+        "back_top_v": 0.37150224621533545,
+        "back_half_u": 0.31108693709892915
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_10MM",
+      "local_params": {
+        "length_cm": 32.34865400454658
+      }
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_10MM_NICKEL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_CUTOUT_JERSEY",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.6875,
+    "saturation": 0.7947467601177601,
+    "lightness": 0.20520661072905472,
+    "pattern_overlay": "checker",
+    "pattern_scale": 0.6817026088021243,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_08_bralette_shoulder_strap_w0",
+  "variant_index": 14,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

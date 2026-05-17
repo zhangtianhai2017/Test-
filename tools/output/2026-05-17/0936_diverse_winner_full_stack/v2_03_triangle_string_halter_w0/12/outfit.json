@@ -1,0 +1,70 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.08346457699277672,
+        "half_v": 0.06355323306566557,
+        "inner_u": 0.04433014758909189,
+        "apex_lift": -0.09119261322044506,
+        "underband_dip": 0.09781543467226275
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.3286996032401063,
+        "front_half_u": 0.29254991710132155,
+        "front_leg_curve": 0.5193245987846724,
+        "back_top_v": 0.25090303718200047,
+        "back_half_u": 0.25350293505528276
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 60.19781258080965
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEQUIN_DENSE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_STUD_PEARL",
+      "local_params": {
+        "size_cm": 0.9642806111916559
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.4375,
+    "saturation": 0.7947467601177601,
+    "lightness": 0.20520661072905472,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.20636987829215148,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_03_triangle_string_halter_w0",
+  "variant_index": 12,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

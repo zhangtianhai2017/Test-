@@ -1,0 +1,69 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_L",
+      "local_params": {
+        "half_u": 0.19211869162923537,
+        "half_v": 0.11441742455037421,
+        "inner_u": 0.0037119228110419344,
+        "apex_lift": 0.36609327704568545,
+        "underband_dip": -0.09256862943436042
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.41751713986244054,
+        "front_half_u": 0.40527166822994204,
+        "front_leg_curve": 0.4746453229748141,
+        "back_top_v": 0.5304911098109967,
+        "back_half_u": 0.3820040226886632
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.3884169329760455,
+        "front_half_u": 0.5125439619477441,
+        "front_leg_curve": 0.5243046832478073,
+        "back_top_v": 0.3054278965861382,
+        "back_half_u": 0.4064513956946346
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 20.79544566490046
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_NEOPRENE_2MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.9375,
+    "saturation": 0.21738831812690798,
+    "lightness": 0.46791542429426614,
+    "pattern_overlay": "stripe",
+    "pattern_scale": 0.7531245893077949,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_00_one_piece_maillot_w0",
+  "variant_index": 5,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.09191967772943829,
+        "half_v": 0.04672941796386682,
+        "inner_u": 0.0999841614645009,
+        "apex_lift": -0.18925900445919688,
+        "underband_dip": -0.00014634430309129476
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.4112817918597067,
+        "front_half_u": 0.4814671858894872,
+        "front_leg_curve": 0.3217987724219913,
+        "back_top_v": 0.41742510205281047,
+        "back_half_u": 0.29426096174120414
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.3934255714116259,
+        "front_half_u": 0.5107283511896555,
+        "front_leg_curve": 0.5185971293948046,
+        "back_top_v": 0.36837681891164487,
+        "back_half_u": 0.3176410374525687
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_10MM",
+      "local_params": {
+        "length_cm": 32.12489214502411
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_10MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_BAND_SPORT_25MM",
+      "local_params": {
+        "length_cm": 13.132313496380796
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FISHNET_OPEN",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.3125,
+    "saturation": 0.7947467601177601,
+    "lightness": 0.20520661072905472,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.8061284836923566,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_01_one_piece_maillot_w1",
+  "variant_index": 6,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

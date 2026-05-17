@@ -1,0 +1,74 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_M",
+      "local_params": {
+        "half_u": 0.11295198059025167,
+        "half_v": 0.05412029058134525,
+        "inner_u": 0.14742495451209892,
+        "apex_lift": 0.03422558152374411,
+        "underband_dip": 0.012895531289967822
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.3260481411219538,
+        "front_half_u": 0.35049758544606835,
+        "front_leg_curve": 0.5128668328582877,
+        "back_top_v": 0.24708464112661296,
+        "back_half_u": 0.2546894066746265
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.2470484277373692,
+        "front_half_u": 0.3487596131414319,
+        "front_leg_curve": 0.5202694801437002,
+        "back_top_v": 0.30962340161282187,
+        "back_half_u": 0.25342043369653044
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 49.46781131324462
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_VIRGIN_VELVET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.8125,
+    "saturation": 0.7947467601177601,
+    "lightness": 0.7999724260479967,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.6548245740820449,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_03_triangle_string_halter_w0",
+  "variant_index": 14,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_M",
+      "local_params": {
+        "half_u": 0.08732276482420726,
+        "half_v": 0.04532066472203608,
+        "inner_u": 0.06382257116802706,
+        "apex_lift": 0.1276081928942981,
+        "underband_dip": 0.07403028990115992
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.33177278708957875,
+        "front_half_u": 0.3453388750820471,
+        "front_leg_curve": 0.7165263663093036,
+        "back_top_v": 0.31317964235883566,
+        "back_half_u": 0.2482214870826325
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.3332423029335668,
+        "front_half_u": 0.35104293390936225,
+        "front_leg_curve": 0.5206679105018218,
+        "back_top_v": 0.2454885602787403,
+        "back_half_u": 0.2480610559370262
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 52.97787798098288
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_18MM_SILVER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEQUIN_DENSE",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.1875,
+    "saturation": 0.7947467601177601,
+    "lightness": 0.20520661072905472,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.29427176926568516,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5777284053038956,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_04_triangle_string_halter_w1",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

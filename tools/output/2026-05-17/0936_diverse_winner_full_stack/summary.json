@@ -1,0 +1,52 @@
+[
+  {
+    "seed": "v2_00_one_piece_maillot_w0",
+    "n_rendered": 15,
+    "elapsed_s": 63.4
+  },
+  {
+    "seed": "v2_01_one_piece_maillot_w1",
+    "n_rendered": 15,
+    "elapsed_s": 60.7
+  },
+  {
+    "seed": "v2_02_one_piece_maillot_w2",
+    "n_rendered": 1,
+    "elapsed_s": 4.8
+  },
+  {
+    "seed": "v2_03_triangle_string_halter_w0",
+    "n_rendered": 15,
+    "elapsed_s": 29.3
+  },
+  {
+    "seed": "v2_04_triangle_string_halter_w1",
+    "n_rendered": 14,
+    "elapsed_s": 24.9
+  },
+  {
+    "seed": "v2_05_bandeau_back_band_w0",
+    "n_rendered": 15,
+    "elapsed_s": 66.0
+  },
+  {
+    "seed": "v2_06_bandeau_back_band_w1",
+    "n_rendered": 15,
+    "elapsed_s": 68.6
+  },
+  {
+    "seed": "v2_07_bandeau_back_band_w2",
+    "n_rendered": 2,
+    "elapsed_s": 8.7
+  },
+  {
+    "seed": "v2_08_bralette_shoulder_strap_w0",
+    "n_rendered": 15,
+    "elapsed_s": 61.7
+  },
+  {
+    "seed": "v2_09_bralette_shoulder_strap_w1",
+    "n_rendered": 13,
+    "elapsed_s": 59.7
+  }
+]

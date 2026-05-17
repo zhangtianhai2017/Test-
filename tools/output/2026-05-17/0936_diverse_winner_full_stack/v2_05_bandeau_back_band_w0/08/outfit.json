@@ -1,0 +1,81 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_COWL_S",
+      "local_params": {
+        "half_u": 0.1647819230518712,
+        "half_v": 0.08909844200996504,
+        "inner_u": 0.015484344735356335,
+        "apex_lift": 0.059910795445379486,
+        "underband_dip": 0.014539441025887348
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.4130822629785432,
+        "front_half_u": 0.39908199470190614,
+        "front_leg_curve": 0.32152712107553316,
+        "back_top_v": 0.42015580279111203,
+        "back_half_u": 0.2949396295108041
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.39070494277869405,
+        "front_half_u": 0.43212885661921646,
+        "front_leg_curve": 0.33386181386807395,
+        "back_top_v": 0.3713823394054855,
+        "back_half_u": 0.4066526122968125
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 4.655880642408611
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 29.37573786657276
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TULLE_NET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_NEOPRENE_1MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.8125,
+    "saturation": 0.21738831812690798,
+    "lightness": 0.20520661072905472,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.6798795320070157,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.7336619958090895,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_05_bandeau_back_band_w0",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

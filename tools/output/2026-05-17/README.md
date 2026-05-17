@@ -17,3 +17,6 @@ _Top: [`tools/output/`](../README.md)_
 
 - [`0910_diverse_batch_v2_8x15/`](0910_diverse_batch_v2_8x15/README.md) — 128 seed dirs · 249 images
   <br/><a href='0910_diverse_batch_v2_8x15/README.md'><img src='0910_diverse_batch_v2_8x15/overview.png' width='280'/></a>
+
+- [`0936_diverse_winner_full_stack/`](0936_diverse_winner_full_stack/README.md) — 130 seed dirs · 251 images
+  <br/><a href='0936_diverse_winner_full_stack/README.md'><img src='0936_diverse_winner_full_stack/overview.png' width='280'/></a>
