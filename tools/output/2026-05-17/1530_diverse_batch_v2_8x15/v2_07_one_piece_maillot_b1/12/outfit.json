@@ -1,0 +1,78 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_DEEP_V_L",
+      "local_params": {
+        "half_u": 0.2655,
+        "half_v": 0.1475,
+        "inner_u": 0.06,
+        "apex_lift": 0.43897612688847576,
+        "underband_dip": 0.0036967873180890898,
+        "center_v": 0.8103281144811183
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.58,
+        "front_leg_curve": 0.37260147321351494,
+        "back_top_v": 0.55,
+        "back_half_u": 0.46
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 34.05367395634595
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BRODERIE_ANGLAISE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_CHIFFON_30MM",
+      "local_params": {
+        "size_cm": 2.771366362004268
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_TASSEL_SILK_50MM",
+      "local_params": {
+        "length_cm": 6.141747833843151
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.5931342470896691,
+    "saturation": 0.22297587125431784,
+    "lightness": 0.28849081547526595,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.8748187286731497,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_07_one_piece_maillot_b1",
+  "variant_index": 12,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

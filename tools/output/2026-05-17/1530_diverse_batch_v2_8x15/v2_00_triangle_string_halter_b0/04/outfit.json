@@ -1,0 +1,76 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.10723438091396942,
+        "half_v": 0.05213301193070549,
+        "inner_u": 0.11412306381521058,
+        "apex_lift": 0.2766996195586945,
+        "underband_dip": 0.008675854794022811,
+        "center_v": 0.8212499770588981
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.3306996273540239,
+        "front_half_u": 0.35021542287169655,
+        "front_leg_curve": 0.7158711847019749,
+        "back_top_v": 0.25153240702529345,
+        "back_half_u": 0.1843858622847945
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 50.301247507962074
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 20.792413372429614
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ECONYL_PLAIN_LIGHT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.41914757265240793,
+    "saturation": 0.1,
+    "lightness": 0.6077659727026141,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.3640982737256122,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_00_triangle_string_halter_b0",
+  "variant_index": 4,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

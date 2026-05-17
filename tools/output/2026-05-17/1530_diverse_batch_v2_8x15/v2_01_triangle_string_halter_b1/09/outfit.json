@@ -1,0 +1,64 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_M",
+      "local_params": {
+        "half_u": 0.16,
+        "half_v": 0.08,
+        "inner_u": 0.06,
+        "apex_lift": 0.12815147755239503,
+        "underband_dip": 0.020194294634269624,
+        "center_v": 0.7930065160146007
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.6802560424477978,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 55.675388511688986
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_ROSEGOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MUSHROOM_LEATHER",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.2524066107440517,
+    "saturation": 0.6695674272093819,
+    "lightness": 0.16027533100125868,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.6551704434140003,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5145955154066322,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_01_triangle_string_halter_b1",
+  "variant_index": 9,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

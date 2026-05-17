@@ -1,0 +1,95 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_L",
+      "local_params": {
+        "half_u": 0.2596,
+        "half_v": 0.14159999999999998,
+        "inner_u": 0.04,
+        "apex_lift": 0.006942969260162082,
+        "underband_dip": 0.032256888226665864,
+        "dome_depth_cm": 1.6338693110518308,
+        "center_v": 0.7736225616440886
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.49299999999999994,
+        "front_leg_curve": 0.33530421222877455,
+        "back_top_v": 0.55,
+        "back_half_u": 0.391
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.442,
+        "front_leg_curve": 0.4713934443378017,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 4.382548414710156
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BIOPOLYMER_PLAIN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_SMALL_4MM",
+      "local_params": {
+        "count": 15.81845055769519
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_BEADED_80MM",
+      "local_params": {
+        "length_cm": 11.056954540032802
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.1654161060904613,
+    "saturation": 0.8846648776227903,
+    "lightness": 0.5913979522162252,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.8995360542120794,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_03_bandeau_back_band_b1",
+  "variant_index": 0,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

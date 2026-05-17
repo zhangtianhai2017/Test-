@@ -1,0 +1,77 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_M",
+      "local_params": {
+        "half_u": 0.21171973557900312,
+        "half_v": 0.08471271736540026,
+        "inner_u": 0.04532088444474178,
+        "apex_lift": 0.07491242386949719,
+        "underband_dip": 0.006343498375310275,
+        "dome_depth_cm": 1.1233460429620492,
+        "center_v": 0.6995316496593579
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.3906229595256747,
+        "front_half_u": 0.43731752353605285,
+        "front_leg_curve": 0.3238091396528333,
+        "back_top_v": 0.30619139837184955,
+        "back_half_u": 0.40503032365842
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 61.12748109445111
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_BAND_SPORT_25MM",
+      "local_params": {
+        "length_cm": 12.797079715477153
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_CUTOUT_JERSEY",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.4611342470896691,
+    "saturation": 0.3159974121419623,
+    "lightness": 0.298815880858918,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.7907266763409271,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_07_one_piece_maillot_b1",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

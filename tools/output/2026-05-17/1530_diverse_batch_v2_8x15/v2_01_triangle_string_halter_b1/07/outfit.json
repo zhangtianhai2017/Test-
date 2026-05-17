@@ -1,0 +1,101 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.136,
+        "half_v": 0.068,
+        "inner_u": 0.06,
+        "apex_lift": 0.16819000845797377,
+        "underband_dip": 0.05922352998425722,
+        "center_v": 0.7985500890756144
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.6854743659213676,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.5332813112553668,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 69.27795675528549
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_18MM_SILVER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_CROCHET_COTTON",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_BEADED",
+      "local_params": {
+        "diameter_cm": 6.172122087786267
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_DROP_GOLD",
+      "local_params": {
+        "length_cm": 2.5012980014717026
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHARM_BEACH",
+      "local_params": {
+        "diameter_cm": 7.60606385240102
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.2284066107440517,
+    "saturation": 0.6007232212787001,
+    "lightness": 0.1717517479075808,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.7571369265016774,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_01_triangle_string_halter_b1",
+  "variant_index": 7,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

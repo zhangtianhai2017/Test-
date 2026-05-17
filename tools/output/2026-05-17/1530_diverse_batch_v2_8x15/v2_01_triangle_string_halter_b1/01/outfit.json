@@ -1,0 +1,94 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.17,
+        "half_v": 0.085,
+        "inner_u": 0.05,
+        "apex_lift": 0.020431682513227155,
+        "underband_dip": 0.07600395178516632,
+        "center_v": 0.7381573598480077
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.6174717606953499,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.611292810912001,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 69.13964482625747
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_18MM_SILVER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEQUIN_DENSE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_CHIFFON_30MM",
+      "local_params": {
+        "size_cm": 3.4988189931619122
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_BEADED_80MM",
+      "local_params": {
+        "length_cm": 5.387466715102862
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.1564066107440517,
+    "saturation": 0.752237539460303,
+    "lightness": 0.33598015036156104,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.8688647862510903,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.8176053395621707,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_01_triangle_string_halter_b1",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

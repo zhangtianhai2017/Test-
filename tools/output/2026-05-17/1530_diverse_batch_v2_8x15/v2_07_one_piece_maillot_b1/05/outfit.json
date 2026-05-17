@@ -1,0 +1,71 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_ASYM_NECK_M",
+      "local_params": {
+        "half_u": 0.24,
+        "half_v": 0.115,
+        "inner_u": 0.02,
+        "apex_lift": 0.26682762911165536,
+        "underband_dip": 0.03041228498237597,
+        "center_v": 0.7575642537600434
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.442,
+        "front_leg_curve": 0.4064887653159982,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_VIRGIN_VELVET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_CHIFFON_30MM",
+      "local_params": {
+        "size_cm": 4.298954877318437
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_OVAL_8MM",
+      "local_params": {
+        "count": 6.80461821665142
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.5091342470896691,
+    "saturation": 0.39437286146517064,
+    "lightness": 0.15,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.4833147977066576,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5662445305403925,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_07_one_piece_maillot_b1",
+  "variant_index": 5,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

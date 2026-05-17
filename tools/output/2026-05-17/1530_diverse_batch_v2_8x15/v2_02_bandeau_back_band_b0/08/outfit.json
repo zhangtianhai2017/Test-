@@ -1,0 +1,64 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_COWL_S",
+      "local_params": {
+        "half_u": 0.16528347695320947,
+        "half_v": 0.06762876594155018,
+        "inner_u": 0.047322084695182925,
+        "apex_lift": 0.18759391636373268,
+        "underband_dip": 0.013353751093695382,
+        "center_v": 0.6740195414818015
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.39429575577585974,
+        "front_half_u": 0.3651576712486946,
+        "front_leg_curve": 0.3338862791460119,
+        "back_top_v": 0.30991319061963596,
+        "back_half_u": 0.3093259470707181
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 4.3449695971180295
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ALGAE_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_POWERMESH_LINING",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.9702437035453506,
+    "saturation": 0.7214457968845452,
+    "lightness": 0.5611564662943274,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.37935983711389776,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_02_bandeau_back_band_b0",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

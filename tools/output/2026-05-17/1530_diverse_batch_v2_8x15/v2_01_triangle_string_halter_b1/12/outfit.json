@@ -1,0 +1,66 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_L",
+      "local_params": {
+        "half_u": 0.236,
+        "half_v": 0.118,
+        "inner_u": 0.05,
+        "apex_lift": 0.07378345789330439,
+        "underband_dip": 0.07286221248633674,
+        "center_v": 0.757128746310131
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.6882741722508816,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 55.45946680183811
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 22.941720647138936
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FISHNET_OPEN",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.2884066107440517,
+    "saturation": 0.544022705938606,
+    "lightness": 0.15,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.5826663525451412,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_01_triangle_string_halter_b1",
+  "variant_index": 12,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

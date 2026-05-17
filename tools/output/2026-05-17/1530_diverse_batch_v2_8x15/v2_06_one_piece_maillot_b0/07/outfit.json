@@ -1,0 +1,95 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_COWL_M",
+      "local_params": {
+        "half_u": 0.19310681356849418,
+        "half_v": 0.07912885749213638,
+        "inner_u": 0.04670624679529979,
+        "apex_lift": 0.06204015248442538,
+        "underband_dip": -0.05598712616436876,
+        "center_v": 0.7979032129841289
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.41423010488689355,
+        "front_half_u": 0.5631753050015432,
+        "front_leg_curve": 0.3182022263763273,
+        "back_top_v": 0.5347600977698741,
+        "back_half_u": 0.35001545382343574
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 55.693465541327626
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 27.540728528175578
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FISHNET_OPEN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_MESH_OUTER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_TASSEL_SILK_50MM",
+      "local_params": {
+        "length_cm": 4.868693903362377
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_BELLY",
+      "local_params": {
+        "length_cm": 69.13917750662469
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.2484753694498432,
+    "saturation": 0.45830597912088944,
+    "lightness": 0.4927130251040247,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.5999994075799362,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.6433696667751188,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_06_one_piece_maillot_b0",
+  "variant_index": 7,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

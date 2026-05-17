@@ -1,0 +1,97 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_ASYM_NECK_M",
+      "local_params": {
+        "half_u": 0.24,
+        "half_v": 0.115,
+        "inner_u": 0.02,
+        "apex_lift": 0.4099818034735585,
+        "underband_dip": 0.023919634459827692,
+        "center_v": 0.7550401086258764
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.49299999999999994,
+        "front_leg_curve": 0.3179919136766799,
+        "back_top_v": 0.55,
+        "back_half_u": 0.391
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 3.9160481383363277
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_BAND_SPORT_25MM",
+      "local_params": {
+        "length_cm": 12.756873004260779
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOIL_COATED_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHARM_BEACH",
+      "local_params": {
+        "diameter_cm": 8.823745324544898
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHAIN",
+      "local_params": {
+        "diameter_cm": 9.296120745240508
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_BEADED",
+      "local_params": {
+        "diameter_cm": 7.390975246092273
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.9342437035453506,
+    "saturation": 0.7179734923668926,
+    "lightness": 0.5887625221516105,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.815411749878912,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.8912584180915516,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_02_bandeau_back_band_b0",
+  "variant_index": 5,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

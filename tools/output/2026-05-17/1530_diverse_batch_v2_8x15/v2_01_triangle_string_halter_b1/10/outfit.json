@@ -1,0 +1,78 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_M",
+      "local_params": {
+        "half_u": 0.2,
+        "half_v": 0.1,
+        "inner_u": 0.05,
+        "apex_lift": 0.007523232744572372,
+        "underband_dip": 0.08698735898138865,
+        "center_v": 0.787990249077353
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.7205015559051882,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 69.49017492102078
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 24.939027077685893
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_NEOPRENE_1MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_TASSEL_SILK_50MM",
+      "local_params": {
+        "length_cm": 7.785037035680292
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.2644066107440517,
+    "saturation": 0.5837451499155752,
+    "lightness": 0.28314790602768647,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.7463508459373003,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_01_triangle_string_halter_b1",
+  "variant_index": 10,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

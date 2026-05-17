@@ -1,0 +1,85 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_M",
+      "local_params": {
+        "half_u": 0.16,
+        "half_v": 0.08,
+        "inner_u": 0.06,
+        "apex_lift": 0.21993192521413157,
+        "underband_dip": 0.013481681131210852,
+        "center_v": 0.8257249769891124
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.42,
+        "front_leg_curve": 0.5418840759276502,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 67.30745804044699
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 31.362648637390542
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_8MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ALGAE_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_OVAL_8MM",
+      "local_params": {
+        "count": 13.23316253380905
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_CHIFFON_30MM",
+      "local_params": {
+        "size_cm": 4.238592357564921
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.527147572652408,
+    "saturation": 0.2064591877165799,
+    "lightness": 0.43161950269635657,
+    "pattern_overlay": "polka",
+    "pattern_scale": 0.2561363726675544,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_b0",
+  "variant_index": 13,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

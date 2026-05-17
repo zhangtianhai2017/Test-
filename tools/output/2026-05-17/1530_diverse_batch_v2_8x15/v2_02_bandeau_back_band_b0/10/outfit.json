@@ -1,0 +1,80 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_COWL_S",
+      "local_params": {
+        "half_u": 0.2027087411830332,
+        "half_v": 0.09118351779739539,
+        "inner_u": 0.04713239489272747,
+        "apex_lift": 0.1875222108965292,
+        "underband_dip": 0.009996941650773458,
+        "center_v": 0.8072957709046638
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.39453616794797436,
+        "front_half_u": 0.4315337625483904,
+        "front_leg_curve": 0.31303576308959086,
+        "back_top_v": 0.30438093381016174,
+        "back_half_u": 0.3153969445783639
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 2.6831032291002983
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FISHNET_OPEN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHARM_BEACH",
+      "local_params": {
+        "diameter_cm": 7.732325860034589
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_BELLY",
+      "local_params": {
+        "length_cm": 66.46276568947513
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_BEADED",
+      "local_params": {
+        "diameter_cm": 6.410937639879697
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.9942437035453506,
+    "saturation": 0.5655869438320619,
+    "lightness": 0.40557616983770634,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.6003883388518207,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5717425576760589,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_02_bandeau_back_band_b0",
+  "variant_index": 10,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

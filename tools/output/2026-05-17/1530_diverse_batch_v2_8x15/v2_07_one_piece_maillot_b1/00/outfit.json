@@ -1,0 +1,89 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_ASYM_NECK_S",
+      "local_params": {
+        "half_u": 0.15959904253491702,
+        "half_v": 0.09372399078056141,
+        "inner_u": 0.025580092417070814,
+        "apex_lift": 0.23057820816968802,
+        "underband_dip": 0.03516922181435323,
+        "center_v": 0.6763091253789624
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.5291487596864959,
+        "front_half_u": 0.46815273172575217,
+        "front_leg_curve": 0.3198561524930227,
+        "back_top_v": 0.530764383683705,
+        "back_half_u": 0.3511091350268733
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.41142668293838974,
+        "front_half_u": 0.4033165067631248,
+        "front_leg_curve": 0.4708078484589264,
+        "back_top_v": 0.4081628297973382,
+        "back_half_u": 0.38579593141268875
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 60.23202280810282
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HEMP_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_POWERMESH_LINING",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_SMALL_4MM",
+      "local_params": {
+        "count": 24.692709883302474
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_OVAL_8MM",
+      "local_params": {
+        "count": 14.872016593491256
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.4491342470896691,
+    "saturation": 0.276349489790922,
+    "lightness": 0.3575793647904706,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.5260830150798467,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.8238746997904483,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_07_one_piece_maillot_b1",
+  "variant_index": 0,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

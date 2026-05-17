@@ -1,0 +1,97 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_M",
+      "local_params": {
+        "half_u": 0.2,
+        "half_v": 0.1,
+        "inner_u": 0.05,
+        "apex_lift": 0.20634202091894657,
+        "underband_dip": 0.07792587001863671,
+        "center_v": 0.7016143587776831
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.42,
+        "front_leg_curve": 0.6650362245876568,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 43.144097551391425
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 29.80901145479831
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_ROSEGOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_VIRGIN_VELVET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_COVERSTITCH_3NEEDLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_CHOKER_GOLD",
+      "local_params": {
+        "width_cm": 0.9865067705886201
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_DROP_GOLD",
+      "local_params": {
+        "length_cm": 3.338427581071991
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_PENDANT_SHELL",
+      "local_params": {
+        "chain_length_cm": 48.70812524804254
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.3004066107440517,
+    "saturation": 0.5169855850787759,
+    "lightness": 0.19304680883991787,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.6983937568033527,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_01_triangle_string_halter_b1",
+  "variant_index": 13,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

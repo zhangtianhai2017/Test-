@@ -1,0 +1,66 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_DEEP_V_L",
+      "local_params": {
+        "half_u": 0.2655,
+        "half_v": 0.1475,
+        "inner_u": 0.06,
+        "apex_lift": 0.4650039579778692,
+        "underband_dip": 0.031065017452428935,
+        "center_v": 0.669826664721315
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.49299999999999994,
+        "front_leg_curve": 0.4478600121643457,
+        "back_top_v": 0.55,
+        "back_half_u": 0.391
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 4.951178421854856
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 29.153888652459578
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_QNOVA_RIBBED",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.8862437035453506,
+    "saturation": 0.8023792718054876,
+    "lightness": 0.42328119388414354,
+    "pattern_overlay": "stripe",
+    "pattern_scale": 0.7400750341200675,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_02_bandeau_back_band_b0",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

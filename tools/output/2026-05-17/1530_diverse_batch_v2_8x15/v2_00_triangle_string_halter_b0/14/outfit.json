@@ -1,0 +1,71 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_M",
+      "local_params": {
+        "half_u": 0.16,
+        "half_v": 0.08,
+        "inner_u": 0.06,
+        "apex_lift": 0.10228465881422955,
+        "underband_dip": 0.058433600820944114,
+        "center_v": 0.7853760822881225
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.5251049216676228,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 55.14158056207938
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HEMP_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_PENDANT_SHELL",
+      "local_params": {
+        "chain_length_cm": 52.42383885141051
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.539147572652408,
+    "saturation": 0.1,
+    "lightness": 0.36850585676043224,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.817418383203256,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_b0",
+  "variant_index": 14,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

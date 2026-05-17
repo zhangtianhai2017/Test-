@@ -1,0 +1,71 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_DEEP_V_S",
+      "local_params": {
+        "half_u": 0.1913,
+        "half_v": 0.1062,
+        "inner_u": 0.06,
+        "apex_lift": 0.5082934974135274,
+        "underband_dip": 0.040635217663055244,
+        "center_v": 0.7835429388378906
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.52,
+        "front_leg_curve": 0.35583776237458986,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 3.028412223862519
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 27.662636512642194
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SLUB_LINEN_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_QNOVA_RIBBED",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.2494161060904613,
+    "saturation": 0.9339053459358506,
+    "lightness": 0.39680407334234946,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.3155341374564725,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_03_bandeau_back_band_b1",
+  "variant_index": 7,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

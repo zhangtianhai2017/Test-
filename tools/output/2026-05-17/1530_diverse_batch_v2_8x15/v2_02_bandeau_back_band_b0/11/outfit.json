@@ -1,0 +1,76 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_ASYM_NECK_M",
+      "local_params": {
+        "half_u": 0.18519840808973823,
+        "half_v": 0.08239948243819054,
+        "inner_u": 0.06379430724122324,
+        "apex_lift": 0.2170984831765178,
+        "underband_dip": 0.03606176517210229,
+        "center_v": 0.676188718844115
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.5343612497061201,
+        "front_half_u": 0.39701029158982915,
+        "front_leg_curve": 0.4750857010465018,
+        "back_top_v": 0.4207346342497885,
+        "back_half_u": 0.3031655207504408
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 3.268791626383972
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TULLE_NET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_MACRAME_COTTON",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_DROP_GOLD",
+      "local_params": {
+        "length_cm": 1.7941614672589041
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.006243703545350643,
+    "saturation": 0.807060856499181,
+    "lightness": 0.5834818948051708,
+    "pattern_overlay": "checker",
+    "pattern_scale": 0.8653471137734692,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.7072308337782263,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_02_bandeau_back_band_b0",
+  "variant_index": 11,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

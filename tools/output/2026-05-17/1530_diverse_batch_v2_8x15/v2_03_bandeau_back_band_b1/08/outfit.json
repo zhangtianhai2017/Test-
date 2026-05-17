@@ -1,0 +1,84 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_ASYM_NECK_M",
+      "local_params": {
+        "half_u": 0.24,
+        "half_v": 0.115,
+        "inner_u": 0.02,
+        "apex_lift": 0.44965993081665345,
+        "underband_dip": 0.021529505000837293,
+        "center_v": 0.7078421349082549
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.58,
+        "front_leg_curve": 0.43095873606487517,
+        "back_top_v": 0.55,
+        "back_half_u": 0.46
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.52,
+        "front_leg_curve": 0.33180321193798085,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 4.201693873039654
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 23.280805259812382
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_LACE_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_COWRIE_20MM",
+      "local_params": {
+        "size_cm": 2.2116864772663423
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.2614161060904613,
+    "saturation": 0.7358435590023427,
+    "lightness": 0.38447970864585346,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.22097993532611762,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_03_bandeau_back_band_b1",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

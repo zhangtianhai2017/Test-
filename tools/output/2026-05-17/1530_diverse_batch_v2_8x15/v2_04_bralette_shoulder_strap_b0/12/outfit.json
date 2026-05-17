@@ -1,0 +1,99 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_DEEP_V_L",
+      "local_params": {
+        "half_u": 0.2655,
+        "half_v": 0.1475,
+        "inner_u": 0.06,
+        "apex_lift": 0.4563151446029658,
+        "underband_dip": 0.012226200061715138,
+        "center_v": 0.7768411995780574
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.58,
+        "front_leg_curve": 0.32675708549776855,
+        "back_top_v": 0.55,
+        "back_half_u": 0.46
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.58,
+        "front_leg_curve": 0.3108398082737499,
+        "back_top_v": 0.55,
+        "back_half_u": 0.46
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 25.231636184734782
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_10MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 27.929190402126636
+      }
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_20MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_TERRY_KNIT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_STUD_PEARL",
+      "local_params": {
+        "size_cm": 0.5680654695617937
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.6105697474150735,
+    "saturation": 0.6892809077833034,
+    "lightness": 0.8836576974868366,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.4496144032335275,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_b0",
+  "variant_index": 12,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

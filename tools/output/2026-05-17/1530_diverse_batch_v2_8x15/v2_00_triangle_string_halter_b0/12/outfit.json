@@ -1,0 +1,82 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.136,
+        "half_v": 0.068,
+        "inner_u": 0.06,
+        "apex_lift": 0.13197881562743824,
+        "underband_dip": 0.07479210487309518,
+        "center_v": 0.7503739206001028
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.6599730580981346,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.5548608986043297,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 64.49580877708286
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 33.78684589564072
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HUNZA_CRINKLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.515147572652408,
+    "saturation": 0.15768017997334932,
+    "lightness": 0.5004903884579505,
+    "pattern_overlay": "polka",
+    "pattern_scale": 0.4950336213958298,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.6844146527873117,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_b0",
+  "variant_index": 12,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

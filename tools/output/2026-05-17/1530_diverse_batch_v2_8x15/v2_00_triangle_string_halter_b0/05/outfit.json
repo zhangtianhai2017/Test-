@@ -1,0 +1,108 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.1888,
+        "half_v": 0.0944,
+        "inner_u": 0.06,
+        "apex_lift": 0.16366858816841906,
+        "underband_dip": 0.05100187189606684,
+        "center_v": 0.7391442647690316
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.42,
+        "front_leg_curve": 0.5751115583180071,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.6051638938796369,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 69.41721776327766
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 28.877539399739188
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEERSUCKER_STRIPE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 9.358745454805678
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_OVAL_8MM",
+      "local_params": {
+        "count": 8.521870448010347
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_STUD_PEARL",
+      "local_params": {
+        "size_cm": 0.5657962567216561
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.43114757265240794,
+    "saturation": 0.1,
+    "lightness": 0.5889480634661941,
+    "pattern_overlay": "checker",
+    "pattern_scale": 0.6526964879456395,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_b0",
+  "variant_index": 5,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

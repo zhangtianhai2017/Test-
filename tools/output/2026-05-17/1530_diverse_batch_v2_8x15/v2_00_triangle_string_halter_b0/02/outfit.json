@@ -1,0 +1,76 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_M",
+      "local_params": {
+        "half_u": 0.16,
+        "half_v": 0.08,
+        "inner_u": 0.06,
+        "apex_lift": 0.21035574378797933,
+        "underband_dip": 0.0019525803925580121,
+        "center_v": 0.8209769426911903
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.6763915753787065,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 47.303856575793596
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 26.922383409840524
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_8MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_CUTOUT_JERSEY",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.39514757265240796,
+    "saturation": 0.12196680980873621,
+    "lightness": 0.541293495795058,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.6908319241489255,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_b0",
+  "variant_index": 2,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

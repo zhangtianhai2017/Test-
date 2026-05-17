@@ -1,0 +1,85 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_ASYM_NECK_S",
+      "local_params": {
+        "half_u": 0.204,
+        "half_v": 0.0978,
+        "inner_u": 0.02,
+        "apex_lift": 0.348583556998029,
+        "underband_dip": 0.014382871377796244,
+        "center_v": 0.7639088975504574
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.58,
+        "front_leg_curve": 0.33778268337691963,
+        "back_top_v": 0.55,
+        "back_half_u": 0.46
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.442,
+        "front_leg_curve": 0.3313009690520015,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ALGAE_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_BRODERIE_ANGLAISE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_BEADED_80MM",
+      "local_params": {
+        "length_cm": 5.169875841169124
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.2844753694498432,
+    "saturation": 0.3617539913437861,
+    "lightness": 0.4930958160250071,
+    "pattern_overlay": "checker",
+    "pattern_scale": 0.6296136563588128,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5719375004248364,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_06_one_piece_maillot_b0",
+  "variant_index": 10,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

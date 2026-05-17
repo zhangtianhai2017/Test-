@@ -1,0 +1,99 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_HIGH_NECK_S",
+      "local_params": {
+        "half_u": 0.1955,
+        "half_v": 0.1105,
+        "inner_u": 0.04,
+        "apex_lift": -0.14409598294328346,
+        "underband_dip": 0.03689088244929162,
+        "center_v": 0.6819348248151844
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.52,
+        "front_leg_curve": 0.3304753902619648,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_10MM",
+      "local_params": {
+        "length_cm": 30.156346114884617
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 23.35966877438394
+      }
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_20MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_NEOPRENE_1MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_BEADED_80MM",
+      "local_params": {
+        "length_cm": 5.690073549028445
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 4.9449320808021495
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_BELLY",
+      "local_params": {
+        "length_cm": 68.86937163140159
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHARM_BEACH",
+      "local_params": {
+        "diameter_cm": 7.876613266744554
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.023604478826889652,
+    "saturation": 0.6515414335444967,
+    "lightness": 0.43015552924080797,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.8011818460012228,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_05_bralette_shoulder_strap_b1",
+  "variant_index": 6,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

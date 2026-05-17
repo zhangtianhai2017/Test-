@@ -1,0 +1,71 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_DEEP_V_S",
+      "local_params": {
+        "half_u": 0.18820853237156232,
+        "half_v": 0.07597378525535645,
+        "inner_u": 0.07099354225763024,
+        "apex_lift": 0.41814651250374013,
+        "underband_dip": 0.003561807441430598,
+        "center_v": 0.6802909828355732
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.5337800560523398,
+        "front_half_u": 0.4751515845733149,
+        "front_leg_curve": 0.4898063819467474,
+        "back_top_v": 0.5382641360726956,
+        "back_half_u": 0.3567042970450684
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 4.119673369985373
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_BAND_SPORT_25MM",
+      "local_params": {
+        "length_cm": 13.656874620192522
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FISHNET_OPEN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_HEMP_BLEND",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.042243703545350675,
+    "saturation": 0.8389754434186639,
+    "lightness": 0.3866048236039019,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.5880300048158089,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.8077031638246475,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_02_bandeau_back_band_b0",
+  "variant_index": 14,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

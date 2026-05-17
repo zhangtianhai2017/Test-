@@ -1,0 +1,76 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_ASYM_NECK_S",
+      "local_params": {
+        "half_u": 0.204,
+        "half_v": 0.0978,
+        "inner_u": 0.02,
+        "apex_lift": 0.23696202503941793,
+        "underband_dip": 0.03959096704822827,
+        "center_v": 0.7227409641014789
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.442,
+        "front_leg_curve": 0.395683971307231,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BIOPOLYMER_PLAIN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_MUSHROOM_LEATHER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_COVERSTITCH_3NEEDLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_OVAL_8MM",
+      "local_params": {
+        "count": 5.74909297878161
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_SMALL_4MM",
+      "local_params": {
+        "count": 12.373416456479305
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.5331342470896691,
+    "saturation": 0.5004377091265229,
+    "lightness": 0.15,
+    "pattern_overlay": "checker",
+    "pattern_scale": 0.47464293859658463,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_07_one_piece_maillot_b1",
+  "variant_index": 7,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

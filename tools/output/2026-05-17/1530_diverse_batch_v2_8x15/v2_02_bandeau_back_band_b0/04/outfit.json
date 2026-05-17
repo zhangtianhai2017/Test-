@@ -1,0 +1,64 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_DEEP_V_M",
+      "local_params": {
+        "half_u": 0.22136872758192108,
+        "half_v": 0.08981274357359798,
+        "inner_u": 0.07087709226430894,
+        "apex_lift": 0.575172059844763,
+        "underband_dip": 0.045434181679678526,
+        "center_v": 0.8065045609107088
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.30813734917224705,
+        "front_half_u": 0.4336426910823008,
+        "front_leg_curve": 0.3174659583084798,
+        "back_top_v": 0.37298161906181104,
+        "back_half_u": 0.3163055855995096
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 2.8136810406254713
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_CROCHET_COTTON",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_HUNZA_CRINKLE",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.9222437035453507,
+    "saturation": 0.7329829986574593,
+    "lightness": 0.6048618863436728,
+    "pattern_overlay": "checker",
+    "pattern_scale": 0.44529994212843327,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_02_bandeau_back_band_b0",
+  "variant_index": 4,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_ASYM_NECK_M",
+      "local_params": {
+        "half_u": 0.24,
+        "half_v": 0.115,
+        "inner_u": 0.02,
+        "apex_lift": 0.3745401003665259,
+        "underband_dip": 0.033811314857416765,
+        "center_v": 0.6836387108594362
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.442,
+        "front_leg_curve": 0.40840813770358575,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.442,
+        "front_leg_curve": 0.320200807366165,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_15MM",
+      "local_params": {
+        "length_cm": 10.240770180540824
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_COVERSTITCH_3NEEDLE",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.2964753694498432,
+    "saturation": 0.46426748576383525,
+    "lightness": 0.26720769128586486,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.26607437102888626,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_06_one_piece_maillot_b0",
+  "variant_index": 11,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_COWL_L",
+      "local_params": {
+        "half_u": 0.2891,
+        "half_v": 0.1298,
+        "inner_u": 0.01,
+        "apex_lift": 0.18200731752314897,
+        "underband_dip": -0.022397954715488673,
+        "center_v": 0.8009582049558801
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.58,
+        "front_leg_curve": 0.48505026461735795,
+        "back_top_v": 0.55,
+        "back_half_u": 0.46
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.52,
+        "front_leg_curve": 0.5179994011814258,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 25.800009781338485
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_BAND_SPORT_25MM",
+      "local_params": {
+        "length_cm": 10.1204253323428
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_LACE_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_CROCHET_COTTON",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.047604478826889673,
+    "saturation": 0.8756932238073593,
+    "lightness": 0.48534001756765566,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.5118125378692184,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.8356955877420117,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_05_bralette_shoulder_strap_b1",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

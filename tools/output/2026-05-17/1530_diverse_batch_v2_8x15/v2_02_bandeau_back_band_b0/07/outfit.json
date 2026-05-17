@@ -1,0 +1,87 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_COWL_S",
+      "local_params": {
+        "half_u": 0.2082,
+        "half_v": 0.0935,
+        "inner_u": 0.01,
+        "apex_lift": 0.14470158036386993,
+        "underband_dip": -0.041336210439198204,
+        "center_v": 0.7805554193256996
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.58,
+        "front_leg_curve": 0.4852724470705706,
+        "back_top_v": 0.55,
+        "back_half_u": 0.46
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.52,
+        "front_leg_curve": 0.4270637986968378,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 5.863754553018937
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ALGAE_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_MACRAME_COTTON",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_BEADED_80MM",
+      "local_params": {
+        "length_cm": 7.1955778513496185
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.9582437035453506,
+    "saturation": 0.8042006335073006,
+    "lightness": 0.6559836990389842,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.36986910794086897,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_02_bandeau_back_band_b0",
+  "variant_index": 7,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

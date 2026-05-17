@@ -1,0 +1,99 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_DEEP_V_S",
+      "local_params": {
+        "half_u": 0.1456372956418153,
+        "half_v": 0.07662994079909234,
+        "inner_u": 0.06813014963267924,
+        "apex_lift": 0.4230443079575258,
+        "underband_dip": 0.004919015782091168,
+        "center_v": 0.6724086620700725
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.3093524886473972,
+        "front_half_u": 0.43009611292643063,
+        "front_leg_curve": 0.5295425352770868,
+        "back_top_v": 0.3058438176764967,
+        "back_half_u": 0.3076492406116112
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.3084802795282376,
+        "front_half_u": 0.5142975655876154,
+        "front_leg_curve": 0.3332468436367485,
+        "back_top_v": 0.31120653527290043,
+        "back_half_u": 0.30705423575971436
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_15MM",
+      "local_params": {
+        "length_cm": 26.982192523827596
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_COMPRESSION_SPORT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_BRODERIE_ANGLAISE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_TASSEL_SILK_50MM",
+      "local_params": {
+        "length_cm": 5.800071896097464
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_PENDANT_SHELL",
+      "local_params": {
+        "chain_length_cm": 41.43389695809753
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.2604753694498432,
+    "saturation": 0.4822888432792047,
+    "lightness": 0.3471516387350995,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.7563301201492205,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5589915061155639,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_06_one_piece_maillot_b0",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

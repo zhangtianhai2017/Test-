@@ -1,0 +1,94 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_COWL_S",
+      "local_params": {
+        "half_u": 0.20171552223917916,
+        "half_v": 0.08965971466547193,
+        "inner_u": 0.01252741976161103,
+        "apex_lift": 0.18916934791066653,
+        "underband_dip": 0.008402369375666824,
+        "center_v": 0.6784908622303732
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.38967510670601224,
+        "front_half_u": 0.36282206752747853,
+        "front_leg_curve": 0.5307280976609012,
+        "back_top_v": 0.31001891342729165,
+        "back_half_u": 0.41261629735598987
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.39406187426263634,
+        "front_half_u": 0.4250426472664119,
+        "front_leg_curve": 0.5350574215229353,
+        "back_top_v": 0.30772265570777674,
+        "back_half_u": 0.4026001317247129
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 25.778991013198514
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_QNOVA_RIBBED",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_HUNZA_CRINKLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 7.403756008327193
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_TASSEL_SILK_50MM",
+      "local_params": {
+        "length_cm": 6.597884367936482
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.5625697474150735,
+    "saturation": 0.6803831659783708,
+    "lightness": 0.6478187497412382,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.4743772762526885,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5541185533833974,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_b0",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

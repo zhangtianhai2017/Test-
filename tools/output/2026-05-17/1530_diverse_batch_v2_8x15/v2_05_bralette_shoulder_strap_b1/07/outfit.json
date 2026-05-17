@@ -1,0 +1,115 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_HIGH_NECK_M",
+      "local_params": {
+        "half_u": 0.23,
+        "half_v": 0.13,
+        "inner_u": 0.04,
+        "apex_lift": -0.12238206389833975,
+        "underband_dip": 0.021021194227912356,
+        "center_v": 0.7115084239716545
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.49299999999999994,
+        "front_leg_curve": 0.4837831977341268,
+        "back_top_v": 0.55,
+        "back_half_u": 0.391
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.58,
+        "front_leg_curve": 0.3389841873722575,
+        "back_top_v": 0.55,
+        "back_half_u": 0.46
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 24.464862195561576
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_BAND_SPORT_25MM",
+      "local_params": {
+        "length_cm": 12.827194315489468
+      }
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_10MM_NICKEL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FOIL_COATED_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_OVAL_8MM",
+      "local_params": {
+        "count": 6.368654237549228
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_CHIFFON_30MM",
+      "local_params": {
+        "size_cm": 3.919027443602671
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_DROP_GOLD",
+      "local_params": {
+        "length_cm": 3.623617177624246
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_CHOKER_GOLD",
+      "local_params": {
+        "width_cm": 1.0529914695230396
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.03560447882688966,
+    "saturation": 0.7074976930198043,
+    "lightness": 0.5671488839889747,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.801325820877691,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_05_bralette_shoulder_strap_b1",
+  "variant_index": 7,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_M",
+      "local_params": {
+        "half_u": 0.22,
+        "half_v": 0.12,
+        "inner_u": 0.04,
+        "apex_lift": 0.027544663654416227,
+        "underband_dip": 0.0495373621144315,
+        "dome_depth_cm": 1.4593155865825893,
+        "center_v": 0.7889372709600597
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.442,
+        "front_leg_curve": 0.4040444941949236,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BRODERIE_ANGLAISE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 7.1684293317073715
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.5451342470896691,
+    "saturation": 0.35954548538387704,
+    "lightness": 0.15,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.6711405074615624,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_07_one_piece_maillot_b1",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

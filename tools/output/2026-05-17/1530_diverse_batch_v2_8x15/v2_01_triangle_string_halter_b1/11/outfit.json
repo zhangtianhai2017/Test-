@@ -1,0 +1,59 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.136,
+        "half_v": 0.068,
+        "inner_u": 0.06,
+        "apex_lift": 0.17542753153557428,
+        "underband_dip": 0.03911617551118668,
+        "center_v": 0.7557457009320381
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.6679729839546061,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 57.531856515635226
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TULLE_NET",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.2764066107440517,
+    "saturation": 0.551236901322423,
+    "lightness": 0.210723413749562,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.2619177924717964,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_01_triangle_string_halter_b1",
+  "variant_index": 11,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

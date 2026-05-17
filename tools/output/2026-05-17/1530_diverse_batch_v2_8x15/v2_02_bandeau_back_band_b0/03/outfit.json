@@ -1,0 +1,71 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_HIGH_NECK_L",
+      "local_params": {
+        "half_u": 0.26466230971538834,
+        "half_v": 0.10900439871135527,
+        "inner_u": 0.0854063826044987,
+        "apex_lift": -0.06191422752189828,
+        "underband_dip": 0.054059099566049734,
+        "center_v": 0.807078645430447
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.3133683824559481,
+        "front_half_u": 0.4313479018781062,
+        "front_leg_curve": 0.33021127952662316,
+        "back_top_v": 0.3694170415362328,
+        "back_half_u": 0.30811278553027194
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 4.535111678719367
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_8MM",
+      "local_params": {
+        "length_cm": 13.689380166385888
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_CROCHET_COTTON",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.9102437035453507,
+    "saturation": 0.7041963524500742,
+    "lightness": 0.5218824769449674,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.31997454122841856,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_02_bandeau_back_band_b0",
+  "variant_index": 3,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

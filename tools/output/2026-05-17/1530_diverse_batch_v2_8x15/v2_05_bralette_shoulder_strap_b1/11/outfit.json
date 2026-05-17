@@ -1,0 +1,94 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_COWL_S",
+      "local_params": {
+        "half_u": 0.2082,
+        "half_v": 0.0935,
+        "inner_u": 0.01,
+        "apex_lift": 0.19796752798830558,
+        "underband_dip": -0.021741292101373766,
+        "center_v": 0.7624015599389139
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.52,
+        "front_leg_curve": 0.38790462934036685,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.442,
+        "front_leg_curve": 0.4989399773512451,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_10MM",
+      "local_params": {
+        "length_cm": 34.649669111163945
+      }
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_15MM_NICKEL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HUNZA_CRINKLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 5.421393473999997
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_SATIN_40MM",
+      "local_params": {
+        "size_cm": 4.883147427195034
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.0836044788268897,
+    "saturation": 0.895091937027521,
+    "lightness": 0.40540326241119107,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.2539291288842025,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_05_bralette_shoulder_strap_b1",
+  "variant_index": 11,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

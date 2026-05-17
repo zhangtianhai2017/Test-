@@ -1,0 +1,84 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.09215956867751463,
+        "half_v": 0.08180073904340698,
+        "inner_u": 0.15088800341889036,
+        "apex_lift": 0.043713382610836064,
+        "underband_dip": 0.01341619354698383,
+        "center_v": 0.8112348808825863
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.24546623788501074,
+        "front_half_u": 0.40959040654334816,
+        "front_leg_curve": 0.7167931614491817,
+        "back_top_v": 0.3096371893990453,
+        "back_half_u": 0.185909698476716
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.33092413020886735,
+        "front_half_u": 0.34955017296309204,
+        "front_leg_curve": 0.5245010884981499,
+        "back_top_v": 0.24955280099183652,
+        "back_half_u": 0.2490206530443197
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 51.71690230356985
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TERRY_KNIT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_CHIFFON_30MM",
+      "local_params": {
+        "size_cm": 4.971974211886408
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_SMALL_4MM",
+      "local_params": {
+        "count": 23.65774345402727
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.1684066107440517,
+    "saturation": 0.5035363638037413,
+    "lightness": 0.3450584329917975,
+    "pattern_overlay": "checker",
+    "pattern_scale": 0.5247145074603459,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.9340728771958624,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_01_triangle_string_halter_b1",
+  "variant_index": 2,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.17,
+        "half_v": 0.085,
+        "inner_u": 0.05,
+        "apex_lift": 0.2732218790553378,
+        "underband_dip": 0.0374811270408073,
+        "center_v": 0.8296272471325127
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.42,
+        "front_leg_curve": 0.5607248725673321,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.5960963316909651,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 69.17807643316522
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 25.73474282113611
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEQUIN_DENSE",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.44314757265240795,
+    "saturation": 0.2868819128207947,
+    "lightness": 0.5991500688654057,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.7695878657047859,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_b0",
+  "variant_index": 6,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

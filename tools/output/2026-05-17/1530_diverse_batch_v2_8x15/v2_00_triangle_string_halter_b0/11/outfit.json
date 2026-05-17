@@ -1,0 +1,80 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.12853282251705303,
+        "half_v": 0.03744738648535342,
+        "inner_u": 0.06794108371813641,
+        "apex_lift": 0.12592759946857937,
+        "underband_dip": 0.06897688766486632,
+        "center_v": 0.7097312864083885
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.249506311780706,
+        "front_half_u": 0.34996519908734314,
+        "front_leg_curve": 0.7232471338097881,
+        "back_top_v": 0.3117565279702016,
+        "back_half_u": 0.187531020942432
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.32796142003016715,
+        "front_half_u": 0.348037120533743,
+        "front_leg_curve": 0.5330120371063894,
+        "back_top_v": 0.24680868860511906,
+        "back_half_u": 0.18577592341421179
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 61.20863192656925
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_8MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MACRAME_COTTON",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.503147572652408,
+    "saturation": 0.1,
+    "lightness": 0.3765104498276959,
+    "pattern_overlay": "stripe",
+    "pattern_scale": 0.8597474449577687,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_00_triangle_string_halter_b0",
+  "variant_index": 11,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

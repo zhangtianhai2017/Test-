@@ -1,0 +1,70 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.136,
+        "half_v": 0.068,
+        "inner_u": 0.06,
+        "apex_lift": 0.13346990160434702,
+        "underband_dip": 0.003793215501868854,
+        "center_v": 0.7046984314645254
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.639163374143743,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.42,
+        "front_leg_curve": 0.7174047374853675,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 45.14830698461743
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MESH_OUTER",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.4791475726524079,
+    "saturation": 0.2838575711171385,
+    "lightness": 0.4256450559018967,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.29189373709446237,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_b0",
+  "variant_index": 9,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_S",
+      "local_params": {
+        "half_u": 0.1419445949740156,
+        "half_v": 0.09800436423712214,
+        "inner_u": 0.04431480699893444,
+        "apex_lift": 0.07078078645317605,
+        "underband_dip": 0.003340366749678188,
+        "dome_depth_cm": 1.850639810011245,
+        "center_v": 0.6992350150861412
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.5369259524195767,
+        "front_half_u": 0.4047171837611147,
+        "front_leg_curve": 0.3215070742028208,
+        "back_top_v": 0.4117663678302056,
+        "back_half_u": 0.29646365859668145
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.4179005300779758,
+        "front_half_u": 0.4778989265075938,
+        "front_leg_curve": 0.31657707673059055,
+        "back_top_v": 0.5382308015105954,
+        "back_half_u": 0.2999469787340481
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_15MM",
+      "local_params": {
+        "length_cm": 29.513724894245293
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 20.03131270950957
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_COVERSTITCH_3NEEDLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_PENDANT_DROP_15MM_GOLD",
+      "local_params": {
+        "size_cm": 2.049157223828916
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_CHOKER_GOLD",
+      "local_params": {
+        "width_cm": 0.43461373335349357
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.2724753694498432,
+    "saturation": 0.5819348275227941,
+    "lightness": 0.4529294065090319,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.29888453210246985,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5001639238497524,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_06_one_piece_maillot_b0",
+  "variant_index": 9,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

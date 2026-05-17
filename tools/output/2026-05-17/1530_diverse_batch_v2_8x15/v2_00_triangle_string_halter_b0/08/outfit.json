@@ -1,0 +1,70 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_M",
+      "local_params": {
+        "half_u": 0.15484449939584333,
+        "half_v": 0.04552916268793676,
+        "inner_u": 0.11441445957791183,
+        "apex_lift": 0.27259695679063245,
+        "underband_dip": 0.06992577661130202,
+        "center_v": 0.813068846011987
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.25091153932132915,
+        "front_half_u": 0.4114782440188731,
+        "front_leg_curve": 0.5278726240122826,
+        "back_top_v": 0.24549013695678795,
+        "back_half_u": 0.2529397770205296
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.32825935215080243,
+        "front_half_u": 0.41163955317746503,
+        "front_leg_curve": 0.7305657593240442,
+        "back_top_v": 0.24681588435367313,
+        "back_half_u": 0.25410938064687627
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 60.40043681684679
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TULLE_NET",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.4671475726524079,
+    "saturation": 0.15419122315749365,
+    "lightness": 0.43727010134132627,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.5578074709840869,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_00_triangle_string_halter_b0",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

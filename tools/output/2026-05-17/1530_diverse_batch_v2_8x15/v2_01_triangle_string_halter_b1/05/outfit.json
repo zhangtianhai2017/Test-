@@ -1,0 +1,73 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.17,
+        "half_v": 0.085,
+        "inner_u": 0.05,
+        "apex_lift": 0.009829473458423875,
+        "underband_dip": 0.09378601486557812,
+        "center_v": 0.7369739159389728
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.42,
+        "front_leg_curve": 0.6363782319019589,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 51.464632971510376
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 25.729412299926945
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_COMPRESSION_SPORT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_PENDANT_DROP_15MM_GOLD",
+      "local_params": {
+        "size_cm": 1.8273965405763266
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.2044066107440517,
+    "saturation": 0.7563953157239431,
+    "lightness": 0.34086676018923634,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.6071613098898624,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_01_triangle_string_halter_b1",
+  "variant_index": 5,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

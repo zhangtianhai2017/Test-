@@ -1,0 +1,77 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_S",
+      "local_params": {
+        "half_u": 0.14010010718808533,
+        "half_v": 0.09922611643666704,
+        "inner_u": 0.04468742523178253,
+        "apex_lift": 0.06964561178477201,
+        "underband_dip": 0.0031160534387055616,
+        "dome_depth_cm": 1.0548741358106297,
+        "center_v": 0.7768315615208813
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.31308405990917104,
+        "front_half_u": 0.4302962930352786,
+        "front_leg_curve": 0.3201924952968088,
+        "back_top_v": 0.30611032914497294,
+        "back_half_u": 0.4106595978706452
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_BAND_SPORT_25MM",
+      "local_params": {
+        "length_cm": 10.760224303403962
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MACRAME_COTTON",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHARM_BEACH",
+      "local_params": {
+        "diameter_cm": 9.689205905637682
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.2124753694498432,
+    "saturation": 0.5864500969572257,
+    "lightness": 0.44401807520889813,
+    "pattern_overlay": "checker",
+    "pattern_scale": 0.26068799511559765,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_06_one_piece_maillot_b0",
+  "variant_index": 4,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

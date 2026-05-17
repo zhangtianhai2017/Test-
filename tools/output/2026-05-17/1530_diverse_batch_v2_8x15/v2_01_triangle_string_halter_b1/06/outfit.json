@@ -1,0 +1,83 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.17,
+        "half_v": 0.085,
+        "inner_u": 0.05,
+        "apex_lift": 0.23475990501578795,
+        "underband_dip": 0.0021847541842506704,
+        "center_v": 0.7732986424791349
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.42,
+        "front_leg_curve": 0.6631075243862952,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 62.44975809922679
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 29.574215871605677
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SLUB_LINEN_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_CHOKER_GOLD",
+      "local_params": {
+        "width_cm": 0.5123294628486637
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.2164066107440517,
+    "saturation": 0.776859332583019,
+    "lightness": 0.2502311838544027,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.39740731555921055,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5746214735686423,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_01_triangle_string_halter_b1",
+  "variant_index": 6,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

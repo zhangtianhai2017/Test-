@@ -1,0 +1,83 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_COWL_L",
+      "local_params": {
+        "half_u": 0.2891,
+        "half_v": 0.1298,
+        "inner_u": 0.01,
+        "apex_lift": 0.14509357320949184,
+        "underband_dip": 0.005267614117351549,
+        "center_v": 0.753924750181934
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.58,
+        "front_leg_curve": 0.3123927675344867,
+        "back_top_v": 0.55,
+        "back_half_u": 0.46
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 32.94890846678236
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 29.801410147547216
+      }
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_10MM_NICKEL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_WAFFLE_HONEYCOMB",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_SEERSUCKER_STRIPE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_PENDANT_SHELL",
+      "local_params": {
+        "chain_length_cm": 49.07195258833185
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.5505697474150735,
+    "saturation": 0.8300297394500977,
+    "lightness": 0.9,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.5038059790510256,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.8467774235148371,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_b0",
+  "variant_index": 7,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

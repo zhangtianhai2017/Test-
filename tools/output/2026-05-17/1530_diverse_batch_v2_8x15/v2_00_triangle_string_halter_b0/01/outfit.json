@@ -1,0 +1,73 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.10198314276911812,
+        "half_v": 0.051245404108483945,
+        "inner_u": 0.11464522385644918,
+        "apex_lift": 0.28290044038126294,
+        "underband_dip": 0.0710884740641575,
+        "center_v": 0.8178930969731293
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.24791825060190822,
+        "front_half_u": 0.2941090323982037,
+        "front_leg_curve": 0.5162792580927514,
+        "back_top_v": 0.31071552886271125,
+        "back_half_u": 0.18888738579551828
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 62.52573546196381
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HEMP_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_BEADED_80MM",
+      "local_params": {
+        "length_cm": 9.81467014303589
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_SATIN_40MM",
+      "local_params": {
+        "size_cm": 5.923984582139941
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.38314757265240795,
+    "saturation": 0.23130734125799907,
+    "lightness": 0.3548954709758406,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.8583971956740384,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.6426192407889597,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_00_triangle_string_halter_b0",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

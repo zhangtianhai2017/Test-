@@ -1,0 +1,110 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_M",
+      "local_params": {
+        "half_u": 0.16,
+        "half_v": 0.08,
+        "inner_u": 0.06,
+        "apex_lift": 0.19427288614080568,
+        "underband_dip": 0.02978097617939235,
+        "center_v": 0.8094501534799102
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.5385504123999596,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.42,
+        "front_leg_curve": 0.6216458175410865,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 66.83791842960794
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 15.353608091100165
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_18MM_SILVER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEERSUCKER_STRIPE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_BEADED_80MM",
+      "local_params": {
+        "length_cm": 5.245383783223511
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_PENDANT_DROP_15MM_GOLD",
+      "local_params": {
+        "size_cm": 1.0367451441943096
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_WAIST",
+      "local_params": {
+        "length_cm": 88.62968251355004
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_PENDANT_SHELL",
+      "local_params": {
+        "chain_length_cm": 46.69693354527857
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.2404066107440517,
+    "saturation": 0.5650720255292054,
+    "lightness": 0.15,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.576581559941906,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.6292182137531109,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_01_triangle_string_halter_b1",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

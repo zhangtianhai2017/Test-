@@ -1,0 +1,102 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_COWL_M",
+      "local_params": {
+        "half_u": 0.245,
+        "half_v": 0.11,
+        "inner_u": 0.01,
+        "apex_lift": 0.09065243683850344,
+        "underband_dip": 0.004897454707073076,
+        "center_v": 0.7878666878728963
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.49299999999999994,
+        "front_leg_curve": 0.4813498905620025,
+        "back_top_v": 0.55,
+        "back_half_u": 0.391
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_10MM",
+      "local_params": {
+        "length_cm": 34.201325974962394
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_8MM",
+      "local_params": {
+        "length_cm": 9.336236892708955
+      }
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_10MM_NICKEL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_LACE_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_BEADED_80MM",
+      "local_params": {
+        "length_cm": 5.332709704696886
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_SATIN_40MM",
+      "local_params": {
+        "size_cm": 5.851413065754744
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_CHOKER_GOLD",
+      "local_params": {
+        "width_cm": 0.4958451602106243
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.09560447882688972,
+    "saturation": 0.7962826246522815,
+    "lightness": 0.6225843241751177,
+    "pattern_overlay": "stripe",
+    "pattern_scale": 0.6415934799760303,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5765790242059122,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_05_bralette_shoulder_strap_b1",
+  "variant_index": 12,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

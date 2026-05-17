@@ -1,0 +1,67 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_DEEP_V_M",
+      "local_params": {
+        "half_u": 0.225,
+        "half_v": 0.125,
+        "inner_u": 0.06,
+        "apex_lift": 0.4351637372177133,
+        "underband_dip": 0.04838960193482718,
+        "center_v": 0.7047815840327825
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.58,
+        "front_leg_curve": 0.37703011401947906,
+        "back_top_v": 0.55,
+        "back_half_u": 0.46
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_10MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BIOPOLYMER_PLAIN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_NEOPRENE_2MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.5691342470896691,
+    "saturation": 0.36952758908128125,
+    "lightness": 0.2855971544772528,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.7400311524634013,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_07_one_piece_maillot_b1",
+  "variant_index": 10,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

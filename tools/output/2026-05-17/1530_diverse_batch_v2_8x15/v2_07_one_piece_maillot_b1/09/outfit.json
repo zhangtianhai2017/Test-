@@ -1,0 +1,86 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_L",
+      "local_params": {
+        "half_u": 0.2511099614363007,
+        "half_v": 0.09743664955455514,
+        "inner_u": 0.0479404581450137,
+        "apex_lift": 0.009601998330120723,
+        "underband_dip": 0.006731415396583543,
+        "dome_depth_cm": 1.0516815311600554,
+        "center_v": 0.7791149303400925
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.4215234160408587,
+        "front_half_u": 0.3978261550630022,
+        "front_leg_curve": 0.3245391497362786,
+        "back_top_v": 0.4171159089830875,
+        "back_half_u": 0.3812414361182518
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MUSHROOM_LEATHER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 6.820682352720691
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_STUD_PEARL",
+      "local_params": {
+        "size_cm": 0.9165994100160398
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_CHOKER_GOLD",
+      "local_params": {
+        "width_cm": 0.5989794684080716
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_CHAIN_GOLD",
+      "local_params": {
+        "diameter_cm": 7.327402147972055
+      }
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.5571342470896691,
+    "saturation": 0.5209155027018008,
+    "lightness": 0.35738631250992237,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.8062995074042625,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5372576922453521,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_07_one_piece_maillot_b1",
+  "variant_index": 9,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

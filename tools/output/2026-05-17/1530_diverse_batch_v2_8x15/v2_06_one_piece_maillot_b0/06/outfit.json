@@ -1,0 +1,81 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_L",
+      "local_params": {
+        "half_u": 0.2596,
+        "half_v": 0.14159999999999998,
+        "inner_u": 0.04,
+        "apex_lift": 0.049939468353130706,
+        "underband_dip": 0.009296395846791622,
+        "dome_depth_cm": 1.9185788779953605,
+        "center_v": 0.7496901755167237
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.52,
+        "front_leg_curve": 0.5072439648666838,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.52,
+        "front_leg_curve": 0.3296139547521853,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 22.093148987449272
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MACRAME_COTTON",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.2364753694498432,
+    "saturation": 0.5410443829482052,
+    "lightness": 0.26180762379406697,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.8212394218573917,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_06_one_piece_maillot_b0",
+  "variant_index": 6,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

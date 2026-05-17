@@ -1,0 +1,90 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_DEEP_V_M",
+      "local_params": {
+        "half_u": 0.21969781014288758,
+        "half_v": 0.09016682525976462,
+        "inner_u": 0.07096410656697837,
+        "apex_lift": 0.5756129080230028,
+        "underband_dip": 0.0073914790880567,
+        "center_v": 0.6833783854030501
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.31062097373302133,
+        "front_half_u": 0.43304874959190875,
+        "front_leg_curve": 0.5342493666952234,
+        "back_top_v": 0.3094686693575796,
+        "back_half_u": 0.31431114143557565
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_10MM",
+      "local_params": {
+        "length_cm": 34.90732063647235
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 29.598455655832545
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEQUIN_DENSE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_BELLY",
+      "local_params": {
+        "length_cm": 61.08546405082463
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHAIN",
+      "local_params": {
+        "diameter_cm": 8.064485884749793
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.32047536944984323,
+    "saturation": 0.41877656706899746,
+    "lightness": 0.35950767926949684,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.33694184739824373,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5900184084701172,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_06_one_piece_maillot_b0",
+  "variant_index": 13,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

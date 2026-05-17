@@ -1,0 +1,91 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_COWL_S",
+      "local_params": {
+        "half_u": 0.2082,
+        "half_v": 0.0935,
+        "inner_u": 0.01,
+        "apex_lift": 0.16630506340806533,
+        "underband_dip": -0.013494144009550506,
+        "center_v": 0.7493035548998335
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.442,
+        "front_leg_curve": 0.311512424775994,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.442,
+        "front_leg_curve": 0.43503190676665027,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 4.210876740281676
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 18.486124377386886
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_AMNI_SOUL_RIBBED",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_CHIFFON_30MM",
+      "local_params": {
+        "size_cm": 4.6935793189331925
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_TROCHUS_25MM",
+      "local_params": {
+        "size_cm": 2.6499401896164483
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.8982437035453507,
+    "saturation": 0.8271892730692978,
+    "lightness": 0.6949469749111344,
+    "pattern_overlay": "checker",
+    "pattern_scale": 0.20594729985313848,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.8985465535793118,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_02_bandeau_back_band_b0",
+  "variant_index": 2,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

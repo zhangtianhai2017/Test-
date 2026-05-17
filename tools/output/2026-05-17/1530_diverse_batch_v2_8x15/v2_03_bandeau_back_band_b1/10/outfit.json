@@ -1,0 +1,73 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_HIGH_NECK_M",
+      "local_params": {
+        "half_u": 0.17690641648990515,
+        "half_v": 0.09236520690845484,
+        "inner_u": 0.08627113520524905,
+        "apex_lift": -0.1403283889540616,
+        "underband_dip": 0.05541862040057236,
+        "center_v": 0.6772388065484339
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.541135317533187,
+        "front_half_u": 0.5731814171551673,
+        "front_leg_curve": 0.4755040421827185,
+        "back_top_v": 0.5320629408160169,
+        "back_half_u": 0.44371614550113214
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 5.719151631698264
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BIOPOLYMER_PLAIN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_CHOKER_GOLD",
+      "local_params": {
+        "width_cm": 0.48123826667772907
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_WAIST",
+      "local_params": {
+        "length_cm": 67.19659448504575
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.2854161060904613,
+    "saturation": 0.8816136689018874,
+    "lightness": 0.4265429625447527,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.640003720036286,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.585628391309866,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_03_bandeau_back_band_b1",
+  "variant_index": 10,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

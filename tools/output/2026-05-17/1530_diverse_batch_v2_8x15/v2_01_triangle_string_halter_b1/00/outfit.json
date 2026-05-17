@@ -1,0 +1,66 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.17,
+        "half_v": 0.085,
+        "inner_u": 0.05,
+        "apex_lift": 0.015039166130633485,
+        "underband_dip": 0.05494411733883439,
+        "center_v": 0.7741014557659776
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.42,
+        "front_leg_curve": 0.5100358700973128,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 51.096366257329464
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 31.671620480220263
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BRODERIE_ANGLAISE",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.1444066107440517,
+    "saturation": 0.799201595728915,
+    "lightness": 0.190264611196328,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.8686944686421265,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_01_triangle_string_halter_b1",
+  "variant_index": 0,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

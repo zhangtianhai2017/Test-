@@ -1,0 +1,71 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.136,
+        "half_v": 0.068,
+        "inner_u": 0.06,
+        "apex_lift": 0.24049572032236188,
+        "underband_dip": 0.06879373166974012,
+        "center_v": 0.7804693667701526
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.7006056547910513,
+        "back_top_v": 0.32,
+        "back_half_u": 0.26
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 64.40230053757116
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_NEOPRENE_2MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_COVERSTITCH_3NEEDLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_BELLY",
+      "local_params": {
+        "length_cm": 82.48937254754108
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.37114757265240794,
+    "saturation": 0.29546478390620307,
+    "lightness": 0.37806846132842453,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.290673406925395,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_b0",
+  "variant_index": 0,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

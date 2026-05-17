@@ -1,0 +1,69 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_ASYM_NECK_S",
+      "local_params": {
+        "half_u": 0.204,
+        "half_v": 0.0978,
+        "inner_u": 0.02,
+        "apex_lift": 0.41210626005451173,
+        "underband_dip": 0.025872239823303313,
+        "center_v": 0.6865344458048138
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.49299999999999994,
+        "front_leg_curve": 0.3631246783641673,
+        "back_top_v": 0.55,
+        "back_half_u": 0.391
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 29.48376738632663
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEERSUCKER_STRIPE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_COMPRESSION_SPORT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.49056974741507353,
+    "saturation": 0.7750559821902516,
+    "lightness": 0.8885572681268809,
+    "pattern_overlay": "checker",
+    "pattern_scale": 0.5454486566403589,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_04_bralette_shoulder_strap_b0",
+  "variant_index": 2,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_DEEP_V_L",
+      "local_params": {
+        "half_u": 0.2655,
+        "half_v": 0.1475,
+        "inner_u": 0.06,
+        "apex_lift": 0.553460552440101,
+        "underband_dip": 0.023041889037454667,
+        "center_v": 0.6942708303301255
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.58,
+        "front_leg_curve": 0.32944998464233194,
+        "back_top_v": 0.55,
+        "back_half_u": 0.46
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 16.035969971188326
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_LACE_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_HUNZA_CRINKLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_OVAL_8MM",
+      "local_params": {
+        "count": 6.515938067982484
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.5811342470896691,
+    "saturation": 0.5236002437546483,
+    "lightness": 0.3494669422604263,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.6332402374680333,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.9134374019952032,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_07_one_piece_maillot_b1",
+  "variant_index": 11,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

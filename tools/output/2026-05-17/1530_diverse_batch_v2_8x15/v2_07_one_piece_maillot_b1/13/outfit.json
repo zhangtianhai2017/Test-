@@ -1,0 +1,87 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_HIGH_NECK_S",
+      "local_params": {
+        "half_u": 0.1955,
+        "half_v": 0.1105,
+        "inner_u": 0.04,
+        "apex_lift": -0.05527975140898993,
+        "underband_dip": 0.031570058339603434,
+        "center_v": 0.8196449759968557
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.442,
+        "front_leg_curve": 0.47222533955334334,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.49299999999999994,
+        "front_leg_curve": 0.4805815691510407,
+        "back_top_v": 0.55,
+        "back_half_u": 0.391
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 44.127572884069316
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_10MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_8MM",
+      "local_params": {
+        "length_cm": 13.486850661075412
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MISSONI_SHINY_KNIT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.6051342470896691,
+    "saturation": 0.25141549347820635,
+    "lightness": 0.15,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.5495795141407742,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.7772967168827867,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_07_one_piece_maillot_b1",
+  "variant_index": 13,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

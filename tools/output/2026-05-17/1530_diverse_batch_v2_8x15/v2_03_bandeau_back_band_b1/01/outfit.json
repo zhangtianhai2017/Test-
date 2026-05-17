@@ -1,0 +1,83 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_ASYM_NECK_S",
+      "local_params": {
+        "half_u": 0.19938874164765563,
+        "half_v": 0.09601825690376259,
+        "inner_u": 0.024881309926134694,
+        "apex_lift": 0.4347509955775111,
+        "underband_dip": 0.03680084811294601,
+        "center_v": 0.8061406008538108
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.41061375173745024,
+        "front_half_u": 0.4027122909144089,
+        "front_leg_curve": 0.486365178800758,
+        "back_top_v": 0.42227887241512774,
+        "back_half_u": 0.2977118747911951
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 4.711185881566586
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_NEOPRENE_1MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_ECONYL_PLAIN_LIGHT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 5.971769349485705
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_SMALL_4MM",
+      "local_params": {
+        "count": 28.688694626654605
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.17741610609046132,
+    "saturation": 0.855762970419223,
+    "lightness": 0.6249563843578865,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.5173720691208364,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_03_bandeau_back_band_b1",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

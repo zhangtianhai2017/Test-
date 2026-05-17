@@ -1,0 +1,76 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_DEEP_V_S",
+      "local_params": {
+        "half_u": 0.1913,
+        "half_v": 0.1062,
+        "inner_u": 0.06,
+        "apex_lift": 0.4926542270775488,
+        "underband_dip": 0.035646821515473284,
+        "center_v": 0.6620840186518282
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.58,
+        "front_leg_curve": 0.4470795905021231,
+        "back_top_v": 0.55,
+        "back_half_u": 0.46
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 2.976681541282272
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ECONYL_PLAIN_LIGHT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_POWERMESH_LINING",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_OVAL_8MM",
+      "local_params": {
+        "count": 6.255632869988071
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.1894161060904613,
+    "saturation": 0.756609542401073,
+    "lightness": 0.524107040782621,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.7575923037922556,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_03_bandeau_back_band_b1",
+  "variant_index": 2,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

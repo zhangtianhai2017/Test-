@@ -1,0 +1,85 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_DEEP_V_M",
+      "local_params": {
+        "half_u": 0.225,
+        "half_v": 0.125,
+        "inner_u": 0.06,
+        "apex_lift": 0.570451300522212,
+        "underband_dip": 0.02902953613606528,
+        "center_v": 0.7876236540066395
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.58,
+        "front_leg_curve": 0.473122088586618,
+        "back_top_v": 0.55,
+        "back_half_u": 0.46
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_10MM",
+      "local_params": {
+        "length_cm": 26.062610710444172
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_10MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MESH_OUTER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHAIN",
+      "local_params": {
+        "diameter_cm": 8.041926443475559
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_CHOKER_GOLD",
+      "local_params": {
+        "width_cm": 0.8237535995643854
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_BEADED",
+      "local_params": {
+        "diameter_cm": 5.684491233382821
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.1764753694498432,
+    "saturation": 0.5848790722939287,
+    "lightness": 0.3409465723758594,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.5787016876421249,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_06_one_piece_maillot_b0",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

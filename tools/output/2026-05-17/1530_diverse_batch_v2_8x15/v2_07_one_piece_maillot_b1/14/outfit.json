@@ -1,0 +1,75 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_HIGH_NECK_L",
+      "local_params": {
+        "half_u": 0.2714,
+        "half_v": 0.1534,
+        "inner_u": 0.04,
+        "apex_lift": -0.06402914978187652,
+        "underband_dip": 0.03330861213087512,
+        "center_v": 0.6742841912547948
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.55,
+        "front_half_u": 0.49299999999999994,
+        "front_leg_curve": 0.40075420585255805,
+        "back_top_v": 0.55,
+        "back_half_u": 0.391
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.52,
+        "front_leg_curve": 0.31828006422438815,
+        "back_top_v": 0.38,
+        "back_half_u": 0.42
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_BAND_SPORT_25MM",
+      "local_params": {
+        "length_cm": 12.132721582884706
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MUSHROOM_LEATHER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.617134247089669,
+    "saturation": 0.4387016200477074,
+    "lightness": 0.15,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.3383469506340091,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.9744209370154331,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_07_one_piece_maillot_b1",
+  "variant_index": 14,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}
