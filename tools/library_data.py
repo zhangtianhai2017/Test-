@@ -126,6 +126,80 @@ for size_class, scale in (("S", 0.85), ("M", 1.00), ("L", 1.18)):
 
 # 15 cups total across 5 geometries × 3 size classes
 
+# ---------------------------------------------------------------------------
+# Extra cups under geometry_kind="softcup_squareneck" — high-coverage but
+# soft (no foam dome) so they qualify as full-coverage for the modesty
+# filter without collapsing the look to molded_foam.  Tagged 'softcup'
+# + 'balconette' so they match the bralette / one_piece / bandeau slots
+# at strict>=0.66.
+# ---------------------------------------------------------------------------
+
+_SOFTCUP_STYLES = {
+    "HIGH_NECK": {
+        "name_suffix": "high-neck",
+        "tags": ("softcup", "balconette", "high_neckline", "structured"),
+        "apex_lift": (-0.15, -0.05, -0.10),    # flat top, no V
+        "half_v":    (0.090, 0.130, 0.110),    # tall cup -> reaches collarbone
+        "half_u":    (0.170, 0.230, 0.200),
+        "inner_u":   (0.040, 0.090, 0.065),
+        "underband_dip": (0.000, 0.060, 0.020),
+        "notes": "Square / high neckline soft cup, reaches collarbone.",
+    },
+    "ASYM_NECK": {
+        "name_suffix": "asymmetric-neck",
+        "tags": ("softcup", "balconette", "asymmetric"),
+        "apex_lift": (0.20, 0.45, 0.30),       # one shoulder pulls higher
+        "half_v":    (0.080, 0.115, 0.095),
+        "half_u":    (0.180, 0.240, 0.210),
+        "inner_u":   (0.020, 0.070, 0.045),
+        "underband_dip": (0.000, 0.040, 0.015),
+        "notes": "One-shoulder asymmetric neckline soft cup.",
+    },
+    "COWL": {
+        "name_suffix": "cowl",
+        "tags": ("softcup", "balconette", "draped"),
+        "apex_lift": (0.05, 0.20, 0.10),       # gentle scoop
+        "half_v":    (0.075, 0.110, 0.090),
+        "half_u":    (0.190, 0.245, 0.215),
+        "inner_u":   (0.010, 0.050, 0.030),    # cups close together (cowl join)
+        "underband_dip": (-0.060, 0.020, -0.020),
+        "notes": "Draped cowl front, cups join low between with a scoop.",
+    },
+    "DEEP_V": {
+        "name_suffix": "deep-V",
+        "tags": ("softcup", "balconette", "deep_v"),
+        "apex_lift": (0.40, 0.60, 0.50),       # strong V down between cups
+        "half_v":    (0.085, 0.125, 0.105),
+        "half_u":    (0.165, 0.225, 0.190),
+        "inner_u":   (0.060, 0.140, 0.100),
+        "underband_dip": (0.000, 0.050, 0.020),
+        "notes": "Plunging V neckline, structured soft cup.",
+    },
+}
+
+for _size_class, _scale in _SIZE_SCALES.items() if False else (("S", 0.85), ("M", 1.0), ("L", 1.18)):
+    for _style_key, _style in _SOFTCUP_STYLES.items():
+        _id = f"CUP_SOFTCUP_{_style_key}_{_size_class}"
+        CUP_PIECES[_id] = LibraryEntry(
+            id=_id, kind="cup_piece",
+            name=f"Soft cup {_style['name_suffix']} {_size_class}",
+            tags=_style["tags"],
+            anatomy_hints=("front_chest",),
+            geometry_kind="softcup_squareneck",
+            base_polygon_recipe="cup_softcup",
+            cup_size_class=_size_class,
+            local_params_schema={
+                "half_u":      tuple(round(v * _scale, 4) for v in _style["half_u"]),
+                "half_v":      tuple(round(v * _scale, 4) for v in _style["half_v"]),
+                "inner_u":     _style["inner_u"],
+                "apex_lift":   _style["apex_lift"],
+                "underband_dip": _style["underband_dip"],
+            },
+            notes=_style["notes"],
+        )
+
+# 12 new softcup_squareneck cups (4 styles x 3 sizes) -> 27 cups total.
+
 
 # ---------------------------------------------------------------------------
 # BOTTOM_PIECES — 10 entries (5 geometry × 2 size class)

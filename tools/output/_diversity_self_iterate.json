@@ -1,0 +1,1326 @@
+{
+  "history": [
+    {
+      "strategy": "01_baseline_M095",
+      "metrics": {
+        "n": 120,
+        "near_dup_pairs": 28,
+        "near_dup_pct": 0.39215686274509803,
+        "clearly_distinct_pairs": 5066,
+        "clearly_distinct_pct": 70.95238095238095,
+        "axis_flatness": [
+          {
+            "axis": "archetype",
+            "seen": 4,
+            "universe": 4,
+            "entropy_norm": 0.9954958554158458,
+            "dist": {
+              "bandeau_back_band": 25,
+              "one_piece_maillot": 33,
+              "triangle_string_halter": 29,
+              "bralette_shoulder_strap": 33
+            }
+          },
+          {
+            "axis": "cup_family",
+            "seen": 3,
+            "universe": 5,
+            "entropy_norm": 0.5704993086247485,
+            "dist": {
+              "softcup": 74,
+              "foam": 17,
+              "triangle": 29
+            }
+          },
+          {
+            "axis": "hue",
+            "seen": 8,
+            "universe": 8,
+            "entropy_norm": 0.9812362563316013,
+            "dist": {
+              "orange": 22,
+              "blue": 12,
+              "purple": 14,
+              "green": 20,
+              "red": 18,
+              "cyan": 12,
+              "yellow": 9,
+              "pink": 13
+            }
+          },
+          {
+            "axis": "lightness",
+            "seen": 3,
+            "universe": 3,
+            "entropy_norm": 0.8915309993832705,
+            "dist": {
+              "mid": 68,
+              "dark": 22,
+              "light": 30
+            }
+          },
+          {
+            "axis": "saturation",
+            "seen": 2,
+            "universe": 2,
+            "entropy_norm": 0.9264046652620238,
+            "dist": {
+              "vivid": 79,
+              "muted": 41
+            }
+          },
+          {
+            "axis": "pattern_family",
+            "seen": 4,
+            "universe": 4,
+            "entropy_norm": 0.8623186560546202,
+            "dist": {
+              "gradient": 22,
+              "geometric": 58,
+              "organic": 32,
+              "solid": 8
+            }
+          },
+          {
+            "axis": "weave_family",
+            "seen": 6,
+            "universe": 6,
+            "entropy_norm": 0.9013785401229177,
+            "dist": {
+              "lustrous": 13,
+              "textured": 42,
+              "lace_open": 14,
+              "structured": 13,
+              "plain": 31,
+              "mesh_open": 7
+            }
+          },
+          {
+            "axis": "bottom_coverage",
+            "seen": 2,
+            "universe": 3,
+            "entropy_norm": 0.5033563358041313,
+            "dist": {
+              "full": 91,
+              "medium": 29
+            }
+          },
+          {
+            "axis": "symmetry",
+            "seen": 2,
+            "universe": 2,
+            "entropy_norm": 0.8812908963453026,
+            "dist": {
+              "mirror": 84,
+              "dramatic_asym": 36
+            }
+          }
+        ],
+        "score": 70.56022408963585
+      },
+      "pair_hist": {
+        "5": 1533,
+        "4": 1195,
+        "6": 1568,
+        "3": 639,
+        "7": 1193,
+        "8": 640,
+        "2": 212,
+        "9": 132,
+        "1": 27,
+        "0": 1
+      }
+    },
+    {
+      "strategy": "02_decouple_modesty",
+      "metrics": {
+        "n": 120,
+        "near_dup_pairs": 26,
+        "near_dup_pct": 0.3641456582633053,
+        "clearly_distinct_pairs": 5235,
+        "clearly_distinct_pct": 73.31932773109244,
+        "axis_flatness": [
+          {
+            "axis": "archetype",
+            "seen": 4,
+            "universe": 4,
+            "entropy_norm": 0.9949671862773981,
+            "dist": {
+              "triangle_string_halter": 35,
+              "bandeau_back_band": 25,
+              "bralette_shoulder_strap": 30,
+              "one_piece_maillot": 30
+            }
+          },
+          {
+            "axis": "cup_family",
+            "seen": 5,
+            "universe": 5,
+            "entropy_norm": 0.6526848522856054,
+            "dist": {
+              "triangle": 40,
+              "softcup": 66,
+              "balconette": 6,
+              "foam": 7,
+              "bandeau": 1
+            }
+          },
+          {
+            "axis": "hue",
+            "seen": 8,
+            "universe": 8,
+            "entropy_norm": 0.9817486236935447,
+            "dist": {
+              "cyan": 10,
+              "blue": 17,
+              "orange": 14,
+              "red": 12,
+              "green": 20,
+              "yellow": 22,
+              "purple": 10,
+              "pink": 15
+            }
+          },
+          {
+            "axis": "lightness",
+            "seen": 3,
+            "universe": 3,
+            "entropy_norm": 0.8752868153525799,
+            "dist": {
+              "light": 38,
+              "dark": 16,
+              "mid": 66
+            }
+          },
+          {
+            "axis": "saturation",
+            "seen": 2,
+            "universe": 2,
+            "entropy_norm": 0.9603622674300879,
+            "dist": {
+              "vivid": 74,
+              "muted": 46
+            }
+          },
+          {
+            "axis": "pattern_family",
+            "seen": 4,
+            "universe": 4,
+            "entropy_norm": 0.8356717776906473,
+            "dist": {
+              "organic": 22,
+              "geometric": 67,
+              "gradient": 19,
+              "solid": 12
+            }
+          },
+          {
+            "axis": "weave_family",
+            "seen": 6,
+            "universe": 6,
+            "entropy_norm": 0.9116929649857428,
+            "dist": {
+              "textured": 43,
+              "structured": 13,
+              "mesh_open": 11,
+              "lustrous": 8,
+              "lace_open": 25,
+              "plain": 20
+            }
+          },
+          {
+            "axis": "bottom_coverage",
+            "seen": 2,
+            "universe": 3,
+            "entropy_norm": 0.5494543031483281,
+            "dist": {
+              "medium": 35,
+              "full": 85
+            }
+          },
+          {
+            "axis": "symmetry",
+            "seen": 2,
+            "universe": 2,
+            "entropy_norm": 0.8912401983059127,
+            "dist": {
+              "dramatic_asym": 37,
+              "mirror": 83
+            }
+          }
+        ],
+        "score": 72.95518207282913
+      },
+      "pair_hist": {
+        "8": 649,
+        "7": 1290,
+        "4": 1108,
+        "6": 1618,
+        "3": 590,
+        "5": 1541,
+        "9": 137,
+        "1": 22,
+        "2": 181,
+        "0": 4
+      }
+    },
+    {
+      "strategy": "03_archetype_stratified",
+      "metrics": {
+        "n": 120,
+        "near_dup_pairs": 18,
+        "near_dup_pct": 0.25210084033613445,
+        "clearly_distinct_pairs": 5361,
+        "clearly_distinct_pct": 75.08403361344538,
+        "axis_flatness": [
+          {
+            "axis": "archetype",
+            "seen": 4,
+            "universe": 4,
+            "entropy_norm": 0.9999999971146099,
+            "dist": {
+              "triangle_string_halter": 30,
+              "bandeau_back_band": 30,
+              "one_piece_maillot": 30,
+              "bralette_shoulder_strap": 30
+            }
+          },
+          {
+            "axis": "cup_family",
+            "seen": 5,
+            "universe": 5,
+            "entropy_norm": 0.7268699144690879,
+            "dist": {
+              "triangle": 36,
+              "softcup": 64,
+              "balconette": 9,
+              "foam": 7,
+              "bandeau": 4
+            }
+          },
+          {
+            "axis": "hue",
+            "seen": 8,
+            "universe": 8,
+            "entropy_norm": 0.9908766774740873,
+            "dist": {
+              "red": 21,
+              "green": 11,
+              "blue": 13,
+              "yellow": 15,
+              "pink": 17,
+              "purple": 12,
+              "orange": 16,
+              "cyan": 15
+            }
+          },
+          {
+            "axis": "lightness",
+            "seen": 3,
+            "universe": 3,
+            "entropy_norm": 0.9173857680626072,
+            "dist": {
+              "mid": 61,
+              "light": 39,
+              "dark": 20
+            }
+          },
+          {
+            "axis": "saturation",
+            "seen": 2,
+            "universe": 2,
+            "entropy_norm": 0.9264046652620238,
+            "dist": {
+              "muted": 41,
+              "vivid": 79
+            }
+          },
+          {
+            "axis": "pattern_family",
+            "seen": 4,
+            "universe": 4,
+            "entropy_norm": 0.8876704837650482,
+            "dist": {
+              "organic": 30,
+              "gradient": 19,
+              "geometric": 58,
+              "solid": 13
+            }
+          },
+          {
+            "axis": "weave_family",
+            "seen": 6,
+            "universe": 6,
+            "entropy_norm": 0.9470414134452597,
+            "dist": {
+              "textured": 29,
+              "structured": 17,
+              "plain": 32,
+              "lace_open": 22,
+              "lustrous": 9,
+              "mesh_open": 11
+            }
+          },
+          {
+            "axis": "bottom_coverage",
+            "seen": 2,
+            "universe": 3,
+            "entropy_norm": 0.5118595053224364,
+            "dist": {
+              "medium": 30,
+              "full": 90
+            }
+          },
+          {
+            "axis": "symmetry",
+            "seen": 2,
+            "universe": 2,
+            "entropy_norm": 0.8912401983059127,
+            "dist": {
+              "mirror": 83,
+              "dramatic_asym": 37
+            }
+          }
+        ],
+        "score": 74.83193277310924
+      },
+      "pair_hist": {
+        "6": 1660,
+        "2": 163,
+        "9": 152,
+        "5": 1504,
+        "8": 673,
+        "7": 1372,
+        "4": 1094,
+        "3": 504,
+        "1": 18
+      }
+    },
+    {
+      "strategy": "04_hue_stratified",
+      "metrics": {
+        "n": 120,
+        "near_dup_pairs": 13,
+        "near_dup_pct": 0.18207282913165265,
+        "clearly_distinct_pairs": 5469,
+        "clearly_distinct_pct": 76.59663865546219,
+        "axis_flatness": [
+          {
+            "axis": "archetype",
+            "seen": 4,
+            "universe": 4,
+            "entropy_norm": 0.9999999971146099,
+            "dist": {
+              "bralette_shoulder_strap": 30,
+              "one_piece_maillot": 30,
+              "triangle_string_halter": 30,
+              "bandeau_back_band": 30
+            }
+          },
+          {
+            "axis": "cup_family",
+            "seen": 5,
+            "universe": 5,
+            "entropy_norm": 0.7117944230591438,
+            "dist": {
+              "balconette": 18,
+              "softcup": 62,
+              "foam": 3,
+              "triangle": 35,
+              "bandeau": 2
+            }
+          },
+          {
+            "axis": "hue",
+            "seen": 8,
+            "universe": 8,
+            "entropy_norm": 0.9999999961528133,
+            "dist": {
+              "cyan": 15,
+              "pink": 15,
+              "blue": 15,
+              "yellow": 15,
+              "green": 15,
+              "red": 15,
+              "orange": 15,
+              "purple": 15
+            }
+          },
+          {
+            "axis": "lightness",
+            "seen": 3,
+            "universe": 3,
+            "entropy_norm": 0.9255954148392541,
+            "dist": {
+              "mid": 60,
+              "light": 39,
+              "dark": 21
+            }
+          },
+          {
+            "axis": "saturation",
+            "seen": 2,
+            "universe": 2,
+            "entropy_norm": 0.9603622674300879,
+            "dist": {
+              "muted": 46,
+              "vivid": 74
+            }
+          },
+          {
+            "axis": "pattern_family",
+            "seen": 4,
+            "universe": 4,
+            "entropy_norm": 0.8659209465161593,
+            "dist": {
+              "gradient": 19,
+              "geometric": 59,
+              "organic": 32,
+              "solid": 10
+            }
+          },
+          {
+            "axis": "weave_family",
+            "seen": 6,
+            "universe": 6,
+            "entropy_norm": 0.9445994097596312,
+            "dist": {
+              "plain": 25,
+              "lustrous": 17,
+              "mesh_open": 13,
+              "textured": 38,
+              "structured": 10,
+              "lace_open": 17
+            }
+          },
+          {
+            "axis": "bottom_coverage",
+            "seen": 2,
+            "universe": 3,
+            "entropy_norm": 0.5118595053224364,
+            "dist": {
+              "full": 90,
+              "medium": 30
+            }
+          },
+          {
+            "axis": "symmetry",
+            "seen": 2,
+            "universe": 2,
+            "entropy_norm": 0.8812908963453026,
+            "dist": {
+              "dramatic_asym": 36,
+              "mirror": 84
+            }
+          }
+        ],
+        "score": 76.41456582633053
+      },
+      "pair_hist": {
+        "7": 1404,
+        "6": 1791,
+        "8": 606,
+        "9": 139,
+        "5": 1529,
+        "3": 468,
+        "4": 1045,
+        "2": 145,
+        "1": 11,
+        "0": 2
+      }
+    },
+    {
+      "strategy": "05_sat_light_stratified",
+      "metrics": {
+        "n": 120,
+        "near_dup_pairs": 13,
+        "near_dup_pct": 0.18207282913165265,
+        "clearly_distinct_pairs": 5586,
+        "clearly_distinct_pct": 78.23529411764706,
+        "axis_flatness": [
+          {
+            "axis": "archetype",
+            "seen": 4,
+            "universe": 4,
+            "entropy_norm": 0.9999999971146099,
+            "dist": {
+              "bandeau_back_band": 30,
+              "bralette_shoulder_strap": 30,
+              "triangle_string_halter": 30,
+              "one_piece_maillot": 30
+            }
+          },
+          {
+            "axis": "cup_family",
+            "seen": 5,
+            "universe": 5,
+            "entropy_norm": 0.7224650709405075,
+            "dist": {
+              "balconette": 13,
+              "softcup": 62,
+              "triangle": 37,
+              "foam": 6,
+              "bandeau": 2
+            }
+          },
+          {
+            "axis": "hue",
+            "seen": 8,
+            "universe": 8,
+            "entropy_norm": 0.9999999961528133,
+            "dist": {
+              "green": 15,
+              "red": 15,
+              "purple": 15,
+              "yellow": 15,
+              "orange": 15,
+              "pink": 15,
+              "blue": 15,
+              "cyan": 15
+            }
+          },
+          {
+            "axis": "lightness",
+            "seen": 3,
+            "universe": 3,
+            "entropy_norm": 0.9999999972692823,
+            "dist": {
+              "mid": 40,
+              "light": 40,
+              "dark": 40
+            }
+          },
+          {
+            "axis": "saturation",
+            "seen": 2,
+            "universe": 2,
+            "entropy_norm": 0.99999999711461,
+            "dist": {
+              "muted": 60,
+              "vivid": 60
+            }
+          },
+          {
+            "axis": "pattern_family",
+            "seen": 4,
+            "universe": 4,
+            "entropy_norm": 0.906822744919214,
+            "dist": {
+              "solid": 10,
+              "gradient": 26,
+              "geometric": 51,
+              "organic": 33
+            }
+          },
+          {
+            "axis": "weave_family",
+            "seen": 6,
+            "universe": 6,
+            "entropy_norm": 0.9153966228766616,
+            "dist": {
+              "mesh_open": 8,
+              "lace_open": 19,
+              "lustrous": 11,
+              "structured": 12,
+              "plain": 34,
+              "textured": 36
+            }
+          },
+          {
+            "axis": "bottom_coverage",
+            "seen": 2,
+            "universe": 3,
+            "entropy_norm": 0.5118595053224364,
+            "dist": {
+              "full": 90,
+              "medium": 30
+            }
+          },
+          {
+            "axis": "symmetry",
+            "seen": 2,
+            "universe": 2,
+            "entropy_norm": 0.8812908963453026,
+            "dist": {
+              "dramatic_asym": 36,
+              "mirror": 84
+            }
+          }
+        ],
+        "score": 78.0532212885154
+      },
+      "pair_hist": {
+        "4": 1010,
+        "6": 1733,
+        "8": 719,
+        "7": 1427,
+        "5": 1536,
+        "3": 437,
+        "9": 171,
+        "2": 94,
+        "1": 12,
+        "0": 1
+      }
+    },
+    {
+      "strategy": "06_pattern_stratified",
+      "metrics": {
+        "n": 120,
+        "near_dup_pairs": 12,
+        "near_dup_pct": 0.16806722689075632,
+        "clearly_distinct_pairs": 5642,
+        "clearly_distinct_pct": 79.01960784313725,
+        "axis_flatness": [
+          {
+            "axis": "archetype",
+            "seen": 4,
+            "universe": 4,
+            "entropy_norm": 0.9999999971146099,
+            "dist": {
+              "triangle_string_halter": 30,
+              "bandeau_back_band": 30,
+              "one_piece_maillot": 30,
+              "bralette_shoulder_strap": 30
+            }
+          },
+          {
+            "axis": "cup_family",
+            "seen": 5,
+            "universe": 5,
+            "entropy_norm": 0.6887439122340694,
+            "dist": {
+              "triangle": 34,
+              "balconette": 8,
+              "softcup": 68,
+              "foam": 8,
+              "bandeau": 2
+            }
+          },
+          {
+            "axis": "hue",
+            "seen": 8,
+            "universe": 8,
+            "entropy_norm": 0.9999999961528133,
+            "dist": {
+              "cyan": 15,
+              "red": 15,
+              "orange": 15,
+              "purple": 15,
+              "green": 15,
+              "yellow": 15,
+              "blue": 15,
+              "pink": 15
+            }
+          },
+          {
+            "axis": "lightness",
+            "seen": 3,
+            "universe": 3,
+            "entropy_norm": 0.9999999972692823,
+            "dist": {
+              "dark": 40,
+              "mid": 40,
+              "light": 40
+            }
+          },
+          {
+            "axis": "saturation",
+            "seen": 2,
+            "universe": 2,
+            "entropy_norm": 0.99999999711461,
+            "dist": {
+              "muted": 60,
+              "vivid": 60
+            }
+          },
+          {
+            "axis": "pattern_family",
+            "seen": 4,
+            "universe": 4,
+            "entropy_norm": 0.9999999971146099,
+            "dist": {
+              "organic": 30,
+              "gradient": 30,
+              "solid": 30,
+              "geometric": 30
+            }
+          },
+          {
+            "axis": "weave_family",
+            "seen": 6,
+            "universe": 6,
+            "entropy_norm": 0.9378336552733298,
+            "dist": {
+              "lace_open": 26,
+              "mesh_open": 13,
+              "lustrous": 16,
+              "plain": 30,
+              "textured": 29,
+              "structured": 6
+            }
+          },
+          {
+            "axis": "bottom_coverage",
+            "seen": 2,
+            "universe": 3,
+            "entropy_norm": 0.5118595053224364,
+            "dist": {
+              "medium": 30,
+              "full": 90
+            }
+          },
+          {
+            "axis": "symmetry",
+            "seen": 2,
+            "universe": 2,
+            "entropy_norm": 0.9007196769769693,
+            "dist": {
+              "mirror": 82,
+              "dramatic_asym": 38
+            }
+          }
+        ],
+        "score": 78.8515406162465
+      },
+      "pair_hist": {
+        "6": 1639,
+        "5": 1566,
+        "3": 394,
+        "8": 822,
+        "7": 1423,
+        "4": 1007,
+        "9": 192,
+        "1": 12,
+        "2": 85
+      }
+    },
+    {
+      "strategy": "07_weave_stratified",
+      "metrics": {
+        "n": 120,
+        "near_dup_pairs": 16,
+        "near_dup_pct": 0.22408963585434175,
+        "clearly_distinct_pairs": 5789,
+        "clearly_distinct_pct": 81.07843137254902,
+        "axis_flatness": [
+          {
+            "axis": "archetype",
+            "seen": 4,
+            "universe": 4,
+            "entropy_norm": 0.9999999971146099,
+            "dist": {
+              "one_piece_maillot": 30,
+              "triangle_string_halter": 30,
+              "bralette_shoulder_strap": 30,
+              "bandeau_back_band": 30
+            }
+          },
+          {
+            "axis": "cup_family",
+            "seen": 5,
+            "universe": 5,
+            "entropy_norm": 0.7419866721237083,
+            "dist": {
+              "softcup": 62,
+              "triangle": 36,
+              "balconette": 11,
+              "foam": 8,
+              "bandeau": 3
+            }
+          },
+          {
+            "axis": "hue",
+            "seen": 8,
+            "universe": 8,
+            "entropy_norm": 0.9999999961528133,
+            "dist": {
+              "cyan": 15,
+              "blue": 15,
+              "green": 15,
+              "purple": 15,
+              "orange": 15,
+              "red": 15,
+              "yellow": 15,
+              "pink": 15
+            }
+          },
+          {
+            "axis": "lightness",
+            "seen": 3,
+            "universe": 3,
+            "entropy_norm": 0.9999999972692823,
+            "dist": {
+              "light": 40,
+              "dark": 40,
+              "mid": 40
+            }
+          },
+          {
+            "axis": "saturation",
+            "seen": 2,
+            "universe": 2,
+            "entropy_norm": 0.99999999711461,
+            "dist": {
+              "muted": 60,
+              "vivid": 60
+            }
+          },
+          {
+            "axis": "pattern_family",
+            "seen": 4,
+            "universe": 4,
+            "entropy_norm": 0.9999999971146099,
+            "dist": {
+              "gradient": 30,
+              "geometric": 30,
+              "solid": 30,
+              "organic": 30
+            }
+          },
+          {
+            "axis": "weave_family",
+            "seen": 6,
+            "universe": 6,
+            "entropy_norm": 0.9999999966513363,
+            "dist": {
+              "mesh_open": 20,
+              "lustrous": 20,
+              "structured": 20,
+              "lace_open": 20,
+              "plain": 20,
+              "textured": 20
+            }
+          },
+          {
+            "axis": "bottom_coverage",
+            "seen": 2,
+            "universe": 3,
+            "entropy_norm": 0.5118595053224364,
+            "dist": {
+              "full": 90,
+              "medium": 30
+            }
+          },
+          {
+            "axis": "symmetry",
+            "seen": 2,
+            "universe": 2,
+            "entropy_norm": 0.9340680524901009,
+            "dist": {
+              "dramatic_asym": 42,
+              "mirror": 78
+            }
+          }
+        ],
+        "score": 80.85434173669468
+      },
+      "pair_hist": {
+        "4": 914,
+        "9": 241,
+        "7": 1485,
+        "5": 1487,
+        "6": 1729,
+        "2": 75,
+        "8": 847,
+        "3": 346,
+        "1": 16
+      }
+    },
+    {
+      "strategy": "08_wide_form_only",
+      "metrics": {
+        "n": 120,
+        "near_dup_pairs": 21,
+        "near_dup_pct": 0.29411764705882354,
+        "clearly_distinct_pairs": 5313,
+        "clearly_distinct_pct": 74.41176470588235,
+        "axis_flatness": [
+          {
+            "axis": "archetype",
+            "seen": 4,
+            "universe": 4,
+            "entropy_norm": 0.9999999971146099,
+            "dist": {
+              "bandeau_back_band": 30,
+              "one_piece_maillot": 30,
+              "triangle_string_halter": 30,
+              "bralette_shoulder_strap": 30
+            }
+          },
+          {
+            "axis": "cup_family",
+            "seen": 5,
+            "universe": 5,
+            "entropy_norm": 0.7354650248791349,
+            "dist": {
+              "balconette": 15,
+              "softcup": 61,
+              "triangle": 35,
+              "foam": 8,
+              "bandeau": 1
+            }
+          },
+          {
+            "axis": "hue",
+            "seen": 8,
+            "universe": 8,
+            "entropy_norm": 0.9870052467906438,
+            "dist": {
+              "pink": 21,
+              "purple": 17,
+              "green": 10,
+              "blue": 12,
+              "orange": 16,
+              "red": 11,
+              "yellow": 17,
+              "cyan": 16
+            }
+          },
+          {
+            "axis": "lightness",
+            "seen": 3,
+            "universe": 3,
+            "entropy_norm": 0.9441152216440227,
+            "dist": {
+              "dark": 27,
+              "mid": 60,
+              "light": 33
+            }
+          },
+          {
+            "axis": "saturation",
+            "seen": 2,
+            "universe": 2,
+            "entropy_norm": 0.9480782407085153,
+            "dist": {
+              "muted": 44,
+              "vivid": 76
+            }
+          },
+          {
+            "axis": "pattern_family",
+            "seen": 4,
+            "universe": 4,
+            "entropy_norm": 0.7883067873898087,
+            "dist": {
+              "solid": 11,
+              "geometric": 72,
+              "gradient": 14,
+              "organic": 23
+            }
+          },
+          {
+            "axis": "weave_family",
+            "seen": 6,
+            "universe": 6,
+            "entropy_norm": 0.9533091377165385,
+            "dist": {
+              "lustrous": 14,
+              "textured": 36,
+              "structured": 15,
+              "mesh_open": 15,
+              "lace_open": 13,
+              "plain": 27
+            }
+          },
+          {
+            "axis": "bottom_coverage",
+            "seen": 2,
+            "universe": 3,
+            "entropy_norm": 0.5118595053224364,
+            "dist": {
+              "full": 90,
+              "medium": 30
+            }
+          },
+          {
+            "axis": "symmetry",
+            "seen": 2,
+            "universe": 2,
+            "entropy_norm": 0.8812908963453026,
+            "dist": {
+              "mirror": 84,
+              "dramatic_asym": 36
+            }
+          }
+        ],
+        "score": 74.11764705882352
+      },
+      "pair_hist": {
+        "6": 1684,
+        "4": 1151,
+        "8": 641,
+        "3": 515,
+        "5": 1564,
+        "7": 1279,
+        "9": 145,
+        "1": 19,
+        "2": 140,
+        "0": 2
+      }
+    },
+    {
+      "strategy": "09_farthest_point",
+      "metrics": {
+        "n": 120,
+        "near_dup_pairs": 0,
+        "near_dup_pct": 0.0,
+        "clearly_distinct_pairs": 5700,
+        "clearly_distinct_pct": 79.83193277310924,
+        "axis_flatness": [
+          {
+            "axis": "archetype",
+            "seen": 4,
+            "universe": 4,
+            "entropy_norm": 0.9945241069883628,
+            "dist": {
+              "bandeau_back_band": 28,
+              "triangle_string_halter": 25,
+              "one_piece_maillot": 33,
+              "bralette_shoulder_strap": 34
+            }
+          },
+          {
+            "axis": "cup_family",
+            "seen": 5,
+            "universe": 5,
+            "entropy_norm": 0.8301239511516109,
+            "dist": {
+              "softcup": 54,
+              "triangle": 32,
+              "foam": 11,
+              "balconette": 19,
+              "bandeau": 4
+            }
+          },
+          {
+            "axis": "hue",
+            "seen": 8,
+            "universe": 8,
+            "entropy_norm": 0.994684026395411,
+            "dist": {
+              "blue": 17,
+              "yellow": 17,
+              "pink": 15,
+              "red": 16,
+              "cyan": 11,
+              "orange": 15,
+              "purple": 17,
+              "green": 12
+            }
+          },
+          {
+            "axis": "lightness",
+            "seen": 3,
+            "universe": 3,
+            "entropy_norm": 0.9696955099670482,
+            "dist": {
+              "dark": 29,
+              "mid": 54,
+              "light": 37
+            }
+          },
+          {
+            "axis": "saturation",
+            "seen": 2,
+            "universe": 2,
+            "entropy_norm": 0.9837082597377956,
+            "dist": {
+              "muted": 51,
+              "vivid": 69
+            }
+          },
+          {
+            "axis": "pattern_family",
+            "seen": 4,
+            "universe": 4,
+            "entropy_norm": 0.9155241148021173,
+            "dist": {
+              "geometric": 52,
+              "organic": 33,
+              "solid": 13,
+              "gradient": 22
+            }
+          },
+          {
+            "axis": "weave_family",
+            "seen": 6,
+            "universe": 6,
+            "entropy_norm": 0.970888070714034,
+            "dist": {
+              "structured": 12,
+              "lace_open": 21,
+              "mesh_open": 14,
+              "textured": 32,
+              "lustrous": 18,
+              "plain": 23
+            }
+          },
+          {
+            "axis": "bottom_coverage",
+            "seen": 2,
+            "universe": 3,
+            "entropy_norm": 0.4658058868409452,
+            "dist": {
+              "full": 95,
+              "medium": 25
+            }
+          },
+          {
+            "axis": "symmetry",
+            "seen": 2,
+            "universe": 2,
+            "entropy_norm": 0.9480782407085153,
+            "dist": {
+              "mirror": 76,
+              "dramatic_asym": 44
+            }
+          }
+        ],
+        "score": 79.83193277310924
+      },
+      "pair_hist": {
+        "9": 176,
+        "7": 1434,
+        "6": 1734,
+        "5": 1605,
+        "4": 1006,
+        "8": 751,
+        "3": 407,
+        "2": 27
+      }
+    },
+    {
+      "strategy": "10_full_stack",
+      "metrics": {
+        "n": 120,
+        "near_dup_pairs": 0,
+        "near_dup_pct": 0.0,
+        "clearly_distinct_pairs": 5882,
+        "clearly_distinct_pct": 82.38095238095238,
+        "axis_flatness": [
+          {
+            "axis": "archetype",
+            "seen": 4,
+            "universe": 4,
+            "entropy_norm": 0.998997493675929,
+            "dist": {
+              "one_piece_maillot": 31,
+              "triangle_string_halter": 29,
+              "bandeau_back_band": 32,
+              "bralette_shoulder_strap": 28
+            }
+          },
+          {
+            "axis": "cup_family",
+            "seen": 5,
+            "universe": 5,
+            "entropy_norm": 0.8153346031946895,
+            "dist": {
+              "foam": 11,
+              "triangle": 37,
+              "softcup": 55,
+              "balconette": 10,
+              "bandeau": 7
+            }
+          },
+          {
+            "axis": "hue",
+            "seen": 8,
+            "universe": 8,
+            "entropy_norm": 0.9989472729388237,
+            "dist": {
+              "pink": 14,
+              "cyan": 14,
+              "blue": 15,
+              "purple": 14,
+              "red": 15,
+              "orange": 17,
+              "yellow": 16,
+              "green": 15
+            }
+          },
+          {
+            "axis": "lightness",
+            "seen": 3,
+            "universe": 3,
+            "entropy_norm": 0.9998103443386728,
+            "dist": {
+              "light": 41,
+              "dark": 39,
+              "mid": 40
+            }
+          },
+          {
+            "axis": "saturation",
+            "seen": 2,
+            "universe": 2,
+            "entropy_norm": 0.99999999711461,
+            "dist": {
+              "vivid": 60,
+              "muted": 60
+            }
+          },
+          {
+            "axis": "pattern_family",
+            "seen": 4,
+            "universe": 4,
+            "entropy_norm": 0.999197905110019,
+            "dist": {
+              "solid": 30,
+              "geometric": 32,
+              "organic": 30,
+              "gradient": 28
+            }
+          },
+          {
+            "axis": "weave_family",
+            "seen": 6,
+            "universe": 6,
+            "entropy_norm": 0.9992898119795202,
+            "dist": {
+              "structured": 20,
+              "lace_open": 21,
+              "textured": 21,
+              "lustrous": 20,
+              "mesh_open": 20,
+              "plain": 18
+            }
+          },
+          {
+            "axis": "bottom_coverage",
+            "seen": 2,
+            "universe": 3,
+            "entropy_norm": 0.5033563358041313,
+            "dist": {
+              "full": 91,
+              "medium": 29
+            }
+          },
+          {
+            "axis": "symmetry",
+            "seen": 2,
+            "universe": 2,
+            "entropy_norm": 0.96586668583071,
+            "dist": {
+              "mirror": 73,
+              "dramatic_asym": 47
+            }
+          }
+        ],
+        "score": 82.38095238095238
+      },
+      "pair_hist": {
+        "9": 227,
+        "7": 1532,
+        "6": 1761,
+        "5": 1460,
+        "4": 854,
+        "8": 902,
+        "3": 348,
+        "2": 56
+      }
+    }
+  ],
+  "winner": "10_full_stack"
+}
