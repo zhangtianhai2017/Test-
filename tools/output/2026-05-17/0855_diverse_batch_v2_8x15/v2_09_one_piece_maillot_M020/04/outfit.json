@@ -1,0 +1,63 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.10427581159984106,
+        "half_v": 0.08835204845994751,
+        "inner_u": 0.11591670253815525,
+        "apex_lift": 0.2854718055193338,
+        "underband_dip": 0.004983512801086736
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.327125780786302,
+        "front_half_u": 0.34714902987481555,
+        "front_leg_curve": 0.7373853242333057,
+        "back_top_v": 0.24946261486879442,
+        "back_half_u": 0.24830799108471308
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_15MM",
+      "local_params": {
+        "length_cm": 13.768052527730255
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SLUB_LINEN_BLEND",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.3249122165701515,
+    "saturation": 0.46883684033398954,
+    "lightness": 0.48101303239758675,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.3060086867020144,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.8550233201475269,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_09_one_piece_maillot_M020",
+  "variant_index": 4,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

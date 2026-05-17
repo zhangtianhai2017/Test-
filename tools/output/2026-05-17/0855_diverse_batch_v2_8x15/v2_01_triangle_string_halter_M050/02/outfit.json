@@ -1,0 +1,77 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.09267484930065255,
+        "half_v": 0.057749243128401025,
+        "inner_u": 0.09926904614775794,
+        "apex_lift": 0.19094969221841923,
+        "underband_dip": 0.0725911401672633
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.28678795898849213,
+        "front_half_u": 0.3403466014718619,
+        "front_leg_curve": 0.528041711659089,
+        "back_top_v": 0.31754004533487507,
+        "back_half_u": 0.1816229903675843
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 49.38318932391867
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 26.634663844360798
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_BEADED_80MM",
+      "local_params": {
+        "length_cm": 6.80158140877492
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.613873265228057,
+    "saturation": 0.71398602370266,
+    "lightness": 0.6804224365837439,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.29821826939177487,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.8424641515266916,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_01_triangle_string_halter_M050",
+  "variant_index": 2,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}

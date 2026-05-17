@@ -1,0 +1,105 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_M",
+      "local_params": {
+        "half_u": 0.22253018028908172,
+        "half_v": 0.07168044306260751,
+        "inner_u": 0.05430606714263691,
+        "apex_lift": 0.0914635161160695,
+        "underband_dip": 0.007435509468027221
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.3216702776518804,
+        "front_half_u": 0.432689098875862,
+        "front_leg_curve": 0.5392476611843615,
+        "back_top_v": 0.30290582722661863,
+        "back_half_u": 0.35957639079818743
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.2504472165679968,
+        "front_half_u": 0.30228191421526834,
+        "front_leg_curve": 0.5033213543567643,
+        "back_top_v": 0.3130678209634802,
+        "back_half_u": 0.2083124685287433
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_15MM",
+      "local_params": {
+        "length_cm": 24.044304908448566
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_ALGAE_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_BELLY",
+      "local_params": {
+        "length_cm": 73.84743958411678
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHARM_BEACH",
+      "local_params": {
+        "diameter_cm": 9.8570350663454
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_STUD_PEARL",
+      "local_params": {
+        "size_cm": 0.996392390043802
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.3729122165701515,
+    "saturation": 0.5650469100669284,
+    "lightness": 0.5257591887471799,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.747467573927423,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_09_one_piece_maillot_M020",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

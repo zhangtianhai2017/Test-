@@ -1,0 +1,86 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_M",
+      "local_params": {
+        "half_u": 0.20821775734912917,
+        "half_v": 0.08368727682479779,
+        "inner_u": 0.004479579588923959,
+        "apex_lift": 0.02896554908763002,
+        "underband_dip": -0.08541944782177577
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.5387956119286352,
+        "front_half_u": 0.5644908698345493,
+        "front_leg_curve": 0.3281724951210001,
+        "back_top_v": 0.5295854892820262,
+        "back_half_u": 0.3562304679698727
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.40766817425090307,
+        "front_half_u": 0.4860671180648861,
+        "front_leg_curve": 0.47252718090635826,
+        "back_top_v": 0.5414331348933275,
+        "back_half_u": 0.3819974656340987
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 5.079674765282151
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_BAND_SPORT_25MM",
+      "local_params": {
+        "length_cm": 10.276931038439368
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BRODERIE_ANGLAISE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_WAFFLE_HONEYCOMB",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_COVERSTITCH_3NEEDLE",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.011697592597773143,
+    "saturation": 0.9110839762301801,
+    "lightness": 0.3302450254989924,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.7046748717666667,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_04_bandeau_back_band_M050",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_M",
+      "local_params": {
+        "half_u": 0.16319138387952029,
+        "half_v": 0.0800046821766589,
+        "inner_u": 0.0630238067987732,
+        "apex_lift": 0.060557590303162795,
+        "underband_dip": -0.008916270578285937
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.5032666059931871,
+        "front_half_u": 0.4492300364995546,
+        "front_leg_curve": 0.380070646829468,
+        "back_top_v": 0.413478453875325,
+        "back_half_u": 0.3768724239589049
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.2725122859401948,
+        "front_half_u": 0.3440482241282007,
+        "front_leg_curve": 0.5212780173051628,
+        "back_top_v": 0.2665423832242895,
+        "back_half_u": 0.23630325846106812
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BIOPOLYMER_PLAIN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_SATIN_40MM",
+      "local_params": {
+        "size_cm": 4.563343834102781
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHARM_BEACH",
+      "local_params": {
+        "diameter_cm": 8.168807037617727
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_WAIST",
+      "local_params": {
+        "length_cm": 61.35986011285926
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.1358370608459305,
+    "saturation": 0.5068373168511687,
+    "lightness": 0.3518100390989417,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.35323648651079087,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_10_one_piece_maillot_M050",
+  "variant_index": 9,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}

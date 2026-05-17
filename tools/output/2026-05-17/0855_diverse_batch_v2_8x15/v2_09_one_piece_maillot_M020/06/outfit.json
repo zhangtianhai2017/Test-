@@ -1,0 +1,93 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_L",
+      "local_params": {
+        "half_u": 0.17289479755229215,
+        "half_v": 0.06989890695587034,
+        "inner_u": 0.1458463975383566,
+        "apex_lift": 0.07300938014382866,
+        "underband_dip": 0.07894687814382628
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.2481700521513613,
+        "front_half_u": 0.29512967780902793,
+        "front_leg_curve": 0.5298002431775425,
+        "back_top_v": 0.2754700451247004,
+        "back_half_u": 0.19013008715871355
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.31176826526784474,
+        "front_half_u": 0.3212758932582913,
+        "front_leg_curve": 0.7111574939199283,
+        "back_top_v": 0.2957881231039704,
+        "back_half_u": 0.18404723512934815
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 52.487673625978765
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_COMPRESSION_SPORT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_COVERSTITCH_3NEEDLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_PENDANT_DROP_15MM_GOLD",
+      "local_params": {
+        "size_cm": 1.9093835410416007
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_BEADED_80MM",
+      "local_params": {
+        "length_cm": 5.463412057661612
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.34891221657015153,
+    "saturation": 0.49517993862565873,
+    "lightness": 0.4942326249259518,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.8052172900836401,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_09_one_piece_maillot_M020",
+  "variant_index": 6,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

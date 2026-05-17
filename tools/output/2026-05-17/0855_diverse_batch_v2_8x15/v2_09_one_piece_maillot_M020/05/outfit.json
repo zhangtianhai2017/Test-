@@ -1,0 +1,89 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.1785126816313069,
+        "half_v": 0.04959452867997359,
+        "inner_u": 0.11328172362159028,
+        "apex_lift": 0.1195718957949995,
+        "underband_dip": 0.009087110258317026
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.3315045497212374,
+        "front_half_u": 0.29451526351458474,
+        "front_leg_curve": 0.7242004762366907,
+        "back_top_v": 0.3142298124795316,
+        "back_half_u": 0.2539994250273944
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_8MM",
+      "local_params": {
+        "length_cm": 9.23493810762678
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_COMPRESSION_SPORT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_BEADED",
+      "local_params": {
+        "diameter_cm": 6.550168824227091
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_PENDANT_SHELL",
+      "local_params": {
+        "chain_length_cm": 51.28084632621835
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_BELLY",
+      "local_params": {
+        "length_cm": 74.77886321636429
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.3369122165701515,
+    "saturation": 0.5955647023546703,
+    "lightness": 0.5431566004988866,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.32984744581870573,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_09_one_piece_maillot_M020",
+  "variant_index": 5,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

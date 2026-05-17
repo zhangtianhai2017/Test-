@@ -1,0 +1,84 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_M",
+      "local_params": {
+        "half_u": 0.15407006153535535,
+        "half_v": 0.04276533534649178,
+        "inner_u": 0.06624972816584518,
+        "apex_lift": 0.2733368500946614,
+        "underband_dip": 0.07193818617720635
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.33298219135645096,
+        "front_half_u": 0.3500001553173531,
+        "front_leg_curve": 0.5326708065465992,
+        "back_top_v": 0.24608203516110774,
+        "back_half_u": 0.25224024016794855
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 52.09797954002082
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 20.992735793452926
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_COMPRESSION_SPORT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 7.628723381028232
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_TROCHUS_25MM",
+      "local_params": {
+        "size_cm": 2.1935610245338806
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.6738732652280569,
+    "saturation": 0.7155506251596447,
+    "lightness": 0.7080008519989476,
+    "pattern_overlay": "stripe",
+    "pattern_scale": 0.35273333084779845,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_01_triangle_string_halter_M050",
+  "variant_index": 7,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}

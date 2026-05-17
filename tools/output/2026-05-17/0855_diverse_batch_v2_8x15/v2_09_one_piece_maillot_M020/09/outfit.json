@@ -1,0 +1,77 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_S",
+      "local_params": {
+        "half_u": 0.19959403019149238,
+        "half_v": 0.05466758728358295,
+        "inner_u": 0.04352799289332293,
+        "apex_lift": -0.04163281761879684,
+        "underband_dip": 0.04415090706764649
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.38965404524202013,
+        "front_half_u": 0.42521009318624725,
+        "front_leg_curve": 0.5255248042432464,
+        "back_top_v": 0.3690066640531055,
+        "back_half_u": 0.31350686655327914
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TULLE_NET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_WAIST",
+      "local_params": {
+        "length_cm": 88.28083601823005
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_BELLY",
+      "local_params": {
+        "length_cm": 77.58711628736943
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_CHOKER_GOLD",
+      "local_params": {
+        "width_cm": 0.4420399875333249
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.3849122165701515,
+    "saturation": 0.47247958027944054,
+    "lightness": 0.5040162227931854,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.5620584121374095,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.8984757772973964,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_09_one_piece_maillot_M020",
+  "variant_index": 9,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

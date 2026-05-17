@@ -1,0 +1,84 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_M",
+      "local_params": {
+        "half_u": 0.18870516089031134,
+        "half_v": 0.05354576402419509,
+        "inner_u": 0.1491780791570136,
+        "apex_lift": 0.01892763802020284,
+        "underband_dip": 0.013608649138467195
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.3345093006987595,
+        "front_half_u": 0.29480874306872157,
+        "front_leg_curve": 0.7336379979370189,
+        "back_top_v": 0.3099226890764605,
+        "back_half_u": 0.18825122322039212
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 67.56354624038747
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 20.856524344842082
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BIOPOLYMER_PLAIN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHARM_BEACH",
+      "local_params": {
+        "diameter_cm": 9.83962127828829
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_STUD_PEARL",
+      "local_params": {
+        "size_cm": 0.8913901225886229
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.6618732652280569,
+    "saturation": 0.7114290929500924,
+    "lightness": 0.562774082316446,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.6498234581771545,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_01_triangle_string_halter_M050",
+  "variant_index": 6,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}

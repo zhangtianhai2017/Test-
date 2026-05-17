@@ -1,0 +1,81 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_S",
+      "local_params": {
+        "half_u": 0.1728405606445162,
+        "half_v": 0.07331874317930141,
+        "inner_u": 0.06412485945415243,
+        "apex_lift": -0.0023713775660776718,
+        "underband_dip": 0.03208288309236776
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.42412964844199247,
+        "front_half_u": 0.4724569324397757,
+        "front_leg_curve": 0.33021110297872086,
+        "back_top_v": 0.49210888980313844,
+        "back_half_u": 0.3421734187430423
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.41015349999758816,
+        "front_half_u": 0.539213522667918,
+        "front_leg_curve": 0.31361773279483857,
+        "back_top_v": 0.5035928431567903,
+        "back_half_u": 0.4213576102087686
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 28.619209606511795
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_LACE_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_SMALL_4MM",
+      "local_params": {
+        "count": 29.568710251937205
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.12383706084593052,
+    "saturation": 0.5021102204466322,
+    "lightness": 0.3052234318949178,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.5881782478118013,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_10_one_piece_maillot_M050",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.1057511974340352,
+        "half_v": 0.08925981344503797,
+        "inner_u": 0.11151432806590572,
+        "apex_lift": 0.12842206445416127,
+        "underband_dip": 0.008047039380540456
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.3270432768894275,
+        "front_half_u": 0.415047154046554,
+        "front_leg_curve": 0.7226115515870339,
+        "back_top_v": 0.311973259497379,
+        "back_half_u": 0.25044109464988784
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 55.45471803067839
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TULLE_NET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_OVAL_8MM",
+      "local_params": {
+        "count": 6.939892914415538
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHAIN",
+      "local_params": {
+        "diameter_cm": 8.373369701889533
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_WAIST",
+      "local_params": {
+        "length_cm": 74.60659457044746
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_BEADED",
+      "local_params": {
+        "diameter_cm": 6.110486644175494
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.1255651314496744,
+    "saturation": 0.8082517808513897,
+    "lightness": 0.48748307298067217,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.8321744667818893,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_02_triangle_string_halter_M080",
+  "variant_index": 0,
+  "modesty": {
+    "bottom_coverage_strict": 0.8,
+    "cup_coverage_strict": 0.8
+  }
+}

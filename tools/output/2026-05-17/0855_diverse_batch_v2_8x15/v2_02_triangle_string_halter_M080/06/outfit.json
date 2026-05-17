@@ -1,0 +1,88 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.10304294677156117,
+        "half_v": 0.08807023523701749,
+        "inner_u": 0.11504328454871254,
+        "apex_lift": 0.2868959977608053,
+        "underband_dip": 0.011795019999733217
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.24524288722782708,
+        "front_half_u": 0.35228075086502525,
+        "front_leg_curve": 0.7345951614426945,
+        "back_top_v": 0.31427258962385385,
+        "back_half_u": 0.1884677417684499
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.3299791235108547,
+        "front_half_u": 0.3455859647784221,
+        "front_leg_curve": 0.7266571197201365,
+        "back_top_v": 0.30927572002197473,
+        "back_half_u": 0.2509626840657514
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 44.222560960128675
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 24.637317775454896
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEERSUCKER_STRIPE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_PENDANT_DROP_15MM_GOLD",
+      "local_params": {
+        "size_cm": 1.8601349116622052
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.1975651314496744,
+    "saturation": 0.6901841549581715,
+    "lightness": 0.45843151123139103,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.6267206153452688,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.8201699670383605,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_02_triangle_string_halter_M080",
+  "variant_index": 6,
+  "modesty": {
+    "bottom_coverage_strict": 0.8,
+    "cup_coverage_strict": 0.8
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_L",
+      "local_params": {
+        "half_u": 0.28109435634264085,
+        "half_v": 0.1104414941135056,
+        "inner_u": 0.02007811719735542,
+        "apex_lift": -0.09390442119200627,
+        "underband_dip": 0.0055184826394172465
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.3207731554088019,
+        "front_half_u": 0.36774734851435165,
+        "front_leg_curve": 0.7402652337384846,
+        "back_top_v": 0.2560856649142013,
+        "back_half_u": 0.2103709667892754
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 3.3743835746970463
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_LACE_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.27056961858225437,
+    "saturation": 0.8019800458519721,
+    "lightness": 0.5556208640792094,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.8563739734947231,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_03_bandeau_back_band_M020",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_M",
+      "local_params": {
+        "half_u": 0.21689250737348792,
+        "half_v": 0.07213867022145037,
+        "inner_u": 0.04151121206912451,
+        "apex_lift": -0.010862521367731415,
+        "underband_dip": -0.04234762661661406
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.4663820077836394,
+        "front_half_u": 0.48162558501750086,
+        "front_leg_curve": 0.40884284527614717,
+        "back_top_v": 0.4674845530047774,
+        "back_half_u": 0.4527142388848565
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.5137916278712573,
+        "front_half_u": 0.5186405359109235,
+        "front_leg_curve": 0.3103027914018172,
+        "back_top_v": 0.4676921990946048,
+        "back_half_u": 0.432793016544268
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MESH_OUTER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_CHIFFON_30MM",
+      "local_params": {
+        "size_cm": 3.7667999161652466
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_COWRIE_20MM",
+      "local_params": {
+        "size_cm": 2.3321938314125346
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.027837060845930517,
+    "saturation": 0.5057826398522941,
+    "lightness": 0.46502566543087703,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.22024081229952097,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.8580949096615715,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_10_one_piece_maillot_M050",
+  "variant_index": 0,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}

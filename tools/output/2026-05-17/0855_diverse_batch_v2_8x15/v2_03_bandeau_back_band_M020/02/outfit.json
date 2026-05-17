@@ -1,0 +1,70 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_S",
+      "local_params": {
+        "half_u": 0.16407836059656108,
+        "half_v": 0.08233151580915654,
+        "inner_u": 0.0738265550622625,
+        "apex_lift": -0.002758970705033295,
+        "underband_dip": 0.04691088186716427
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.26901320423396924,
+        "front_half_u": 0.30856612270211947,
+        "front_leg_curve": 0.6098651362455374,
+        "back_top_v": 0.2456377375732158,
+        "back_half_u": 0.2581092891631728
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 3.9604549264616304
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 29.04789940731483
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BRODERIE_ANGLAISE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.2825696185822544,
+    "saturation": 0.7484330042981949,
+    "lightness": 0.5442412781195792,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.30211368572300945,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.7908519038200348,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_03_bandeau_back_band_M020",
+  "variant_index": 2,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

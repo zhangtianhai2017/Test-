@@ -1,0 +1,104 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_L",
+      "local_params": {
+        "half_u": 0.29627923977240256,
+        "half_v": 0.10060765280735505,
+        "inner_u": 0.00456050511604438,
+        "apex_lift": 0.040704356566120536,
+        "underband_dip": -0.08906086554916595
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.4112401522679974,
+        "front_half_u": 0.4866746447825992,
+        "front_leg_curve": 0.31574925750870264,
+        "back_top_v": 0.5377799633600645,
+        "back_half_u": 0.2995569351863876
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.5283920952947785,
+        "front_half_u": 0.3994803850625049,
+        "front_leg_curve": 0.4777256172723453,
+        "back_top_v": 0.5415511199236209,
+        "back_half_u": 0.38474750129951496
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 4.119607860593215
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HUNZA_CRINKLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_BEADED_80MM",
+      "local_params": {
+        "length_cm": 5.169442161216726
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_TROCHUS_25MM",
+      "local_params": {
+        "size_cm": 2.37600281753911
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_DROP_GOLD",
+      "local_params": {
+        "length_cm": 1.9478270822255495
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHARM_BEACH",
+      "local_params": {
+        "diameter_cm": 7.80772471070589
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_BEADED",
+      "local_params": {
+        "diameter_cm": 7.208808708587473
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.023697592597773154,
+    "saturation": 0.7920005836918759,
+    "lightness": 0.38497263848056706,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.8074922667210831,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_04_bandeau_back_band_M050",
+  "variant_index": 2,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}

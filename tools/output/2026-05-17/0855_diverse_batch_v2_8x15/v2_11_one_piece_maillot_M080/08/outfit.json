@@ -1,0 +1,64 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_S",
+      "local_params": {
+        "half_u": 0.18212455085163448,
+        "half_v": 0.09842100751703708,
+        "inner_u": 0.04565290315032015,
+        "apex_lift": 0.06805126958615074,
+        "underband_dip": 0.004338985519333844,
+        "dome_depth_cm": 1.8962996664432348
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.3927812152829878,
+        "front_half_u": 0.4319199036132418,
+        "front_leg_curve": 0.5183718891600447,
+        "back_top_v": 0.30449427962130454,
+        "back_half_u": 0.4135014589418029
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FOIL_COATED_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 5.340478465316991
+      }
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.4308531541651617,
+    "saturation": 0.556473571224712,
+    "lightness": 0.25,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.20512223198697752,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_11_one_piece_maillot_M080",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.8,
+    "cup_coverage_strict": 0.8
+  }
+}

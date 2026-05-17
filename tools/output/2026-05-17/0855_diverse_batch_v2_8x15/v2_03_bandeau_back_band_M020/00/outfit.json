@@ -1,0 +1,82 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_M",
+      "local_params": {
+        "half_u": 0.19260380811259661,
+        "half_v": 0.08753183787937696,
+        "inner_u": 0.052027582402188084,
+        "apex_lift": 0.07962649026754719,
+        "underband_dip": -0.02169076625083423
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.36726280490635893,
+        "front_half_u": 0.44987907306902275,
+        "front_leg_curve": 0.44923031586639395,
+        "back_top_v": 0.3086565221617053,
+        "back_half_u": 0.32998222000855465
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 5.622120656150755
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 29.180304910694616
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MUSHROOM_LEATHER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_NEOPRENE_1MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_COVERSTITCH_3NEEDLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_BEADED",
+      "local_params": {
+        "diameter_cm": 6.127490003691572
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.25856961858225436,
+    "saturation": 0.8237450635144524,
+    "lightness": 0.5995817251955513,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.6795906652372137,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.9687276341214776,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_03_bandeau_back_band_M020",
+  "variant_index": 0,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

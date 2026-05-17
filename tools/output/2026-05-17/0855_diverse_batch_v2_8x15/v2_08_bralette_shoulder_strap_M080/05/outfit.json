@@ -1,0 +1,81 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_M",
+      "local_params": {
+        "half_u": 0.16737751958573754,
+        "half_v": 0.11726319141798927,
+        "inner_u": 0.09584513926748506,
+        "apex_lift": 0.07295652768143435,
+        "underband_dip": 0.045081196974867885,
+        "dome_depth_cm": 1.925305643583382
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.41874066800742843,
+        "front_half_u": 0.4776689973412551,
+        "front_leg_curve": 0.47678773186881845,
+        "back_top_v": 0.534522996365006,
+        "back_half_u": 0.446069428350626
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_15MM",
+      "local_params": {
+        "length_cm": 30.074856679971447
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_BAND_SPORT_25MM",
+      "local_params": {
+        "length_cm": 9.250386671334702
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HUNZA_CRINKLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.996490094761209,
+    "saturation": 0.6372806811962518,
+    "lightness": 0.518906027076238,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.5812676467917008,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.7190962458378622,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_08_bralette_shoulder_strap_M080",
+  "variant_index": 5,
+  "modesty": {
+    "bottom_coverage_strict": 0.8,
+    "cup_coverage_strict": 0.8
+  }
+}

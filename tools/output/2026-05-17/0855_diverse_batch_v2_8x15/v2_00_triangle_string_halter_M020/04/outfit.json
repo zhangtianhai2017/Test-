@@ -1,0 +1,88 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.09304985273507482,
+        "half_v": 0.056848290233705835,
+        "inner_u": 0.08391578339559208,
+        "apex_lift": 0.2454698047402624,
+        "underband_dip": 0.0626739417094277
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.25140959164981713,
+        "front_half_u": 0.348623489859852,
+        "front_leg_curve": 0.7976230599806624,
+        "back_top_v": 0.2608092964860265,
+        "back_half_u": 0.11469266614917505
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.255622614040034,
+        "front_half_u": 0.3356939684175103,
+        "front_leg_curve": 0.6038376297329113,
+        "back_top_v": 0.2862708618582276,
+        "back_half_u": 0.21777074291113574
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 46.8654971140174
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_BEADED_80MM",
+      "local_params": {
+        "length_cm": 9.991295520648965
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_OVAL_8MM",
+      "local_params": {
+        "count": 12.15172046287065
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.9883239203334245,
+    "saturation": 0.6643726269058634,
+    "lightness": 0.49874228896268885,
+    "pattern_overlay": "stripe",
+    "pattern_scale": 0.5860267853409182,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_M020",
+  "variant_index": 4,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

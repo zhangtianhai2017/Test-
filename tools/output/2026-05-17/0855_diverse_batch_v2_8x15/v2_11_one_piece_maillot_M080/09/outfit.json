@@ -1,0 +1,99 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_M",
+      "local_params": {
+        "half_u": 0.16649947956505606,
+        "half_v": 0.11697792670167054,
+        "inner_u": 0.09446555617160746,
+        "apex_lift": 0.07473602853163026,
+        "underband_dip": 0.04345408805917003,
+        "dome_depth_cm": 1.130358605542863
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.5377270991520132,
+        "front_half_u": 0.5632105515553081,
+        "front_leg_curve": 0.47737160869794715,
+        "back_top_v": 0.5421820279807983,
+        "back_half_u": 0.35344035454234946
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.31084683980910954,
+        "front_half_u": 0.42550004513128503,
+        "front_leg_curve": 0.5319670797439743,
+        "back_top_v": 0.30989788542368324,
+        "back_half_u": 0.41356488643940026
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_10MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 25.77441696805508
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ECONYL_PLAIN_HEAVY",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 8.831462440136619
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_TROCHUS_25MM",
+      "local_params": {
+        "size_cm": 1.7644507646217553
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.4428531541651617,
+    "saturation": 0.5824433944432311,
+    "lightness": 0.25942365034686954,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.8285080304395782,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.9850878822258469,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_11_one_piece_maillot_M080",
+  "variant_index": 9,
+  "modesty": {
+    "bottom_coverage_strict": 0.8,
+    "cup_coverage_strict": 0.8
+  }
+}

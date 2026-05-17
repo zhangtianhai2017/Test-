@@ -1,0 +1,56 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_L",
+      "local_params": {
+        "half_u": 0.272891892237013,
+        "half_v": 0.07547118018039943,
+        "inner_u": 0.09666377880359955,
+        "apex_lift": -0.031086847344953695,
+        "underband_dip": -0.0406026502039401
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.5333435732224968,
+        "front_half_u": 0.396231225228027,
+        "front_leg_curve": 0.48755925713301285,
+        "back_top_v": 0.5317938627816925,
+        "back_half_u": 0.3767226238635297
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_VIRGIN_VELVET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_SLUB_LINEN_BLEND",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.07583706084593052,
+    "saturation": 0.5324539837667513,
+    "lightness": 0.36998780050131563,
+    "pattern_overlay": "checker",
+    "pattern_scale": 0.6356661235346845,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.7641787770659535,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_10_one_piece_maillot_M050",
+  "variant_index": 4,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}

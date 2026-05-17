@@ -1,0 +1,88 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_M",
+      "local_params": {
+        "half_u": 0.20015797841096095,
+        "half_v": 0.11164280462347916,
+        "inner_u": 0.03306506662291767,
+        "apex_lift": 0.023422208239914685,
+        "underband_dip": 0.008451741507250421
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.45993371391729987,
+        "front_half_u": 0.4913180285185831,
+        "front_leg_curve": 0.34512874378965136,
+        "back_top_v": 0.5179809042435609,
+        "back_half_u": 0.38388432467234573
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.2589712945143158,
+        "front_half_u": 0.38586255861686114,
+        "front_leg_curve": 0.6148117279474021,
+        "back_top_v": 0.288864912535371,
+        "back_half_u": 0.1926298419872545
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 4.435986315560723
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_15MM",
+      "local_params": {
+        "length_cm": 11.88737484123406
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEQUIN_DENSE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_TROCHUS_25MM",
+      "local_params": {
+        "size_cm": 2.153218789409438
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.3425696185822543,
+    "saturation": 0.7746206025703075,
+    "lightness": 0.4856028755622459,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.213874203671725,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_03_bandeau_back_band_M020",
+  "variant_index": 7,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

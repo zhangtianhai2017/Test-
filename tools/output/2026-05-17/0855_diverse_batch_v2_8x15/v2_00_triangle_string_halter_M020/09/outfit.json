@@ -1,0 +1,65 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.1047490425429082,
+        "half_v": 0.05338678287876189,
+        "inner_u": 0.067497517051655,
+        "apex_lift": 0.11614465721968698,
+        "underband_dip": 0.0045587984377528
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.31313275970777227,
+        "front_half_u": 0.2649498875696662,
+        "front_leg_curve": 0.5350857494097466,
+        "back_top_v": 0.20512063811036674,
+        "back_half_u": 0.0682223683341765
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 65.51690479114407
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 18.708332145785118
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MUSHROOM_LEATHER",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.048323920333424475,
+    "saturation": 0.6543278805176793,
+    "lightness": 0.5623039461229075,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.8840585883877454,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_00_triangle_string_halter_M020",
+  "variant_index": 9,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

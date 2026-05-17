@@ -1,0 +1,82 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_M",
+      "local_params": {
+        "half_u": 0.22344218617816636,
+        "half_v": 0.09469198756162599,
+        "inner_u": 0.09090146815413985,
+        "apex_lift": 0.07008737294917607,
+        "underband_dip": 0.0174051345346022
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.43062427595528197,
+        "front_half_u": 0.5046189192181444,
+        "front_leg_curve": 0.34569619171495014,
+        "back_top_v": 0.47563439865433654,
+        "back_half_u": 0.3752200654270813
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_10MM",
+      "local_params": {
+        "length_cm": 32.429535527731296
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_CUTOUT_JERSEY",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_AMNI_SOUL_RIBBED",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_SATIN_40MM",
+      "local_params": {
+        "size_cm": 3.9982155842977667
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_BEADED_80MM",
+      "local_params": {
+        "length_cm": 8.34575153806009
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.2769122165701515,
+    "saturation": 0.5522134842435011,
+    "lightness": 0.5114207482407379,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.8475871902920584,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_09_one_piece_maillot_M020",
+  "variant_index": 0,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

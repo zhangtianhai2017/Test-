@@ -1,0 +1,69 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_L",
+      "local_params": {
+        "half_u": 0.15816057342100795,
+        "half_v": 0.09826064900391793,
+        "inner_u": 0.12483237656531462,
+        "apex_lift": 0.18783042852064905,
+        "underband_dip": 0.09523282865941429
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.20250108217965254,
+        "front_half_u": 0.24474259279387253,
+        "front_leg_curve": 0.5651473692234277,
+        "back_top_v": 0.24211514033453368,
+        "back_half_u": 0.13059174523065176
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.22235871774312252,
+        "front_half_u": 0.328896143857264,
+        "front_leg_curve": 0.7249987007025978,
+        "back_top_v": 0.22475729174584436,
+        "back_half_u": 0.13319699361730525
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 45.311458060357786
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FOIL_COATED_GOLD",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.024323920333424454,
+    "saturation": 0.6337286484100594,
+    "lightness": 0.6370355179801164,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.7350426188641312,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_M020",
+  "variant_index": 7,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

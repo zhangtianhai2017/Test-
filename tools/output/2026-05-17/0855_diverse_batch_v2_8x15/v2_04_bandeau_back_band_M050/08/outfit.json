@@ -1,0 +1,82 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_M",
+      "local_params": {
+        "half_u": 0.25341723887130974,
+        "half_v": 0.08564458480213998,
+        "inner_u": 0.03428294053703744,
+        "apex_lift": 0.036350988659115374,
+        "underband_dip": -0.09076761999890189
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.3921517607192013,
+        "front_half_u": 0.5110100154862921,
+        "front_leg_curve": 0.5244266148671026,
+        "back_top_v": 0.3053617405176892,
+        "back_half_u": 0.4112534215304141
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 2.6097696921228906
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 29.317526669163698
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEQUIN_DENSE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_VIRGIN_VELVET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_COVERSTITCH_3NEEDLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_DROP_GOLD",
+      "local_params": {
+        "length_cm": 1.5369984068937244
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.09569759259777322,
+    "saturation": 0.9124577239760199,
+    "lightness": 0.38878173634596463,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.7827388279937268,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_04_bandeau_back_band_M050",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}

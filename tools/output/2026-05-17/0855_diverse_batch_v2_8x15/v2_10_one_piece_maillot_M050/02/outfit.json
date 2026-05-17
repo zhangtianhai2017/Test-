@@ -1,0 +1,107 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_L",
+      "local_params": {
+        "half_u": 0.1967582954349518,
+        "half_v": 0.07362046750873169,
+        "inner_u": 0.09538197508354118,
+        "apex_lift": 0.08974618326593421,
+        "underband_dip": -0.03868410456254716
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.25365891276834773,
+        "front_half_u": 0.4104659344771761,
+        "front_leg_curve": 0.7234494350244304,
+        "back_top_v": 0.3090842128233581,
+        "back_half_u": 0.2530292848431321
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.3857536805890496,
+        "front_half_u": 0.4356636380097342,
+        "front_leg_curve": 0.31380938925195695,
+        "back_top_v": 0.3098361971838763,
+        "back_half_u": 0.413397217078448
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 41.177089294998154
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_15MM",
+      "local_params": {
+        "length_cm": 11.394127743060357
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_WAFFLE_HONEYCOMB",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_WAFFLE_HONEYCOMB",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_PENDANT_SHELL",
+      "local_params": {
+        "chain_length_cm": 49.06909457654509
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_CHOKER_GOLD",
+      "local_params": {
+        "width_cm": 0.8292045653184874
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_BELLY",
+      "local_params": {
+        "length_cm": 65.17038960887326
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.05183706084593052,
+    "saturation": 0.47474473865506206,
+    "lightness": 0.4032726866083638,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.3235138742098634,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_10_one_piece_maillot_M050",
+  "variant_index": 2,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}

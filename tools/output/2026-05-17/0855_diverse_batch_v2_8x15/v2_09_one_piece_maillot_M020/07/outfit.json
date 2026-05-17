@@ -1,0 +1,79 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_S",
+      "local_params": {
+        "half_u": 0.07813497327379965,
+        "half_v": 0.05754010759724143,
+        "inner_u": 0.10132814188631349,
+        "apex_lift": 0.2643132857590831,
+        "underband_dip": 0.07870772148823751
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.2768078353141529,
+        "front_half_u": 0.2873292346855456,
+        "front_leg_curve": 0.6746244753596808,
+        "back_top_v": 0.2716624438026461,
+        "back_half_u": 0.11725495255687887
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.3789726799952047,
+        "front_half_u": 0.4121867886589358,
+        "front_leg_curve": 0.3941694552400875,
+        "back_top_v": 0.35235775308656886,
+        "back_half_u": 0.3632935117496927
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_LACE_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_COVERSTITCH_3NEEDLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_PENDANT_DROP_15MM_GOLD",
+      "local_params": {
+        "size_cm": 2.0416049143510917
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.3609122165701515,
+    "saturation": 0.5020174631879191,
+    "lightness": 0.4470752503467345,
+    "pattern_overlay": "checker",
+    "pattern_scale": 0.8447866141965883,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.7068661929003968,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_09_one_piece_maillot_M020",
+  "variant_index": 7,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

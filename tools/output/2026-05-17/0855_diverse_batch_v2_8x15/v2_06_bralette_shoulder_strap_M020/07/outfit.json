@@ -1,0 +1,65 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.15599278268827715,
+        "half_v": 0.08485836021818605,
+        "inner_u": 0.07101887345541928,
+        "apex_lift": 0.21057596232387807,
+        "underband_dip": 0.05235906410660876
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.38570591972991475,
+        "front_half_u": 0.4822203944582646,
+        "front_leg_curve": 0.5167557419139746,
+        "back_top_v": 0.3792249250338994,
+        "back_half_u": 0.32129480713616054
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_10MM",
+      "local_params": {
+        "length_cm": 32.190347303319996
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 25.018349782961195
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ALGAE_BLEND",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.9018891271930325,
+    "saturation": 0.7158860592516374,
+    "lightness": 0.5404602777159576,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.8329542365334242,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_06_bralette_shoulder_strap_M020",
+  "variant_index": 7,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

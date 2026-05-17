@@ -1,0 +1,65 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_S",
+      "local_params": {
+        "half_u": 0.19818153371731362,
+        "half_v": 0.053263045340363455,
+        "inner_u": 0.09604880087211132,
+        "apex_lift": -0.03513494172915049,
+        "underband_dip": 0.03608454742532226
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.4181601682144645,
+        "front_half_u": 0.4805255559662582,
+        "front_leg_curve": 0.3290250382079793,
+        "back_top_v": 0.5353287777656588,
+        "back_half_u": 0.30207339901012004
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 4.291016759959909
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEQUIN_DENSE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 7.156490791912951
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.36656961858225434,
+    "saturation": 0.7357483586543155,
+    "lightness": 0.5488325877057962,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.47459204293735263,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_03_bandeau_back_band_M020",
+  "variant_index": 9,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

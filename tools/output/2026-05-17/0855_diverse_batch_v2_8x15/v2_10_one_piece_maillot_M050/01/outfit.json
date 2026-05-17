@@ -1,0 +1,82 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_M",
+      "local_params": {
+        "half_u": 0.229647103020319,
+        "half_v": 0.0941765224144526,
+        "inner_u": 0.09531510485488998,
+        "apex_lift": -0.03577444482762534,
+        "underband_dip": 0.03708985460936601
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.25135061327594,
+        "front_half_u": 0.40883150510016186,
+        "front_leg_curve": 0.729107828158968,
+        "back_top_v": 0.24504924340703513,
+        "back_half_u": 0.252828835256872
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_8MM",
+      "local_params": {
+        "length_cm": 8.322794908392126
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEQUIN_DENSE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_ALGAE_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_SATIN_40MM",
+      "local_params": {
+        "size_cm": 5.689360053541526
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_PENDANT_DROP_15MM_GOLD",
+      "local_params": {
+        "size_cm": 2.125384256656279
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.039837060845930514,
+    "saturation": 0.42201697207037236,
+    "lightness": 0.4363374110725494,
+    "pattern_overlay": "stripe",
+    "pattern_scale": 0.28952535817620184,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.9113528051478326,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_10_one_piece_maillot_M050",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}

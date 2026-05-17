@@ -1,0 +1,84 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_M",
+      "local_params": {
+        "half_u": 0.2588289177666563,
+        "half_v": 0.0965741631877102,
+        "inner_u": 0.01706827628229049,
+        "apex_lift": -0.034332391610234575,
+        "underband_dip": -0.06023110102397519
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.43580926675314346,
+        "front_half_u": 0.47178521186843264,
+        "front_leg_curve": 0.47490633684982875,
+        "back_top_v": 0.5330403532790667,
+        "back_half_u": 0.303954154165248
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 3.9879555314312314
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 15.94366234237056
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BRODERIE_ANGLAISE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_TERRY_KNIT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_SATIN_40MM",
+      "local_params": {
+        "size_cm": 3.344895635163417
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_TASSEL_SILK_50MM",
+      "local_params": {
+        "length_cm": 5.009856324178054
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.047697592597773175,
+    "saturation": 0.9251022710853927,
+    "lightness": 0.392718794996034,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.3417006272734637,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.8655068156478978,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_04_bandeau_back_band_M050",
+  "variant_index": 4,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}

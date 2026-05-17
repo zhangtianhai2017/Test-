@@ -1,0 +1,95 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_L",
+      "local_params": {
+        "half_u": 0.13415993327117656,
+        "half_v": 0.11445724719302133,
+        "inner_u": 0.14501947989508024,
+        "apex_lift": 0.016772499507010222,
+        "underband_dip": 0.09383867727439489
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.25171257079549886,
+        "front_half_u": 0.35059729081522456,
+        "front_leg_curve": 0.5211892666663042,
+        "back_top_v": 0.3120801308930026,
+        "back_half_u": 0.25170460437313447
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.21677725550845503,
+        "front_half_u": 0.19348086892610517,
+        "front_leg_curve": 0.7634185860511055,
+        "back_top_v": 0.20656811278278225,
+        "back_half_u": 0.06787785917290914
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 69.63855249642354
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 29.53857265188789
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MESH_OUTER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_BELLY",
+      "local_params": {
+        "length_cm": 83.50074965138614
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_DROP_GOLD",
+      "local_params": {
+        "length_cm": 1.5210481415991868
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.00032392033342443227,
+    "saturation": 0.5382713729771383,
+    "lightness": 0.6099202884910542,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.8311002425184635,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_00_triangle_string_halter_M020",
+  "variant_index": 5,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_S",
+      "local_params": {
+        "half_u": 0.17424015666706738,
+        "half_v": 0.0724672418112278,
+        "inner_u": 0.03816741875110752,
+        "apex_lift": -0.027286085347849556,
+        "underband_dip": -0.05951193788642111
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.2762035057132734,
+        "front_half_u": 0.3015403915553658,
+        "front_leg_curve": 0.7487239009140726,
+        "back_top_v": 0.22828413920188267,
+        "back_half_u": 0.14157669605703863
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.25717811475443186,
+        "front_half_u": 0.34321452691850146,
+        "front_leg_curve": 0.7138380561783073,
+        "back_top_v": 0.24906681245943757,
+        "back_half_u": 0.22650867441646175
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 4.848933323261677
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TERRY_KNIT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_MISSONI_SHINY_KNIT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 6.365183974489968
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHARM_BEACH",
+      "local_params": {
+        "diameter_cm": 9.983672289891325
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHAIN",
+      "local_params": {
+        "diameter_cm": 7.469300452298548
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.33056961858225437,
+    "saturation": 0.7586670757494881,
+    "lightness": 0.5482554457381594,
+    "pattern_overlay": "checker",
+    "pattern_scale": 0.20525670472753954,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_03_bandeau_back_band_M020",
+  "variant_index": 6,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_M",
+      "local_params": {
+        "half_u": 0.20408143855897679,
+        "half_v": 0.1196798884782577,
+        "inner_u": 0.006449165893068285,
+        "apex_lift": -0.05934563434572193,
+        "underband_dip": -0.07910697033640406
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.34734555001730816,
+        "front_half_u": 0.3853221659097724,
+        "front_leg_curve": 0.4215834333956303,
+        "back_top_v": 0.3390801797069769,
+        "back_half_u": 0.34993584436075514
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 4.1966238068580415
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_8MM",
+      "local_params": {
+        "length_cm": 12.43893502383684
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BRODERIE_ANGLAISE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_SMALL_4MM",
+      "local_params": {
+        "count": 10.879381125954485
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.0716975925977732,
+    "saturation": 0.9339573617080593,
+    "lightness": 0.3589386477268582,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.3221017996359738,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_04_bandeau_back_band_M050",
+  "variant_index": 6,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}

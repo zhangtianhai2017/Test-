@@ -1,0 +1,69 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_S",
+      "local_params": {
+        "half_u": 0.1985082880435886,
+        "half_v": 0.05551182444906394,
+        "inner_u": 0.04785018980653783,
+        "apex_lift": 0.08114088766559242,
+        "underband_dip": 0.04206345668031035
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.2319882262089427,
+        "front_half_u": 0.29879167649772725,
+        "front_leg_curve": 0.7801655239997162,
+        "back_top_v": 0.2759778882472362,
+        "back_half_u": 0.17361590428278995
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.3299182124283384,
+        "front_half_u": 0.34968040485948565,
+        "front_leg_curve": 0.5140744394128661,
+        "back_top_v": 0.25034262066194113,
+        "back_half_u": 0.188307710962662
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 5.337427929322409
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MESH_OUTER",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.35456961858225433,
+    "saturation": 0.8270481405734041,
+    "lightness": 0.5420679669452527,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.24067249150850026,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_03_bandeau_back_band_M020",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.1833664596620748,
+        "half_v": 0.057850353116563544,
+        "inner_u": 0.10871968075301372,
+        "apex_lift": 0.18619733229936952,
+        "underband_dip": 0.0015718331538469865
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.327959103723002,
+        "front_half_u": 0.36242656638959014,
+        "front_leg_curve": 0.5379642156380126,
+        "back_top_v": 0.31505181873967236,
+        "back_half_u": 0.21434565162271313
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.23645762493338918,
+        "front_half_u": 0.2928833638512064,
+        "front_leg_curve": 0.5519296533405342,
+        "back_top_v": 0.23503067186636561,
+        "back_half_u": 0.1294393665191326
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 62.384398190085264
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BRODERIE_ANGLAISE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.036323920333424464,
+    "saturation": 0.5875417482145143,
+    "lightness": 0.6116923121665419,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.8324310719930379,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.9042820077669147,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_M020",
+  "variant_index": 8,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

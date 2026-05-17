@@ -1,0 +1,69 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.09612071068935306,
+        "half_v": 0.07236275722186955,
+        "inner_u": 0.061032993298820046,
+        "apex_lift": 0.054314785105043284,
+        "underband_dip": 0.09325712227941338
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.2681927885028387,
+        "front_half_u": 0.3230621242640155,
+        "front_leg_curve": 0.622534859668789,
+        "back_top_v": 0.24214622634456154,
+        "back_half_u": 0.11137394295546765
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.437824115660747,
+        "front_half_u": 0.546241060032319,
+        "front_leg_curve": 0.39417751216988084,
+        "back_top_v": 0.5021792876305151,
+        "back_half_u": 0.3966015902918222
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 26.50663903042429
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BIOPOLYMER_PLAIN",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.9258891271930325,
+    "saturation": 0.6516378794289637,
+    "lightness": 0.7044364423309997,
+    "pattern_overlay": "polka",
+    "pattern_scale": 0.8091919619561208,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_06_bralette_shoulder_strap_M020",
+  "variant_index": 9,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

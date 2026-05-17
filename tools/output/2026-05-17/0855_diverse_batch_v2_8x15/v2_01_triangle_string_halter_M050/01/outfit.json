@@ -1,0 +1,102 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_M",
+      "local_params": {
+        "half_u": 0.10949922227426494,
+        "half_v": 0.09491778390326122,
+        "inner_u": 0.059432224055756724,
+        "apex_lift": 0.27483198627696176,
+        "underband_dip": 0.013975293961531755
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.24585712725303197,
+        "front_half_u": 0.3506046553441443,
+        "front_leg_curve": 0.725202508708168,
+        "back_top_v": 0.31006531877184845,
+        "back_half_u": 0.25042666160736565
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.2546442444612459,
+        "front_half_u": 0.3447190624630427,
+        "front_leg_curve": 0.5175024863708862,
+        "back_top_v": 0.24666149033457707,
+        "back_half_u": 0.24859361713132577
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 68.81032747878623
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_BEADED_80MM",
+      "local_params": {
+        "length_cm": 6.007998806512127
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_TROCHUS_25MM",
+      "local_params": {
+        "size_cm": 1.6467848236788685
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHAIN",
+      "local_params": {
+        "diameter_cm": 8.781823176104995
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_CHAIN_GOLD",
+      "local_params": {
+        "diameter_cm": 5.826737611027406
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.601873265228057,
+    "saturation": 0.7150788006831768,
+    "lightness": 0.6094760976632903,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.43516623652261366,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_01_triangle_string_halter_M050",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.1595929744159565,
+        "half_v": 0.04606485882695454,
+        "inner_u": 0.06357143147802677,
+        "apex_lift": 0.2762081510304872,
+        "underband_dip": 0.009292570427509155
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.333414542539236,
+        "front_half_u": 0.3496485263500077,
+        "front_leg_curve": 0.5360370471021638,
+        "back_top_v": 0.24814041206802365,
+        "back_half_u": 0.24904355725639005
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.2465477471486294,
+        "front_half_u": 0.4156833758812947,
+        "front_leg_curve": 0.7344185315045954,
+        "back_top_v": 0.31161286461134,
+        "back_half_u": 0.18591963913140067
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 57.57384064489541
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_8MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FOIL_COATED_GOLD",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.637873265228057,
+    "saturation": 0.7197195482399975,
+    "lightness": 0.6812355460211588,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.5535169393318522,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_01_triangle_string_halter_M050",
+  "variant_index": 4,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_M",
+      "local_params": {
+        "half_u": 0.15922402292406979,
+        "half_v": 0.04575309577366182,
+        "inner_u": 0.07025257626449251,
+        "apex_lift": 0.138359888953893,
+        "underband_dip": 0.07255305440488333
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.26364111834167037,
+        "front_half_u": 0.39314985433194133,
+        "front_leg_curve": 0.6413146921332695,
+        "back_top_v": 0.30607633345757645,
+        "back_half_u": 0.19645199493313953
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 67.70284827688366
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FOIL_COATED_GOLD",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.6978732652280569,
+    "saturation": 0.8164462075267419,
+    "lightness": 0.687438813968457,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.5583680281504408,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.9766797575798303,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_01_triangle_string_halter_M050",
+  "variant_index": 9,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}

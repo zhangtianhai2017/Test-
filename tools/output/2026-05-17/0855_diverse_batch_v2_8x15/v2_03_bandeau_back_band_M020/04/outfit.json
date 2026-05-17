@@ -1,0 +1,74 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_L",
+      "local_params": {
+        "half_u": 0.27233363782158937,
+        "half_v": 0.11276168736180217,
+        "inner_u": 0.09216372949234652,
+        "apex_lift": 0.08868577270149407,
+        "underband_dip": 0.04381546829786835
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.22873541923191631,
+        "front_half_u": 0.2448737505061448,
+        "front_leg_curve": 0.5758365926722959,
+        "back_top_v": 0.27103959071922135,
+        "back_half_u": 0.1699154749479816
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.21749618621640882,
+        "front_half_u": 0.1974344362326729,
+        "front_leg_curve": 0.5363813239674144,
+        "back_top_v": 0.2899434219195453,
+        "back_half_u": 0.12912366449601567
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 3.9107640730279285
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_QNOVA_RIBBED",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.30656961858225434,
+    "saturation": 0.7143651011812295,
+    "lightness": 0.48444666135336256,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.639939357985394,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_03_bandeau_back_band_M020",
+  "variant_index": 4,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

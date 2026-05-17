@@ -1,0 +1,64 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_S",
+      "local_params": {
+        "half_u": 0.1421853125716357,
+        "half_v": 0.0728895750281768,
+        "inner_u": 0.0947969054365641,
+        "apex_lift": 0.010003009778154402,
+        "underband_dip": 0.04639445873020236,
+        "dome_depth_cm": 1.891568580385358
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.4105796828232933,
+        "front_half_u": 0.4746610127809302,
+        "front_leg_curve": 0.3245278352716092,
+        "back_top_v": 0.4110530729605076,
+        "back_half_u": 0.35075794896629153
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_15MM",
+      "local_params": {
+        "length_cm": 33.422443147593974
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FOIL_COATED_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.9364900947612089,
+    "saturation": 0.6098694013117977,
+    "lightness": 0.5054318213963135,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.6328947890197437,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_08_bralette_shoulder_strap_M080",
+  "variant_index": 0,
+  "modesty": {
+    "bottom_coverage_strict": 0.8,
+    "cup_coverage_strict": 0.8
+  }
+}

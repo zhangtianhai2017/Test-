@@ -1,0 +1,79 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_M",
+      "local_params": {
+        "half_u": 0.10442818200634724,
+        "half_v": 0.09103844097728366,
+        "inner_u": 0.1544732425614545,
+        "apex_lift": 0.10755463299838035,
+        "underband_dip": 0.04020341413514642
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.2981808817614079,
+        "front_half_u": 0.23952562133516783,
+        "front_leg_curve": 0.5589188079366376,
+        "back_top_v": 0.2619889621872195,
+        "back_half_u": 0.14037040782214688
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 29.805386116357568
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_15MM",
+      "local_params": {
+        "length_cm": 8.782761322376706
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_QNOVA_RIBBED",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_OVAL_8MM",
+      "local_params": {
+        "count": 12.900113092340888
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_PENDANT_DROP_15MM_GOLD",
+      "local_params": {
+        "size_cm": 2.4694114636649163
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.8658891271930326,
+    "saturation": 0.6446182264456426,
+    "lightness": 0.5440117062725972,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.8894680574753353,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_06_bralette_shoulder_strap_M020",
+  "variant_index": 4,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

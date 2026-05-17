@@ -1,0 +1,76 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_S",
+      "local_params": {
+        "half_u": 0.17832678527818144,
+        "half_v": 0.0960608921131009,
+        "inner_u": 0.00981163524197532,
+        "apex_lift": -0.06848355800793421,
+        "underband_dip": -0.00964627368559047
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.4879012630675138,
+        "front_half_u": 0.5306556256531079,
+        "front_leg_curve": 0.4386654474158199,
+        "back_top_v": 0.4198483183071815,
+        "back_half_u": 0.43913000158916726
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.30008280808347404,
+        "front_half_u": 0.37080764194717675,
+        "front_leg_curve": 0.3949891299310475,
+        "back_top_v": 0.34939026402625967,
+        "back_half_u": 0.41236282222240866
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 4.514416723330461
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_WAFFLE_HONEYCOMB",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 7.454413274336236
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.10769759259777323,
+    "saturation": 0.8381727582282447,
+    "lightness": 0.33561073947794023,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.6314285155243138,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_04_bandeau_back_band_M050",
+  "variant_index": 9,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_M",
+      "local_params": {
+        "half_u": 0.19185360292374196,
+        "half_v": 0.059408112644473446,
+        "inner_u": 0.133274489608683,
+        "apex_lift": 0.2805842964196422,
+        "underband_dip": 0.0619784194959516
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.3255414957254919,
+        "front_half_u": 0.35159909363967606,
+        "front_leg_curve": 0.6492713649627005,
+        "back_top_v": 0.30687533573114567,
+        "back_half_u": 0.20153655944941015
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 41.74085283919796
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 16.939265003860342
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_8MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_NEOPRENE_2MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.9523239203334245,
+    "saturation": 0.661465478932243,
+    "lightness": 0.5437387863664855,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.4470609434896845,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_00_triangle_string_halter_M020",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

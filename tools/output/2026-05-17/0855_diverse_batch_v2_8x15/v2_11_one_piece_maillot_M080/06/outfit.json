@@ -1,0 +1,75 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_M",
+      "local_params": {
+        "half_u": 0.21289026165305153,
+        "half_v": 0.11539382721020966,
+        "inner_u": 0.09347775392075253,
+        "apex_lift": 0.009215455161547377,
+        "underband_dip": 0.04625684891852788,
+        "dome_depth_cm": 1.9032328294470473
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.38671751796727694,
+        "front_half_u": 0.5073071232938319,
+        "front_leg_curve": 0.3266350939780982,
+        "back_top_v": 0.31116716132833183,
+        "back_half_u": 0.31653337019046374
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.3053445683858415,
+        "front_half_u": 0.36360158840032725,
+        "front_leg_curve": 0.5258206491721243,
+        "back_top_v": 0.30633919858856956,
+        "back_half_u": 0.31406932022961304
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 30.17011917036379
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_NEOPRENE_2MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.4068531541651617,
+    "saturation": 0.4770669212568201,
+    "lightness": 0.38996937015274263,
+    "pattern_overlay": "polka",
+    "pattern_scale": 0.7486887564725822,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.6966904362915942,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_11_one_piece_maillot_M080",
+  "variant_index": 6,
+  "modesty": {
+    "bottom_coverage_strict": 0.8,
+    "cup_coverage_strict": 0.8
+  }
+}

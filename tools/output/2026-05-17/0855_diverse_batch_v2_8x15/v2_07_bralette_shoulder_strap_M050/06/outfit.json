@@ -1,0 +1,75 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_S",
+      "local_params": {
+        "half_u": 0.14393110848534088,
+        "half_v": 0.053252713938123454,
+        "inner_u": 0.045498207428438193,
+        "apex_lift": 0.07766787735577414,
+        "underband_dip": 0.0365302018531181
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.5354292284335611,
+        "front_half_u": 0.4861570305437147,
+        "front_leg_curve": 0.4850702656142954,
+        "back_top_v": 0.5399539338110837,
+        "back_half_u": 0.2995355125860522
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 30.391680666833068
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ALGAE_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_BRODERIE_ANGLAISE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_OVAL_8MM",
+      "local_params": {
+        "count": 11.290868048242027
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.6750716337476419,
+    "saturation": 0.5368774759258732,
+    "lightness": 0.6481529671484896,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.8857183425084021,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_07_bralette_shoulder_strap_M050",
+  "variant_index": 6,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}

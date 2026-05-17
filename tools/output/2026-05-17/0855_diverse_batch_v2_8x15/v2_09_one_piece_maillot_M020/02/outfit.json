@@ -1,0 +1,75 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_M",
+      "local_params": {
+        "half_u": 0.15221813229332648,
+        "half_v": 0.04490548379638807,
+        "inner_u": 0.06536981428232604,
+        "apex_lift": 0.27616857632465736,
+        "underband_dip": 0.010763569473351237
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.31409156959657614,
+        "front_half_u": 0.3681084162366803,
+        "front_leg_curve": 0.32441941358284393,
+        "back_top_v": 0.3699416492487218,
+        "back_half_u": 0.312497328492717
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_10MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TULLE_NET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_SLUB_LINEN_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_BEADED_80MM",
+      "local_params": {
+        "length_cm": 11.46201040078823
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_PENDANT_DROP_15MM_GOLD",
+      "local_params": {
+        "size_cm": 2.4733269649232343
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.30091221657015155,
+    "saturation": 0.5000611099864218,
+    "lightness": 0.4617604363551672,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.7968284301700859,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_09_one_piece_maillot_M020",
+  "variant_index": 2,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

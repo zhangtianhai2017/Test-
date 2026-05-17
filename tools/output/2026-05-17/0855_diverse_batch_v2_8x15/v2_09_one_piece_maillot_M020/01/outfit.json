@@ -1,0 +1,76 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_L",
+      "local_params": {
+        "half_u": 0.2674968664522553,
+        "half_v": 0.11391216687538347,
+        "inner_u": 0.06944037693367619,
+        "apex_lift": -0.0026145340811942475,
+        "underband_dip": -0.0016935761416881218
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.3394227846287642,
+        "front_half_u": 0.32026495708991387,
+        "front_leg_curve": 0.5812288967643131,
+        "back_top_v": 0.27250489534575195,
+        "back_half_u": 0.23510645947005046
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.30832678623009135,
+        "front_half_u": 0.29737590137370645,
+        "front_leg_curve": 0.5014318561383755,
+        "back_top_v": 0.3112973111332604,
+        "back_half_u": 0.2154913170865093
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 29.04943305310605
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_QNOVA_RIBBED",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 5.713254755334817
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.28891221657015154,
+    "saturation": 0.47926439493267575,
+    "lightness": 0.47283542114216537,
+    "pattern_overlay": "checker",
+    "pattern_scale": 0.5368606252867884,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_09_one_piece_maillot_M020",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.2,
+    "cup_coverage_strict": 0.2
+  }
+}

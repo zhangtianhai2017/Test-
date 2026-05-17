@@ -1,0 +1,63 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_M",
+      "local_params": {
+        "half_u": 0.10882437213512312,
+        "half_v": 0.09667212664262358,
+        "inner_u": 0.0617225752360407,
+        "apex_lift": 0.02639556865748696,
+        "underband_dip": 0.005753686451458734
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.3322333530500915,
+        "front_half_u": 0.2936855532013504,
+        "front_leg_curve": 0.7177541899374547,
+        "back_top_v": 0.24516112205203572,
+        "back_half_u": 0.25534448904501744
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 56.553477866319156
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_WAFFLE_HONEYCOMB",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.649873265228057,
+    "saturation": 0.7405946502825783,
+    "lightness": 0.7233193039165142,
+    "pattern_overlay": "stripe",
+    "pattern_scale": 0.4319092884449899,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_01_triangle_string_halter_M050",
+  "variant_index": 5,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}

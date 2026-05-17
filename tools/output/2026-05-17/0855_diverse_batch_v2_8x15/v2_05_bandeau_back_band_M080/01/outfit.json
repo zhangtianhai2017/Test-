@@ -1,0 +1,101 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_S",
+      "local_params": {
+        "half_u": 0.17980744804654147,
+        "half_v": 0.09725648428379081,
+        "inner_u": 0.09125596933161725,
+        "apex_lift": 0.009216008593920742,
+        "underband_dip": 0.04622075209570642,
+        "dome_depth_cm": 1.8618393512001183
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.3884352413196152,
+        "front_half_u": 0.51230733907072,
+        "front_leg_curve": 0.5225684612427564,
+        "back_top_v": 0.3091085675035571,
+        "back_half_u": 0.3061643843230129
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.30819835298690185,
+        "front_half_u": 0.43690470015362226,
+        "front_leg_curve": 0.3321109337961764,
+        "back_top_v": 0.3113533843662323,
+        "back_half_u": 0.306244613320972
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 3.5995753848257652
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_15MM",
+      "local_params": {
+        "length_cm": 10.276622038291295
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ALGAE_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_BELLY",
+      "local_params": {
+        "length_cm": 80.10021033593267
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHAIN",
+      "local_params": {
+        "diameter_cm": 9.898089575820386
+      }
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.2698800547456096,
+    "saturation": 0.6648965151655276,
+    "lightness": 0.25,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.37068720474962885,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_05_bandeau_back_band_M080",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.8,
+    "cup_coverage_strict": 0.8
+  }
+}

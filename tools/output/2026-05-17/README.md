@@ -11,3 +11,6 @@ _Top: [`tools/output/`](../README.md)_
 
 - [`0823_diverse_batch_v2_8x15/`](0823_diverse_batch_v2_8x15/README.md) — 128 seed dirs · 249 images
   <br/><a href='0823_diverse_batch_v2_8x15/README.md'><img src='0823_diverse_batch_v2_8x15/overview.png' width='280'/></a>
+
+- [`0855_diverse_batch_v2_8x15/`](0855_diverse_batch_v2_8x15/README.md) — 132 seed dirs · 253 images
+  <br/><a href='0855_diverse_batch_v2_8x15/README.md'><img src='0855_diverse_batch_v2_8x15/overview.png' width='280'/></a>

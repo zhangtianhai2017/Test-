@@ -1,0 +1,68 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_S",
+      "local_params": {
+        "half_u": 0.141281082006265,
+        "half_v": 0.07748421469891939,
+        "inner_u": 0.08241712146380978,
+        "apex_lift": 0.08128814666700614,
+        "underband_dip": -0.03561214725455371
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.5464753646519742,
+        "front_half_u": 0.5655789373155977,
+        "front_leg_curve": 0.4153424200923963,
+        "back_top_v": 0.4895592617255361,
+        "back_half_u": 0.3552752046810572
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 31.816136568974148
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_10MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BRODERIE_ANGLAISE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_BIOPOLYMER_PLAIN",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.651071633747642,
+    "saturation": 0.5471514657916356,
+    "lightness": 0.6201944164585842,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.5212663538691968,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_07_bralette_shoulder_strap_M050",
+  "variant_index": 4,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}

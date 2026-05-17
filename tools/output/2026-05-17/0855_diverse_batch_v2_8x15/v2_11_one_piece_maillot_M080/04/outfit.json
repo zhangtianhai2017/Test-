@@ -1,0 +1,57 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_M",
+      "local_params": {
+        "half_u": 0.1631947034261996,
+        "half_v": 0.0850692857467788,
+        "inner_u": 0.09249884333910663,
+        "apex_lift": 0.01047602353170822,
+        "underband_dip": 0.04553396815284651,
+        "dome_depth_cm": 1.1123829245152979
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.41579487975073337,
+        "front_half_u": 0.570166891161106,
+        "front_leg_curve": 0.47621851875763577,
+        "back_top_v": 0.4186218063170331,
+        "back_half_u": 0.4453490608216883
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HEMP_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.3828531541651617,
+    "saturation": 0.5218177861759754,
+    "lightness": 0.28197812431892766,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.6324694519855776,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_11_one_piece_maillot_M080",
+  "variant_index": 4,
+  "modesty": {
+    "bottom_coverage_strict": 0.8,
+    "cup_coverage_strict": 0.8
+  }
+}

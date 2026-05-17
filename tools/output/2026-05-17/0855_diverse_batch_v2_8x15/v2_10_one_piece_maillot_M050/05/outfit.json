@@ -1,0 +1,70 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_M",
+      "local_params": {
+        "half_u": 0.18534312505852787,
+        "half_v": 0.0762364251685366,
+        "inner_u": 0.07907654417235216,
+        "apex_lift": 0.003710583933658626,
+        "underband_dip": 0.00236275067907097
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.36039086770298895,
+        "front_half_u": 0.4017516188245975,
+        "front_leg_curve": 0.3273043581344157,
+        "back_top_v": 0.35759605334659483,
+        "back_half_u": 0.30938916823524015
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_10MM",
+      "local_params": {
+        "length_cm": 29.78957104498022
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SLUB_LINEN_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_BEADED",
+      "local_params": {
+        "diameter_cm": 6.291129929739323
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.08783706084593051,
+    "saturation": 0.47356926610676486,
+    "lightness": 0.3082866006302046,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.8957718103156154,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "free"
+  },
+  "source_seed": "v2_10_one_piece_maillot_M050",
+  "variant_index": 5,
+  "modesty": {
+    "bottom_coverage_strict": 0.5,
+    "cup_coverage_strict": 0.5
+  }
+}
