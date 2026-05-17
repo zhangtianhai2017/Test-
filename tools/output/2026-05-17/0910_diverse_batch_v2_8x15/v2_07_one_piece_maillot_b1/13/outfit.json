@@ -1,0 +1,67 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_S",
+      "local_params": {
+        "half_u": 0.183503763587239,
+        "half_v": 0.07220626904079343,
+        "inner_u": 0.044844308607137964,
+        "apex_lift": 0.011823187354817494,
+        "underband_dip": 0.04487845285646524,
+        "dome_depth_cm": 1.0896041473362863
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.3944328767207899,
+        "front_half_u": 0.36394525588389337,
+        "front_leg_curve": 0.32167311288839706,
+        "back_top_v": 0.31129940251408345,
+        "back_half_u": 0.30871385488438624
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEERSUCKER_STRIPE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.6051342470896691,
+    "saturation": 0.3561877241573466,
+    "lightness": 0.3104161702779398,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.30955934870154617,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.7748485179038089,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_07_one_piece_maillot_b1",
+  "variant_index": 13,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

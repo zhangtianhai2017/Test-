@@ -1,0 +1,87 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_M",
+      "local_params": {
+        "half_u": 0.2128747415334282,
+        "half_v": 0.1153092069256121,
+        "inner_u": 0.09174257889588062,
+        "apex_lift": 0.0064347598743475535,
+        "underband_dip": 0.004285395343215983,
+        "dome_depth_cm": 1.140269426514571
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.31383580619775353,
+        "front_half_u": 0.4318482098948945,
+        "front_leg_curve": 0.31889848983251,
+        "back_top_v": 0.3056587351030979,
+        "back_half_u": 0.3139040913223681
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.5293594031078237,
+        "front_half_u": 0.564617394814883,
+        "front_leg_curve": 0.472102723031039,
+        "back_top_v": 0.41174603027670986,
+        "back_half_u": 0.3508845303807438
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 67.59695276889485
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_WAFFLE_HONEYCOMB",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_PENDANT_DROP_15MM_GOLD",
+      "local_params": {
+        "size_cm": 1.6959322444406966
+      }
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.2724753694498432,
+    "saturation": 0.2909578513842037,
+    "lightness": 0.5723176342085592,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.3959030614785682,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_06_one_piece_maillot_b0",
+  "variant_index": 9,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

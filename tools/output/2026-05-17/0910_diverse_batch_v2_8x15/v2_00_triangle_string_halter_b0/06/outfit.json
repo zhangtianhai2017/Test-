@@ -1,0 +1,74 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_M",
+      "local_params": {
+        "half_u": 0.08983136578507303,
+        "half_v": 0.07665373609731554,
+        "inner_u": 0.11393560737304433,
+        "apex_lift": 0.11240928609685745,
+        "underband_dip": 0.07285745592846002
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.3259335450564665,
+        "front_half_u": 0.35126877757545105,
+        "front_leg_curve": 0.5168985584998451,
+        "back_top_v": 0.3142894693646163,
+        "back_half_u": 0.2513652446041484
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.3327813607927438,
+        "front_half_u": 0.3472715653976212,
+        "front_leg_curve": 0.7356292323328987,
+        "back_top_v": 0.24570151617068356,
+        "back_half_u": 0.1848655052265208
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 51.48587414210277
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ECONYL_PLAIN_LIGHT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.44314757265240795,
+    "saturation": 0.3471433894751848,
+    "lightness": 0.47266033988935113,
+    "pattern_overlay": "stripe",
+    "pattern_scale": 0.32736179952621364,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_00_triangle_string_halter_b0",
+  "variant_index": 6,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

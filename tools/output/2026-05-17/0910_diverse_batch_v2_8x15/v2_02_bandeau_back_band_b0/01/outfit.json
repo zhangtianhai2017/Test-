@@ -1,0 +1,87 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_L",
+      "local_params": {
+        "half_u": 0.19706577620404286,
+        "half_v": 0.0993692599491755,
+        "inner_u": 0.04372999910525146,
+        "apex_lift": 0.07420059383146742,
+        "underband_dip": 0.0426939993812997,
+        "dome_depth_cm": 1.0695090701740517
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.30827217411858066,
+        "front_half_u": 0.4313919408559955,
+        "front_leg_curve": 0.5358727623192023,
+        "back_top_v": 0.3085705571785037,
+        "back_half_u": 0.31054174576108945
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.38732408291825793,
+        "front_half_u": 0.36928315305677484,
+        "front_leg_curve": 0.31354982511443524,
+        "back_top_v": 0.3681195595348914,
+        "back_half_u": 0.41119952151693157
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 4.494784566600365
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 24.26974956686681
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.8862437035453506,
+    "saturation": 0.7809216049173049,
+    "lightness": 0.3952501814398248,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.8966217047648155,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_02_bandeau_back_band_b0",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

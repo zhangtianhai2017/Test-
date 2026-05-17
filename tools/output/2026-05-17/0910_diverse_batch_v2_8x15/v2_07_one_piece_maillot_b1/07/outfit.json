@@ -1,0 +1,69 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_M",
+      "local_params": {
+        "half_u": 0.16884136506875158,
+        "half_v": 0.08595909670482282,
+        "inner_u": 0.04330193209497836,
+        "apex_lift": 0.07430667104618167,
+        "underband_dip": 0.04621881622373994,
+        "dome_depth_cm": 1.9247532985762397
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.3062676973401157,
+        "front_half_u": 0.426123643061545,
+        "front_leg_curve": 0.5160180023293579,
+        "back_top_v": 0.30894799663328687,
+        "back_half_u": 0.4075375983484008
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_NEOPRENE_1MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_PENDANT_DROP_15MM_GOLD",
+      "local_params": {
+        "size_cm": 1.5747662193792062
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.5331342470896691,
+    "saturation": 0.33208200264043614,
+    "lightness": 0.15,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.2772916312961211,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_07_one_piece_maillot_b1",
+  "variant_index": 7,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

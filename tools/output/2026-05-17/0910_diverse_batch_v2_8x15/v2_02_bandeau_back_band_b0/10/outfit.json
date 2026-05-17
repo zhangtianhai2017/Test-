@@ -1,0 +1,96 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_S",
+      "local_params": {
+        "half_u": 0.1810031220628414,
+        "half_v": 0.09934813485223715,
+        "inner_u": 0.0956985923390912,
+        "apex_lift": 0.07334517914481557,
+        "underband_dip": 0.04374808853173341,
+        "dome_depth_cm": 1.9205985681541486
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.39453616794797436,
+        "front_half_u": 0.4315337625483904,
+        "front_leg_curve": 0.31303576308959086,
+        "back_top_v": 0.30438093381016174,
+        "back_half_u": 0.3153969445783639
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.30643485115352115,
+        "front_half_u": 0.36162358325975646,
+        "front_leg_curve": 0.517503459123983,
+        "back_top_v": 0.30809583438204835,
+        "back_half_u": 0.3141648105849693
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 2.6831032291002983
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FISHNET_OPEN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHARM_BEACH",
+      "local_params": {
+        "diameter_cm": 7.732325860034589
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_BELLY",
+      "local_params": {
+        "length_cm": 66.46276568947513
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_BEADED",
+      "local_params": {
+        "diameter_cm": 6.410937639879697
+      }
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.9942437035453506,
+    "saturation": 0.7280471719743803,
+    "lightness": 0.4963711378186941,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.29473647422681964,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_02_bandeau_back_band_b0",
+  "variant_index": 10,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.15759943680375693,
+        "half_v": 0.08028409912980769,
+        "inner_u": 0.1502816223024393,
+        "apex_lift": 0.022611569319245062,
+        "underband_dip": 0.09413822244024
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.24847030377650273,
+        "front_half_u": 0.4158646579428292,
+        "front_leg_curve": 0.7363834916297649,
+        "back_top_v": 0.25026026413375435,
+        "back_half_u": 0.1885106856910237
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 44.85562986517314
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 33.55803743663755
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_8MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEERSUCKER_STRIPE",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.2164066107440517,
+    "saturation": 0.7461992629133494,
+    "lightness": 0.2960330160588005,
+    "pattern_overlay": "polka",
+    "pattern_scale": 0.2604202777422005,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_01_triangle_string_halter_b1",
+  "variant_index": 6,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

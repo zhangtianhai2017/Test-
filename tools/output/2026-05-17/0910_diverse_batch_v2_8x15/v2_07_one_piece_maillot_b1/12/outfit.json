@@ -1,0 +1,96 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_L",
+      "local_params": {
+        "half_u": 0.19395441202847752,
+        "half_v": 0.1356274548766056,
+        "inner_u": 0.045397892798613365,
+        "apex_lift": 0.07412880985971562,
+        "underband_dip": 0.004105311992027661,
+        "dome_depth_cm": 1.0988473038187612
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.3856510835114797,
+        "front_half_u": 0.4310080663252013,
+        "front_leg_curve": 0.5199835483745902,
+        "back_top_v": 0.37440192898920643,
+        "back_half_u": 0.3133264566080463
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.3914373374378416,
+        "front_half_u": 0.36558602053079253,
+        "front_leg_curve": 0.33097991372758706,
+        "back_top_v": 0.30561627787523626,
+        "back_half_u": 0.3148970758085545
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HUNZA_CRINKLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_COWRIE_20MM",
+      "local_params": {
+        "size_cm": 1.320145003107662
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHAIN",
+      "local_params": {
+        "diameter_cm": 7.058552387685349
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_CHAIN_GOLD",
+      "local_params": {
+        "diameter_cm": 7.034343918965233
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_DROP_GOLD",
+      "local_params": {
+        "length_cm": 1.7076946327258153
+      }
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.5931342470896691,
+    "saturation": 0.29951556090163073,
+    "lightness": 0.3830342972733408,
+    "pattern_overlay": "polka",
+    "pattern_scale": 0.8637408409042695,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.6577582281931558,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_07_one_piece_maillot_b1",
+  "variant_index": 12,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

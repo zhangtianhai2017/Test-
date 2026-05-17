@@ -1,0 +1,82 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.1810466333523858,
+        "half_v": 0.05118304238608449,
+        "inner_u": 0.11190704357950601,
+        "apex_lift": 0.11277564610564177,
+        "underband_dip": 0.011572358155844538
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.32788484752829894,
+        "front_half_u": 0.34961770521921876,
+        "front_leg_curve": 0.5195455232495275,
+        "back_top_v": 0.24925304828930103,
+        "back_half_u": 0.2522969024034705
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 42.99168462117065
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 20.051836305981936
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_NEOPRENE_1MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_TASSEL_SILK_50MM",
+      "local_params": {
+        "length_cm": 6.643902184747047
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.3004066107440517,
+    "saturation": 0.6112286756152502,
+    "lightness": 0.1964516218909325,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.8249847728872892,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_01_triangle_string_halter_b1",
+  "variant_index": 13,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

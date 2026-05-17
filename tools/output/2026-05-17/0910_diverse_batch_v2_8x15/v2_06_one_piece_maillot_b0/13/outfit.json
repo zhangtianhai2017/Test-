@@ -1,0 +1,80 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_M",
+      "local_params": {
+        "half_u": 0.16830213143264258,
+        "half_v": 0.11497618655548503,
+        "inner_u": 0.044197416160480604,
+        "apex_lift": 0.06854873047472149,
+        "underband_dip": 0.04373175226052219,
+        "dome_depth_cm": 1.1437322450717828
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.3897356212226778,
+        "front_half_u": 0.435225778450437,
+        "front_leg_curve": 0.33545779386736013,
+        "back_top_v": 0.3056227904135532,
+        "back_half_u": 0.3106116804200993
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.536744525357219,
+        "front_half_u": 0.47550047577929383,
+        "front_leg_curve": 0.3274102664174459,
+        "back_top_v": 0.5317096810172521,
+        "back_half_u": 0.3577395498113361
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 30.528529243286993
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_CROCHET_COTTON",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.32047536944984323,
+    "saturation": 0.46926613072168294,
+    "lightness": 0.3650044977855143,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.36198190094371896,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_06_one_piece_maillot_b0",
+  "variant_index": 13,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_L",
+      "local_params": {
+        "half_u": 0.2511099614363007,
+        "half_v": 0.09743664955455514,
+        "inner_u": 0.0479404581450137,
+        "apex_lift": 0.009601998330120723,
+        "underband_dip": 0.006731415396583543,
+        "dome_depth_cm": 1.0516815311600554
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.38911493034009254,
+        "front_half_u": 0.3691966024231532,
+        "front_leg_curve": 0.3167307722132406,
+        "back_top_v": 0.30981565989451143,
+        "back_half_u": 0.31369272718646996
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEQUIN_DENSE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_STUD_PEARL",
+      "local_params": {
+        "size_cm": 0.9165994100160398
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_CHOKER_GOLD",
+      "local_params": {
+        "width_cm": 0.5989794684080716
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_CHAIN_GOLD",
+      "local_params": {
+        "diameter_cm": 7.327402147972055
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.5571342470896691,
+    "saturation": 0.2619792834312993,
+    "lightness": 0.15,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.8156150169160017,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_07_one_piece_maillot_b1",
+  "variant_index": 9,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

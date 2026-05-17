@@ -1,0 +1,104 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.10779652168365655,
+        "half_v": 0.08805233604957871,
+        "inner_u": 0.11645458551339952,
+        "apex_lift": 0.28257691093076964,
+        "underband_dip": 0.006950634444596988
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.33447217823834813,
+        "front_half_u": 0.4098605940994883,
+        "front_leg_curve": 0.5356200166899019,
+        "back_top_v": 0.31338792091371126,
+        "back_half_u": 0.18451798256465235
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.24703047809002246,
+        "front_half_u": 0.4131051591615149,
+        "front_leg_curve": 0.721593077477553,
+        "back_top_v": 0.24527324254319288,
+        "back_half_u": 0.1864783792860793
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 61.769447123509906
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 17.699792703333223
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MUSHROOM_LEATHER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_PENDANT_DROP_15MM_GOLD",
+      "local_params": {
+        "size_cm": 1.114676133256662
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_CHIFFON_30MM",
+      "local_params": {
+        "size_cm": 2.7294196442735976
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_WAIST",
+      "local_params": {
+        "length_cm": 87.10781195636909
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHARM_BEACH",
+      "local_params": {
+        "diameter_cm": 7.173471506309367
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.527147572652408,
+    "saturation": 0.292940248038972,
+    "lightness": 0.4163478284468588,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.682490495468967,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.0,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.0,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_00_triangle_string_halter_b0",
+  "variant_index": 13,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

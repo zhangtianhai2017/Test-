@@ -1,0 +1,82 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_L",
+      "local_params": {
+        "half_u": 0.2545340736093433,
+        "half_v": 0.13594569430412234,
+        "inner_u": 0.0919960013864713,
+        "apex_lift": 0.00748676215829519,
+        "underband_dip": 0.04680174903846698,
+        "dome_depth_cm": 1.9344716177550918
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.4188052921485017,
+        "front_half_u": 0.5636217901817437,
+        "front_leg_curve": 0.48849350923803414,
+        "back_top_v": 0.4126146613843796,
+        "back_half_u": 0.4437237209016508
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.30910073659636794,
+        "front_half_u": 0.4266940081970048,
+        "front_leg_curve": 0.5221423046351621,
+        "back_top_v": 0.3708621623294275,
+        "back_half_u": 0.41222693309948066
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_15MM",
+      "local_params": {
+        "length_cm": 34.898841300822724
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_15MM",
+      "local_params": {
+        "length_cm": 12.167623410870345
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_NEOPRENE_1MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.1764753694498432,
+    "saturation": 0.6015480761689651,
+    "lightness": 0.38597748702618273,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.40286784032932654,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.8296091502798888,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.85,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_06_one_piece_maillot_b0",
+  "variant_index": 1,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}

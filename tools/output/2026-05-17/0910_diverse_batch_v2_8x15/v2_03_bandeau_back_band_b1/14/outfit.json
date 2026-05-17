@@ -1,0 +1,78 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_M",
+      "local_params": {
+        "half_u": 0.16702564152293595,
+        "half_v": 0.1176612893153755,
+        "inner_u": 0.09551575338809387,
+        "apex_lift": 0.06884796807202839,
+        "underband_dip": 0.04343266411508657,
+        "dome_depth_cm": 1.133597482404842
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.5377101892344309,
+        "front_half_u": 0.4051402472637757,
+        "front_leg_curve": 0.31887331893771276,
+        "back_top_v": 0.42104713859278214,
+        "back_half_u": 0.3829020645079977
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 5.657032627821044
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEERSUCKER_STRIPE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_CHIFFON_30MM",
+      "local_params": {
+        "size_cm": 4.749116667409552
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_PENDANT_DROP_15MM_GOLD",
+      "local_params": {
+        "size_cm": 1.8360907821265728
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.3334161060904613,
+    "saturation": 0.7888460359633036,
+    "lightness": 0.667390879209516,
+    "pattern_overlay": "polka",
+    "pattern_scale": 0.4917165977488658,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.7647575222975461,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.45,
+    "shape_mode": "extreme"
+  },
+  "source_seed": "v2_03_bandeau_back_band_b1",
+  "variant_index": 14,
+  "modesty": {
+    "bottom_coverage_strict": 0.95,
+    "cup_coverage_strict": 0.95
+  }
+}
