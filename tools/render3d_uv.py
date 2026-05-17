@@ -1062,20 +1062,27 @@ def build_fabric_shell(body_mesh: o3d.geometry.TriangleMesh, body_uvs: np.ndarra
     pts_g = body_uvs.copy()
     pts_g[:, 0] = pts_g[:, 0] * 2.0 - 1.0
 
-    # Shrink each polygon inward by SHELL_UV_MARGIN before the test.
+    # Shrink CUP polygons inward by SHELL_UV_MARGIN before the test.
     # The cylindrical UV unwrap places the armpit body triangles at the
     # same u-range as a wide cup's outer edge, and contains_points has
     # no tolerance — without this margin, ~15% of outputs picked up
     # armpit triangles and produced a fabric "bridge" from chest side
-    # to inner upper arm. Scaling toward centroid pulls the long-axis
-    # outer vertices in by MORE than the margin, which is exactly the
-    # u-axis edge that bleeds into the armpit.
+    # to inner upper arm.
+    #
+    # IMPORTANT: only applied to polygons whose centroid sits in the
+    # upper-body band (v > 0.55).  Bottom panels lie in v < 0.50 and
+    # already have to fight the body deployment must_clear filter for
+    # legs; shrinking them too makes narrow thongs / brazilian bottoms
+    # disappear from the render entirely.
     SHELL_UV_MARGIN = 0.02
+    CUP_V_THRESHOLD = 0.55   # polygons centred above this get the shrink
 
-    def _shrink_poly(p_np):
+    def _shrink_poly_if_cup(p_np):
         if len(p_np) < 3:
             return p_np
         c = p_np.mean(axis=0)
+        if c[1] < CUP_V_THRESHOLD:
+            return p_np                    # bottom / side-tie: no shrink
         v = p_np - c
         mean_r = float(np.linalg.norm(v, axis=1).mean())
         if mean_r < 1e-6:
@@ -1090,7 +1097,7 @@ def build_fabric_shell(body_mesh: o3d.geometry.TriangleMesh, body_uvs: np.ndarra
         if len(poly) < 3:
             continue
         p = np.asarray(poly, dtype=np.float32)
-        p = _shrink_poly(p)
+        p = _shrink_poly_if_cup(p)
         path = Path(p)
         inside_any |= path.contains_points(pts_g)
 
@@ -1432,8 +1439,8 @@ def _velvet_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
         amp = 1.0 / (2.0 ** i)
         phx, phy = rng.uniform(0, 2 * np.pi, 2)
         height = height + amp * np.sin(xx * fx + phx) * np.sin(yy * fy + phy)
-    height = height * 0.3              # keep gentle
-    return _height_to_normal(height, strength=2.0)
+    height = height * 0.6              # stronger pile read
+    return _height_to_normal(height, strength=4.0)
 
 
 def _crochet_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
@@ -1526,22 +1533,23 @@ def _fishnet_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
 
 
 def _neoprene_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
-    """Rubber-coated nylon — uniform low micro-grain."""
+    """Rubber-coated nylon — uniform low micro-grain, slightly stronger
+    so the wetsuit feel reads at viewing distance."""
     rng = np.random.default_rng(41)
-    height = rng.normal(scale=0.12, size=(h, w))
-    # smooth a touch
+    height = rng.normal(scale=0.22, size=(h, w))
     from scipy.ndimage import gaussian_filter
-    height = gaussian_filter(height, sigma=0.8)
-    return _height_to_normal(height, strength=1.2)
+    height = gaussian_filter(height, sigma=0.6)
+    return _height_to_normal(height, strength=2.2)
 
 
 def _slub_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
-    """Linen-like slub — irregular horizontal thickness variations."""
+    """Linen-like slub — irregular horizontal thickness variations.
+    Bumped strength so the linen texture reads clearly."""
     rng = np.random.default_rng(53)
-    rows = rng.normal(scale=0.6, size=(h, 1))
+    rows = rng.normal(scale=0.9, size=(h, 1))
     cols = 0.5 + 0.5 * np.cos(np.linspace(0, 2 * np.pi * 30, w))[None, :]
     height = rows * cols
-    return _height_to_normal(height, strength=3.0)
+    return _height_to_normal(height, strength=4.5)
 
 
 def _terry_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
