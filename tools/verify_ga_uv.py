@@ -144,6 +144,8 @@ CONT_FIELDS = [
     "fringe_length",       # 0..1 -> 1..10 cm
     "has_beads",           # 0/1: small beads along the top-band edge
     "has_shell",           # 0/1: shell-like charm hanging at front center
+    "asym_amount",         # 0 = mirror, >=0.5 = dramatic asym (clamped binary)
+    "geom_ratio_pull",     # 0 = free, 1 = snap hu/hv to phi (golden); 0.5 = thirds
 ]
 
 
@@ -199,6 +201,9 @@ class Genome:
     # style (Batch 2 new)
     style_archetype: str
     hardware_metal: str
+    # structural / aesthetic (Batch 3 new)
+    asym_amount: float = 0.0
+    geom_ratio_pull: float = 0.0
 
     def as_dict(self) -> dict:
         return asdict(self)
@@ -425,6 +430,37 @@ def _enforce_constraints(g: Genome) -> Genome:
     if d["bot_front_top_v"] > cup_bottom_v - 0.02:
         d["bot_front_top_v"] = max(p_v_hi + 0.04, cup_bottom_v - 0.05)
 
+    # --- Batch 3: thin-panel forbidden band -----------------------------
+    # The back bottom either reads as a real panel (>= 0.13) or as a
+    # string/thong driven by the strap render path (<= 0.05).  A 0.05–
+    # 0.13 panel paints as a tall narrow strip — visually cheap and
+    # structurally implausible.  Snap upward into "panel" territory.
+    if 0.05 < d["bot_back_half_u"] < 0.13:
+        d["bot_back_half_u"] = 0.13
+
+    # --- Batch 3: symmetry binary ---------------------------------------
+    # Either perfect mirror (asym=0) or dramatic (asym>=0.5).  Squash the
+    # in-between region — small asymmetries read as construction errors,
+    # not design intent.
+    if 0.05 < d["asym_amount"] < 0.5:
+        d["asym_amount"] = 0.0 if d["asym_amount"] < 0.28 else 0.5
+
+    # --- Batch 3: golden-ratio pull -------------------------------------
+    # When geom_ratio_pull is high, nudge cup hu/hv toward phi (1.618).
+    # When near 0.5, nudge toward 1.5 (thirds proportion).  When 0,
+    # leave free.  Pull strength = geom_ratio_pull magnitude, ≤ 30%.
+    if d["geom_ratio_pull"] > 0.10:
+        if d["geom_ratio_pull"] > 0.66:
+            target = 1.618    # phi (golden)
+        else:
+            target = 1.50     # thirds
+        current = d["top_half_u"] / max(d["top_half_v"], 1e-3)
+        pull = min(0.30, d["geom_ratio_pull"])
+        new_ratio = current + pull * (target - current)
+        d["top_half_u"] = d["top_half_v"] * new_ratio
+        # re-apply lower clamp so we don't dip below the seed
+        d["top_half_u"] = max(d["top_half_u"], 0.05)
+
     # --- Batch 1: fabric_weight affects drape ---------------------------
     # heavier fabric -> less stretch -> panels stay more structured.
     # (No-op here; used downstream in render_mesh for wrinkle amplitude.)
@@ -534,10 +570,18 @@ def _cup_polygon(g: Genome, side: int) -> list[tuple[float, float]]:
 
     side: +1 = right (u > 0), -1 = left (u < 0).
     When top_inner_u is 0 the two cups touch in the middle -> effective bandeau.
+
+    When g.asym_amount >= 0.5 the RIGHT cup (side=+1) is scaled down to
+    ~70% (both hu and hv) so the silhouette reads as a deliberate
+    asymmetric design rather than a symmetric mirror.  The LEFT cup is
+    left untouched so the dominant cup stays at full coverage.
     """
     cv = g.top_center_v
     hv = g.top_half_v
     hu = g.top_half_u
+    if g.asym_amount >= 0.5 and side == 1:
+        hu = hu * 0.65
+        hv = hv * 0.85
     inner_u = g.top_inner_u
     apex = g.top_apex_lift * 0.6
     dip = g.top_underband_dip * 0.3

@@ -913,6 +913,25 @@ for d in (CUP_PIECES, BOTTOM_PIECES, STRAP_PIECES, HARDWARE,
     LIBRARY.update(d)
 
 
+# ---------------------------------------------------------------------------
+# Derive edge_finish_policy per fabric from its weave family.
+# Kept here (vs hand-set on every entry) so a new fabric automatically
+# inherits the right policy as long as its weave is one of the known
+# families. Override on the entry if a specific fabric is special.
+# ---------------------------------------------------------------------------
+
+_RAW_OK_WEAVES      = {"neoprene", "foam"}
+_SELVEDGE_WEAVES    = {"crochet", "lace", "fishnet", "mesh"}
+
+for _fid, _e in FABRICS.items():
+    if _e.edge_finish_policy != "must_bind":
+        continue   # respect any hand-set override
+    if _e.weave in _RAW_OK_WEAVES:
+        object.__setattr__(_e, "edge_finish_policy", "raw_ok")
+    elif _e.weave in _SELVEDGE_WEAVES:
+        object.__setattr__(_e, "edge_finish_policy", "selvedge_only")
+
+
 def entries_by_kind(kind: str) -> list[LibraryEntry]:
     return [e for e in LIBRARY.values() if e.kind == kind]
 

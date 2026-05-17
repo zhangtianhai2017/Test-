@@ -196,6 +196,12 @@ class LibraryEntry:
     metallic: float = 0.0
     fabric_source: str = ""              # econyl / qnova / virgin / biopolymer / amni_soul / cotton_blend
     biodegradable: bool = False
+    # Edge-finishing policy — what the cut edge of this fabric needs.
+    #   "must_bind"     — raw edge frays/rolls; needs binding tape or coverstitch
+    #   "raw_ok"        — neoprene / foam / coated — laser-cut edge is fine
+    #   "selvedge_only" — crochet / lace / macrame — the structure terminates
+    #                     itself; a separate bound edge would be redundant
+    edge_finish_policy: str = "must_bind"
 
     # --- Body jewelry ---
     jewelry_form: str = ""               # bracelet_chain / necklace_choker / earring_drop / etc.

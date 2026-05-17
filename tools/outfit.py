@@ -229,6 +229,18 @@ def random_outfit(archetype: str, rng: Optional[random.Random] = None,
         selected_ids.add(req_id)
 
     # Random global_design
+    # symmetry: binary — 70% perfect mirror, 30% dramatic asymmetric.
+    # No middle ground (a small skew reads as a construction defect).
+    if rng.random() < 0.30:
+        symmetry_mode, asym_amount = "dramatic_asym", 0.5 + 0.5 * rng.random()
+    else:
+        symmetry_mode, asym_amount = "mirror", 0.0
+    # geom_aesthetic: free / thirds / golden.  When chosen, pulls cup
+    # hu/hv ratio toward 1.5 (thirds) or 1.618 (phi).
+    geom_choice = rng.choices(
+        ["free", "thirds", "golden"], weights=[0.55, 0.20, 0.25])[0]
+    geom_pull = {"free": 0.0, "thirds": 0.45, "golden": 0.85}[geom_choice]
+
     global_design = {
         "hue": rng.uniform(0.0, 1.0),
         "saturation": rng.uniform(0.3, 0.85),
@@ -239,6 +251,11 @@ def random_outfit(archetype: str, rng: Optional[random.Random] = None,
              "checker", "herringbone"]),
         "pattern_scale": rng.uniform(0.2, 0.9),
         "palette_preset": "free",
+        # Batch-3 structural / aesthetic axes (see verify_ga_uv constraints).
+        "symmetry_mode":  symmetry_mode,
+        "asym_amount":    asym_amount,
+        "geom_aesthetic": geom_choice,
+        "geom_ratio_pull": geom_pull,
     }
     return Outfit(archetype=archetype, slot_assignments=assignments,
                     global_design=global_design)
@@ -683,6 +700,8 @@ def outfit_to_genome(outfit: Outfit):
         has_shell=1.0 if has_shell else 0.0,
         style_archetype=_v1_style_for(outfit),
         hardware_metal="gold",
+        asym_amount=float(outfit.global_design.get("asym_amount", 0.0)),
+        geom_ratio_pull=float(outfit.global_design.get("geom_ratio_pull", 0.0)),
     ).clipped()
     return _enforce_constraints(g)
 

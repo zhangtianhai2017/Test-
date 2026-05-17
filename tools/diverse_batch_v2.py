@@ -33,7 +33,7 @@ import batch_from_diverse_seeds as B   # reuse make_contact_sheet
 
 
 N_PER_SEED = 15
-RNG_MASTER = 20260517
+RNG_MASTER = 20260518   # bumped so the Batch-3 symmetry/geom samples vary
 
 # 8 (archetype, modesty) cells, ordered so the contact sheet reads
 # left→right by archetype and top→bottom by modesty.
