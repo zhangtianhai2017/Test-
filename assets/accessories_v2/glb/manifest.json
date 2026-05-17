@@ -1,0 +1,196 @@
+{
+  "version": 1,
+  "type": "accessory_catalog",
+  "skeleton": "MetaHuman UE5.6 Body",
+  "unitScale": "cm",
+  "forwardAxis": "+Y",
+  "ueImportSettings": {
+    "SceneScale": 1.0,
+    "ForwardAxis": "Y"
+  },
+  "accessories": [
+    {
+      "id": "ACX_OR_8MM_GOLD",
+      "file": "ACX_OR_8MM_GOLD.glb",
+      "family": "ring",
+      "displayName": "O-ring 8 mm gold",
+      "tags": [
+        "o_ring",
+        "small",
+        "gold"
+      ],
+      "metal": "gold",
+      "baseColorHex": "#d4af37",
+      "metallic": 1.0,
+      "roughness": 0.22,
+      "mount": "loop",
+      "anchorAnatomy": [
+        "sternum_mid"
+      ],
+      "bboxMm": [
+        8.0,
+        8.0,
+        1.4
+      ],
+      "weightG": 0.4,
+      "swingMode": "rigid",
+      "vertexCount": 384,
+      "faceCount": 768,
+      "sizeKb": 19,
+      "unitScale": "cm",
+      "forwardAxis": "+Y"
+    },
+    {
+      "id": "ACX_OR_12MM_GOLD",
+      "file": "ACX_OR_12MM_GOLD.glb",
+      "family": "ring",
+      "displayName": "O-ring 12 mm gold",
+      "tags": [
+        "o_ring",
+        "gold"
+      ],
+      "metal": "gold",
+      "baseColorHex": "#d4af37",
+      "metallic": 1.0,
+      "roughness": 0.22,
+      "mount": "loop",
+      "anchorAnatomy": [
+        "sternum_mid"
+      ],
+      "bboxMm": [
+        12.0,
+        12.0,
+        2.0
+      ],
+      "weightG": 0.9,
+      "swingMode": "rigid",
+      "vertexCount": 384,
+      "faceCount": 768,
+      "sizeKb": 19,
+      "unitScale": "cm",
+      "forwardAxis": "+Y"
+    },
+    {
+      "id": "ACX_OR_18MM_SILVER",
+      "file": "ACX_OR_18MM_SILVER.glb",
+      "family": "ring",
+      "displayName": "O-ring 18 mm silver",
+      "tags": [
+        "o_ring",
+        "large",
+        "silver"
+      ],
+      "metal": "silver",
+      "baseColorHex": "#c0c0c0",
+      "metallic": 1.0,
+      "roughness": 0.18,
+      "mount": "loop",
+      "anchorAnatomy": [
+        "waist_left_side"
+      ],
+      "bboxMm": [
+        18.0,
+        18.0,
+        2.8
+      ],
+      "weightG": 2.4,
+      "swingMode": "rigid",
+      "vertexCount": 384,
+      "faceCount": 768,
+      "sizeKb": 19,
+      "unitScale": "cm",
+      "forwardAxis": "+Y"
+    },
+    {
+      "id": "ACX_OR_12MM_ROSEGOLD",
+      "file": "ACX_OR_12MM_ROSEGOLD.glb",
+      "family": "ring",
+      "displayName": "O-ring 12 mm rose gold",
+      "tags": [
+        "o_ring",
+        "rose_gold"
+      ],
+      "metal": "rosegold",
+      "baseColorHex": "#c98a8a",
+      "metallic": 1.0,
+      "roughness": 0.25,
+      "mount": "loop",
+      "anchorAnatomy": [
+        "sternum_mid"
+      ],
+      "bboxMm": [
+        12.0,
+        12.0,
+        2.0
+      ],
+      "weightG": 0.9,
+      "swingMode": "rigid",
+      "vertexCount": 384,
+      "faceCount": 768,
+      "sizeKb": 19,
+      "unitScale": "cm",
+      "forwardAxis": "+Y"
+    },
+    {
+      "id": "ACX_DR_15MM_SILVER",
+      "file": "ACX_DR_15MM_SILVER.glb",
+      "family": "ring",
+      "displayName": "D-ring 15 mm silver",
+      "tags": [
+        "d_ring",
+        "silver"
+      ],
+      "metal": "silver",
+      "baseColorHex": "#c0c0c0",
+      "metallic": 1.0,
+      "roughness": 0.2,
+      "mount": "loop",
+      "anchorAnatomy": [
+        "sternum_mid"
+      ],
+      "bboxMm": [
+        15.0,
+        15.0,
+        2.4
+      ],
+      "weightG": 1.6,
+      "swingMode": "rigid",
+      "vertexCount": 384,
+      "faceCount": 768,
+      "sizeKb": 19,
+      "unitScale": "cm",
+      "forwardAxis": "+Y"
+    },
+    {
+      "id": "ACX_SR_20MM_BLACK",
+      "file": "ACX_SR_20MM_BLACK.glb",
+      "family": "ring",
+      "displayName": "Square ring 20 mm matte black",
+      "tags": [
+        "square_ring",
+        "matte_black",
+        "modern"
+      ],
+      "metal": "matte_black",
+      "baseColorHex": "#1a1a1a",
+      "metallic": 0.85,
+      "roughness": 0.55,
+      "mount": "loop",
+      "anchorAnatomy": [
+        "hip_left"
+      ],
+      "bboxMm": [
+        20.0,
+        20.0,
+        2.6
+      ],
+      "weightG": 2.0,
+      "swingMode": "rigid",
+      "vertexCount": 672,
+      "faceCount": 1344,
+      "sizeKb": 32,
+      "unitScale": "cm",
+      "forwardAxis": "+Y"
+    }
+  ]
+}
