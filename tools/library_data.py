@@ -587,7 +587,7 @@ FABRICS: dict[str, LibraryEntry] = {
     "F_FOAM_CUP_3MM": LibraryEntry(
         id="F_FOAM_CUP_3MM", kind="fabric",
         name="Molded EVA foam cup 3 mm", tags=("foam", "padding", "structured"),
-        weave="plain", composition="EVA foam laminated tricot",
+        weave="foam", composition="EVA foam laminated tricot",
         weight_gsm=380, stretch_warp_pct=20, stretch_weft_pct=20,
         opacity=1.0, sheen=0.10, fabric_source="virgin",
     ),
@@ -613,6 +613,158 @@ FABRICS: dict[str, LibraryEntry] = {
         weave="ribbed", composition="80% Amni Soul Eco / 20% spandex",
         weight_gsm=215, stretch_warp_pct=140, stretch_weft_pct=120,
         opacity=1.0, sheen=0.30, fabric_source="amni_soul",
+        biodegradable=True,
+    ),
+
+    # ---------------- Textured / sand-handle ----------------
+    "F_SEERSUCKER_STRIPE": LibraryEntry(
+        id="F_SEERSUCKER_STRIPE", kind="fabric",
+        name="Seersucker stripe", tags=("seersucker", "textured", "sandy"),
+        weave="seersucker", composition="65% recycled poly / 30% nylon / 5% spandex",
+        weight_gsm=200, stretch_warp_pct=80, stretch_weft_pct=90,
+        opacity=1.0, sheen=0.25, fabric_source="virgin",
+    ),
+    "F_SLUB_LINEN_BLEND": LibraryEntry(
+        id="F_SLUB_LINEN_BLEND", kind="fabric",
+        name="Slub linen blend", tags=("slub", "textured", "matte"),
+        weave="slub", composition="55% linen / 35% nylon / 10% spandex",
+        weight_gsm=185, stretch_warp_pct=70, stretch_weft_pct=80,
+        opacity=1.0, sheen=0.15, fabric_source="cotton_blend",
+        biodegradable=True,
+    ),
+    "F_TERRY_KNIT": LibraryEntry(
+        id="F_TERRY_KNIT", kind="fabric",
+        name="Terry loop knit", tags=("terry", "textured", "cover_up", "matte"),
+        weave="terry", composition="75% cotton / 22% nylon / 3% spandex",
+        weight_gsm=250, stretch_warp_pct=110, stretch_weft_pct=100,
+        opacity=1.0, sheen=0.20, fabric_source="cotton_blend",
+        biodegradable=True,
+    ),
+    "F_WAFFLE_HONEYCOMB": LibraryEntry(
+        id="F_WAFFLE_HONEYCOMB", kind="fabric",
+        name="Waffle honeycomb knit", tags=("waffle", "textured"),
+        weave="terry", composition="80% nylon / 20% spandex",
+        weight_gsm=220, stretch_warp_pct=140, stretch_weft_pct=130,
+        opacity=1.0, sheen=0.25, fabric_source="virgin",
+    ),
+
+    # ---------------- Open / cutout / lace ----------------
+    "F_LACE_FLORAL": LibraryEntry(
+        id="F_LACE_FLORAL", kind="fabric",
+        name="Floral lace overlay", tags=("lace", "open", "sheer", "luxe"),
+        weave="lace", composition="90% nylon / 10% spandex",
+        weight_gsm=110, stretch_warp_pct=160, stretch_weft_pct=140,
+        opacity=0.45, sheen=0.20, fabric_source="virgin",
+    ),
+    "F_BRODERIE_ANGLAISE": LibraryEntry(
+        id="F_BRODERIE_ANGLAISE", kind="fabric",
+        name="Broderie anglaise eyelet", tags=("eyelet", "open", "cutout"),
+        weave="lace", composition="100% cotton",
+        weight_gsm=130, stretch_warp_pct=10, stretch_weft_pct=15,
+        opacity=0.70, sheen=0.10, fabric_source="cotton_blend",
+        biodegradable=True,
+    ),
+    "F_MACRAME_COTTON": LibraryEntry(
+        id="F_MACRAME_COTTON", kind="fabric",
+        name="Macrame knot cotton", tags=("macrame", "boho", "open", "structured"),
+        weave="crochet", composition="100% cotton",
+        weight_gsm=190, stretch_warp_pct=20, stretch_weft_pct=20,
+        opacity=0.60, sheen=0.05, fabric_source="cotton_blend",
+        biodegradable=True,
+    ),
+    "F_CUTOUT_JERSEY": LibraryEntry(
+        id="F_CUTOUT_JERSEY", kind="fabric",
+        name="Laser-cut jersey", tags=("cutout", "open", "modern"),
+        weave="lace", composition="80% nylon / 20% spandex",
+        weight_gsm=160, stretch_warp_pct=170, stretch_weft_pct=150,
+        opacity=0.65, sheen=0.30, fabric_source="virgin",
+    ),
+
+    # ---------------- Mesh varieties ----------------
+    "F_TULLE_NET": LibraryEntry(
+        id="F_TULLE_NET", kind="fabric",
+        name="Soft tulle net", tags=("tulle", "mesh", "sheer", "soft"),
+        weave="mesh", composition="100% nylon",
+        weight_gsm=80, stretch_warp_pct=80, stretch_weft_pct=70,
+        opacity=0.30, sheen=0.15, fabric_source="virgin",
+    ),
+    "F_FISHNET_OPEN": LibraryEntry(
+        id="F_FISHNET_OPEN", kind="fabric",
+        name="Wide-open fishnet", tags=("fishnet", "open", "sheer"),
+        weave="fishnet", composition="80% nylon / 20% spandex",
+        weight_gsm=100, stretch_warp_pct=180, stretch_weft_pct=180,
+        opacity=0.20, sheen=0.25, fabric_source="virgin",
+    ),
+
+    # ---------------- Sport / tech ----------------
+    "F_NEOPRENE_1MM": LibraryEntry(
+        id="F_NEOPRENE_1MM", kind="fabric",
+        name="Neoprene 1 mm laminate", tags=("neoprene", "sport", "structured", "matte"),
+        weave="neoprene", composition="neoprene core / nylon face",
+        weight_gsm=320, stretch_warp_pct=60, stretch_weft_pct=60,
+        opacity=1.0, sheen=0.10, fabric_source="virgin",
+    ),
+    "F_NEOPRENE_2MM": LibraryEntry(
+        id="F_NEOPRENE_2MM", kind="fabric",
+        name="Neoprene 2 mm laminate", tags=("neoprene", "sport", "heavy", "matte"),
+        weave="neoprene", composition="neoprene core / double nylon face",
+        weight_gsm=460, stretch_warp_pct=40, stretch_weft_pct=40,
+        opacity=1.0, sheen=0.10, fabric_source="virgin",
+    ),
+    "F_COMPRESSION_SPORT": LibraryEntry(
+        id="F_COMPRESSION_SPORT", kind="fabric",
+        name="High-compression sport jersey", tags=("compression", "sport"),
+        weave="ribbed", composition="70% nylon / 30% spandex",
+        weight_gsm=260, stretch_warp_pct=110, stretch_weft_pct=110,
+        opacity=1.0, sheen=0.40, fabric_source="virgin",
+    ),
+
+    # ---------------- Luxe ----------------
+    "F_SEQUIN_DENSE": LibraryEntry(
+        id="F_SEQUIN_DENSE", kind="fabric",
+        name="Dense sequin tile", tags=("sequined", "luxe", "metallic", "shiny"),
+        weave="sequined", composition="polyester sequins on nylon mesh base",
+        weight_gsm=280, stretch_warp_pct=80, stretch_weft_pct=70,
+        opacity=1.0, sheen=0.90, metallic=0.55, fabric_source="virgin",
+    ),
+    "F_FOIL_COATED_GOLD": LibraryEntry(
+        id="F_FOIL_COATED_GOLD", kind="fabric",
+        name="Gold-foil coated swim", tags=("foil", "luxe", "metallic", "shiny"),
+        weave="plain", composition="nylon-spandex with metallic foil coat",
+        weight_gsm=210, stretch_warp_pct=150, stretch_weft_pct=130,
+        opacity=1.0, sheen=0.95, metallic=0.75, fabric_source="virgin",
+    ),
+    "F_JACQUARD_FLORAL": LibraryEntry(
+        id="F_JACQUARD_FLORAL", kind="fabric",
+        name="Floral jacquard knit", tags=("jacquard", "luxe", "textured"),
+        weave="jacquard", composition="78% nylon / 22% spandex",
+        weight_gsm=235, stretch_warp_pct=120, stretch_weft_pct=110,
+        opacity=1.0, sheen=0.45, fabric_source="virgin",
+    ),
+
+    # ---------------- Eco / bio additions ----------------
+    "F_HEMP_BLEND": LibraryEntry(
+        id="F_HEMP_BLEND", kind="fabric",
+        name="Hemp-nylon blend", tags=("plain", "eco", "matte"),
+        weave="plain", composition="55% hemp / 35% recycled nylon / 10% spandex",
+        weight_gsm=215, stretch_warp_pct=120, stretch_weft_pct=110,
+        opacity=1.0, sheen=0.20, fabric_source="cotton_blend",
+        biodegradable=True,
+    ),
+    "F_ALGAE_BLEND": LibraryEntry(
+        id="F_ALGAE_BLEND", kind="fabric",
+        name="Algae-based bio knit", tags=("plain", "bio", "eco"),
+        weave="plain", composition="65% algae yarn / 25% nylon / 10% spandex",
+        weight_gsm=195, stretch_warp_pct=150, stretch_weft_pct=140,
+        opacity=0.97, sheen=0.30, fabric_source="biopolymer",
+        biodegradable=True,
+    ),
+    "F_MUSHROOM_LEATHER": LibraryEntry(
+        id="F_MUSHROOM_LEATHER", kind="fabric",
+        name="Mycelium leather panel", tags=("vegan_leather", "bio", "structured", "matte"),
+        weave="foam", composition="mycelium-based mat with cotton backing",
+        weight_gsm=340, stretch_warp_pct=15, stretch_weft_pct=15,
+        opacity=1.0, sheen=0.20, fabric_source="biopolymer",
         biodegradable=True,
     ),
 }

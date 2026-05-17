@@ -1404,21 +1404,202 @@ def _mesh_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
     return (normal * 255).clip(0, 255).astype(np.uint8)
 
 
+# ---------------------------------------------------------------------------
+# Extended fabric weaves.  Each returns an HxWx3 uint8 tangent-space
+# normal map in the same convention as the originals (x=u, y=v, z=out).
+# ---------------------------------------------------------------------------
+
+def _height_to_normal(height: np.ndarray, strength: float) -> np.ndarray:
+    dv, du = np.gradient(height)
+    nx = -du * strength
+    ny = -dv * strength
+    nz = np.ones_like(height)
+    length = np.sqrt(nx * nx + ny * ny + nz * nz)
+    nx /= length; ny /= length; nz /= length
+    normal = np.stack([(nx * 0.5 + 0.5), (ny * 0.5 + 0.5), (nz * 0.5 + 0.5)], axis=-1)
+    return (normal * 255).clip(0, 255).astype(np.uint8)
+
+
+def _velvet_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
+    """Velvet pile — micro-random bumps biased along V (pile direction).
+    Soft, dense, mostly subtle."""
+    rng = np.random.default_rng(11)
+    height = 0.0
+    yy, xx = np.indices((h, w)).astype(np.float32)
+    for i in range(3):
+        fx = 0.45 * (2.0 ** i)
+        fy = 0.85 * (2.0 ** i)        # finer along v (pile)
+        amp = 1.0 / (2.0 ** i)
+        phx, phy = rng.uniform(0, 2 * np.pi, 2)
+        height = height + amp * np.sin(xx * fx + phx) * np.sin(yy * fy + phy)
+    height = height * 0.3              # keep gentle
+    return _height_to_normal(height, strength=2.0)
+
+
+def _crochet_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
+    """Regular hexagonal-ish open lattice — deep dark holes between
+    bright thread bundles.  Reads as crochet/macrame."""
+    cell = 28
+    yy, xx = np.indices((h, w)).astype(np.float32)
+    # offset rows for a brick-like layout (close to hex)
+    row = (yy // cell).astype(int)
+    cx = (xx + (row % 2) * (cell / 2)) % cell - cell / 2
+    cy = (yy % cell) - cell / 2
+    r2 = (cx * cx) / ((cell / 2) ** 2) + (cy * cy) / ((cell / 2) ** 2)
+    # height: ring-shaped thread bundle around each cell, deep dip in centre
+    rim = np.exp(-((r2 - 0.55) ** 2) * 18.0)
+    hole = -np.exp(-r2 * 4.0) * 1.4
+    height = rim + hole
+    return _height_to_normal(height, strength=6.0)
+
+
+def _shiny_knit_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
+    """Fine horizontal rib bands, narrower than 'ribbed', for shiny knit
+    (Missoni-ish space-dye)."""
+    ys = np.linspace(0, 2 * np.pi * 220, h)
+    height = (0.5 + 0.5 * np.cos(ys))[:, None] * np.ones((1, w))
+    return _height_to_normal(height, strength=4.0)
+
+
+def _foam_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
+    """EVA foam — nearly featureless flat surface (foam cup)."""
+    rng = np.random.default_rng(3)
+    height = rng.normal(scale=0.04, size=(h, w))   # imperceptible micro-roughness
+    return _height_to_normal(height, strength=0.6)
+
+
+def _sequined_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
+    """Tile pattern of small raised discs."""
+    tile = 16
+    yy, xx = np.indices((h, w)).astype(np.float32)
+    cx = (xx % tile) - tile / 2
+    cy = (yy % tile) - tile / 2
+    r2 = cx * cx + cy * cy
+    disc = np.exp(-r2 / (tile * 0.6))           # raised plateau
+    edge = np.exp(-((np.sqrt(r2) - tile * 0.35) ** 2) / 4.0) * 0.7
+    height = disc + edge
+    return _height_to_normal(height, strength=5.0)
+
+
+def _seersucker_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
+    """Puckered alternating stripes — sand-grain rough between flat
+    stripes, looks like seersucker or sand-washed fabric."""
+    stripe = 26
+    xs = (np.arange(w) // stripe) % 2
+    puckered_cols = xs.astype(np.float32)[None, :].repeat(h, axis=0)
+    rng = np.random.default_rng(17)
+    pucker = rng.normal(scale=1.0, size=(h, w)) * puckered_cols * 0.35
+    flat   = (1.0 - puckered_cols) * 0.0
+    height = pucker + flat
+    return _height_to_normal(height, strength=4.0)
+
+
+def _lace_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
+    """Dense organic lacework — overlapping floral motifs with holes."""
+    rng = np.random.default_rng(23)
+    yy, xx = np.indices((h, w)).astype(np.float32)
+    height = np.zeros_like(xx)
+    for _ in range(120):                          # place 120 floral nodes
+        cx = rng.uniform(0, w); cy = rng.uniform(0, h)
+        r = rng.uniform(10, 24)
+        d2 = (xx - cx) ** 2 + (yy - cy) ** 2
+        # ring (thread) + petal lobes
+        ring = np.exp(-((d2 - r * r) ** 2) / (r * r * 8))
+        height = height + ring
+    # subtractive grid of micro-holes
+    holes = np.cos(xx / 4.0) * np.cos(yy / 4.0)
+    height = height - 0.25 * (holes > 0.7)
+    return _height_to_normal(height, strength=3.5)
+
+
+def _fishnet_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
+    """Wide-open diamond mesh — sharper / larger than sports mesh."""
+    period = 26
+    yy, xx = np.indices((h, w)).astype(np.float32)
+    # diagonal stripes both directions
+    a = np.cos((xx + yy) * 2 * np.pi / period)
+    b = np.cos((xx - yy) * 2 * np.pi / period)
+    height = np.maximum(a, b)                      # raised threads
+    # dig holes where neither thread lies (deep cells)
+    height = np.where(height < 0.0, height - 0.6, height)
+    return _height_to_normal(height, strength=8.0)
+
+
+def _neoprene_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
+    """Rubber-coated nylon — uniform low micro-grain."""
+    rng = np.random.default_rng(41)
+    height = rng.normal(scale=0.12, size=(h, w))
+    # smooth a touch
+    from scipy.ndimage import gaussian_filter
+    height = gaussian_filter(height, sigma=0.8)
+    return _height_to_normal(height, strength=1.2)
+
+
+def _slub_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
+    """Linen-like slub — irregular horizontal thickness variations."""
+    rng = np.random.default_rng(53)
+    rows = rng.normal(scale=0.6, size=(h, 1))
+    cols = 0.5 + 0.5 * np.cos(np.linspace(0, 2 * np.pi * 30, w))[None, :]
+    height = rows * cols
+    return _height_to_normal(height, strength=3.0)
+
+
+def _terry_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
+    """Terry loops — dense small loops (towel-like)."""
+    rng = np.random.default_rng(67)
+    yy, xx = np.indices((h, w)).astype(np.float32)
+    height = np.zeros_like(xx)
+    for _ in range(800):                           # many small loops
+        cx = rng.uniform(0, w); cy = rng.uniform(0, h)
+        d2 = (xx - cx) ** 2 + (yy - cy) ** 2
+        height = height + np.exp(-d2 / 14.0)
+    return _height_to_normal(height, strength=2.5)
+
+
+def _jacquard_normal_map(w: int = TEX_W, h: int = TEX_H) -> np.ndarray:
+    """Decorative woven motif — interlocked diamond bumps + flat negative."""
+    period = 60
+    yy, xx = np.indices((h, w)).astype(np.float32)
+    diamond = np.abs(((xx % period) - period / 2)) + np.abs(((yy % period) - period / 2))
+    motif = np.clip(period / 2 - diamond, 0, None) / (period / 2)
+    # secondary fine ribbing inside the motif
+    ribs = 0.4 * np.cos(xx * 0.3) * np.cos(yy * 0.3)
+    height = motif + 0.3 * ribs * motif
+    return _height_to_normal(height, strength=4.0)
+
+
+# ---------------------------------------------------------------------------
+
+
 # Cache once — same weave for every genome.
 _NORMAL_CACHE: dict[str, np.ndarray] = {}
 _WEAVE_SHADE_CACHE = None
 
 
+_WEAVE_BUILDERS = {
+    "plain":       lambda: _fabric_normal_map(),
+    "crinkle":     lambda: _crinkle_normal_map(),
+    "ribbed":      lambda: _ribbed_normal_map(),
+    "mesh":        lambda: _mesh_normal_map(),
+    "velvet":      lambda: _velvet_normal_map(),
+    "crochet":     lambda: _crochet_normal_map(),
+    "shiny_knit":  lambda: _shiny_knit_normal_map(),
+    "foam":        lambda: _foam_normal_map(),
+    "sequined":    lambda: _sequined_normal_map(),
+    "seersucker":  lambda: _seersucker_normal_map(),
+    "lace":        lambda: _lace_normal_map(),
+    "fishnet":     lambda: _fishnet_normal_map(),
+    "neoprene":    lambda: _neoprene_normal_map(),
+    "slub":        lambda: _slub_normal_map(),
+    "terry":       lambda: _terry_normal_map(),
+    "jacquard":    lambda: _jacquard_normal_map(),
+}
+
+
 def _get_fabric_normal(weave: str = "plain") -> np.ndarray:
     if weave not in _NORMAL_CACHE:
-        if weave == "crinkle":
-            _NORMAL_CACHE[weave] = _crinkle_normal_map()
-        elif weave == "ribbed":
-            _NORMAL_CACHE[weave] = _ribbed_normal_map()
-        elif weave == "mesh":
-            _NORMAL_CACHE[weave] = _mesh_normal_map()
-        else:
-            _NORMAL_CACHE[weave] = _fabric_normal_map()
+        builder = _WEAVE_BUILDERS.get(weave, _WEAVE_BUILDERS["plain"])
+        _NORMAL_CACHE[weave] = builder()
     return _NORMAL_CACHE[weave]
 
 def _get_weave_shade() -> np.ndarray:
