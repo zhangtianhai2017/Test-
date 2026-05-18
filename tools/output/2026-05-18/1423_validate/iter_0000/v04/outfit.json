@@ -1,0 +1,77 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_DEEP_V_M",
+      "local_params": {
+        "half_u": 0.17690879106521606,
+        "half_v": 0.09816485643386841,
+        "inner_u": 0.11004434525966644,
+        "apex_lift": 0.1678893119096756,
+        "underband_dip": 0.030771911144256592,
+        "center_v": 0.752040445804596
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.34945401549339294,
+        "front_leg_curve": 0.5,
+        "back_top_v": 0.32,
+        "back_half_u": 0.24735163152217865
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.23287192453385575,
+        "front_half_u": 0.28568828712914407,
+        "front_leg_curve": 0.658820962589271,
+        "back_top_v": 0.24022603730186654,
+        "back_half_u": 0.11480373973074616
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 3.6991704986637006
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MACRAME_COTTON",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_MISSONI_SHINY_KNIT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_TASSEL_SILK_50MM",
+      "local_params": {
+        "length_cm": 5.55750055946104
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.5051907300949097,
+    "saturation": 0.49271222949028015,
+    "lightness": 0.5141000747680664,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.4843948185443878,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5242785811424255,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.4941951036453247,
+    "shape_mode": "free",
+    "secondary_hue": 0.5169763565063477
+  }
+}

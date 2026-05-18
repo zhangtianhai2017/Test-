@@ -1,0 +1,71 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_DEEP_V_L",
+      "local_params": {
+        "half_u": 0.1947,
+        "half_v": 0.1003,
+        "inner_u": 0.10887695848941803,
+        "apex_lift": 0.4,
+        "underband_dip": 0.03041541576385498,
+        "center_v": 0.7504199147224426
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.3514218032360077,
+        "front_leg_curve": 0.5,
+        "back_top_v": 0.32,
+        "back_half_u": 0.2450384795665741
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 5.394568847170099
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HUNZA_CRINKLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_BRODERIE_ANGLAISE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_PENDANT_SHELL",
+      "local_params": {
+        "chain_length_cm": 44.005687156769056
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.5007218718528748,
+    "saturation": 0.49262455105781555,
+    "lightness": 0.5001354813575745,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.4816468358039856,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5126450061798096,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.4891655445098877,
+    "shape_mode": "free",
+    "secondary_hue": 0.5153032541275024
+  }
+}

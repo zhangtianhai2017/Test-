@@ -1,0 +1,70 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_COWL_L",
+      "local_params": {
+        "half_u": 0.2242,
+        "half_v": 0.09793151915073395,
+        "inner_u": 0.05,
+        "apex_lift": 0.17145936191082,
+        "underband_dip": 0.02,
+        "center_v": 0.7506441473960876
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.35140272974967957,
+        "front_leg_curve": 0.5060504078865051,
+        "back_top_v": 0.32,
+        "back_half_u": 0.2488684505224228
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.22484414615892576,
+        "front_half_u": 0.28555529210323166,
+        "front_leg_curve": 0.7864207774417031,
+        "back_top_v": 0.22493627677203729,
+        "back_half_u": 0.1747650353961852
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 3.846800026448829
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ECONYL_PLAIN_LIGHT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.4977022409439087,
+    "saturation": 0.5005908012390137,
+    "lightness": 0.49874377250671387,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.4879561960697174,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5150270462036133,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.4833182692527771,
+    "shape_mode": "extreme",
+    "secondary_hue": 0.515845537185669
+  }
+}

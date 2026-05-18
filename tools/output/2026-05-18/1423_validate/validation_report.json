@@ -1,0 +1,208 @@
+{
+  "checkpoint": "tools/output/2026-05-18/1418_rl_run/generator_final.pt",
+  "judge_backend": "mock",
+  "briefs": [
+    "classic triangle bikini, vibrant red, beach holiday",
+    "elegant bandeau, gold metallic shimmer, mediterranean",
+    "sport racerback bralette, deep navy, full coverage",
+    "boho macrame asymmetric halter, cream beige",
+    "minimalist matte black one-piece, deep V neckline",
+    "tropical floral balconette, vivid orange, cheeky bottom",
+    "wetsuit neoprene, dark grey, modest cut",
+    "sequin gold bandeau, evening party glam"
+  ],
+  "n_rendered": 8,
+  "symbolic_fitness_mean": 0.782109797000885,
+  "symbolic_fitness_per_brief": [
+    0.784991443157196,
+    0.7876108884811401,
+    0.7732614874839783,
+    0.781416654586792,
+    0.7834653258323669,
+    0.7827461361885071,
+    0.7787961959838867,
+    0.7845900654792786
+  ],
+  "j_pass_rate": 0.75,
+  "j_validity_mean": 7.375,
+  "j_aesthetic_mean": 5.875,
+  "per_variant": [
+    {
+      "brief": "classic triangle bikini, vibrant red, beach holiday",
+      "image_path": "/home/user/Test-/tools/output/2026-05-18/1423_validate/iter_0000/v00/01_front.png",
+      "symbolic_fitness": 0.784991443157196,
+      "judge": {
+        "is_valid_swimsuit": false,
+        "validity_score": 4,
+        "aesthetic_score": 5,
+        "structural_issues": [
+          "missing_bottom_panel"
+        ],
+        "anatomical_overflow": [
+          "neck",
+          "right_knee"
+        ],
+        "missing_required_parts": [
+          "bottom_panel"
+        ],
+        "style_descriptors": [
+          "balconette",
+          "sport",
+          "boho"
+        ],
+        "overall_assessment": "fabric extends into prohibited region",
+        "image_path": "/home/user/Test-/tools/output/2026-05-18/1423_validate/iter_0000/v00/01_front.png",
+        "elapsed_s": 0.0002617835998535156,
+        "backend": "mock"
+      }
+    },
+    {
+      "brief": "elegant bandeau, gold metallic shimmer, mediterranean",
+      "image_path": "/home/user/Test-/tools/output/2026-05-18/1423_validate/iter_0000/v01/01_front.png",
+      "symbolic_fitness": 0.7876108884811401,
+      "judge": {
+        "is_valid_swimsuit": true,
+        "validity_score": 8,
+        "aesthetic_score": 6,
+        "structural_issues": [],
+        "anatomical_overflow": [],
+        "missing_required_parts": [],
+        "style_descriptors": [
+          "boho",
+          "high_neck",
+          "minimal"
+        ],
+        "overall_assessment": "structurally valid swimsuit",
+        "image_path": "/home/user/Test-/tools/output/2026-05-18/1423_validate/iter_0000/v01/01_front.png",
+        "elapsed_s": 5.936622619628906e-05,
+        "backend": "mock"
+      }
+    },
+    {
+      "brief": "sport racerback bralette, deep navy, full coverage",
+      "image_path": "/home/user/Test-/tools/output/2026-05-18/1423_validate/iter_0000/v02/01_front.png",
+      "symbolic_fitness": 0.7732614874839783,
+      "judge": {
+        "is_valid_swimsuit": true,
+        "validity_score": 10,
+        "aesthetic_score": 9,
+        "structural_issues": [],
+        "anatomical_overflow": [],
+        "missing_required_parts": [],
+        "style_descriptors": [
+          "bandeau"
+        ],
+        "overall_assessment": "structurally valid swimsuit",
+        "image_path": "/home/user/Test-/tools/output/2026-05-18/1423_validate/iter_0000/v02/01_front.png",
+        "elapsed_s": 2.002716064453125e-05,
+        "backend": "mock"
+      }
+    },
+    {
+      "brief": "boho macrame asymmetric halter, cream beige",
+      "image_path": "/home/user/Test-/tools/output/2026-05-18/1423_validate/iter_0000/v03/01_front.png",
+      "symbolic_fitness": 0.781416654586792,
+      "judge": {
+        "is_valid_swimsuit": false,
+        "validity_score": 3,
+        "aesthetic_score": 4,
+        "structural_issues": [
+          "fabric_extending_to_inner_knee"
+        ],
+        "anatomical_overflow": [
+          "right_arm"
+        ],
+        "missing_required_parts": [],
+        "style_descriptors": [
+          "boho"
+        ],
+        "overall_assessment": "fabric extends into prohibited region",
+        "image_path": "/home/user/Test-/tools/output/2026-05-18/1423_validate/iter_0000/v03/01_front.png",
+        "elapsed_s": 1.7642974853515625e-05,
+        "backend": "mock"
+      }
+    },
+    {
+      "brief": "minimalist matte black one-piece, deep V neckline",
+      "image_path": "/home/user/Test-/tools/output/2026-05-18/1423_validate/iter_0000/v04/01_front.png",
+      "symbolic_fitness": 0.7834653258323669,
+      "judge": {
+        "is_valid_swimsuit": true,
+        "validity_score": 8,
+        "aesthetic_score": 6,
+        "structural_issues": [],
+        "anatomical_overflow": [],
+        "missing_required_parts": [],
+        "style_descriptors": [
+          "high_neck"
+        ],
+        "overall_assessment": "structurally valid swimsuit",
+        "image_path": "/home/user/Test-/tools/output/2026-05-18/1423_validate/iter_0000/v04/01_front.png",
+        "elapsed_s": 2.002716064453125e-05,
+        "backend": "mock"
+      }
+    },
+    {
+      "brief": "tropical floral balconette, vivid orange, cheeky bottom",
+      "image_path": "/home/user/Test-/tools/output/2026-05-18/1423_validate/iter_0000/v05/01_front.png",
+      "symbolic_fitness": 0.7827461361885071,
+      "judge": {
+        "is_valid_swimsuit": true,
+        "validity_score": 7,
+        "aesthetic_score": 6,
+        "structural_issues": [],
+        "anatomical_overflow": [],
+        "missing_required_parts": [],
+        "style_descriptors": [
+          "sport",
+          "minimal",
+          "balconette"
+        ],
+        "overall_assessment": "structurally valid swimsuit",
+        "image_path": "/home/user/Test-/tools/output/2026-05-18/1423_validate/iter_0000/v05/01_front.png",
+        "elapsed_s": 1.9788742065429688e-05,
+        "backend": "mock"
+      }
+    },
+    {
+      "brief": "wetsuit neoprene, dark grey, modest cut",
+      "image_path": "/home/user/Test-/tools/output/2026-05-18/1423_validate/iter_0000/v06/01_front.png",
+      "symbolic_fitness": 0.7787961959838867,
+      "judge": {
+        "is_valid_swimsuit": true,
+        "validity_score": 9,
+        "aesthetic_score": 5,
+        "structural_issues": [],
+        "anatomical_overflow": [],
+        "missing_required_parts": [],
+        "style_descriptors": [
+          "minimal"
+        ],
+        "overall_assessment": "structurally valid swimsuit",
+        "image_path": "/home/user/Test-/tools/output/2026-05-18/1423_validate/iter_0000/v06/01_front.png",
+        "elapsed_s": 2.765655517578125e-05,
+        "backend": "mock"
+      }
+    },
+    {
+      "brief": "sequin gold bandeau, evening party glam",
+      "image_path": "/home/user/Test-/tools/output/2026-05-18/1423_validate/iter_0000/v07/01_front.png",
+      "symbolic_fitness": 0.7845900654792786,
+      "judge": {
+        "is_valid_swimsuit": true,
+        "validity_score": 10,
+        "aesthetic_score": 6,
+        "structural_issues": [],
+        "anatomical_overflow": [],
+        "missing_required_parts": [],
+        "style_descriptors": [
+          "bandeau"
+        ],
+        "overall_assessment": "structurally valid swimsuit",
+        "image_path": "/home/user/Test-/tools/output/2026-05-18/1423_validate/iter_0000/v07/01_front.png",
+        "elapsed_s": 2.2649765014648438e-05,
+        "backend": "mock"
+      }
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_L",
+      "local_params": {
+        "half_u": 0.1754353940486908,
+        "half_v": 0.09856384992599487,
+        "inner_u": 0.1103636622428894,
+        "apex_lift": 0.17059297859668732,
+        "underband_dip": 0.028295770287513733,
+        "center_v": 0.7515656352043152
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.35524260997772217,
+        "front_leg_curve": 0.5022782683372498,
+        "back_top_v": 0.32,
+        "back_half_u": 0.24964192509651184
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.2083378566337413,
+        "front_half_u": 0.1943495572871142,
+        "front_leg_curve": 0.5248953023802997,
+        "back_top_v": 0.28911043249157325,
+        "back_half_u": 0.13011145217144415
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 3.5014009987967647
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HUNZA_CRINKLE",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.5091521739959717,
+    "saturation": 0.4992617666721344,
+    "lightness": 0.5046180486679077,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.4871983230113983,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.519031822681427,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.48753902316093445,
+    "shape_mode": "extreme",
+    "secondary_hue": 0.5118035674095154
+  }
+}

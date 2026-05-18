@@ -1,0 +1,82 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_M",
+      "local_params": {
+        "half_u": 0.17744235694408417,
+        "half_v": 0.09833022952079773,
+        "inner_u": 0.10768818855285645,
+        "apex_lift": 0.1650422364473343,
+        "underband_dip": 0.029001042246818542,
+        "center_v": 0.7507632970809937
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.3508635461330414,
+        "front_leg_curve": 0.5,
+        "back_top_v": 0.32,
+        "back_half_u": 0.245594784617424
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 5.304579099923661
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 26.64544181343716
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEERSUCKER_STRIPE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_DROP_GOLD",
+      "local_params": {
+        "length_cm": 1.9251681194317156
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHARM_BEACH",
+      "local_params": {
+        "diameter_cm": 7.585600828517388
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_NECKLACE_CHOKER_GOLD",
+      "local_params": {
+        "width_cm": 0.7382978043558348
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.5033286213874817,
+    "saturation": 0.49281707406044006,
+    "lightness": 0.5045403242111206,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.4849797785282135,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.516796350479126,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.48107022047042847,
+    "shape_mode": "extreme",
+    "secondary_hue": 0.5168244242668152
+  }
+}

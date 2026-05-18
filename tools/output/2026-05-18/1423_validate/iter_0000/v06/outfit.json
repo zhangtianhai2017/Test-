@@ -1,0 +1,75 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_DEEP_V_L",
+      "local_params": {
+        "half_u": 0.1947,
+        "half_v": 0.1003,
+        "inner_u": 0.10945746302604675,
+        "apex_lift": 0.4,
+        "underband_dip": 0.026513949036598206,
+        "center_v": 0.7517996430397034
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.3506602942943573,
+        "front_leg_curve": 0.5,
+        "back_top_v": 0.32,
+        "back_half_u": 0.24666963517665863
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.31464595060730055,
+        "front_half_u": 0.5143056950942969,
+        "front_leg_curve": 0.5134042396427906,
+        "back_top_v": 0.3059840610771158,
+        "back_half_u": 0.4056514944016032
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SLUB_LINEN_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_CHAIN_GOLD",
+      "local_params": {
+        "diameter_cm": 6.830606685727574
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.5048854351043701,
+    "saturation": 0.4947795867919922,
+    "lightness": 0.513606071472168,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.4861537218093872,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5205234885215759,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.48338982462882996,
+    "shape_mode": "extreme",
+    "secondary_hue": 0.5091146230697632
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_HIGH_NECK_M",
+      "local_params": {
+        "half_u": 0.16,
+        "half_v": 0.08,
+        "inner_u": 0.11047050356864929,
+        "apex_lift": 0.1630462259054184,
+        "underband_dip": 0.03387385606765747,
+        "center_v": 0.7506797909736633
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.34984809160232544,
+        "front_leg_curve": 0.5073792934417725,
+        "back_top_v": 0.32,
+        "back_half_u": 0.24704492092132568
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 3.8837548051847164
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_BAND_SPORT_25MM",
+      "local_params": {
+        "length_cm": 10.491300788005601
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_QNOVA_RIBBED",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.5014267563819885,
+    "saturation": 0.4985085129737854,
+    "lightness": 0.5052962303161621,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.4823344349861145,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5209718346595764,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.4932316541671753,
+    "shape_mode": "free",
+    "secondary_hue": 0.5090118646621704
+  }
+}

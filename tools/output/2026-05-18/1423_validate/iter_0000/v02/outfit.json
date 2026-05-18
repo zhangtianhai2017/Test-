@@ -1,0 +1,82 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_L",
+      "local_params": {
+        "half_u": 0.17796963453292847,
+        "half_v": 0.09910835325717926,
+        "inner_u": 0.11224916577339172,
+        "apex_lift": 0.17050419747829437,
+        "underband_dip": 0.029187098145484924,
+        "center_v": 0.7509113550186157
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.34956657886505127,
+        "front_leg_curve": 0.5035696625709534,
+        "back_top_v": 0.32,
+        "back_half_u": 0.24853956699371338
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.41667884666826577,
+        "front_half_u": 0.4850638311303975,
+        "front_leg_curve": 0.4882743650134284,
+        "back_top_v": 0.5372066357584273,
+        "back_half_u": 0.37671503502872883
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 4.4521591224951536
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 19.048649294841013
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BIOPOLYMER_PLAIN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_CROCHET_COTTON",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.5044907927513123,
+    "saturation": 0.4932648539543152,
+    "lightness": 0.5072968602180481,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.4794977605342865,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5203098654747009,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.4893284738063812,
+    "shape_mode": "extreme",
+    "secondary_hue": 0.5153611898422241
+  }
+}
