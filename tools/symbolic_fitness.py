@@ -180,18 +180,20 @@ def cup_covers_seed(half_u: Tensor, half_v: Tensor, inner_u: Tensor,
 
 def bottom_covers_pelvic_seed(half_u: Tensor, top_v: Tensor) -> Tensor:
     """Soft pelvic-front coverage check.  Bottom front panel must
-    contain the pelvic_front seed rectangle."""
-    seed_u_lo, seed_u_hi, seed_v_lo, seed_v_hi = PRIVACY_SEEDS["pelvic_front"]
+    contain the pelvic_front seed rectangle.
+
+    Bottom always reaches down past v=0.10 (legs), well below the
+    seed's v_lo=0.30, so only the u extent and top edge need a soft
+    check."""
+    seed_u_lo, seed_u_hi, _seed_v_lo, seed_v_hi = PRIVACY_SEEDS["pelvic_front"]
     bot_u_lo = -half_u   # symmetric around u=0
     bot_u_hi =  half_u
     bot_v_hi = top_v
-    bot_v_lo = 0.10      # bottoms always go down to legs
     SHARPNESS = 50.0
     s_u_lo = torch.sigmoid((seed_u_lo - bot_u_lo) * SHARPNESS)
     s_u_hi = torch.sigmoid((bot_u_hi - seed_u_hi) * SHARPNESS)
-    s_v_lo = torch.sigmoid((seed_v_lo - bot_v_lo) * SHARPNESS)
     s_v_hi = torch.sigmoid((bot_v_hi - seed_v_hi) * SHARPNESS)
-    return (s_u_lo * s_u_hi * s_v_lo * s_v_hi)
+    return (s_u_lo * s_u_hi * s_v_hi)
 
 
 # ---------------------------------------------------------------------------
@@ -325,20 +327,25 @@ def _smoke_test() -> None:
     torch.manual_seed(0)
     B = 8
 
-    # A "normal" outfit batch
+    # All inputs must be LEAF tensors with requires_grad=True so .grad
+    # populates after backward.  Build via raw assignment, not via
+    # arithmetic-on-a-leaf (which produces a non-leaf result).
+    def leaf(t):
+        return t.detach().clone().requires_grad_(True)
+
     g = {
-        "hue":            torch.rand(B, requires_grad=True),
-        "saturation":     torch.rand(B, requires_grad=True) * 0.6 + 0.2,
-        "lightness":      torch.rand(B, requires_grad=True) * 0.6 + 0.2,
-        "secondary_hue":  torch.rand(B, requires_grad=True),
-        "top_center_v":   torch.rand(B, requires_grad=True) * 0.10 + 0.70,
-        "top_half_u":     torch.rand(B, requires_grad=True) * 0.15 + 0.10,
-        "top_half_v":     torch.rand(B, requires_grad=True) * 0.08 + 0.05,
-        "top_inner_u":    torch.rand(B, requires_grad=True) * 0.20 - 0.05,
-        "top_apex_lift":  torch.rand(B, requires_grad=True) * 0.6 - 0.1,
-        "bot_front_half_u": torch.rand(B, requires_grad=True) * 0.40 + 0.20,
-        "bot_front_top_v":  torch.rand(B, requires_grad=True) * 0.30 + 0.25,
-        "asym_amount":    torch.rand(B, requires_grad=True),
+        "hue":              leaf(torch.rand(B)),
+        "saturation":       leaf(torch.rand(B) * 0.6 + 0.2),
+        "lightness":        leaf(torch.rand(B) * 0.6 + 0.2),
+        "secondary_hue":    leaf(torch.rand(B)),
+        "top_center_v":     leaf(torch.rand(B) * 0.10 + 0.70),
+        "top_half_u":       leaf(torch.rand(B) * 0.15 + 0.10),
+        "top_half_v":       leaf(torch.rand(B) * 0.08 + 0.05),
+        "top_inner_u":      leaf(torch.rand(B) * 0.20 - 0.05),
+        "top_apex_lift":    leaf(torch.rand(B) * 0.6 - 0.1),
+        "bot_front_half_u": leaf(torch.rand(B) * 0.40 + 0.20),
+        "bot_front_top_v":  leaf(torch.rand(B) * 0.30 + 0.25),
+        "asym_amount":      leaf(torch.rand(B)),
     }
     out = total_fitness(g)
     print(f"score axes: {sorted(out.keys())}")
