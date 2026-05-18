@@ -1,0 +1,66 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_ASYM_NECK_M",
+      "local_params": {
+        "half_u": 0.18,
+        "half_v": 0.09874729812145233,
+        "inner_u": 0.07,
+        "apex_lift": 0.2,
+        "underband_dip": 0.027897492051124573,
+        "center_v": 0.751188337802887
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.35118868947029114,
+        "front_leg_curve": 0.5,
+        "back_top_v": 0.32,
+        "back_half_u": 0.24304012954235077
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_15MM",
+      "local_params": {
+        "length_cm": 30.162765767616946
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 28.577407807742443
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_CUTOUT_JERSEY",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.49953895807266235,
+    "saturation": 0.48874151706695557,
+    "lightness": 0.5088574886322021,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.4882451295852661,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5131766200065613,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.48953574895858765,
+    "shape_mode": "extreme",
+    "secondary_hue": 0.5191036462783813
+  }
+}

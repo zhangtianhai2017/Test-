@@ -1,0 +1,77 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_ASYM_NECK_M",
+      "local_params": {
+        "half_u": 0.18,
+        "half_v": 0.09946568310260773,
+        "inner_u": 0.07,
+        "apex_lift": 0.2,
+        "underband_dip": 0.026919573545455933,
+        "center_v": 0.7506033182144165
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.3,
+        "front_half_u": 0.306,
+        "front_leg_curve": 0.55,
+        "back_top_v": 0.28,
+        "back_half_u": 0.18
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.2519409586728136,
+        "front_half_u": 0.315664945561327,
+        "front_leg_curve": 0.6342759649495253,
+        "back_top_v": 0.252993002600232,
+        "back_half_u": 0.1660850312409049
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 3.292737800193071
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 24.24655761568462
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FOIL_COATED_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.4958527684211731,
+    "saturation": 0.488891065120697,
+    "lightness": 0.49898645281791687,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.47778812050819397,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5208901166915894,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.48914313316345215,
+    "shape_mode": "free",
+    "secondary_hue": 0.5124220848083496
+  }
+}

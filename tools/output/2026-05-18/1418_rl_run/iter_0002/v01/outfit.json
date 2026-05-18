@@ -1,0 +1,89 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.17690032720565796,
+        "half_v": 0.0944,
+        "inner_u": 0.11348582804203033,
+        "apex_lift": 0.16694305837154388,
+        "underband_dip": 0.03220842778682709,
+        "center_v": 0.7513852715492249
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.3,
+        "front_half_u": 0.306,
+        "front_leg_curve": 0.55,
+        "back_top_v": 0.28,
+        "back_half_u": 0.18
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.3282965492118224,
+        "front_half_u": 0.4069976824176289,
+        "front_leg_curve": 0.7035054456999696,
+        "back_top_v": 0.2553292805227493,
+        "back_half_u": 0.21510404187811114
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_15MM",
+      "local_params": {
+        "length_cm": 35.38881952242165
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HEMP_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHAIN",
+      "local_params": {
+        "diameter_cm": 8.634548780956967
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_BELLY",
+      "local_params": {
+        "length_cm": 68.26484002873
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.5060507655143738,
+    "saturation": 0.48549410700798035,
+    "lightness": 0.5021349191665649,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.48312175273895264,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5064025521278381,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.4930289685726166,
+    "shape_mode": "free",
+    "secondary_hue": 0.5065589547157288
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_HIGH_NECK_M",
+      "local_params": {
+        "half_u": 0.17910587787628174,
+        "half_v": 0.09843181073665619,
+        "inner_u": 0.09,
+        "apex_lift": -0.05,
+        "underband_dip": 0.026762455701828003,
+        "center_v": 0.751693069934845
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.32,
+        "front_half_u": 0.272,
+        "front_leg_curve": 0.5,
+        "back_top_v": 0.3,
+        "back_half_u": 0.14
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.32965653508981824,
+        "front_half_u": 0.49448445274893194,
+        "front_leg_curve": 0.3431639744191555,
+        "back_top_v": 0.3347962659618305,
+        "back_half_u": 0.3118653185549143
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 44.07085511446863
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_10MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_WAFFLE_HONEYCOMB",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_VIRGIN_VELVET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.501440167427063,
+    "saturation": 0.4960569739341736,
+    "lightness": 0.5114080309867859,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.482448548078537,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5267736911773682,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.491483211517334,
+    "shape_mode": "free",
+    "secondary_hue": 0.5087019801139832
+  }
+}

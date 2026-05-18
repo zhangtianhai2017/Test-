@@ -1,0 +1,87 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_ASYM_NECK_L",
+      "local_params": {
+        "half_u": 0.2,
+        "half_v": 0.09898294508457184,
+        "inner_u": 0.04,
+        "apex_lift": 0.05,
+        "underband_dip": 0.0314624160528183,
+        "center_v": 0.7493916749954224
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.3,
+        "front_half_u": 0.306,
+        "front_leg_curve": 0.55,
+        "back_top_v": 0.28,
+        "back_half_u": 0.18
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.310904063925288,
+        "front_half_u": 0.4331143798070394,
+        "front_leg_curve": 0.533518945208753,
+        "back_top_v": 0.3699133226941898,
+        "back_half_u": 0.31494689843376655
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_8MM",
+      "local_params": {
+        "length_cm": 10.873466233917389
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_POWERMESH_LINING",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_FOIL_COATED_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_SATIN_40MM",
+      "local_params": {
+        "size_cm": 4.554797384841191
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.5027683973312378,
+    "saturation": 0.4952118694782257,
+    "lightness": 0.4930018484592438,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.49129393696784973,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.504004180431366,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.4928397834300995,
+    "shape_mode": "extreme",
+    "secondary_hue": 0.5168611407279968
+  }
+}

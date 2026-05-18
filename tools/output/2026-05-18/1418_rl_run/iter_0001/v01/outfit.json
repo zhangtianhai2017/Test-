@@ -1,0 +1,83 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_L",
+      "local_params": {
+        "half_u": 0.17619992792606354,
+        "half_v": 0.0944,
+        "inner_u": 0.11579139530658722,
+        "apex_lift": 0.16005222499370575,
+        "underband_dip": 0.02648836374282837,
+        "center_v": 0.7505933046340942
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.49609577655792236,
+        "back_top_v": 0.38,
+        "back_half_u": 0.3
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_15MM",
+      "local_params": {
+        "length_cm": 31.162529441650957
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SLUB_LINEN_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_HEMP_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_COVERSTITCH_3NEEDLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_SMALL_4MM",
+      "local_params": {
+        "count": 10.067437148230137
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_SATIN_40MM",
+      "local_params": {
+        "size_cm": 5.274067545037045
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.49151697754859924,
+    "saturation": 0.4995252192020416,
+    "lightness": 0.5037597417831421,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.486820250749588,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5134880542755127,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.4840272068977356,
+    "shape_mode": "free",
+    "secondary_hue": 0.5098990797996521
+  }
+}

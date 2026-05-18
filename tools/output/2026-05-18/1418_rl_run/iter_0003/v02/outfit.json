@@ -1,0 +1,70 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_COWL_M",
+      "local_params": {
+        "half_u": 0.19,
+        "half_v": 0.09912972152233124,
+        "inner_u": 0.05,
+        "apex_lift": 0.16264478862285614,
+        "underband_dip": 0.02,
+        "center_v": 0.7509013414382935
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.35127338767051697,
+        "front_leg_curve": 0.5048951506614685,
+        "back_top_v": 0.32,
+        "back_half_u": 0.2448756992816925
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.2295189301660776,
+        "front_half_u": 0.2656735119856589,
+        "front_leg_curve": 0.6747826963805693,
+        "back_top_v": 0.24923707602593756,
+        "back_half_u": 0.14085369405505693
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 5.892402747357595
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_BRODERIE_ANGLAISE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.5069107413291931,
+    "saturation": 0.48576438426971436,
+    "lightness": 0.4989134967327118,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.48085203766822815,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5206771492958069,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.4877283573150635,
+    "shape_mode": "free",
+    "secondary_hue": 0.5191388726234436
+  }
+}

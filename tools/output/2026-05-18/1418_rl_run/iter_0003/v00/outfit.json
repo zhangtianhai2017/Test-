@@ -1,0 +1,73 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BANDEAU_M",
+      "local_params": {
+        "half_u": 0.2,
+        "half_v": 0.09896312654018402,
+        "inner_u": 0.04,
+        "apex_lift": 0.05,
+        "underband_dip": 0.027025997638702393,
+        "center_v": 0.751052975654602
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.3,
+        "front_half_u": 0.306,
+        "front_leg_curve": 0.55,
+        "back_top_v": 0.28,
+        "back_half_u": 0.18
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 3.7900181332004834
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 33.81717088265634
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_SATIN_40MM",
+      "local_params": {
+        "size_cm": 3.8641331219926682
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.500328540802002,
+    "saturation": 0.4930003583431244,
+    "lightness": 0.5035766363143921,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.4775666892528534,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5247730016708374,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.4884498119354248,
+    "shape_mode": "free",
+    "secondary_hue": 0.5189737677574158
+  }
+}

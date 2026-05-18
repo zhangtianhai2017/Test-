@@ -1,0 +1,71 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_M",
+      "local_params": {
+        "half_u": 0.17734752595424652,
+        "half_v": 0.09940788894891739,
+        "inner_u": 0.11336056888103485,
+        "apex_lift": 0.16413532197475433,
+        "underband_dip": 0.028642922639846802,
+        "center_v": 0.750881552696228
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.42,
+        "front_leg_curve": 0.5034727454185486,
+        "back_top_v": 0.38,
+        "back_half_u": 0.3
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 55.49076230496429
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 19.826317442428767
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_NEOPRENE_2MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.5005143880844116,
+    "saturation": 0.5066483616828918,
+    "lightness": 0.4998614490032196,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.48592597246170044,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5084834098815918,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.4880028963088989,
+    "shape_mode": "extreme",
+    "secondary_hue": 0.510695219039917
+  }
+}

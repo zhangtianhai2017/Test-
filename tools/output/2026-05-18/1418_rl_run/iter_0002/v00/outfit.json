@@ -1,0 +1,77 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_M",
+      "local_params": {
+        "half_u": 0.16,
+        "half_v": 0.08,
+        "inner_u": 0.1109752357006073,
+        "apex_lift": 0.1629439741373062,
+        "underband_dip": 0.03028249740600586,
+        "center_v": 0.749525249004364
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.32,
+        "front_half_u": 0.32,
+        "front_leg_curve": 0.5007634162902832,
+        "back_top_v": 0.3,
+        "back_half_u": 0.14
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.43105800119872906,
+        "front_half_u": 0.47382113904929735,
+        "front_leg_curve": 0.35063665579297637,
+        "back_top_v": 0.4602791308613286,
+        "back_half_u": 0.3413913890279697
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_10MM",
+      "local_params": {
+        "length_cm": 25.8159165236559
+      }
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_15MM_NICKEL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_POWERMESH_LINING",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHAIN",
+      "local_params": {
+        "diameter_cm": 8.425574948695006
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.49595484137535095,
+    "saturation": 0.4945410490036011,
+    "lightness": 0.4996868073940277,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.4900723695755005,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5115993618965149,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.4844891428947449,
+    "shape_mode": "free",
+    "secondary_hue": 0.5169528722763062
+  }
+}

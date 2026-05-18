@@ -1,0 +1,77 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_DEEP_V_M",
+      "local_params": {
+        "half_u": 0.17788812518119812,
+        "half_v": 0.09827849268913269,
+        "inner_u": 0.1109025776386261,
+        "apex_lift": 0.4,
+        "underband_dip": 0.029667645692825317,
+        "center_v": 0.7500854730606079
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.32,
+        "front_half_u": 0.272,
+        "front_leg_curve": 0.5,
+        "back_top_v": 0.3,
+        "back_half_u": 0.14
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.21489099219819616,
+        "front_half_u": 0.3146284450153006,
+        "front_leg_curve": 0.7687169349001286,
+        "back_top_v": 0.2881527853668815,
+        "back_half_u": 0.06483180323462538
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 37.30560876708492
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 23.919685713535706
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_COMPRESSION_SPORT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.49881163239479065,
+    "saturation": 0.49447008967399597,
+    "lightness": 0.5033672451972961,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.4832485318183899,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.518244206905365,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.49056416749954224,
+    "shape_mode": "extreme",
+    "secondary_hue": 0.5140625834465027
+  }
+}

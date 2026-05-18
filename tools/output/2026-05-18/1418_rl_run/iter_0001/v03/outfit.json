@@ -1,0 +1,71 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_HIGH_NECK_L",
+      "local_params": {
+        "half_u": 0.2006,
+        "half_v": 0.1062,
+        "inner_u": 0.09,
+        "apex_lift": -0.05,
+        "underband_dip": 0.031433120369911194,
+        "center_v": 0.7503877878189087
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.32,
+        "front_half_u": 0.32,
+        "front_leg_curve": 0.5023613572120667,
+        "back_top_v": 0.3,
+        "back_half_u": 0.14
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_10MM",
+      "local_params": {
+        "length_cm": 30.00578641071904
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 29.890996077703697
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MESH_OUTER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_VIRGIN_VELVET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.5032715797424316,
+    "saturation": 0.4956214427947998,
+    "lightness": 0.5054329633712769,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.48777487874031067,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5122717022895813,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.4926632046699524,
+    "shape_mode": "free",
+    "secondary_hue": 0.5184872150421143
+  }
+}

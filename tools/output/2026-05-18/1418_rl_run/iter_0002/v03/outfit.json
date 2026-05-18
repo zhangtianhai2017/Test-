@@ -1,0 +1,72 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_L",
+      "local_params": {
+        "half_u": 0.1888,
+        "half_v": 0.09806731343269348,
+        "inner_u": 0.1,
+        "apex_lift": 0.08,
+        "underband_dip": 0.029678553342819214,
+        "dome_depth_cm": 1.5,
+        "center_v": 0.7511024475097656
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.3,
+        "front_half_u": 0.3535061776638031,
+        "front_leg_curve": 0.55,
+        "back_top_v": 0.28,
+        "back_half_u": 0.18
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 5.850443320029489
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MISSONI_SHINY_KNIT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_ALGAE_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_CHAIN_GOLD",
+      "local_params": {
+        "diameter_cm": 5.550083739312978
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.5003431439399719,
+    "saturation": 0.4954510033130646,
+    "lightness": 0.5187081098556519,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.4838781952857971,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.525660514831543,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.491676926612854,
+    "shape_mode": "free",
+    "secondary_hue": 0.519297182559967
+  }
+}
