@@ -215,7 +215,7 @@ def slot_pair_compat(slot_logits_a: Tensor, slot_logits_b: Tensor,
     p_a = torch.softmax(slot_logits_a, dim=-1)      # (B, N_a)
     p_b = torch.softmax(slot_logits_b, dim=-1)      # (B, N_b)
     # Expected compatibility = sum_{i,j} p_a[i] * p_b[j] * C[i,j]
-    score = torch.einsum("ba,nb,an->b", p_a, p_b, compat_matrix)
+    score = torch.einsum("bi,bj,ij->b", p_a, p_b, compat_matrix)
     return torch.clamp(score, 0.0, 1.0)
 
 
