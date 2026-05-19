@@ -51,16 +51,46 @@ DEFAULT_MODEL_NAME  = os.environ.get("VISION_JUDGE_MODEL",
                                        "Qwen/Qwen2.5-VL-7B-Instruct")
 
 
+def _safe_int(v, default: int = 0, lo: int = 0, hi: int = 10) -> int:
+    """Coerce a model-emitted number into [lo, hi].
+
+    - returns `default` on non-numeric input
+    - returns `lo` for slightly negative
+    - returns `hi` for slight overshoot (LLM sometimes says 11 for 10)
+    - returns `default` for wildly out-of-range (LLM token-repetition
+      degenerate output, e.g. assembly_quality: 11111111111111111111)
+    """
+    try:
+        i = int(float(v))
+    except (TypeError, ValueError):
+        return default
+    if i < lo:
+        return lo
+    if i > hi:
+        if i <= hi + 5:
+            return hi
+        return default      # 16+ on a 0-10 scale = garbage, low-trust
+    return i
+
+
 @dataclass
 class JudgeResult:
     is_valid_swimsuit:       bool
-    validity_score:          int   # 0-10
-    aesthetic_score:         int   # 0-10
+    validity_score:          int   # 0-10  (legacy, derived in V2)
+    aesthetic_score:         int   # 0-10  (legacy, == aesthetic in V2)
     structural_issues:       list[str]
     anatomical_overflow:     list[str]
     missing_required_parts:  list[str]
     style_descriptors:       list[str]
     overall_assessment:      str
+    # ---- V2 multi-dim sub-scores (each 0-10) ----
+    chest_coverage:          int = 0
+    pelvic_coverage:         int = 0
+    anatomy_clean:           int = 0
+    assembly_quality:        int = 0
+    aesthetic:               int = 0
+    chest_observation:       str = ""
+    pelvic_observation:      str = ""
     # ---- metadata (not from the model) ----
     image_path:              str = ""
     elapsed_s:               float = 0.0
@@ -72,15 +102,48 @@ class JudgeResult:
     @classmethod
     def from_dict(cls, d: dict, image_path: str = "",
                   elapsed_s: float = 0.0, backend: str = "") -> "JudgeResult":
+        # V2 sub-scores
+        chest = _safe_int(d.get("chest_coverage"))
+        pelvic = _safe_int(d.get("pelvic_coverage"))
+        anatomy = _safe_int(d.get("anatomy_clean"))
+        assembly = _safe_int(d.get("assembly_quality"))
+        aesthetic = _safe_int(d.get("aesthetic"))
+        # Legacy fields: prefer the model's own values if present, else
+        # derive from sub-scores (V2 prompt instructs the same formula).
+        if "validity_score" in d:
+            v_score = _safe_int(d.get("validity_score"))
+        else:
+            v_score = round((chest + pelvic + anatomy + assembly) / 4)
+        if "aesthetic_score" in d:
+            a_score = _safe_int(d.get("aesthetic_score"))
+        else:
+            a_score = aesthetic
+        # Derive is_valid from sub-scores if not explicitly given.
+        # Python-side gate is stricter than Qwen's self-judgement, which
+        # we found unreliable for "no bottom" cases (it sometimes passes
+        # is_valid=True even when pelvic_coverage is low).
+        if any(k in d for k in ("chest_coverage", "pelvic_coverage")):
+            is_valid_strict = (chest >= 5 and pelvic >= 5
+                                and anatomy >= 5 and assembly >= 5)
+            is_valid = is_valid_strict
+        else:
+            is_valid = bool(d.get("is_valid_swimsuit", False))
         return cls(
-            is_valid_swimsuit=bool(d.get("is_valid_swimsuit", False)),
-            validity_score=int(d.get("validity_score", 0)),
-            aesthetic_score=int(d.get("aesthetic_score", 0)),
-            structural_issues=list(d.get("structural_issues", [])),
-            anatomical_overflow=list(d.get("anatomical_overflow", [])),
-            missing_required_parts=list(d.get("missing_required_parts", [])),
-            style_descriptors=list(d.get("style_descriptors", [])),
+            is_valid_swimsuit=is_valid,
+            validity_score=v_score,
+            aesthetic_score=a_score,
+            structural_issues=list(d.get("structural_issues", []) or []),
+            anatomical_overflow=list(d.get("anatomical_overflow", []) or []),
+            missing_required_parts=list(d.get("missing_required_parts", []) or []),
+            style_descriptors=list(d.get("style_descriptors", []) or []),
             overall_assessment=str(d.get("overall_assessment", "")),
+            chest_coverage=chest,
+            pelvic_coverage=pelvic,
+            anatomy_clean=anatomy,
+            assembly_quality=assembly,
+            aesthetic=aesthetic,
+            chest_observation=str(d.get("chest_observation", "")),
+            pelvic_observation=str(d.get("pelvic_observation", "")),
             image_path=image_path,
             elapsed_s=elapsed_s,
             backend=backend,
@@ -304,7 +367,7 @@ class VLLMVisionJudge(VisionJudge):
                 ],
             }],
             temperature=0.0,    # deterministic structural judgement
-            max_tokens=400,
+            max_tokens=800,     # V2 prompt schema has ~17 keys; 400 truncates
         )
         raw = response.choices[0].message.content or ""
         parsed = _extract_json(raw)
@@ -316,10 +379,29 @@ class VLLMVisionJudge(VisionJudge):
         )
 
 
+def _repair_json(text: str) -> str:
+    """Best-effort fixups for common Qwen JSON mistakes we've actually
+    observed in production (2026-05-19): missing commas between
+    "key":value pairs, runaway digit repetition collapsing a value,
+    duplicate trailing word in a key.
+
+    Cheap regex passes — if any of these don't apply, the string is
+    unchanged. Caller must still try json.loads after."""
+    # 1. Missing comma between "string" newline "key": -> add comma
+    text = re.sub(r'("\s*)\n(\s*"[A-Za-z_])', r'\1,\n\2', text)
+    # 2. Runaway digits in a numeric value: a long run of one repeated
+    #    digit (>20 chars) collapses to first 2 digits.
+    text = re.sub(r':\s*(\d)\1{20,}', r': \1\1', text)
+    # 3. Duplicate trailing word in key: "style_descriptorscriptors":
+    #    -> "style_descriptors":   (only common Qwen mistake we've seen)
+    text = re.sub(r'"([a-z_]+?)([a-z]+)\2":', r'"\1\2":', text)
+    return text
+
+
 def _extract_json(text: str) -> dict:
     """The model is told to emit pure JSON, but real responses sometimes
-    wrap it in ``` fences or add a stray sentence.  Pull the first
-    {...} block, decode."""
+    wrap it in ``` fences or add a stray sentence. Pull the first
+    {...} block, decode. On strict-parse failure, try _repair_json once."""
     text = text.strip()
     if text.startswith("```"):
         m = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.S)
@@ -330,6 +412,10 @@ def _extract_json(text: str) -> dict:
         text = m.group(0)
     try:
         return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+    try:
+        return json.loads(_repair_json(text))
     except json.JSONDecodeError:
         # malformed — return a safe "unparseable" result so the
         # batch pipeline doesn't crash on one bad sample

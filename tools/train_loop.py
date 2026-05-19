@@ -213,12 +213,28 @@ class TrainLoop:
             results = [JudgeResult.from_dict({}, backend="error")
                         for _ in briefs]
 
-        # Reward uses BOTH validity + aesthetic so the judge's graded
-        # multi-dim rubric (V2 prompt, 2026-05-19) produces continuous
-        # RL signal instead of binary 0.2/0.8. Empirically gives
-        # ~2.5x more sample-to-sample variance on the same renders.
+        # Reward uses V2's multi-dim sub-scores (chest/pelvic/anatomy/
+        # assembly/aesthetic). pelvic_coverage gets the heaviest weight
+        # because "missing bottom panel" is the dominant failure mode in
+        # the current render pipeline (the body_region_classifier strips
+        # bottom triangles below y_pelvis). Direct judge tests show Qwen
+        # gives pelvic=0 for top-only and pelvic=5-7 for present — much
+        # stronger signal than the validity (5 vs 8) it derives.
+        #
+        # Falls back to legacy (v+a)/20 if sub-scores absent (e.g. very
+        # old judge results or parse failure).
+        def _reward(r) -> float:
+            if r.pelvic_coverage or r.chest_coverage:
+                return (
+                    0.35 * r.pelvic_coverage
+                    + 0.20 * r.chest_coverage
+                    + 0.15 * r.anatomy_clean
+                    + 0.15 * r.assembly_quality
+                    + 0.15 * r.aesthetic
+                ) / 10.0
+            return (r.validity_score + r.aesthetic_score) / 20.0
         rewards = torch.tensor(
-            [(r.validity_score + r.aesthetic_score) / 20.0 for r in results],
+            [_reward(r) for r in results],
             dtype=torch.float32, device=self.device)
         # Baseline subtraction for variance reduction
         advantages = (rewards - self.baseline_R).detach()
