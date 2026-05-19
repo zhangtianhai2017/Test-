@@ -1,0 +1,78 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_L",
+      "local_params": {
+        "half_u": 0.1888,
+        "half_v": 0.09854190051555634,
+        "inner_u": 0.1,
+        "apex_lift": 0.1,
+        "underband_dip": 0.028927534818649292,
+        "center_v": 0.7502796649932861
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_M",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.42,
+        "front_leg_curve": 0.4995498061180115,
+        "back_top_v": 0.38,
+        "back_half_u": 0.3
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 32.07472872776653
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 17.650403588462957
+      }
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_10MM_NICKEL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FISHNET_OPEN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BEADS_OVAL_8MM",
+      "local_params": {
+        "count": 12.554968656819527
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.5063755512237549,
+    "saturation": 0.497233510017395,
+    "lightness": 0.5086283087730408,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.47093018889427185,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5241885781288147,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.48599228262901306,
+    "shape_mode": "extreme",
+    "secondary_hue": 0.513540506362915
+  }
+}

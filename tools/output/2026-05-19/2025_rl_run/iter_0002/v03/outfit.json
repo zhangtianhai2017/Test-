@@ -1,0 +1,59 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_L",
+      "local_params": {
+        "half_u": 0.136,
+        "half_v": 0.068,
+        "inner_u": 0.10761286318302155,
+        "apex_lift": 0.16771645843982697,
+        "underband_dip": 0.028873398900032043,
+        "center_v": 0.7525102496147156
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.3,
+        "front_half_u": 0.3459397256374359,
+        "front_leg_curve": 0.55,
+        "back_top_v": 0.28,
+        "back_half_u": 0.18
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 4.945305942978096
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.5022208094596863,
+    "saturation": 0.5037704706192017,
+    "lightness": 0.5129650235176086,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.48217540979385376,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5261126160621643,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.4862705171108246,
+    "shape_mode": "free",
+    "secondary_hue": 0.5110050439834595
+  }
+}

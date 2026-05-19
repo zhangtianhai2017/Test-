@@ -1,0 +1,80 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_M",
+      "local_params": {
+        "half_u": 0.1947,
+        "half_v": 0.1003,
+        "inner_u": 0.10777954757213593,
+        "apex_lift": 0.4,
+        "underband_dip": 0.02737344801425934,
+        "center_v": 0.7500854134559631
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.4427036643028259,
+        "front_half_u": 0.391,
+        "front_leg_curve": 0.49422967433929443,
+        "back_top_v": 0.41915854811668396,
+        "back_half_u": 0.28900000000000003
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 53.949989464085654
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 24.93115997858618
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_8MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_CUTOUT_JERSEY",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_CHIFFON_30MM",
+      "local_params": {
+        "size_cm": 2.788646974742029
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_PENDANT_DROP_15MM_GOLD",
+      "local_params": {
+        "size_cm": 1.006634312623087
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.503892183303833,
+    "saturation": 0.5036277174949646,
+    "lightness": 0.5122995972633362,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.4811376631259918,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5294233560562134,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.4761400520801544,
+    "shape_mode": "extreme",
+    "secondary_hue": 0.5053078532218933
+  }
+}

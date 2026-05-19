@@ -1,0 +1,64 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_COWL_S",
+      "local_params": {
+        "half_u": 0.17936870455741882,
+        "half_v": 0.0935,
+        "inner_u": 0.05,
+        "apex_lift": 0.16563044488430023,
+        "underband_dip": 0.02,
+        "center_v": 0.7511763572692871
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.3498733937740326,
+        "front_leg_curve": 0.5,
+        "back_top_v": 0.32,
+        "back_half_u": 0.2463478147983551
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 36.933701647344726
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_WAFFLE_HONEYCOMB",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.4983159005641937,
+    "saturation": 0.4929673671722412,
+    "lightness": 0.5044777393341064,
+    "pattern_overlay": "leopard",
+    "pattern_scale": 0.4808182418346405,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5231508612632751,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.486255019903183,
+    "shape_mode": "free",
+    "secondary_hue": 0.5151651501655579
+  }
+}

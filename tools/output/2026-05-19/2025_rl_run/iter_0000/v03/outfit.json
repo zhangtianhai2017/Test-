@@ -1,0 +1,76 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_L",
+      "local_params": {
+        "half_u": 0.1772397756576538,
+        "half_v": 0.0993112325668335,
+        "inner_u": 0.11692902445793152,
+        "apex_lift": 0.1697138398885727,
+        "underband_dip": 0.03208008408546448,
+        "center_v": 0.7501146197319031
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.4238395094871521,
+        "front_half_u": 0.46,
+        "front_leg_curve": 0.5,
+        "back_top_v": 0.4198243021965027,
+        "back_half_u": 0.34
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_15MM",
+      "local_params": {
+        "length_cm": 29.442995293724287
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_10MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_15MM",
+      "local_params": {
+        "length_cm": 9.899302427345116
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MUSHROOM_LEATHER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_TULLE_NET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.5023582577705383,
+    "saturation": 0.487801194190979,
+    "lightness": 0.49469321966171265,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.489745169878006,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.502422571182251,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.4965812563896179,
+    "shape_mode": "extreme",
+    "secondary_hue": 0.5128777027130127
+  }
+}

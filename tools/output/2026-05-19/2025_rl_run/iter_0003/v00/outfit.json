@@ -1,0 +1,66 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_M",
+      "local_params": {
+        "half_u": 0.17777977883815765,
+        "half_v": 0.09908066689968109,
+        "inner_u": 0.1,
+        "apex_lift": 0.08,
+        "underband_dip": 0.02698703110218048,
+        "dome_depth_cm": 1.5,
+        "center_v": 0.7517664432525635
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.3,
+        "front_half_u": 0.306,
+        "front_leg_curve": 0.55,
+        "back_top_v": 0.28,
+        "back_half_u": 0.18
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.22046790406599312,
+        "front_half_u": 0.20832154757148386,
+        "front_leg_curve": 0.6949575979750736,
+        "back_top_v": 0.24237966930671256,
+        "back_half_u": 0.0957672883415159
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 4.2446785604678885
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_LACE_FLORAL",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.5001904368400574,
+    "saturation": 0.4875124990940094,
+    "lightness": 0.5016672611236572,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.4776059091091156,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.521364152431488,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.49345332384109497,
+    "shape_mode": "free",
+    "secondary_hue": 0.5145605206489563
+  }
+}

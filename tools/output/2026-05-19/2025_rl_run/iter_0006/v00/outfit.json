@@ -1,0 +1,90 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_ASYM_NECK_M",
+      "local_params": {
+        "half_u": 0.18,
+        "half_v": 0.09952780604362488,
+        "inner_u": 0.07,
+        "apex_lift": 0.2,
+        "underband_dip": 0.027436062693595886,
+        "center_v": 0.7512037754058838
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.4367867112159729,
+        "front_half_u": 0.46,
+        "front_leg_curve": 0.4978161156177521,
+        "back_top_v": 0.41908442974090576,
+        "back_half_u": 0.34
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 29.58005637853342
+      }
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_20MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_CROCHET_COTTON",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_ECONYL_PLAIN_LIGHT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_TASSEL_SILK_50MM",
+      "local_params": {
+        "length_cm": 7.445090979075369
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_TROCHUS_25MM",
+      "local_params": {
+        "size_cm": 1.7619655907888498
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHARM_BEACH",
+      "local_params": {
+        "diameter_cm": 7.550065485581121
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.5092729926109314,
+    "saturation": 0.4908658564090729,
+    "lightness": 0.5038468837738037,
+    "pattern_overlay": "checker",
+    "pattern_scale": 0.48196542263031006,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5279920697212219,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.4838612675666809,
+    "shape_mode": "extreme",
+    "secondary_hue": 0.5136963725090027
+  }
+}

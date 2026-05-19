@@ -1,0 +1,91 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_COWL_M",
+      "local_params": {
+        "half_u": 0.17,
+        "half_v": 0.085,
+        "inner_u": 0.10394930839538574,
+        "apex_lift": 0.16682599484920502,
+        "underband_dip": 0.023702815175056458,
+        "center_v": 0.7522032856941223
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.4964010417461395,
+        "back_top_v": 0.38,
+        "back_half_u": 0.3
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.3099153960548428,
+        "front_half_u": 0.43560949616833383,
+        "front_leg_curve": 0.3277225347829314,
+        "back_top_v": 0.3729809817738956,
+        "back_half_u": 0.3080411021971551
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 4.0397252224728515
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 28.102240357274447
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FISHNET_OPEN",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_MUSHROOM_LEATHER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_BOW_SATIN_40MM",
+      "local_params": {
+        "size_cm": 5.425838692365822
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHAIN",
+      "local_params": {
+        "diameter_cm": 9.185374215459557
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.5007339715957642,
+    "saturation": 0.513333797454834,
+    "lightness": 0.5143846869468689,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.4767412841320038,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5419455766677856,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.4736526310443878,
+    "shape_mode": "extreme",
+    "secondary_hue": 0.5133631229400635
+  }
+}

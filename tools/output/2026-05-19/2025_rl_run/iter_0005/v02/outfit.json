@@ -1,0 +1,83 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_S",
+      "local_params": {
+        "half_u": 0.17721788585186005,
+        "half_v": 0.10011711716651917,
+        "inner_u": 0.1,
+        "apex_lift": 0.08,
+        "underband_dip": 0.027791589498519897,
+        "dome_depth_cm": 1.5,
+        "center_v": 0.7502224445343018
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.3,
+        "front_half_u": 0.35472947359085083,
+        "front_leg_curve": 0.55,
+        "back_top_v": 0.28,
+        "back_half_u": 0.18
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.4897303682954298,
+        "front_half_u": 0.5184550328848812,
+        "front_leg_curve": 0.37339112181461165,
+        "back_top_v": 0.5400182979503756,
+        "back_half_u": 0.3690946729170794
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_10MM",
+      "local_params": {
+        "length_cm": 35.650662528306256
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_15MM",
+      "local_params": {
+        "length_cm": 13.29056845445454
+      }
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_20MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MESH_OUTER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_COVERSTITCH_3NEEDLE",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.5071090459823608,
+    "saturation": 0.4868886172771454,
+    "lightness": 0.4911227226257324,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.48103976249694824,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5105443596839905,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.4813150465488434,
+    "shape_mode": "free",
+    "secondary_hue": 0.5210758447647095
+  }
+}

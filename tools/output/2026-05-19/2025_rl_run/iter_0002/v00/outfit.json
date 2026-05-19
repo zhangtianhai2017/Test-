@@ -1,0 +1,68 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_M",
+      "local_params": {
+        "half_u": 0.2242,
+        "half_v": 0.09981554746627808,
+        "inner_u": 0.05,
+        "apex_lift": 0.16291646659374237,
+        "underband_dip": 0.02,
+        "center_v": 0.7491793632507324
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.32,
+        "front_half_u": 0.32,
+        "front_leg_curve": 0.5017087459564209,
+        "back_top_v": 0.3,
+        "back_half_u": 0.14
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 43.60166242364598
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_3MM",
+      "local_params": {
+        "length_cm": 22.399429878272024
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ALGAE_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_STUD_PEARL",
+      "local_params": {
+        "size_cm": 0.6550234790329821
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.4998472332954407,
+    "saturation": 0.48951447010040283,
+    "lightness": 0.49481987953186035,
+    "pattern_overlay": "polka",
+    "pattern_scale": 0.4900524318218231,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5053487420082092,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.48750874400138855,
+    "shape_mode": "free",
+    "secondary_hue": 0.513895571231842
+  }
+}

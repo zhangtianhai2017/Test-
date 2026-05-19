@@ -1,0 +1,87 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BRAZILIAN_M",
+      "local_params": {
+        "half_u": 0.17847798764705658,
+        "half_v": 0.09748823940753937,
+        "inner_u": 0.07,
+        "apex_lift": 0.2,
+        "underband_dip": 0.030722439289093018,
+        "center_v": 0.749675989151001
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.42,
+        "front_leg_curve": 0.4989061653614044,
+        "back_top_v": 0.38,
+        "back_half_u": 0.3
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 43.892554439711
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 17.3446781351267
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_8MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_ALGAE_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_CHAIN_GOLD",
+      "local_params": {
+        "diameter_cm": 6.82955801572569
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BODY_CHAIN_BELLY",
+      "local_params": {
+        "length_cm": 81.32044203889828
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_ANKLET_CHARM_BEACH",
+      "local_params": {
+        "diameter_cm": 7.024377900376754
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.513996958732605,
+    "saturation": 0.4995366930961609,
+    "lightness": 0.5080753564834595,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.48185479640960693,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5234215259552002,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.486907958984375,
+    "shape_mode": "extreme",
+    "secondary_hue": 0.511121928691864
+  }
+}

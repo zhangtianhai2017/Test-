@@ -1,0 +1,59 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_M",
+      "local_params": {
+        "half_u": 0.1772443652153015,
+        "half_v": 0.09826302528381348,
+        "inner_u": 0.1,
+        "apex_lift": 0.1,
+        "underband_dip": 0.02726885676383972,
+        "center_v": 0.7496620416641235
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.3,
+        "front_half_u": 0.306,
+        "front_leg_curve": 0.55,
+        "back_top_v": 0.28,
+        "back_half_u": 0.18
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 47.16360908645719
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_10MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MUSHROOM_LEATHER",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.5078392028808594,
+    "saturation": 0.4958942234516144,
+    "lightness": 0.5119298696517944,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.4833182096481323,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5299642086029053,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.4831660985946655,
+    "shape_mode": "free",
+    "secondary_hue": 0.5114172697067261
+  }
+}

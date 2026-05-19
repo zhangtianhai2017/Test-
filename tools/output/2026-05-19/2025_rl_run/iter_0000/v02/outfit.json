@@ -1,0 +1,70 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_L",
+      "local_params": {
+        "half_u": 0.17523807287216187,
+        "half_v": 0.09935437142848969,
+        "inner_u": 0.11433617770671844,
+        "apex_lift": 0.1675705760717392,
+        "underband_dip": 0.02999916672706604,
+        "center_v": 0.7513776421546936
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.42932194471359253,
+        "front_half_u": 0.391,
+        "front_leg_curve": 0.4978431761264801,
+        "back_top_v": 0.4220868647098541,
+        "back_half_u": 0.28900000000000003
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.31152021552597287,
+        "front_half_u": 0.30988428225634,
+        "front_leg_curve": 0.5375825471120022,
+        "back_top_v": 0.2933549283137369,
+        "back_half_u": 0.13487428663723583
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 69.7288055857225
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_JACQUARD_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.49720993638038635,
+    "saturation": 0.49435877799987793,
+    "lightness": 0.5103607773780823,
+    "pattern_overlay": "ombre",
+    "pattern_scale": 0.4870169460773468,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5133297443389893,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.4885503053665161,
+    "shape_mode": "extreme",
+    "secondary_hue": 0.5191347002983093
+  }
+}

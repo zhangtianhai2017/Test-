@@ -1,0 +1,94 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_COWL_L",
+      "local_params": {
+        "half_u": 0.2242,
+        "half_v": 0.09758739173412323,
+        "inner_u": 0.05,
+        "apex_lift": 0.17282144725322723,
+        "underband_dip": 0.02,
+        "center_v": 0.7499070167541504
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.5075693130493164,
+        "back_top_v": 0.38,
+        "back_half_u": 0.3
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.4105586677467801,
+        "front_half_u": 0.46317978061889814,
+        "front_leg_curve": 0.38116336033671727,
+        "back_top_v": 0.4439563888838862,
+        "back_half_u": 0.3811232516282494
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_8MM",
+      "local_params": {
+        "length_cm": 8.241419873029214
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MESH_OUTER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_LACE_FLORAL",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_TASSEL_SILK_50MM",
+      "local_params": {
+        "length_cm": 4.70619242088037
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_TROCHUS_25MM",
+      "local_params": {
+        "size_cm": 2.0684435406706236
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.5101197361946106,
+    "saturation": 0.5053303837776184,
+    "lightness": 0.513154149055481,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.4798678457736969,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5396705269813538,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.4726698398590088,
+    "shape_mode": "free",
+    "secondary_hue": 0.5079848766326904
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_COWL_S",
+      "local_params": {
+        "half_u": 0.1761963665485382,
+        "half_v": 0.0935,
+        "inner_u": 0.05,
+        "apex_lift": 0.1637834757566452,
+        "underband_dip": 0.02,
+        "center_v": 0.7506780028343201
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.3,
+        "front_half_u": 0.306,
+        "front_leg_curve": 0.55,
+        "back_top_v": 0.28,
+        "back_half_u": 0.18
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_PADDED_20MM",
+      "local_params": {
+        "length_cm": 35.17461843365264
+      }
+    },
+    {
+      "slot_name": "slider",
+      "library_id": "HW_SLIDER_20MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEERSUCKER_STRIPE",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.49550145864486694,
+    "saturation": 0.49681878089904785,
+    "lightness": 0.5023930072784424,
+    "pattern_overlay": "herringbone",
+    "pattern_scale": 0.4841703772544861,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5128186345100403,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.48311010003089905,
+    "shape_mode": "free",
+    "secondary_hue": 0.517876148223877
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_FOAM_MOLDED_M",
+      "local_params": {
+        "half_u": 0.17673757672309875,
+        "half_v": 0.09810870885848999,
+        "inner_u": 0.1,
+        "apex_lift": 0.08,
+        "underband_dip": 0.02297338843345642,
+        "dome_depth_cm": 1.5,
+        "center_v": 0.7494817972183228
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.32,
+        "front_half_u": 0.272,
+        "front_leg_curve": 0.5,
+        "back_top_v": 0.3,
+        "back_half_u": 0.14
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.29316214438153787,
+        "front_half_u": 0.35213664187232785,
+        "front_leg_curve": 0.5794591287121121,
+        "back_top_v": 0.27143054098450964,
+        "back_half_u": 0.17290252433856973
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_15MM",
+      "local_params": {
+        "length_cm": 10.371712381448297
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_COMPRESSION_SPORT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_POWERMESH_LINING",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.5161004662513733,
+    "saturation": 0.5015459060668945,
+    "lightness": 0.5128251910209656,
+    "pattern_overlay": "polka",
+    "pattern_scale": 0.47956717014312744,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5360830426216125,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.48192575573921204,
+    "shape_mode": "extreme",
+    "secondary_hue": 0.5132084488868713
+  }
+}

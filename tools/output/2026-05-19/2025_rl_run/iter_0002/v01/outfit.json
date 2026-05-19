@@ -1,0 +1,77 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.17,
+        "half_v": 0.085,
+        "inner_u": 0.111111119389534,
+        "apex_lift": 0.1661679893732071,
+        "underband_dip": 0.03406728804111481,
+        "center_v": 0.751051127910614
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.34879252314567566,
+        "front_leg_curve": 0.5068279504776001,
+        "back_top_v": 0.32,
+        "back_half_u": 0.2519785463809967
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.3297201443546005,
+        "front_half_u": 0.2905545222066963,
+        "front_leg_curve": 0.6544008836180548,
+        "back_top_v": 0.31033163909363015,
+        "back_half_u": 0.2536320300117445
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 56.27327780178345
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 21.10552427951912
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_8MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_CUTOUT_JERSEY",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.5054203271865845,
+    "saturation": 0.480841726064682,
+    "lightness": 0.503292441368103,
+    "pattern_overlay": "stripe",
+    "pattern_scale": 0.47942233085632324,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5086765289306641,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.4927572011947632,
+    "shape_mode": "free",
+    "secondary_hue": 0.5092027187347412
+  }
+}

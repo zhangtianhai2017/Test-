@@ -1,0 +1,61 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_BALCONETTE_S",
+      "local_params": {
+        "half_u": 0.1770586222410202,
+        "half_v": 0.085,
+        "inner_u": 0.1,
+        "apex_lift": 0.1,
+        "underband_dip": 0.025134548544883728,
+        "center_v": 0.7504055500030518
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.3,
+        "front_half_u": 0.34620973467826843,
+        "front_leg_curve": 0.55,
+        "back_top_v": 0.28,
+        "back_half_u": 0.18
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 2.9555737643873528
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_ELASTIC_15MM",
+      "local_params": {
+        "length_cm": 9.48078000018228
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FOIL_COATED_GOLD",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.5101003050804138,
+    "saturation": 0.501476526260376,
+    "lightness": 0.5138719081878662,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.4783802330493927,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5311593413352966,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.4856351315975189,
+    "shape_mode": "free",
+    "secondary_hue": 0.5180320143699646
+  }
+}

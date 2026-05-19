@@ -1,0 +1,70 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_COWL_S",
+      "local_params": {
+        "half_u": 0.1779094934463501,
+        "half_v": 0.0935,
+        "inner_u": 0.05,
+        "apex_lift": 0.16545914113521576,
+        "underband_dip": 0.02,
+        "center_v": 0.7504432797431946
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.34829163551330566,
+        "front_leg_curve": 0.5,
+        "back_top_v": 0.32,
+        "back_half_u": 0.24762272834777832
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.20571419430774263,
+        "front_half_u": 0.2717923975147167,
+        "front_leg_curve": 0.7093749530583433,
+        "back_top_v": 0.23152830812150696,
+        "back_half_u": 0.13062601590678175
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 3.0480612788972374
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HUNZA_CRINKLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.5091424584388733,
+    "saturation": 0.5054216384887695,
+    "lightness": 0.5107756853103638,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.48393240571022034,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5451126098632812,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.47924983501434326,
+    "shape_mode": "free",
+    "secondary_hue": 0.5050374269485474
+  }
+}

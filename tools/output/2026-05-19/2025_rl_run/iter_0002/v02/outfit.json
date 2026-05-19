@@ -1,0 +1,77 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_S",
+      "local_params": {
+        "half_u": 0.19,
+        "half_v": 0.10028080642223358,
+        "inner_u": 0.05,
+        "apex_lift": 0.1639443188905716,
+        "underband_dip": 0.02,
+        "center_v": 0.7526529431343079
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.3499526381492615,
+        "front_leg_curve": 0.5004368424415588,
+        "back_top_v": 0.32,
+        "back_half_u": 0.24593065679073334
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_THONG_S",
+      "local_params": {
+        "front_top_v": 0.21702709769490558,
+        "front_half_u": 0.25976246830906013,
+        "front_leg_curve": 0.5319820076237933,
+        "back_top_v": 0.20849889230620844,
+        "back_half_u": 0.13197350305225947
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 47.03031344469187
+      }
+    },
+    {
+      "slot_name": "side_tie",
+      "library_id": "STR_TIE_RIBBON_15MM",
+      "local_params": {
+        "length_cm": 29.266990991711012
+      }
+    },
+    {
+      "slot_name": "oring",
+      "library_id": "HW_OR_12MM_GOLD",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.49804240465164185,
+    "saturation": 0.49543556571006775,
+    "lightness": 0.5064278841018677,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.48898181319236755,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5108090043067932,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.4905376732349396,
+    "shape_mode": "extreme",
+    "secondary_hue": 0.5100687146186829
+  }
+}

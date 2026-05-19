@@ -1,0 +1,75 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_HIGH_NECK_S",
+      "local_params": {
+        "half_u": 0.17691442370414734,
+        "half_v": 0.09922422468662262,
+        "inner_u": 0.09,
+        "apex_lift": -0.05,
+        "underband_dip": 0.027780741453170776,
+        "center_v": 0.7502106428146362
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.34,
+        "front_half_u": 0.3538111746311188,
+        "front_leg_curve": 0.5021713376045227,
+        "back_top_v": 0.32,
+        "back_half_u": 0.24790231883525848
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.3008102415977292,
+        "front_half_u": 0.4186094986997215,
+        "front_leg_curve": 0.5354564387631746,
+        "back_top_v": 0.30395136002545964,
+        "back_half_u": 0.30007152305344703
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_BAND_SPORT_25MM",
+      "local_params": {
+        "length_cm": 13.637664220580337
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_FOAM_CUP_3MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_COMPRESSION_SPORT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_OVERLOCK_4THREAD",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.497964471578598,
+    "saturation": 0.4897737205028534,
+    "lightness": 0.5015795826911926,
+    "pattern_overlay": "floral",
+    "pattern_scale": 0.4809330701828003,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.518665611743927,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.488971084356308,
+    "shape_mode": "free",
+    "secondary_hue": 0.5137874484062195
+  }
+}

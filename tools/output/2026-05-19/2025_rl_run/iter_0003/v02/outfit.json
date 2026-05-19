@@ -1,0 +1,70 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_COWL_S",
+      "local_params": {
+        "half_u": 0.17757734656333923,
+        "half_v": 0.0935,
+        "inner_u": 0.05,
+        "apex_lift": 0.16570357978343964,
+        "underband_dip": 0.02,
+        "center_v": 0.7512838840484619
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.3,
+        "front_half_u": 0.34995317459106445,
+        "front_leg_curve": 0.55,
+        "back_top_v": 0.28,
+        "back_half_u": 0.18
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.41474230156865277,
+        "front_half_u": 0.48016778186175424,
+        "front_leg_curve": 0.3184796257816086,
+        "back_top_v": 0.4121336536947392,
+        "back_half_u": 0.3852613337824643
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_HIP_BAND_SPORT_25MM",
+      "local_params": {
+        "length_cm": 11.80566309780707
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_COMPRESSION_SPORT",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.5040755867958069,
+    "saturation": 0.4891684055328369,
+    "lightness": 0.5047650933265686,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.4809960126876831,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5188913345336914,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.4889521598815918,
+    "shape_mode": "extreme",
+    "secondary_hue": 0.5179062485694885
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_ASYM_NECK_M",
+      "local_params": {
+        "half_u": 0.1804134100675583,
+        "half_v": 0.09795279800891876,
+        "inner_u": 0.07,
+        "apex_lift": 0.2,
+        "underband_dip": 0.027562737464904785,
+        "center_v": 0.7511579990386963
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_HIGHWAIST_S",
+      "local_params": {
+        "front_top_v": 0.4374297559261322,
+        "front_half_u": 0.391,
+        "front_leg_curve": 0.4980284869670868,
+        "back_top_v": 0.42032966017723083,
+        "back_half_u": 0.28900000000000003
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_CHEEKY_S",
+      "local_params": {
+        "front_top_v": 0.26980562674532527,
+        "front_half_u": 0.31203166764962864,
+        "front_leg_curve": 0.5402118066358632,
+        "back_top_v": 0.2839442876731579,
+        "back_half_u": 0.1902229278097578
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_RIBBED",
+      "local_params": {
+        "height_cm": 5.786089859505542
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_TULLE_NET",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_MESH_OUTER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_15MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_EARRING_DROP_GOLD",
+      "local_params": {
+        "length_cm": 1.91348738990549
+      }
+    },
+    {
+      "slot_name": "body_jewelry",
+      "library_id": "BJ_BRACELET_CHAIN_GOLD",
+      "local_params": {
+        "diameter_cm": 5.8286514559390294
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.4969604015350342,
+    "saturation": 0.4944223463535309,
+    "lightness": 0.5097450613975525,
+    "pattern_overlay": "chevron",
+    "pattern_scale": 0.4783681333065033,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5286137461662292,
+    "geom_aesthetic": "free",
+    "geom_ratio_pull": 0.48734572529792786,
+    "shape_mode": "free",
+    "secondary_hue": 0.5098488330841064
+  }
+}

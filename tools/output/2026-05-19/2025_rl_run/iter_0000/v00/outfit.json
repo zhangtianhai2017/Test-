@@ -1,0 +1,71 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_DEEP_V_L",
+      "local_params": {
+        "half_u": 0.1947,
+        "half_v": 0.1003,
+        "inner_u": 0.1146954745054245,
+        "apex_lift": 0.4,
+        "underband_dip": 0.028025299310684204,
+        "center_v": 0.7523334622383118
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.4,
+        "front_half_u": 0.357,
+        "front_leg_curve": 0.4996844530105591,
+        "back_top_v": 0.38,
+        "back_half_u": 0.3
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 4.8119416220641655
+      }
+    },
+    {
+      "slot_name": "hip_strap",
+      "library_id": "STR_TIE_CORD_5MM",
+      "local_params": {
+        "length_cm": 29.498709290264205
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HEMP_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_HUNZA_CRINKLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.5055768489837646,
+    "saturation": 0.49121958017349243,
+    "lightness": 0.509405791759491,
+    "pattern_overlay": "tie_dye",
+    "pattern_scale": 0.48949265480041504,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5146763324737549,
+    "geom_aesthetic": "thirds",
+    "geom_ratio_pull": 0.4951727092266083,
+    "shape_mode": "free",
+    "secondary_hue": 0.5118855834007263
+  }
+}

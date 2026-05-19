@@ -1,0 +1,78 @@
+{
+  "archetype": "triangle_string_halter",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_TRIANGLE_L",
+      "local_params": {
+        "half_u": 0.1888,
+        "half_v": 0.09954383224248886,
+        "inner_u": 0.1,
+        "apex_lift": 0.08,
+        "underband_dip": 0.027456894516944885,
+        "dome_depth_cm": 1.5,
+        "center_v": 0.7511467933654785
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_CHEEKY_M",
+      "local_params": {
+        "front_top_v": 0.4247637093067169,
+        "front_half_u": 0.46,
+        "front_leg_curve": 0.5,
+        "back_top_v": 0.42179545760154724,
+        "back_half_u": 0.34
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.2600043404343446,
+        "front_half_u": 0.33194822180224964,
+        "front_leg_curve": 0.610423888477275,
+        "back_top_v": 0.220726080959987,
+        "back_half_u": 0.11281152113310772
+      }
+    },
+    {
+      "slot_name": "halter_strap",
+      "library_id": "STR_HALTER_3MM",
+      "local_params": {
+        "length_cm": 46.65096653605191
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_MUSHROOM_LEATHER",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FLATLOCK",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 6.68960409171178
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.504554271697998,
+    "saturation": 0.505649209022522,
+    "lightness": 0.4963120222091675,
+    "pattern_overlay": "solid",
+    "pattern_scale": 0.4872416853904724,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.5084754824638367,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.4876512587070465,
+    "shape_mode": "free",
+    "secondary_hue": 0.509193480014801
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "archetype": "one_piece_maillot",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_HIGH_NECK_S",
+      "local_params": {
+        "half_u": 0.17854075133800507,
+        "half_v": 0.09861554205417633,
+        "inner_u": 0.09,
+        "apex_lift": -0.05,
+        "underband_dip": 0.02961297333240509,
+        "center_v": 0.7514798045158386
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_S",
+      "local_params": {
+        "front_top_v": 0.3,
+        "front_half_u": 0.306,
+        "front_leg_curve": 0.55,
+        "back_top_v": 0.28,
+        "back_half_u": 0.18
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_BRIEF_S",
+      "local_params": {
+        "front_top_v": 0.33175522446126415,
+        "front_half_u": 0.4118970034119017,
+        "front_leg_curve": 0.5280306159606158,
+        "back_top_v": 0.3373670983301155,
+        "back_half_u": 0.4184373532787518
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_HALTER_5MM",
+      "local_params": {
+        "length_cm": 59.698963898280766
+      }
+    },
+    {
+      "slot_name": "underbust",
+      "library_id": "STR_FOE_10MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HEMP_BLEND",
+      "local_params": {}
+    },
+    {
+      "slot_name": "lining_fabric",
+      "library_id": "F_NEOPRENE_2MM",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.5074586868286133,
+    "saturation": 0.5004317164421082,
+    "lightness": 0.5061789751052856,
+    "pattern_overlay": "polka",
+    "pattern_scale": 0.47731301188468933,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5223219394683838,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.48540183901786804,
+    "shape_mode": "free",
+    "secondary_hue": 0.5102291703224182
+  }
+}

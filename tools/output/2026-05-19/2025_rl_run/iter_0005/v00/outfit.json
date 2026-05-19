@@ -1,0 +1,70 @@
+{
+  "archetype": "bralette_shoulder_strap",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_DEEP_V_S",
+      "local_params": {
+        "half_u": 0.17633859813213348,
+        "half_v": 0.09828294813632965,
+        "inner_u": 0.1075148731470108,
+        "apex_lift": 0.4,
+        "underband_dip": 0.02660660445690155,
+        "center_v": 0.7517369985580444
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_BRAZILIAN_M",
+      "local_params": {
+        "front_top_v": 0.3,
+        "front_half_u": 0.3526250720024109,
+        "front_leg_curve": 0.55,
+        "back_top_v": 0.28,
+        "back_half_u": 0.18
+      }
+    },
+    {
+      "slot_name": "bottom_back",
+      "library_id": "BOT_HIGHWAIST_M",
+      "local_params": {
+        "front_top_v": 0.5262988586032994,
+        "front_half_u": 0.46875443653377574,
+        "front_leg_curve": 0.3264488365680725,
+        "back_top_v": 0.5260558118724213,
+        "back_half_u": 0.4163591182036699
+      }
+    },
+    {
+      "slot_name": "shoulder_strap",
+      "library_id": "STR_SHOULDER_WOVEN_15MM",
+      "local_params": {
+        "length_cm": 34.04998671272616
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_HUNZA_CRINKLE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_BARTACK",
+      "local_params": {}
+    }
+  ],
+  "global_design": {
+    "hue": 0.506273627281189,
+    "saturation": 0.49470922350883484,
+    "lightness": 0.5048326253890991,
+    "pattern_overlay": "gingham",
+    "pattern_scale": 0.4832419157028198,
+    "palette_preset": "free",
+    "symmetry_mode": "mirror",
+    "asym_amount": 0.531830906867981,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.4894915819168091,
+    "shape_mode": "free",
+    "secondary_hue": 0.5066691040992737
+  }
+}

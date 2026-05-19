@@ -1,0 +1,73 @@
+{
+  "archetype": "bandeau_back_band",
+  "slot_assignments": [
+    {
+      "slot_name": "cup",
+      "library_id": "CUP_SOFTCUP_ASYM_NECK_M",
+      "local_params": {
+        "half_u": 0.16,
+        "half_v": 0.08,
+        "inner_u": 0.10547788441181183,
+        "apex_lift": 0.1721969097852707,
+        "underband_dip": 0.028944537043571472,
+        "center_v": 0.7506685853004456
+      }
+    },
+    {
+      "slot_name": "bottom_front",
+      "library_id": "BOT_THONG_M",
+      "local_params": {
+        "front_top_v": 0.32,
+        "front_half_u": 0.32,
+        "front_leg_curve": 0.5,
+        "back_top_v": 0.3,
+        "back_half_u": 0.14
+      }
+    },
+    {
+      "slot_name": "back_band",
+      "library_id": "STR_BACKBAND_PLAIN",
+      "local_params": {
+        "height_cm": 4.127936794945302
+      }
+    },
+    {
+      "slot_name": "primary_fabric",
+      "library_id": "F_SEERSUCKER_STRIPE",
+      "local_params": {}
+    },
+    {
+      "slot_name": "seam_type",
+      "library_id": "S_FOE_BIND_25MM",
+      "local_params": {}
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_SHELL_COWRIE_20MM",
+      "local_params": {
+        "size_cm": 1.2605424609648201
+      }
+    },
+    {
+      "slot_name": "accessory",
+      "library_id": "ACC_FRINGE_RAW_60MM",
+      "local_params": {
+        "length_cm": 9.628873096440412
+      }
+    }
+  ],
+  "global_design": {
+    "hue": 0.5200445055961609,
+    "saturation": 0.4998599588871002,
+    "lightness": 0.5132070183753967,
+    "pattern_overlay": "tropical",
+    "pattern_scale": 0.4860304892063141,
+    "palette_preset": "free",
+    "symmetry_mode": "dramatic_asym",
+    "asym_amount": 0.5292690992355347,
+    "geom_aesthetic": "golden",
+    "geom_ratio_pull": 0.49089235067367554,
+    "shape_mode": "free",
+    "secondary_hue": 0.5206952691078186
+  }
+}
