@@ -1,0 +1,24 @@
+{
+  "_comment": "Manual ground truth for the 13 renders I inspected. valid = top+bottom both present and no anatomy overflow. invalid = missing bottom panel entirely (most common failure here).",
+
+  "i0_v0": "valid",
+  "i0_v1": "invalid",
+  "i0_v2": "invalid",
+  "i0_v3": "valid",
+
+  "i1_v0": "valid",
+
+  "i2_v0": "invalid",
+  "i2_v3": "invalid",
+
+  "i3_v0": "invalid",
+
+  "i4_v0": "valid",
+  "i4_v2": "invalid",
+
+  "i5_v0": "valid",
+
+  "i6_v0": "valid",
+
+  "i7_v0": "invalid"
+}

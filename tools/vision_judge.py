@@ -91,37 +91,80 @@ class JudgeResult:
 # Prompt — drives the model toward structural-validity-only judgment
 # ---------------------------------------------------------------------------
 
-JUDGE_PROMPT = """You are evaluating a 3D rendered image of a generated swimsuit on a body.
-Your job is to judge STRUCTURAL VALIDITY ONLY, not personal taste.
+JUDGE_PROMPT = """You are inspecting a 3D rendered image of a swimsuit on a mannequin.
+Look carefully at the FABRIC visible on the body and answer five short
+questions with numeric scores 0-10. Be willing to use the full range.
 
-A valid swimsuit must:
-- Show fabric covering the chest region (cup, bandeau, or one-piece top)
-- Show fabric covering the pelvic region (bottom panel)
-- Keep all fabric bounded to the torso / hip / shoulder cap area
-- Have no fabric extending onto bare arms, legs, head, or neck
-- Have no obvious geometry clipping into the body
-- Have all straps connected at both ends (no floating pieces)
+For each, first describe ONE phrase of what you see on that body region,
+then give a score from 0 to 10.
 
-DO NOT mark as invalid for these (they are intentional style choices):
-- Asymmetric designs (one-shoulder, single-cup, asymmetric cuts)
-- Minimal coverage (thongs, micro bikinis, deep cutouts)
-- Non-conventional cup or bottom shapes (deep V, scoop, square neck)
-- Bold colours, mesh, lace, sheer fabrics
-- Hardware decorations (rings, slides, buckles)
+Rubric (each 0-10):
 
-Output STRICT JSON ONLY, no prose around it.  Use this exact schema:
+1. chest_coverage   — how well the BREAST area is covered by fabric:
+   0 = bare breasts, no fabric at all
+   3 = tiny pasties / nipple covers only
+   5 = minimal cups or strapless bandeau, partial coverage
+   7 = standard bikini cups or bralette, well-defined coverage
+   9 = full bralette, halter, or one-piece top with broad coverage
+   10 = generous coverage (sports bra style, T-shirt style)
+
+2. pelvic_coverage  — how well the PELVIC / GROIN area is covered:
+   0 = completely bare, no fabric in pelvic region at all
+   3 = thong / G-string (visible string only, minimal panel)
+   5 = micro bikini bottom or small triangle, partial coverage
+   7 = standard bikini brief or hipster
+   9 = full brief, boy-short, or one-piece crotch panel
+   10 = high-waist brief or skirted bottom
+
+3. anatomy_clean    — how cleanly the fabric stays on torso/hip/shoulder
+   (no overflow onto bare arms, legs, head, neck, or floating in space):
+   0 = major overflow onto multiple non-torso body parts
+   5 = minor overflow on one region (e.g. fabric trailing onto arm)
+   10 = all fabric stays on intended body regions
+
+4. assembly_quality — straps connected, no obvious geometry clipping,
+   no broken / floating pieces:
+   0 = many disconnected pieces or severe clipping
+   5 = one minor issue (one disconnected strap)
+   10 = clean assembly
+
+5. aesthetic        — overall visual appeal (color harmony, proportion,
+   silhouette, balance). Use the full 1-10 range:
+   1 = visually broken / unappealing
+   5 = average / forgettable
+   10 = strikingly attractive
+
+A design counts as a VALID SWIMSUIT only if chest_coverage >= 4 AND
+pelvic_coverage >= 4 AND anatomy_clean >= 5 AND assembly_quality >= 5.
+
+Output STRICT JSON only, no prose or markdown. Use this exact schema:
 {
+  "chest_observation":      "<one short phrase>",
+  "chest_coverage":         <int 0-10>,
+  "pelvic_observation":     "<one short phrase>",
+  "pelvic_coverage":        <int 0-10>,
+  "anatomy_observation":    "<one short phrase>",
+  "anatomy_clean":          <int 0-10>,
+  "assembly_observation":   "<one short phrase>",
+  "assembly_quality":       <int 0-10>,
+  "aesthetic_observation":  "<one short phrase>",
+  "aesthetic":              <int 0-10>,
   "is_valid_swimsuit":      <true|false>,
   "validity_score":         <int 0-10>,
   "aesthetic_score":        <int 0-10>,
   "structural_issues":      [<list of short tags>],
-  "anatomical_overflow":    [<list of body parts, e.g. "left_arm">],
+  "anatomical_overflow":    [<list of body parts>],
   "missing_required_parts": [<list, e.g. "bottom_panel">],
   "style_descriptors":      [<list of short tags>],
   "overall_assessment":     "<one sentence>"
 }
 
-Begin your output with `{` and end with `}`. No markdown, no explanation."""
+For the legacy fields:
+  validity_score = round((chest_coverage + pelvic_coverage + anatomy_clean + assembly_quality) / 4)
+  aesthetic_score = aesthetic
+  is_valid_swimsuit derived from the rule above.
+
+Begin with `{` end with `}`."""
 
 
 # ---------------------------------------------------------------------------

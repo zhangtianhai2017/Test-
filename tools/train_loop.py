@@ -213,8 +213,12 @@ class TrainLoop:
             results = [JudgeResult.from_dict({}, backend="error")
                         for _ in briefs]
 
+        # Reward uses BOTH validity + aesthetic so the judge's graded
+        # multi-dim rubric (V2 prompt, 2026-05-19) produces continuous
+        # RL signal instead of binary 0.2/0.8. Empirically gives
+        # ~2.5x more sample-to-sample variance on the same renders.
         rewards = torch.tensor(
-            [r.validity_score / 10.0 for r in results],
+            [(r.validity_score + r.aesthetic_score) / 20.0 for r in results],
             dtype=torch.float32, device=self.device)
         # Baseline subtraction for variance reduction
         advantages = (rewards - self.baseline_R).detach()
