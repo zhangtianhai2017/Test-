@@ -285,11 +285,23 @@ class TrainLoop:
         rewards = torch.tensor(
             [b + self.w_div * d for b, d in zip(base_rewards, div_bonuses)],
             dtype=torch.float32, device=self.device)
-        # Baseline subtraction for variance reduction
+        # Baseline subtraction for variance reduction.
         advantages = (rewards - self.baseline_R).detach()
-        # REINFORCE loss: -E[advantage * sum_d log p(sampled_d)]
+        # Per-batch advantage normalization (PPO-style). Without this,
+        # gradient magnitude tracks raw reward scale; with diversity
+        # bonus the reward range is ~3x wider than legacy reward and
+        # plain REINFORCE updates become unstable (2026-05-20 mid-run
+        # at w_div=0.3 saw mean_reward 0.79 -> 0.71 over 30 iters).
+        # Normalization keeps update magnitudes roughly constant across
+        # iters regardless of reward distribution shape.
+        if advantages.numel() > 1 and advantages.std().item() > 1e-6:
+            adv = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
+        else:
+            adv = advantages
+        # Loss: -E[adv * sum_d log p(sampled_d)]  (advantage-normalized
+        # REINFORCE; equivalent to PPO with 1 inner epoch).
         sum_log_p = torch.stack(log_probs, dim=0).sum(dim=0)   # (B,)
-        loss_rl = -(advantages * sum_log_p).mean()
+        loss_rl = -(adv * sum_log_p).mean()
 
         loss_total = self.w_sym * loss_sym + self.w_rl * loss_rl
 
