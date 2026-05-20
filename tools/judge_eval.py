@@ -34,10 +34,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import vision_judge as vj
 
 
-# V2 prompt — multi-dimensional rubric, validity DERIVED from sub-scores
-# rather than a single binary judgment. Gives Qwen 5 numeric outputs so
-# the trainer sees graded reward instead of pass/fail.
-NEW_JUDGE_PROMPT = """You are inspecting a 3D rendered image of a swimsuit on a mannequin.
+# V2 prompt — original 5-dim multi-dim rubric (chest/pelvic/anatomy/
+# assembly/aesthetic). Kept here as the baseline for V3 A/B comparison.
+# Current vision_judge.JUDGE_PROMPT is V3 (8 dims).
+V2_JUDGE_PROMPT = """You are inspecting a 3D rendered image of a swimsuit on a mannequin.
 Look carefully at the FABRIC visible on the body and answer five short
 questions with numeric scores 0-10. Be willing to use the full range.
 
@@ -134,6 +134,17 @@ def judge_dir(img_dir: Path, prompt: str, label: str) -> list[dict]:
                 "is_valid": r.is_valid_swimsuit,
                 "v_score": r.validity_score,
                 "a_score": r.aesthetic_score,
+                # V2 structural sub-scores
+                "chest_coverage": r.chest_coverage,
+                "pelvic_coverage": r.pelvic_coverage,
+                "anatomy_clean": r.anatomy_clean,
+                "assembly_quality": r.assembly_quality,
+                "aesthetic": r.aesthetic,
+                # V3 aesthetic sub-scores (added 2026-05-20)
+                "color_harmony": r.color_harmony,
+                "proportion": r.proportion,
+                "silhouette": r.silhouette,
+                # context
                 "missing": r.missing_required_parts,
                 "issues": r.structural_issues,
                 "overflow": r.anatomical_overflow,
@@ -206,13 +217,15 @@ def main():
         labels = json.loads(args.labels.read_text())
         print(f"loaded {len(labels)} labels")
 
+    # 'OLD' slot now holds V2; 'NEW' slot holds the current
+    # vision_judge.JUDGE_PROMPT (V3 at time of writing).
     old_res = new_res = []
     if args.only in ("old", "both"):
-        print(f"\n=== OLD prompt on {args.img_dir} ===")
-        old_res = judge_dir(args.img_dir, vj.JUDGE_PROMPT, "OLD")
+        print(f"\n=== V2 prompt (baseline) on {args.img_dir} ===")
+        old_res = judge_dir(args.img_dir, V2_JUDGE_PROMPT, "V2")
     if args.only in ("new", "both"):
-        print(f"\n=== NEW prompt on {args.img_dir} ===")
-        new_res = judge_dir(args.img_dir, NEW_JUDGE_PROMPT, "NEW")
+        print(f"\n=== current vision_judge.JUDGE_PROMPT on {args.img_dir} ===")
+        new_res = judge_dir(args.img_dir, vj.JUDGE_PROMPT, "CURR")
 
     if args.only == "both":
         compare(old_res, new_res, labels)

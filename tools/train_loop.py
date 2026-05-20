@@ -213,25 +213,31 @@ class TrainLoop:
             results = [JudgeResult.from_dict({}, backend="error")
                         for _ in briefs]
 
-        # Reward uses V2's multi-dim sub-scores (chest/pelvic/anatomy/
-        # assembly/aesthetic). pelvic_coverage gets the heaviest weight
-        # because "missing bottom panel" is the dominant failure mode in
-        # the current render pipeline (the body_region_classifier strips
-        # bottom triangles below y_pelvis). Direct judge tests show Qwen
-        # gives pelvic=0 for top-only and pelvic=5-7 for present — much
-        # stronger signal than the validity (5 vs 8) it derives.
+        # Reward uses V3's 8 sub-scores. Structural dims (chest/pelvic/
+        # anatomy/assembly) carry 60% of the weight — failures here
+        # are real defects. The 4 aesthetic dims (aesthetic/color_harmony/
+        # proportion/silhouette) carry the other 40% and give the score
+        # space room to vary for designs that all pass structural gate.
+        # V2 collapsed 85% of renders to identical (chest=7, pelvic=7),
+        # so 4 aesthetic axes were added 2026-05-20 specifically to
+        # widen the reward distribution.
         #
-        # Falls back to legacy (v+a)/20 if sub-scores absent (e.g. very
-        # old judge results or parse failure).
+        # Falls back to legacy (v+a)/20 if sub-scores absent.
         def _reward(r) -> float:
             if r.pelvic_coverage or r.chest_coverage:
-                return (
-                    0.35 * r.pelvic_coverage
-                    + 0.20 * r.chest_coverage
-                    + 0.15 * r.anatomy_clean
-                    + 0.15 * r.assembly_quality
-                    + 0.15 * r.aesthetic
-                ) / 10.0
+                w_struct = (
+                    0.25 * r.pelvic_coverage
+                    + 0.15 * r.chest_coverage
+                    + 0.10 * r.anatomy_clean
+                    + 0.10 * r.assembly_quality
+                )
+                w_aesth = (
+                    0.10 * r.aesthetic
+                    + 0.10 * r.color_harmony
+                    + 0.10 * r.proportion
+                    + 0.10 * r.silhouette
+                )
+                return (w_struct + w_aesth) / 10.0
             return (r.validity_score + r.aesthetic_score) / 20.0
         rewards = torch.tensor(
             [_reward(r) for r in results],

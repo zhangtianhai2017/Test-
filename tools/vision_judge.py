@@ -83,14 +83,22 @@ class JudgeResult:
     missing_required_parts:  list[str]
     style_descriptors:       list[str]
     overall_assessment:      str
-    # ---- V2 multi-dim sub-scores (each 0-10) ----
+    # ---- V2 structural sub-scores (each 0-10) ----
     chest_coverage:          int = 0
     pelvic_coverage:         int = 0
     anatomy_clean:           int = 0
     assembly_quality:        int = 0
     aesthetic:               int = 0
+    # ---- V3 aesthetic sub-scores (each 0-10, added 2026-05-20) ----
+    color_harmony:           int = 0
+    proportion:              int = 0
+    silhouette:              int = 0
+    # ---- observation phrases ----
     chest_observation:       str = ""
     pelvic_observation:      str = ""
+    color_observation:       str = ""
+    proportion_observation:  str = ""
+    silhouette_observation:  str = ""
     # ---- metadata (not from the model) ----
     image_path:              str = ""
     elapsed_s:               float = 0.0
@@ -102,14 +110,18 @@ class JudgeResult:
     @classmethod
     def from_dict(cls, d: dict, image_path: str = "",
                   elapsed_s: float = 0.0, backend: str = "") -> "JudgeResult":
-        # V2 sub-scores
+        # Structural sub-scores (V2)
         chest = _safe_int(d.get("chest_coverage"))
         pelvic = _safe_int(d.get("pelvic_coverage"))
         anatomy = _safe_int(d.get("anatomy_clean"))
         assembly = _safe_int(d.get("assembly_quality"))
         aesthetic = _safe_int(d.get("aesthetic"))
-        # Legacy fields: prefer the model's own values if present, else
-        # derive from sub-scores (V2 prompt instructs the same formula).
+        # Aesthetic sub-scores (V3, added 2026-05-20)
+        color_harmony = _safe_int(d.get("color_harmony"))
+        proportion = _safe_int(d.get("proportion"))
+        silhouette = _safe_int(d.get("silhouette"))
+        # Legacy validity_score: prefer model's value, else derive from
+        # the 4 structural sub-scores (V2/V3 prompt instructs same).
         if "validity_score" in d:
             v_score = _safe_int(d.get("validity_score"))
         else:
@@ -118,14 +130,11 @@ class JudgeResult:
             a_score = _safe_int(d.get("aesthetic_score"))
         else:
             a_score = aesthetic
-        # Derive is_valid from sub-scores if not explicitly given.
-        # Python-side gate is stricter than Qwen's self-judgement, which
-        # we found unreliable for "no bottom" cases (it sometimes passes
-        # is_valid=True even when pelvic_coverage is low).
+        # Derive is_valid Python-side; trust the 4 structural fields,
+        # not the model's own is_valid_swimsuit (which can be lenient).
         if any(k in d for k in ("chest_coverage", "pelvic_coverage")):
-            is_valid_strict = (chest >= 5 and pelvic >= 5
-                                and anatomy >= 5 and assembly >= 5)
-            is_valid = is_valid_strict
+            is_valid = (chest >= 5 and pelvic >= 5
+                         and anatomy >= 5 and assembly >= 5)
         else:
             is_valid = bool(d.get("is_valid_swimsuit", False))
         return cls(
@@ -142,8 +151,14 @@ class JudgeResult:
             anatomy_clean=anatomy,
             assembly_quality=assembly,
             aesthetic=aesthetic,
+            color_harmony=color_harmony,
+            proportion=proportion,
+            silhouette=silhouette,
             chest_observation=str(d.get("chest_observation", "")),
             pelvic_observation=str(d.get("pelvic_observation", "")),
+            color_observation=str(d.get("color_observation", "")),
+            proportion_observation=str(d.get("proportion_observation", "")),
+            silhouette_observation=str(d.get("silhouette_observation", "")),
             image_path=image_path,
             elapsed_s=elapsed_s,
             backend=backend,
@@ -155,77 +170,91 @@ class JudgeResult:
 # ---------------------------------------------------------------------------
 
 JUDGE_PROMPT = """You are inspecting a 3D rendered image of a swimsuit on a mannequin.
-Look carefully at the FABRIC visible on the body and answer five short
-questions with numeric scores 0-10. Be willing to use the full range.
+Score 8 dimensions (each 0-10). Use the FULL 0-10 range; don't default
+to 5 or 7 — push apart designs that are different.
 
-For each, first describe ONE phrase of what you see on that body region,
-then give a score from 0 to 10.
+For each dimension, give one short observation phrase, then the score.
 
-Rubric (each 0-10):
+STRUCTURAL (rejects design when too low):
 
-1. chest_coverage   — how well the BREAST area is covered by fabric:
-   0 = bare breasts, no fabric at all
-   3 = tiny pasties / nipple covers only
-   5 = minimal cups or strapless bandeau, partial coverage
-   7 = standard bikini cups or bralette, well-defined coverage
-   9 = full bralette, halter, or one-piece top with broad coverage
-   10 = generous coverage (sports bra style, T-shirt style)
+1. chest_coverage   — how much fabric covers the BREAST area:
+   0 = bare. 3 = pasties only. 5 = minimal cups. 7 = standard bikini
+   cups. 9 = full bralette/halter. 10 = sports-bra coverage.
 
-2. pelvic_coverage  — how well the PELVIC / GROIN area is covered:
-   0 = completely bare, no fabric in pelvic region at all
-   3 = thong / G-string (visible string only, minimal panel)
-   5 = micro bikini bottom or small triangle, partial coverage
-   7 = standard bikini brief or hipster
-   9 = full brief, boy-short, or one-piece crotch panel
-   10 = high-waist brief or skirted bottom
+2. pelvic_coverage  — how much fabric covers the PELVIC / GROIN area:
+   0 = completely bare. 3 = thong string only. 5 = micro bottom.
+   7 = standard brief. 9 = full brief / boy-short. 10 = high waist.
 
-3. anatomy_clean    — how cleanly the fabric stays on torso/hip/shoulder
-   (no overflow onto bare arms, legs, head, neck, or floating in space):
-   0 = major overflow onto multiple non-torso body parts
-   5 = minor overflow on one region (e.g. fabric trailing onto arm)
-   10 = all fabric stays on intended body regions
+3. anatomy_clean    — fabric stays on torso/hip/shoulder, no overflow
+   onto arms/legs/head/neck or floating:
+   0 = major overflow multiple body parts. 5 = minor overflow one
+   region. 10 = all clean.
 
-4. assembly_quality — straps connected, no obvious geometry clipping,
-   no broken / floating pieces:
-   0 = many disconnected pieces or severe clipping
-   5 = one minor issue (one disconnected strap)
-   10 = clean assembly
+4. assembly_quality — straps connected, no clipping, no broken pieces:
+   0 = many disconnected / clipping severe. 5 = one minor issue.
+   10 = clean.
 
-5. aesthetic        — overall visual appeal (color harmony, proportion,
-   silhouette, balance). Use the full 1-10 range:
-   1 = visually broken / unappealing
-   5 = average / forgettable
-   10 = strikingly attractive
+AESTHETIC (does not affect validity but drives quality reward):
 
-A design counts as a VALID SWIMSUIT only if chest_coverage >= 4 AND
-pelvic_coverage >= 4 AND anatomy_clean >= 5 AND assembly_quality >= 5.
+5. color_harmony    — palette coherence between primary, secondary,
+   pattern, hardware:
+   0 = clashing / muddy colors. 3 = one color dominates awkwardly.
+   5 = competent but unmemorable. 7 = clean coordinated palette.
+   9 = striking complementary or analogous combo. 10 = exceptional.
 
-Output STRICT JSON only, no prose or markdown. Use this exact schema:
+6. proportion       — top-to-bottom balance, where the eye lands, how
+   the silhouette flatters the body:
+   0 = jarringly mismatched halves. 3 = one half visually overwhelms.
+   5 = even but unsculpted. 7 = pleasing balance. 9 = intentional
+   accent (e.g. high-cut bottom lengthening leg). 10 = exceptional.
+
+7. silhouette       — outline shape against the body, how the design
+   reads from across a room:
+   0 = blob / no recognizable silhouette. 3 = one feature dominates
+   incoherently. 5 = readable but generic. 7 = distinctive shape.
+   9 = striking / signature silhouette. 10 = exceptional.
+
+8. aesthetic        — overall visual appeal in one number:
+   1 = visually broken. 5 = average / forgettable. 7 = pleasing.
+   9 = strikingly attractive. 10 = exceptional.
+
+A design counts as VALID only if chest_coverage >= 5 AND
+pelvic_coverage >= 5 AND anatomy_clean >= 5 AND assembly_quality >= 5.
+The 4 aesthetic dimensions never gate validity — they widen the
+quality signal.
+
+Output STRICT JSON only, no prose or markdown. Use exactly this schema
+in this order:
 {
-  "chest_observation":      "<one short phrase>",
-  "chest_coverage":         <int 0-10>,
-  "pelvic_observation":     "<one short phrase>",
-  "pelvic_coverage":        <int 0-10>,
-  "anatomy_observation":    "<one short phrase>",
-  "anatomy_clean":          <int 0-10>,
-  "assembly_observation":   "<one short phrase>",
-  "assembly_quality":       <int 0-10>,
-  "aesthetic_observation":  "<one short phrase>",
-  "aesthetic":              <int 0-10>,
-  "is_valid_swimsuit":      <true|false>,
-  "validity_score":         <int 0-10>,
-  "aesthetic_score":        <int 0-10>,
-  "structural_issues":      [<list of short tags>],
-  "anatomical_overflow":    [<list of body parts>],
-  "missing_required_parts": [<list, e.g. "bottom_panel">],
-  "style_descriptors":      [<list of short tags>],
-  "overall_assessment":     "<one sentence>"
+  "chest_observation":     "<phrase>",
+  "chest_coverage":        <int>,
+  "pelvic_observation":    "<phrase>",
+  "pelvic_coverage":       <int>,
+  "anatomy_observation":   "<phrase>",
+  "anatomy_clean":         <int>,
+  "assembly_observation":  "<phrase>",
+  "assembly_quality":      <int>,
+  "color_observation":     "<phrase>",
+  "color_harmony":         <int>,
+  "proportion_observation":"<phrase>",
+  "proportion":            <int>,
+  "silhouette_observation":"<phrase>",
+  "silhouette":            <int>,
+  "aesthetic_observation": "<phrase>",
+  "aesthetic":             <int>,
+  "is_valid_swimsuit":     <true|false>,
+  "validity_score":        <int>,
+  "aesthetic_score":       <int>,
+  "structural_issues":     [<short tags>],
+  "anatomical_overflow":   [<body parts>],
+  "missing_required_parts":[<short tags>],
+  "style_descriptors":     [<short tags>],
+  "overall_assessment":    "<one sentence>"
 }
 
-For the legacy fields:
-  validity_score = round((chest_coverage + pelvic_coverage + anatomy_clean + assembly_quality) / 4)
+Legacy field derivation:
+  validity_score  = round((chest_coverage + pelvic_coverage + anatomy_clean + assembly_quality) / 4)
   aesthetic_score = aesthetic
-  is_valid_swimsuit derived from the rule above.
 
 Begin with `{` end with `}`."""
 
@@ -367,7 +396,7 @@ class VLLMVisionJudge(VisionJudge):
                 ],
             }],
             temperature=0.0,    # deterministic structural judgement
-            max_tokens=800,     # V2 prompt schema has ~17 keys; 400 truncates
+            max_tokens=1200,    # V3 schema has ~25 keys (8 dims x 2 + legacy)
         )
         raw = response.choices[0].message.content or ""
         parsed = _extract_json(raw)
