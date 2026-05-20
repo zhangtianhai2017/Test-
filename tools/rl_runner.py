@@ -236,6 +236,8 @@ def run(iters: int = 20,
          w_div: float = 0.0,           # diversity bonus weight (added 2026-05-20)
          entropy_coef: float = 0.0,    # anti-collapse: max entropy bonus
          kl_uniform_coef: float = 0.0, # anti-collapse: KL to uniform
+         cont_var_coef: float = 0.0,   # anti-collapse: hue/sat/lit variance bonus
+         trunk_var_coef: float = 0.0,  # anti-collapse: hidden-state variance bonus
          encoder_name: str = "mock",   # "mock" (sha256 hash) or "sbert"
          judge_backend: str = "mock",
          hidden_dim: int = 256,
@@ -272,6 +274,8 @@ def run(iters: int = 20,
                       lr=lr, w_sym=w_sym, w_rl=w_rl, w_div=w_div,
                       entropy_coef=entropy_coef,
                       kl_uniform_coef=kl_uniform_coef,
+                      cont_var_coef=cont_var_coef,
+                      trunk_var_coef=trunk_var_coef,
                       run_dir=out_root)
 
     rng = rd.Random(seed)
@@ -326,6 +330,15 @@ def main():
     ap.add_argument("--kl-uniform-coef", type=float, default=0.0,
                     help="anti-collapse: KL(pi || uniform) penalty per "
                          "discrete head (loss += kc * KL); 0.01-0.05")
+    ap.add_argument("--cont-var-coef", type=float, default=0.0,
+                    help="anti-collapse: batch-variance bonus on "
+                         "continuous outputs hue/sat/lit (loss -= cv * "
+                         "var); 0.5-5.0.")
+    ap.add_argument("--trunk-var-coef", type=float, default=0.0,
+                    help="anti-collapse: batch-variance bonus on trunk "
+                         "hidden output (loss -= tv * h.std.mean); "
+                         "1-10. Forces trunk to not collapse to "
+                         "constant output regardless of input.")
     ap.add_argument("--encoder", choices=["mock", "sbert"], default="mock",
                     help="text encoder. mock=sha256 hash (no semantics, "
                          "for tests). sbert=sentence-transformers "
@@ -338,6 +351,8 @@ def main():
          w_sym=args.w_sym, w_rl=args.w_rl, w_div=args.w_div,
          entropy_coef=args.entropy_coef,
          kl_uniform_coef=args.kl_uniform_coef,
+         cont_var_coef=args.cont_var_coef,
+         trunk_var_coef=args.trunk_var_coef,
          encoder_name=args.encoder,
          judge_backend=args.judge, hidden_dim=args.hidden_dim,
          resume_from=args.resume)

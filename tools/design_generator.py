@@ -155,10 +155,12 @@ class DesignGenerator(nn.Module):
                  hidden_dim: int = 256,
                  n_hidden_layers: int = 3,
                  discrete_sizes: Optional[dict[str, int]] = None,
-                 dropout: float = 0.10):
+                 dropout: float = 0.10,
+                 use_skip: bool = True):
         super().__init__()
         self.text_dim = text_dim
         self.hidden_dim = hidden_dim
+        self.use_skip = use_skip
         self.discrete_sizes = discrete_sizes or discrete_sizes_from_library()
 
         # ---- trunk ----
@@ -169,8 +171,18 @@ class DesignGenerator(nn.Module):
                        nn.Dropout(dropout)]
         self.trunk = nn.Sequential(*layers)
 
+        # Skip connection: feed text_emb directly into the head layers
+        # alongside trunk(h). Without this the trunk can (and empirically
+        # does) collapse to ~constant output for all inputs, since RL +
+        # symbolic both reward stable "safe" outputs and small weights
+        # are the easiest fixed-point (2026-05-20 diagnosis: trunk batch
+        # stdev was 0.0012 after 8 iters from sbert input stdev 0.04).
+        # The skip path makes the optimum "collapse" require zeroing
+        # the head's text_emb columns too — much harder.
+        head_in = hidden_dim + (text_dim if use_skip else 0)
+
         # ---- continuous head ----
-        self.continuous_head = nn.Linear(hidden_dim, len(CONTINUOUS_SPECS))
+        self.continuous_head = nn.Linear(head_in, len(CONTINUOUS_SPECS))
         lo = torch.tensor([s[1] for s in CONTINUOUS_SPECS], dtype=torch.float32)
         hi = torch.tensor([s[2] for s in CONTINUOUS_SPECS], dtype=torch.float32)
         self.register_buffer("cont_lo", lo)
@@ -178,7 +190,7 @@ class DesignGenerator(nn.Module):
 
         # ---- discrete heads ----
         self.discrete_heads = nn.ModuleDict({
-            name: nn.Linear(hidden_dim, n)
+            name: nn.Linear(head_in, n)
             for name, n in self.discrete_sizes.items()
         })
 
@@ -189,15 +201,16 @@ class DesignGenerator(nn.Module):
           discrete name '<name>_logits' -> (B, n_<name>) tensor
         """
         h = self.trunk(text_emb)
+        h_head = torch.cat([h, text_emb], dim=-1) if self.use_skip else h
 
-        cont_raw = self.continuous_head(h)           # (B, n_cont)
+        cont_raw = self.continuous_head(h_head)      # (B, n_cont)
         cont = torch.sigmoid(cont_raw) * (self.cont_hi - self.cont_lo) + self.cont_lo
         out: dict[str, torch.Tensor] = {}
         for i, (name, _lo, _hi) in enumerate(CONTINUOUS_SPECS):
             out[name] = cont[..., i]
 
         for name, head in self.discrete_heads.items():
-            out[f"{name}_logits"] = head(h)
+            out[f"{name}_logits"] = head(h_head)
 
         return out
 

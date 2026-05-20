@@ -118,6 +118,8 @@ class TrainLoop:
                  w_div: float = 0.0,
                  entropy_coef: float = 0.0,
                  kl_uniform_coef: float = 0.0,
+                 cont_var_coef: float = 0.0,
+                 trunk_var_coef: float = 0.0,
                  baseline_alpha: float = 0.9,
                  device: str = "cpu",
                  run_dir: Optional[str] = None):
@@ -152,6 +154,25 @@ class TrainLoop:
         # --entropy-coef and --kl-uniform-coef on rl_runner.
         self.entropy_coef = entropy_coef
         self.kl_uniform_coef = kl_uniform_coef
+        # cont_var_coef:  bonus pushing the continuous-head outputs
+        #                 (hue/saturation/lightness) to have non-zero
+        #                 variance across the batch. entropy/KL only
+        #                 act on discrete logits; without this term the
+        #                 NN happily collapses all continuous outputs
+        #                 to sigmoid(0)=0.5 because that's the local
+        #                 fitness optimum and Qwen scores it consistently.
+        #                 Observed in 2206_rl_run (entropy 0.5, KL 0.2):
+        #                 hue stdev was 0.0002 — generator ignoring
+        #                 text_emb completely. loss -= cv * (var(hue) +
+        #                 var(sat) + var(lit)).
+        self.cont_var_coef = cont_var_coef
+        # trunk_var_coef: bonus on trunk HIDDEN output batch variance.
+        #                 cont_var alone can't backprop through sigmoid
+        #                 saturation to push trunk weights away from 0.
+        #                 Direct penalty on trunk(emb) variance makes
+        #                 "all-zero trunk weights" no longer the optimum.
+        #                 loss -= tv * h.std(dim=0).mean(). Typical 1-10.
+        self.trunk_var_coef = trunk_var_coef
         self.baseline_R = 0.0
         self.baseline_alpha = baseline_alpha
         self.device = device
@@ -216,6 +237,10 @@ class TrainLoop:
             raise RuntimeError("step_full requires a VisionJudge")
         t0 = time.time()
         emb = self.enc.encode(briefs).to(self.device)
+        # Run the trunk separately so we can put a variance penalty on
+        # its output (anti-collapse). Generator.forward duplicates this
+        # work but keeps the public API simple.
+        trunk_out = self.gen.trunk(emb)
         config = self.gen(emb)
 
         # Symbolic loss (continuous gradient path)
@@ -333,16 +358,35 @@ class TrainLoop:
         sum_log_p = torch.stack(log_probs, dim=0).sum(dim=0)   # (B,)
         loss_rl = -(adv * sum_log_p).mean()
 
-        # Anti-collapse regularizers. Both push the discrete softmax
+        # Anti-collapse regularizers. Push the discrete softmax
         # distributions toward higher-entropy / closer-to-uniform.
         # mean over (batch, heads).
         mean_entropy = torch.stack(entropies, dim=0).mean()
         mean_kl_to_u = torch.stack(kl_to_uniform, dim=0).mean()
 
+        # Continuous-output variance bonus.
+        if self.cont_var_coef > 0 and config["hue"].numel() > 1:
+            cont_var = (config["hue"].var(unbiased=False)
+                         + config["saturation"].var(unbiased=False)
+                         + config["lightness"].var(unbiased=False))
+        else:
+            cont_var = torch.zeros((), device=self.device)
+
+        # Trunk-output variance bonus: penalize trunk collapsing to a
+        # constant for all inputs. Acts BEFORE sigmoid so the gradient
+        # path is cleaner — cont_var has near-zero gradient through
+        # sigmoid when its output is already squashed.
+        if self.trunk_var_coef > 0 and trunk_out.shape[0] > 1:
+            trunk_var = trunk_out.std(dim=0).mean()
+        else:
+            trunk_var = torch.zeros((), device=self.device)
+
         loss_total = (self.w_sym * loss_sym
                        + self.w_rl * loss_rl
                        - self.entropy_coef * mean_entropy
-                       + self.kl_uniform_coef * mean_kl_to_u)
+                       + self.kl_uniform_coef * mean_kl_to_u
+                       - self.cont_var_coef * cont_var
+                       - self.trunk_var_coef * trunk_var)
 
         self.opt.zero_grad()
         loss_total.backward()
