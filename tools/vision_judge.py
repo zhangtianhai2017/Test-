@@ -356,7 +356,7 @@ class VLLMVisionJudge(VisionJudge):
                  base_url: str = DEFAULT_BACKEND_URL,
                  model: str = DEFAULT_MODEL_NAME,
                  api_key: str = "dummy",
-                 max_image_dim: int = 480,
+                 max_image_dim: int = 768,
                  request_timeout: float = 60.0):
         from openai import OpenAI                  # lazy import
         self.client = OpenAI(base_url=base_url, api_key=api_key,
