@@ -47,7 +47,8 @@ import library as lib
 import library_data as ld
 from output_paths import dated_dir
 
-from design_generator import DesignGenerator, MockTextEncoder
+from design_generator import (DesignGenerator, MockTextEncoder,
+                                 SentenceTransformerEncoder)
 from vision_judge import make_judge
 from train_loop import TrainLoop, DEFAULT_BRIEFS
 
@@ -233,6 +234,9 @@ def run(iters: int = 20,
          w_sym: float = 1.0,
          w_rl: float = 0.05,           # scaled down per train_loop note
          w_div: float = 0.0,           # diversity bonus weight (added 2026-05-20)
+         entropy_coef: float = 0.0,    # anti-collapse: max entropy bonus
+         kl_uniform_coef: float = 0.0, # anti-collapse: KL to uniform
+         encoder_name: str = "mock",   # "mock" (sha256 hash) or "sbert"
          judge_backend: str = "mock",
          hidden_dim: int = 256,
          text_dim: int = 384,
@@ -242,10 +246,18 @@ def run(iters: int = 20,
     out_root = dated_dir("rl_run")
     print(f"OUT = {out_root}")
     print(f"iters={iters} batch={batch_size} judge={judge_backend} "
-          f"w_sym={w_sym} w_rl={w_rl} w_div={w_div} lr={lr}")
+          f"w_sym={w_sym} w_rl={w_rl} w_div={w_div} "
+          f"entropy_coef={entropy_coef} kl_uniform_coef={kl_uniform_coef} "
+          f"lr={lr}")
 
     torch.manual_seed(seed)
-    enc = MockTextEncoder(dim=text_dim)
+    if encoder_name == "sbert":
+        enc = SentenceTransformerEncoder()
+        text_dim = enc.dim       # use the actual model output dim
+        print(f"  encoder: SentenceTransformer (dim={text_dim})")
+    else:
+        enc = MockTextEncoder(dim=text_dim)
+        print(f"  encoder: MockTextEncoder (sha256 hash, dim={text_dim})")
     gen = DesignGenerator(text_dim=text_dim, hidden_dim=hidden_dim)
     if resume_from and os.path.isfile(resume_from):
         gen.load_state_dict(torch.load(resume_from)["generator_state"])
@@ -258,6 +270,8 @@ def run(iters: int = 20,
 
     loop = TrainLoop(gen, enc, judge=judge,
                       lr=lr, w_sym=w_sym, w_rl=w_rl, w_div=w_div,
+                      entropy_coef=entropy_coef,
+                      kl_uniform_coef=kl_uniform_coef,
                       run_dir=out_root)
 
     rng = rd.Random(seed)
@@ -306,12 +320,25 @@ def main():
     ap.add_argument("--w-div", type=float, default=0.0,
                     help="per-sample diversity bonus weight added to "
                          "reward (0 = off, 0.3 = sensible starting point)")
+    ap.add_argument("--entropy-coef", type=float, default=0.0,
+                    help="anti-collapse: max-entropy bonus per discrete "
+                         "head (loss -= ec * mean H(pi)); 0.01-0.1")
+    ap.add_argument("--kl-uniform-coef", type=float, default=0.0,
+                    help="anti-collapse: KL(pi || uniform) penalty per "
+                         "discrete head (loss += kc * KL); 0.01-0.05")
+    ap.add_argument("--encoder", choices=["mock", "sbert"], default="mock",
+                    help="text encoder. mock=sha256 hash (no semantics, "
+                         "for tests). sbert=sentence-transformers "
+                         "multilingual MiniLM (~120MB, real semantics)")
     ap.add_argument("--judge", choices=["mock", "vllm"], default="mock")
     ap.add_argument("--hidden-dim", type=int, default=256)
     ap.add_argument("--resume", default=None)
     args = ap.parse_args()
     run(iters=args.iters, batch_size=args.batch, lr=args.lr,
          w_sym=args.w_sym, w_rl=args.w_rl, w_div=args.w_div,
+         entropy_coef=args.entropy_coef,
+         kl_uniform_coef=args.kl_uniform_coef,
+         encoder_name=args.encoder,
          judge_backend=args.judge, hidden_dim=args.hidden_dim,
          resume_from=args.resume)
 

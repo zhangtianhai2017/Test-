@@ -116,6 +116,8 @@ class TrainLoop:
                  w_sym: float = 1.0,
                  w_rl: float = 1.0,
                  w_div: float = 0.0,
+                 entropy_coef: float = 0.0,
+                 kl_uniform_coef: float = 0.0,
                  baseline_alpha: float = 0.9,
                  device: str = "cpu",
                  run_dir: Optional[str] = None):
@@ -132,6 +134,24 @@ class TrainLoop:
         # popular config (the headline failure mode of the 2026-05-20 long
         # run where 85% of samples scored identically at chest=7,pelvic=7).
         self.w_div = w_div
+        # Anti-mode-collapse knobs (added 2026-05-20).
+        #
+        # entropy_coef:    bonus pushing each discrete head's softmax
+        #                  toward higher entropy. loss -= ec * mean(H(π)).
+        #                  Standard A3C/PPO trick; counteracts the
+        #                  generator collapsing all probability onto
+        #                  one library_id per head. Typical 0.01-0.1.
+        #
+        # kl_uniform_coef: penalty pushing each head's softmax toward
+        #                  uniform. loss += kc * mean(KL(π || U)).
+        #                  Stronger anti-collapse than entropy alone
+        #                  because it has a concrete anchor distribution.
+        #                  Typical 0.01-0.05.
+        #
+        # Both default to 0 so older runs reproduce. Set via CLI flags
+        # --entropy-coef and --kl-uniform-coef on rl_runner.
+        self.entropy_coef = entropy_coef
+        self.kl_uniform_coef = kl_uniform_coef
         self.baseline_R = 0.0
         self.baseline_alpha = baseline_alpha
         self.device = device
@@ -203,17 +223,27 @@ class TrainLoop:
                             compat_matrices=compat_matrices)
         loss_sym = -sym["total"].mean()
 
-        # Sample discrete picks (argmax for the render; log-probs for RL)
+        # Sample discrete picks (argmax for the render; log-probs for RL).
+        # Also collect entropies + KL-to-uniform per head for the
+        # anti-mode-collapse regularizers below.
         picks: dict[str, torch.Tensor] = {}
         log_probs: list[torch.Tensor] = []
+        entropies: list[torch.Tensor] = []
+        kl_to_uniform: list[torch.Tensor] = []
         for name in self.gen.discrete_sizes:
             logits = config[f"{name}_logits"]
             log_p = F.log_softmax(logits, dim=-1)
-            # Sample stochastically so RL gets exploration
             probs = F.softmax(logits, dim=-1)
             sampled = torch.multinomial(probs, num_samples=1).squeeze(-1)
             picks[name] = sampled.detach().cpu()
             log_probs.append(log_p.gather(-1, sampled.unsqueeze(-1)).squeeze(-1))
+            # H(π) = -sum_k π_k log π_k, per sample, then mean over batch.
+            ent = -(probs * log_p).sum(dim=-1)               # (B,)
+            entropies.append(ent)
+            # KL(π || uniform) = log(K) - H(π).  K = num actions.
+            K = probs.shape[-1]
+            log_K = float(torch.log(torch.tensor(float(K))))
+            kl_to_uniform.append(log_K - ent)                # (B,)
 
         # Render + judge. render_fn may return (paths,) or (paths, outfits)
         outfits = None
@@ -303,7 +333,16 @@ class TrainLoop:
         sum_log_p = torch.stack(log_probs, dim=0).sum(dim=0)   # (B,)
         loss_rl = -(adv * sum_log_p).mean()
 
-        loss_total = self.w_sym * loss_sym + self.w_rl * loss_rl
+        # Anti-collapse regularizers. Both push the discrete softmax
+        # distributions toward higher-entropy / closer-to-uniform.
+        # mean over (batch, heads).
+        mean_entropy = torch.stack(entropies, dim=0).mean()
+        mean_kl_to_u = torch.stack(kl_to_uniform, dim=0).mean()
+
+        loss_total = (self.w_sym * loss_sym
+                       + self.w_rl * loss_rl
+                       - self.entropy_coef * mean_entropy
+                       + self.kl_uniform_coef * mean_kl_to_u)
 
         self.opt.zero_grad()
         loss_total.backward()

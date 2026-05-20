@@ -28,12 +28,16 @@ from library_data import LIBRARY
 
 # 9 perceptual axes.  Discrete buckets so two variants are either in
 # the same bucket (visually similar on that axis) or not.
-HUE_BUCKETS = [
-    "red", "orange", "yellow", "green",
-    "cyan", "blue", "purple", "pink",
-]
-LIGHTNESS_BUCKETS = ["dark", "mid", "light"]
-SATURATION_BUCKETS = ["muted", "vivid"]
+#
+# Bucket counts were widened 2026-05-20 to give the RL diversity bonus
+# more room to register small color/lightness/saturation differences.
+# Coarser buckets meant 8 different briefs all collapsed into the same
+# "cyan-mid-muted" bucket and the bonus was always 0. With these finer
+# buckets, near-by colors are still distinct, so the bonus has a real
+# signal to gradient through.
+HUE_BUCKETS = [f"h{i:02d}" for i in range(24)]            # 15° each
+LIGHTNESS_BUCKETS = [f"l{i}" for i in range(6)]            # ~17% each
+SATURATION_BUCKETS = [f"s{i}" for i in range(4)]           # 25% each
 
 PATTERN_FAMILY = {
     "solid":      "solid",
@@ -89,13 +93,13 @@ def hue_bucket(h: float) -> str:
 
 
 def lightness_bucket(l: float) -> str:
-    if l < 0.40: return "dark"
-    if l < 0.65: return "mid"
-    return "light"
+    idx = int(max(0.0, min(0.9999, l)) * len(LIGHTNESS_BUCKETS))
+    return LIGHTNESS_BUCKETS[idx]
 
 
 def saturation_bucket(s: float) -> str:
-    return "muted" if s < 0.50 else "vivid"
+    idx = int(max(0.0, min(0.9999, s)) * len(SATURATION_BUCKETS))
+    return SATURATION_BUCKETS[idx]
 
 
 def variant_features(outfit_json: dict) -> tuple:
@@ -145,9 +149,9 @@ AXIS_UNIVERSE = {
     "archetype":     {"triangle_string_halter", "bandeau_back_band",
                        "bralette_shoulder_strap", "one_piece_maillot"},
     "cup_family":    {"triangle", "balconette", "bandeau", "foam", "softcup"},
-    "hue":           set(HUE_BUCKETS),
-    "lightness":     set(LIGHTNESS_BUCKETS),
-    "saturation":    set(SATURATION_BUCKETS),
+    "hue":           set(HUE_BUCKETS),       # 24 buckets, 15° each
+    "lightness":     set(LIGHTNESS_BUCKETS), # 6 buckets, ~17% each
+    "saturation":    set(SATURATION_BUCKETS),# 4 buckets, 25% each
     "pattern_family":{"solid", "geometric", "organic", "gradient"},
     "weave_family":  {"plain", "textured", "mesh_open", "lace_open",
                        "lustrous", "structured"},
