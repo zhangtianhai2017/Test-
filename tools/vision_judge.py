@@ -130,10 +130,13 @@ class JudgeResult:
             a_score = _safe_int(d.get("aesthetic_score"))
         else:
             a_score = aesthetic
-        # Derive is_valid Python-side; trust the 4 structural fields,
-        # not the model's own is_valid_swimsuit (which can be lenient).
+        # Derive is_valid Python-side from the 4 structural sub-scores.
+        # Threshold 4 (not 5) on chest/pelvic so that thong / micro
+        # bikini (which Qwen scores at 3) doesn't get automatically
+        # marked invalid — they're real swimsuit categories. Anatomy
+        # and assembly stay at 5 since those measure render defects.
         if any(k in d for k in ("chest_coverage", "pelvic_coverage")):
-            is_valid = (chest >= 5 and pelvic >= 5
+            is_valid = (chest >= 4 and pelvic >= 4
                          and anatomy >= 5 and assembly >= 5)
         else:
             is_valid = bool(d.get("is_valid_swimsuit", False))
@@ -170,58 +173,81 @@ class JudgeResult:
 # ---------------------------------------------------------------------------
 
 JUDGE_PROMPT = """You are inspecting a 3D rendered image of a swimsuit on a mannequin.
-Score 8 dimensions (each 0-10). Use the FULL 0-10 range; don't default
-to 5 or 7 — push apart designs that are different.
+Score 8 dimensions (each 0-10). For each, first describe ONE phrase
+of what you see, then assign the score.
 
-For each dimension, give one short observation phrase, then the score.
+STRUCTURAL (low scores reject the design):
 
-STRUCTURAL (rejects design when too low):
+1. chest_coverage   — how well the BREAST area is covered by fabric:
+   0 = bare breasts, no fabric at all
+   3 = tiny pasties / nipple covers only
+   5 = minimal cups or strapless bandeau, partial coverage
+   7 = standard bikini cups or bralette, well-defined coverage
+   9 = full bralette, halter, or one-piece top with broad coverage
+   10 = generous coverage (sports bra style, T-shirt style)
 
-1. chest_coverage   — how much fabric covers the BREAST area:
-   0 = bare. 3 = pasties only. 5 = minimal cups. 7 = standard bikini
-   cups. 9 = full bralette/halter. 10 = sports-bra coverage.
+2. pelvic_coverage  — how well the PELVIC / GROIN area is covered:
+   0 = completely bare, no fabric in pelvic region at all
+   3 = thong / G-string (visible string only, minimal panel)
+   5 = micro bikini bottom or small triangle, partial coverage
+   7 = standard bikini brief or hipster
+   9 = full brief, boy-short, or one-piece crotch panel
+   10 = high-waist brief or skirted bottom
 
-2. pelvic_coverage  — how much fabric covers the PELVIC / GROIN area:
-   0 = completely bare. 3 = thong string only. 5 = micro bottom.
-   7 = standard brief. 9 = full brief / boy-short. 10 = high waist.
+3. anatomy_clean    — fabric stays on torso/hip/shoulder/breast, no
+   overflow onto bare arms, legs, head, neck, or floating in space:
+   0 = major overflow onto multiple non-torso body parts
+   5 = minor overflow on one region (e.g. fabric trailing onto arm)
+   10 = all fabric stays on intended body regions
 
-3. anatomy_clean    — fabric stays on torso/hip/shoulder, no overflow
-   onto arms/legs/head/neck or floating:
-   0 = major overflow multiple body parts. 5 = minor overflow one
-   region. 10 = all clean.
+4. assembly_quality — straps connected, no obvious geometry clipping
+   into body, no broken / floating pieces:
+   0 = many disconnected pieces or severe clipping
+   5 = one minor issue (e.g. one disconnected strap)
+   10 = clean assembly
 
-4. assembly_quality — straps connected, no clipping, no broken pieces:
-   0 = many disconnected / clipping severe. 5 = one minor issue.
-   10 = clean.
-
-AESTHETIC (does not affect validity but drives quality reward):
+AESTHETIC (do not gate validity; widen the quality signal):
 
 5. color_harmony    — palette coherence between primary, secondary,
    pattern, hardware:
-   0 = clashing / muddy colors. 3 = one color dominates awkwardly.
-   5 = competent but unmemorable. 7 = clean coordinated palette.
-   9 = striking complementary or analogous combo. 10 = exceptional.
+   0 = clashing / muddy
+   3 = one color dominates awkwardly
+   5 = competent but unmemorable
+   7 = clean coordinated palette
+   9 = striking complementary or analogous combo
+   10 = exceptional
 
-6. proportion       — top-to-bottom balance, where the eye lands, how
-   the silhouette flatters the body:
-   0 = jarringly mismatched halves. 3 = one half visually overwhelms.
-   5 = even but unsculpted. 7 = pleasing balance. 9 = intentional
-   accent (e.g. high-cut bottom lengthening leg). 10 = exceptional.
+6. proportion       — top-to-bottom balance, where the eye lands,
+   how the silhouette flatters the body:
+   0 = jarringly mismatched halves
+   3 = one half visually overwhelms
+   5 = even but unsculpted
+   7 = pleasing balance
+   9 = intentional accent (e.g. high-cut bottom lengthening leg)
+   10 = exceptional
 
 7. silhouette       — outline shape against the body, how the design
    reads from across a room:
-   0 = blob / no recognizable silhouette. 3 = one feature dominates
-   incoherently. 5 = readable but generic. 7 = distinctive shape.
-   9 = striking / signature silhouette. 10 = exceptional.
+   0 = blob / no recognizable silhouette
+   3 = one feature dominates incoherently
+   5 = readable but generic
+   7 = distinctive shape
+   9 = striking / signature silhouette
+   10 = exceptional
 
-8. aesthetic        — overall visual appeal in one number:
-   1 = visually broken. 5 = average / forgettable. 7 = pleasing.
-   9 = strikingly attractive. 10 = exceptional.
+8. aesthetic        — overall visual appeal in one number, weighing
+   color + proportion + silhouette together:
+   1 = visually broken / unappealing
+   5 = average / forgettable
+   7 = pleasing
+   9 = strikingly attractive
+   10 = exceptional
 
-A design counts as VALID only if chest_coverage >= 5 AND
-pelvic_coverage >= 5 AND anatomy_clean >= 5 AND assembly_quality >= 5.
-The 4 aesthetic dimensions never gate validity — they widen the
-quality signal.
+A design counts as VALID only if chest_coverage >= 4 AND
+pelvic_coverage >= 4 AND anatomy_clean >= 5 AND assembly_quality >= 5.
+(Threshold 4 lets thongs and micro bikinis pass — they're real
+swimsuits, just minimal.) The 4 aesthetic dimensions never gate
+validity — they widen the quality signal.
 
 Output STRICT JSON only, no prose or markdown. Use exactly this schema
 in this order:

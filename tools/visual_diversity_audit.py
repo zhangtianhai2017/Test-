@@ -160,6 +160,47 @@ def hamming(a: tuple, b: tuple) -> int:
     return sum(1 for x, y in zip(a, b) if x != y)
 
 
+def batch_diversity_bonuses(outfits) -> list[float]:
+    """For an iterable of Outfit-like objects, compute each item's
+    average Hamming distance (normalized to [0, 1]) from every other
+    item in the batch, on the 9 perceptual axes.
+
+    Returned values plug straight into the RL reward as a "be different"
+    bonus. With B variants, each bonus is in [0, 1]:
+      0.0 = identical features to every other batch member
+      1.0 = all 9 features differ from every other member
+
+    Accepts either Outfit dataclass instances OR pre-converted dicts
+    that look like the outfit.json schema (archetype, slot_assignments,
+    global_design).
+    """
+    items = list(outfits)
+    n = len(items)
+    if n < 2:
+        return [0.0] * n
+    feats = []
+    for o in items:
+        if hasattr(o, "archetype"):  # Outfit dataclass
+            d = {
+                "archetype": o.archetype,
+                "slot_assignments": [
+                    {"slot_name": sa.slot_name,
+                     "library_id": sa.library_id,
+                     "local_params": dict(sa.local_params)}
+                    for sa in o.slot_assignments
+                ],
+                "global_design": dict(o.global_design),
+            }
+        else:
+            d = o
+        feats.append(variant_features(d))
+    bonuses = []
+    for i in range(n):
+        d_sum = sum(hamming(feats[i], feats[j]) for j in range(n) if j != i)
+        bonuses.append(d_sum / ((n - 1) * 9))
+    return bonuses
+
+
 def audit(batch_dir: str) -> dict:
     variants = []
     for sd in sorted(os.listdir(batch_dir)):

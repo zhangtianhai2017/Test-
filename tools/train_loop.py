@@ -115,6 +115,7 @@ class TrainLoop:
                  lr: float = 1e-3,
                  w_sym: float = 1.0,
                  w_rl: float = 1.0,
+                 w_div: float = 0.0,
                  baseline_alpha: float = 0.9,
                  device: str = "cpu",
                  run_dir: Optional[str] = None):
@@ -124,6 +125,13 @@ class TrainLoop:
         self.opt = AdamW(self.gen.parameters(), lr=lr)
         self.w_sym = w_sym
         self.w_rl = w_rl
+        # w_div = per-sample diversity bonus weight. When > 0 and render_fn
+        # returns outfits alongside paths, each sample's reward gets
+        # w_div * (avg Hamming distance to other batch members / 9) added
+        # to it. Pushes the generator away from collapsing to a single
+        # popular config (the headline failure mode of the 2026-05-20 long
+        # run where 85% of samples scored identically at chest=7,pelvic=7).
+        self.w_div = w_div
         self.baseline_R = 0.0
         self.baseline_alpha = baseline_alpha
         self.device = device
@@ -178,9 +186,12 @@ class TrainLoop:
                    render_fn: Callable[[dict, dict], list[str]],
                    fitness_weights: Optional[FitnessWeights] = None,
                    compat_matrices: Optional[dict] = None) -> IterationRecord:
-        """`render_fn(config, picks) -> list of image paths`.
-        Must accept a config dict (with continuous tensors + sampled
-        discrete picks as ints) and produce a render per variant."""
+        """`render_fn(config, picks) -> list of image paths`,
+        OR a tuple `(list of image paths, list of Outfit instances)`.
+
+        The 2-element-tuple variant unlocks the diversity bonus
+        (controlled by `self.w_div`). When `render_fn` returns just a
+        list of paths, w_div has no effect."""
         if self.judge is None:
             raise RuntimeError("step_full requires a VisionJudge")
         t0 = time.time()
@@ -204,9 +215,14 @@ class TrainLoop:
             picks[name] = sampled.detach().cpu()
             log_probs.append(log_p.gather(-1, sampled.unsqueeze(-1)).squeeze(-1))
 
-        # Render + judge
+        # Render + judge. render_fn may return (paths,) or (paths, outfits)
+        outfits = None
         try:
-            image_paths = render_fn(config, picks)
+            rendered = render_fn(config, picks)
+            if (isinstance(rendered, tuple) and len(rendered) == 2):
+                image_paths, outfits = rendered
+            else:
+                image_paths = rendered
             results = self.judge.judge_batch(image_paths, verbose=False)
         except Exception as exc:
             print(f"  render/judge failed: {exc}; using zero reward")
@@ -239,8 +255,35 @@ class TrainLoop:
                 )
                 return (w_struct + w_aesth) / 10.0
             return (r.validity_score + r.aesthetic_score) / 20.0
+        base_rewards = [_reward(r) for r in results]
+
+        # Optional diversity bonus per sample: average Hamming distance
+        # on 9 perceptual axes to the other batch members, scaled by
+        # self.w_div. Skipped when render_fn didn't surface outfits or
+        # when w_div == 0.
+        #
+        # IMPORTANT: bonus is ZERO'd for any sample that fails the
+        # structural validity gate (is_valid_swimsuit). Without this
+        # mask, the bonus rewards "novel broken designs" (e.g. missing
+        # bottom panel = unique bottom_coverage bucket = high Hamming
+        # distance from peers), making invalid samples competitive with
+        # valid ones. 2026-05-20 smoke at w_div=0.3 saw pass rate drop
+        # from 96% to 41% before this gate was added.
+        div_bonuses = [0.0] * len(base_rewards)
+        if self.w_div > 0 and outfits is not None and len(outfits) > 1:
+            try:
+                from visual_diversity_audit import batch_diversity_bonuses
+                all_bonuses = batch_diversity_bonuses(outfits)
+                div_bonuses = [
+                    b if (results[i].is_valid_swimsuit
+                          and outfits[i] is not None) else 0.0
+                    for i, b in enumerate(all_bonuses)
+                ]
+            except Exception as exc:
+                print(f"  diversity bonus failed: {exc}; skipping")
+
         rewards = torch.tensor(
-            [_reward(r) for r in results],
+            [b + self.w_div * d for b, d in zip(base_rewards, div_bonuses)],
             dtype=torch.float32, device=self.device)
         # Baseline subtraction for variance reduction
         advantages = (rewards - self.baseline_R).detach()

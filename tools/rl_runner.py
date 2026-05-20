@@ -184,16 +184,21 @@ class RenderRunner:
         self.iter = 0
         self.converter = ConfigToOutfit(id_lists)
 
-    def __call__(self, config: dict, picks: dict) -> list[str]:
+    def __call__(self, config: dict, picks: dict):
+        """Returns (paths, outfits). train_loop.step_full accepts either
+        a plain list or this tuple — the tuple form enables the
+        per-sample diversity bonus (controlled by TrainLoop.w_div)."""
         B = next(iter(picks.values())).shape[0]
         iter_dir = os.path.join(self.out_dir, f"iter_{self.iter:04d}")
         os.makedirs(iter_dir, exist_ok=True)
         paths: list[str] = []
+        outfits: list = []
         for i in range(B):
             sub = os.path.join(iter_dir, f"v{i:02d}")
             os.makedirs(sub, exist_ok=True)
             try:
                 outfit = self.converter(config, picks, i)
+                outfits.append(outfit)
                 g = outfit_to_genome(outfit)
                 params = IterParams()
                 params.outfit = outfit
@@ -213,8 +218,9 @@ class RenderRunner:
             except Exception as exc:
                 print(f"  [iter {self.iter} v{i}] render fail: {exc}")
                 paths.append("")  # empty -> judge will mark invalid
+                outfits.append(None)
         self.iter += 1
-        return paths
+        return paths, outfits
 
 
 # ---------------------------------------------------------------------------
@@ -226,6 +232,7 @@ def run(iters: int = 20,
          lr: float = 5e-4,
          w_sym: float = 1.0,
          w_rl: float = 0.05,           # scaled down per train_loop note
+         w_div: float = 0.0,           # diversity bonus weight (added 2026-05-20)
          judge_backend: str = "mock",
          hidden_dim: int = 256,
          text_dim: int = 384,
@@ -235,7 +242,7 @@ def run(iters: int = 20,
     out_root = dated_dir("rl_run")
     print(f"OUT = {out_root}")
     print(f"iters={iters} batch={batch_size} judge={judge_backend} "
-          f"w_sym={w_sym} w_rl={w_rl} lr={lr}")
+          f"w_sym={w_sym} w_rl={w_rl} w_div={w_div} lr={lr}")
 
     torch.manual_seed(seed)
     enc = MockTextEncoder(dim=text_dim)
@@ -250,7 +257,7 @@ def run(iters: int = 20,
     render_runner = RenderRunner(out_root, id_lists, body)
 
     loop = TrainLoop(gen, enc, judge=judge,
-                      lr=lr, w_sym=w_sym, w_rl=w_rl,
+                      lr=lr, w_sym=w_sym, w_rl=w_rl, w_div=w_div,
                       run_dir=out_root)
 
     rng = rd.Random(seed)
@@ -296,12 +303,15 @@ def main():
     ap.add_argument("--lr", type=float, default=5e-4)
     ap.add_argument("--w-sym", type=float, default=1.0)
     ap.add_argument("--w-rl", type=float, default=0.05)
+    ap.add_argument("--w-div", type=float, default=0.0,
+                    help="per-sample diversity bonus weight added to "
+                         "reward (0 = off, 0.3 = sensible starting point)")
     ap.add_argument("--judge", choices=["mock", "vllm"], default="mock")
     ap.add_argument("--hidden-dim", type=int, default=256)
     ap.add_argument("--resume", default=None)
     args = ap.parse_args()
     run(iters=args.iters, batch_size=args.batch, lr=args.lr,
-         w_sym=args.w_sym, w_rl=args.w_rl,
+         w_sym=args.w_sym, w_rl=args.w_rl, w_div=args.w_div,
          judge_backend=args.judge, hidden_dim=args.hidden_dim,
          resume_from=args.resume)
 
