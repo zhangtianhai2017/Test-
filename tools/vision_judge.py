@@ -766,7 +766,8 @@ class CVPlusCLIPJudge(VisionJudge):
         total_fab = max(1, int(mask.sum()))
         overflow_ratio = (arm_l + arm_r + head + leg) / total_fab
         # 0% overflow -> 10. 30% overflow -> 0. Linear in between.
-        anatomy = max(0, min(10, int(round(10 * (1.0 - overflow_ratio / 0.30)))))
+        # Float, not int, so reward gradient is smooth.
+        anatomy = max(0.0, min(10.0, 10.0 * (1.0 - overflow_ratio / 0.30)))
 
         # Assembly: fraction of fabric mass in the top-3 connected
         # components. The raw component count is useless because real
@@ -790,20 +791,24 @@ class CVPlusCLIPJudge(VisionJudge):
         except Exception:
             top3_frac = 1.0
             ncomp = 1
+        # Linearly interpolated float (smooth reward gradient).
         if top3_frac >= 0.85:
-            assembly = 10
-        elif top3_frac >= 0.70:
-            assembly = 7
-        elif top3_frac >= 0.50:
-            assembly = 4
+            assembly = 10.0
+        elif top3_frac <= 0.50:
+            assembly = max(0.0, top3_frac / 0.50 * 4.0)  # 0..4 below 0.5
         else:
-            assembly = 1
+            # 0.50 -> 4.0, 0.85 -> 10.0, linear
+            assembly = 4.0 + (top3_frac - 0.50) / 0.35 * 6.0
 
-        # Coverage -> 0-10 (linear, saturated at SAT)
+        # Coverage -> 0-10 (linear, saturated at SAT).
+        # Returns FLOAT (no rounding) so train_loop can compute a
+        # continuous-gradient advantage. The int gate fields used by
+        # is_valid_swimsuit and dataclass typing still see floor-rounded
+        # ints further below.
         def _cov_score(cov, sat):
-            if cov <= 0.03: return 0
-            if cov >= sat:  return 10
-            return max(0, min(10, int(round(10 * cov / sat))))
+            if cov <= 0.03: return 0.0
+            if cov >= sat:  return 10.0
+            return max(0.0, min(10.0, 10.0 * cov / sat))
         chest_score = _cov_score(chest_cov, self.CHEST_SAT)
         pelv_score  = _cov_score(pelv_cov,  self.PELV_SAT)
 
@@ -834,22 +839,29 @@ class CVPlusCLIPJudge(VisionJudge):
         img_np = np.asarray(img_pil)
         chest, pelv, anat, asm, diag = self._structural_scores(img_np)
 
-        # brief_match via CLIP image-text cosine
+        # brief_match via CLIP image-text cosine (float, no rounding).
         with self.torch.no_grad():
             img_emb = self.image_model.encode(
                 [img_pil], convert_to_tensor=True,
                 normalize_embeddings=True)[0]
         brief_emb = self._embed_brief(brief)
         cos = float((img_emb * brief_emb).sum().item())
-        bm = max(0, min(10, int(round(
-            (cos - self.brief_floor) / (self.brief_ceil - self.brief_floor) * 10))))
+        bm = max(0.0, min(10.0,
+            (cos - self.brief_floor) / (self.brief_ceil - self.brief_floor) * 10.0))
         # Hard rule from V4 prompt: structurally-broken design CANNOT
         # exceed brief_match=3, even if CLIP says color matches.
         if chest <= 2 or pelv <= 2:
-            bm = min(bm, 3)
+            bm = min(bm, 3.0)
 
-        is_valid = (chest >= 4 and pelv >= 4
-                     and anat >= 5 and asm >= 5)
+        # Validity gate still uses semantic thresholds (>= 4 / 5).
+        # Cast to Python bool — numpy.float64 comparisons return
+        # numpy.bool_ which json.dumps in train_loop._log_record can't
+        # serialize. Same goes for the scores themselves; cast to
+        # Python float so asdict() emits plain dict entries.
+        is_valid = bool(chest >= 4 and pelv >= 4
+                         and anat >= 5 and asm >= 5)
+        chest = float(chest); pelv = float(pelv)
+        anat = float(anat); asm = float(asm); bm = float(bm)
         struct_issues = []
         overflow_parts = []
         missing = []
@@ -861,32 +873,38 @@ class CVPlusCLIPJudge(VisionJudge):
         if diag["leg"]   > 0: overflow_parts.append("legs")
         if diag["top3_frac"] < 0.70:
             struct_issues.append(f"fragmented_top3_frac_{diag['top3_frac']:.2f}")
-        return JudgeResult.from_dict({
-            "chest_coverage": chest, "pelvic_coverage": pelv,
-            "anatomy_clean": anat, "assembly_quality": asm,
-            # CV can't judge aesthetics. Neutral 7s so the aesthetic
-            # weight in the reward formula contributes a constant
-            # (effectively zero gradient). brief_match carries the
-            # learnable signal beyond structural.
-            "aesthetic": 7, "color_harmony": 7,
-            "proportion": 7, "silhouette": 7,
-            "brief_match": bm,
-            "is_valid_swimsuit": is_valid,
-            "validity_score": round((chest + pelv + anat + asm) / 4),
-            "aesthetic_score": 7,
-            "structural_issues": struct_issues,
-            "anatomical_overflow": overflow_parts,
-            "missing_required_parts": missing,
-            "style_descriptors": [],
-            "overall_assessment": (
+        # Build JudgeResult directly so we keep the float scores.
+        # (from_dict goes through _safe_int which would re-round to int.)
+        return JudgeResult(
+            is_valid_swimsuit=is_valid,
+            validity_score=int(round((chest + pelv + anat + asm) / 4)),
+            aesthetic_score=7,
+            structural_issues=struct_issues,
+            anatomical_overflow=overflow_parts,
+            missing_required_parts=missing,
+            style_descriptors=[],
+            overall_assessment=(
                 f"CV chest_cov={diag['chest_cov']:.2f} "
                 f"pelv_cov={diag['pelv_cov']:.2f} "
                 f"overflow={diag['overflow_ratio']:.2f} "
                 f"top3_frac={diag['top3_frac']:.2f} "
                 f"brief_cos={cos:.3f}"),
-        }, image_path=image_path,
-           elapsed_s=time.time() - t0,
-           backend=self.backend_name)
+            chest_coverage=chest, pelvic_coverage=pelv,
+            anatomy_clean=anat, assembly_quality=asm,
+            # CV can't judge aesthetics. Neutral 7s so the aesthetic
+            # weight in the reward formula contributes a constant
+            # (effectively zero gradient). brief_match carries the
+            # learnable signal beyond structural.
+            aesthetic=7.0, color_harmony=7.0,
+            proportion=7.0, silhouette=7.0,
+            brief_match=bm,
+            chest_observation="", pelvic_observation="",
+            color_observation="", proportion_observation="",
+            silhouette_observation="", brief_match_observation="",
+            image_path=image_path,
+            elapsed_s=time.time() - t0,
+            backend=self.backend_name,
+        )
 
 
 def make_judge(backend: str = "mock", **kwargs) -> VisionJudge:
