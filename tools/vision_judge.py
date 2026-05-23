@@ -560,23 +560,363 @@ def _extract_json(text: str) -> dict:
 # Factory + smoke test
 # ---------------------------------------------------------------------------
 
+class CLIPVisionJudge(VisionJudge):
+    """Fast brief-match judge. Uses sentence-transformers' M-CLIP
+    pairing:
+      - text encoder: clip-ViT-B-32-multilingual-v1 (ZH + EN)
+      - image encoder: clip-ViT-B-32 (OpenAI CLIP image side)
+    Both are aligned in the same 512-d embedding space.
+
+    Computes cosine(image_emb, brief_emb), maps to brief_match 0-10.
+    Other JudgeResult fields default to neutral mid-values; structural
+    correctness comes from symbolic_fitness in train_loop.
+
+    ~100ms per call vs ~10s for Qwen2.5-VL — 100x speedup.
+    Trade-off: no fabric-coverage / anatomy-overflow detection.
+    Use only when symbolic_fitness handles structure (it does)."""
+
+    backend_name = "clip-mclip-vit-b32"
+
+    def __init__(self,
+                 text_model_name: str = "sentence-transformers/clip-ViT-B-32-multilingual-v1",
+                 image_model_name: str = "clip-ViT-B-32",
+                 brief_score_floor: float = 0.10,
+                 brief_score_ceil: float = 0.35,
+                 device: str = "cuda" if __import__("torch").cuda.is_available() else "cpu"):
+        from sentence_transformers import SentenceTransformer
+        import torch
+        self.torch = torch
+        self.text_model = SentenceTransformer(text_model_name, device=device)
+        self.image_model = SentenceTransformer(image_model_name, device=device)
+        self.device = device
+        # Cosine -> 0-10 linear mapping. M-CLIP paired-pair cosines
+        # typically run ~0.10 (random) to ~0.35 (good match).
+        self.floor = brief_score_floor
+        self.ceil = brief_score_ceil
+        self._brief_cache: dict[str, "torch.Tensor"] = {}
+
+    def _embed_brief(self, brief: str):
+        if brief in self._brief_cache:
+            return self._brief_cache[brief]
+        text = brief or "a swimsuit"
+        with self.torch.no_grad():
+            emb = self.text_model.encode([text], convert_to_tensor=True,
+                                           normalize_embeddings=True)[0]
+        self._brief_cache[brief] = emb
+        return emb
+
+    def judge(self, image_path: str, brief: str = "") -> JudgeResult:
+        from PIL import Image
+        t0 = time.time()
+        img = Image.open(image_path).convert("RGB")
+        with self.torch.no_grad():
+            img_emb = self.image_model.encode(
+                [img], convert_to_tensor=True,
+                normalize_embeddings=True)[0]
+        brief_emb = self._embed_brief(brief)
+        cos = float((img_emb * brief_emb).sum().item())
+        # Map cosine -> 0-10
+        bm = max(0, min(10, int(round(
+            (cos - self.floor) / (self.ceil - self.floor) * 10))))
+        return JudgeResult.from_dict({
+            # CLIP doesn't know about structure — set neutral so the
+            # reward formula's structural component is constant. The
+            # actual structural gradient comes from symbolic_fitness.
+            "chest_coverage": 7, "pelvic_coverage": 7,
+            "anatomy_clean": 8, "assembly_quality": 8,
+            "aesthetic": 7, "color_harmony": 7,
+            "proportion": 7, "silhouette": 7,
+            "brief_match": bm,
+            "is_valid_swimsuit": True,
+            "validity_score": 7, "aesthetic_score": 7,
+            "structural_issues": [], "anatomical_overflow": [],
+            "missing_required_parts": [], "style_descriptors": [],
+            "overall_assessment": (
+                f"CLIP cos={cos:.3f} brief_match={bm}/10"),
+        }, image_path=image_path,
+           elapsed_s=time.time() - t0,
+           backend=self.backend_name)
+
+
+class CVPlusCLIPJudge(VisionJudge):
+    """Pixel-mask structural judge + CLIP brief judge. Combined.
+
+    Replaces Qwen2.5-VL at ~50-100 ms / image (vs ~10s) while still
+    gating structure properly (CLIP-only doesn't).
+
+    Why pure CV instead of fashion-YOLO:
+      - mannequin pose / camera / background / lighting are all FIXED.
+        We control the rendering pipeline. There is nothing to LEARN —
+        coverage = "ratio of non-skin non-bg pixels in chest band".
+      - Tried valentinafeve/yolos-fashionpedia 2026-05-23: blocked by
+        CVE-2025-32434 (transformers requires torch>=2.6 to load .bin
+        weights; we have 2.5.1). Ultralytics route adds a 30+MB package
+        + a different model to download. Pure numpy avoids both.
+
+    Calibration constants (measured on 2026-04-29 renders):
+      - background  = (225, 225, 227) ± small  → grey near-white
+      - skin tones  = (193,183,173) face, (173,157,140) thigh,
+                       (216,212,210) arm — all R > G > B, R ∈ [145, 220]
+      - mannequin centered, image 720x480, body x ∈ [0.30, 0.70]
+
+    Coverage zones (relative to image H, W):
+      chest band  = y ∈ [0.28, 0.45], x ∈ [0.38, 0.62]
+      pelvic band = y ∈ [0.44, 0.58], x ∈ [0.38, 0.62]
+      (recalibrated 2026-05-23: mannequin's actual y_pelvis maps
+       to image y_rel ~ 0.50; the prior [0.55, 0.68] band was the
+       upper-thigh zone, missing the hip ridge entirely.)
+    Overflow zones (anatomy_clean penalty):
+      arms        = y ∈ [0.30, 0.50], x ∈ [0.10, 0.30] ∪ [0.70, 0.90]
+      head/neck   = y ∈ [0.02, 0.20], x ∈ [0.30, 0.70]
+      lower legs  = y ∈ [0.75, 0.92], x ∈ [0.30, 0.70]
+    Constant noise floors (anti-aliasing on fixed silhouette):
+      arm 600 px, head 200 px, leg 600 px
+
+    Falls back to CLIP-only for brief_match. Hard rule: if chest<=2 or
+    pelvic<=2, brief_match capped at 3 (matches Qwen V4 prompt rule)."""
+
+    backend_name = "cv-mask-mclip"
+
+    # Coverage band ROIs (relative coords)
+    CHEST_Y = (0.28, 0.45)
+    PELV_Y  = (0.44, 0.58)   # recalibrated 2026-05-23 to actual y_pelvis
+    BODY_X  = (0.38, 0.62)
+    # Overflow zones
+    ARM_Y      = (0.30, 0.50)
+    ARM_L_X    = (0.10, 0.30)
+    ARM_R_X    = (0.70, 0.90)
+    HEAD_Y     = (0.02, 0.20)
+    HEAD_X     = (0.30, 0.70)
+    LEG_Y      = (0.75, 0.92)
+    LEG_X      = (0.30, 0.70)
+    # Anti-aliasing noise floor (px) subtracted from each overflow zone
+    ARM_NOISE  = 600
+    HEAD_NOISE = 200
+    LEG_NOISE  = 600
+
+    # Coverage saturation point for the 0-10 mapping. chest_coverage of
+    # ~0.85 = full bra/halter, ~0.30 = minimal cup, ~0.05 = nothing.
+    CHEST_SAT = 0.85
+    PELV_SAT  = 0.75
+
+    def __init__(self,
+                 text_model_name: str = "sentence-transformers/clip-ViT-B-32-multilingual-v1",
+                 image_model_name: str = "clip-ViT-B-32",
+                 brief_score_floor: float = 0.10,
+                 brief_score_ceil: float = 0.35,
+                 device: str = "cuda" if __import__("torch").cuda.is_available() else "cpu"):
+        from sentence_transformers import SentenceTransformer
+        import torch
+        self.torch = torch
+        self.text_model = SentenceTransformer(text_model_name, device=device)
+        self.image_model = SentenceTransformer(image_model_name, device=device)
+        self.device = device
+        self.brief_floor = brief_score_floor
+        self.brief_ceil = brief_score_ceil
+        self._brief_cache: dict[str, "torch.Tensor"] = {}
+
+    @staticmethod
+    def _fabric_mask(img_np):
+        """non-background AND non-skin -> fabric."""
+        import numpy as np
+        R = img_np[..., 0].astype(int)
+        G = img_np[..., 1].astype(int)
+        B = img_np[..., 2].astype(int)
+        # Background: near-white grey (R,G,B all >210, low chroma)
+        is_bg = ((R > 210) & (G > 210) & (B > 210)
+                  & (np.abs(R - G) < 12)
+                  & (np.abs(G - B) < 12)
+                  & (np.abs(R - B) < 12))
+        # Skin: warm beige (R > G > B, R in mid range, low-mid saturation)
+        is_skin = ((R > 145) & (R < 225)
+                    & (R > G) & (G > B)
+                    & ((R - B) > 12) & ((R - B) < 80))
+        return ~(is_bg | is_skin)
+
+    def _structural_scores(self, img_np):
+        """returns (chest, pelvic, anatomy, assembly, diagnostics_dict).
+
+        All scores in [0, 10]. diagnostics holds the raw coverages /
+        overflow counts / component count for the assessment string."""
+        import numpy as np
+        H, W = img_np.shape[:2]
+        mask = self._fabric_mask(img_np)
+
+        def _r(lo, hi, dim): return int(lo * dim), int(hi * dim)
+        cy0, cy1 = _r(*self.CHEST_Y, H)
+        py0, py1 = _r(*self.PELV_Y,  H)
+        bx0, bx1 = _r(*self.BODY_X,  W)
+        chest_area = max(1, (cy1 - cy0) * (bx1 - bx0))
+        pelv_area  = max(1, (py1 - py0) * (bx1 - bx0))
+        chest_cov  = mask[cy0:cy1, bx0:bx1].sum() / chest_area
+        pelv_cov   = mask[py0:py1, bx0:bx1].sum() / pelv_area
+
+        # Overflow zones (subtract anti-alias baseline)
+        ay0, ay1 = _r(*self.ARM_Y, H)
+        al0, al1 = _r(*self.ARM_L_X, W)
+        ar0, ar1 = _r(*self.ARM_R_X, W)
+        hy0, hy1 = _r(*self.HEAD_Y, H)
+        hx0, hx1 = _r(*self.HEAD_X, W)
+        ly0, ly1 = _r(*self.LEG_Y,  H)
+        lx0, lx1 = _r(*self.LEG_X,  W)
+        arm_l = max(0, int(mask[ay0:ay1, al0:al1].sum()) - self.ARM_NOISE)
+        arm_r = max(0, int(mask[ay0:ay1, ar0:ar1].sum()) - self.ARM_NOISE)
+        head  = max(0, int(mask[hy0:hy1, hx0:hx1].sum()) - self.HEAD_NOISE)
+        leg   = max(0, int(mask[ly0:ly1, lx0:lx1].sum()) - self.LEG_NOISE)
+        total_fab = max(1, int(mask.sum()))
+        overflow_ratio = (arm_l + arm_r + head + leg) / total_fab
+        # 0% overflow -> 10. 30% overflow -> 0. Linear in between.
+        anatomy = max(0, min(10, int(round(10 * (1.0 - overflow_ratio / 0.30)))))
+
+        # Assembly: fraction of fabric mass in the top-3 connected
+        # components. The raw component count is useless because real
+        # renders have hundreds of single-pixel speckles from pattern
+        # overlays + AA edges — even after 2x2 opening, ncomp = 25-80
+        # for clean designs. But the top-3 component mass fraction is
+        # tight: 0.89-0.98 across the diverse_seeds test set. A truly
+        # fragmented design (panels broken into many small islands)
+        # drops this number sharply.
+        try:
+            from scipy.ndimage import label, binary_opening
+            import numpy as _np
+            denoised = binary_opening(mask, structure=_np.ones((2, 2)))
+            lbl, ncomp = label(denoised)
+            sizes = _np.bincount(lbl.ravel())[1:]  # drop bg label 0
+            if sizes.size:
+                top3 = _np.sort(sizes)[-3:].sum()
+                top3_frac = top3 / max(1, sizes.sum())
+            else:
+                top3_frac = 0.0
+        except Exception:
+            top3_frac = 1.0
+            ncomp = 1
+        if top3_frac >= 0.85:
+            assembly = 10
+        elif top3_frac >= 0.70:
+            assembly = 7
+        elif top3_frac >= 0.50:
+            assembly = 4
+        else:
+            assembly = 1
+
+        # Coverage -> 0-10 (linear, saturated at SAT)
+        def _cov_score(cov, sat):
+            if cov <= 0.03: return 0
+            if cov >= sat:  return 10
+            return max(0, min(10, int(round(10 * cov / sat))))
+        chest_score = _cov_score(chest_cov, self.CHEST_SAT)
+        pelv_score  = _cov_score(pelv_cov,  self.PELV_SAT)
+
+        diag = {
+            "chest_cov": chest_cov, "pelv_cov": pelv_cov,
+            "overflow_ratio": overflow_ratio, "ncomp": int(ncomp),
+            "top3_frac": float(top3_frac),
+            "arm_l": arm_l, "arm_r": arm_r, "head": head, "leg": leg,
+            "total_fab": total_fab,
+        }
+        return chest_score, pelv_score, anatomy, assembly, diag
+
+    def _embed_brief(self, brief: str):
+        if brief in self._brief_cache:
+            return self._brief_cache[brief]
+        text = brief or "a swimsuit"
+        with self.torch.no_grad():
+            emb = self.text_model.encode(
+                [text], convert_to_tensor=True,
+                normalize_embeddings=True)[0]
+        self._brief_cache[brief] = emb
+        return emb
+
+    def judge(self, image_path: str, brief: str = "") -> JudgeResult:
+        import numpy as np
+        t0 = time.time()
+        img_pil = Image.open(image_path).convert("RGB")
+        img_np = np.asarray(img_pil)
+        chest, pelv, anat, asm, diag = self._structural_scores(img_np)
+
+        # brief_match via CLIP image-text cosine
+        with self.torch.no_grad():
+            img_emb = self.image_model.encode(
+                [img_pil], convert_to_tensor=True,
+                normalize_embeddings=True)[0]
+        brief_emb = self._embed_brief(brief)
+        cos = float((img_emb * brief_emb).sum().item())
+        bm = max(0, min(10, int(round(
+            (cos - self.brief_floor) / (self.brief_ceil - self.brief_floor) * 10))))
+        # Hard rule from V4 prompt: structurally-broken design CANNOT
+        # exceed brief_match=3, even if CLIP says color matches.
+        if chest <= 2 or pelv <= 2:
+            bm = min(bm, 3)
+
+        is_valid = (chest >= 4 and pelv >= 4
+                     and anat >= 5 and asm >= 5)
+        struct_issues = []
+        overflow_parts = []
+        missing = []
+        if chest < 4:  missing.append("top_panel")
+        if pelv  < 4:  missing.append("bottom_panel")
+        if diag["arm_l"] > 0: overflow_parts.append("left_arm")
+        if diag["arm_r"] > 0: overflow_parts.append("right_arm")
+        if diag["head"]  > 0: overflow_parts.append("head_neck")
+        if diag["leg"]   > 0: overflow_parts.append("legs")
+        if diag["top3_frac"] < 0.70:
+            struct_issues.append(f"fragmented_top3_frac_{diag['top3_frac']:.2f}")
+        return JudgeResult.from_dict({
+            "chest_coverage": chest, "pelvic_coverage": pelv,
+            "anatomy_clean": anat, "assembly_quality": asm,
+            # CV can't judge aesthetics. Neutral 7s so the aesthetic
+            # weight in the reward formula contributes a constant
+            # (effectively zero gradient). brief_match carries the
+            # learnable signal beyond structural.
+            "aesthetic": 7, "color_harmony": 7,
+            "proportion": 7, "silhouette": 7,
+            "brief_match": bm,
+            "is_valid_swimsuit": is_valid,
+            "validity_score": round((chest + pelv + anat + asm) / 4),
+            "aesthetic_score": 7,
+            "structural_issues": struct_issues,
+            "anatomical_overflow": overflow_parts,
+            "missing_required_parts": missing,
+            "style_descriptors": [],
+            "overall_assessment": (
+                f"CV chest_cov={diag['chest_cov']:.2f} "
+                f"pelv_cov={diag['pelv_cov']:.2f} "
+                f"overflow={diag['overflow_ratio']:.2f} "
+                f"top3_frac={diag['top3_frac']:.2f} "
+                f"brief_cos={cos:.3f}"),
+        }, image_path=image_path,
+           elapsed_s=time.time() - t0,
+           backend=self.backend_name)
+
+
 def make_judge(backend: str = "mock", **kwargs) -> VisionJudge:
-    """`backend` in {'mock', 'vllm'}."""
+    """`backend` in {'mock', 'vllm', 'clip', 'cv_clip'}."""
     if backend == "mock":
         return MockVisionJudge(**kwargs)
     if backend == "vllm":
         return VLLMVisionJudge(**kwargs)
+    if backend == "clip":
+        return CLIPVisionJudge(**kwargs)
+    if backend == "cv_clip":
+        return CVPlusCLIPJudge(**kwargs)
     raise ValueError(f"unknown backend: {backend}")
 
 
 def _smoke_test() -> None:
-    """Sanity test on real render images from the most recent batch."""
+    """Sanity test on real render images from the most recent batch.
+
+    Walks newest -> oldest under tools/output looking for 01_front.png
+    so the test keeps working as new batches arrive (the old hardcoded
+    2026-05-17 path stopped resolving once WSL /tmp got wiped)."""
     import glob
-    candidates = sorted(glob.glob(
-        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                      "tools", "output", "2026-05-17",
-                      "*_diverse_batch_v2_8x15", "*/*/01_front.png"),
-        recursive=False))[:6]
+    root = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "tools", "output")
+    # newest-first: glob across all dates, pick first 6 we can find
+    all_fronts = sorted(
+        glob.glob(os.path.join(root, "**", "01_front.png"), recursive=True),
+        key=os.path.getmtime, reverse=True)
+    candidates = all_fronts[:6]
     if not candidates:
         print("no render images found; falling back to dummy paths")
         candidates = [f"dummy_{i}.png" for i in range(6)]
@@ -591,6 +931,20 @@ def _smoke_test() -> None:
           f"mean validity={mean_v:.1f}  mean aesthetic={mean_a:.1f}")
     print(f"sample result dict (first):")
     print(json.dumps(results[0].to_dict(), indent=2, ensure_ascii=False))
+
+    # cv_clip is cheap (~165ms/img, no service required) — always run.
+    print("\n=== cv_clip judge on same images ===")
+    try:
+        cv = make_judge("cv_clip")
+        cv_results = cv.judge_batch(
+            candidates,
+            briefs=["red triangle bikini"] * len(candidates),
+            verbose=True)
+        n_pass = sum(r.is_valid_swimsuit for r in cv_results)
+        print(f"\ncv_clip summary: pass={n_pass}/{len(cv_results)}  "
+              f"mean elapsed={sum(r.elapsed_s for r in cv_results)/len(cv_results)*1000:.0f}ms")
+    except Exception as exc:
+        print(f"cv_clip judge failed: {exc}")
 
     # Try real backend only if explicitly enabled
     if os.environ.get("VISION_JUDGE_RUN_REAL") == "1":

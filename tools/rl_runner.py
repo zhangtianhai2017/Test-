@@ -349,7 +349,14 @@ def main():
                     help="text encoder. mock=sha256 hash (no semantics, "
                          "for tests). sbert=sentence-transformers "
                          "multilingual MiniLM (~120MB, real semantics)")
-    ap.add_argument("--judge", choices=["mock", "vllm"], default="mock")
+    ap.add_argument("--judge", choices=["mock", "vllm", "clip", "cv_clip"],
+                    default="mock",
+                    help="vision judge backend. clip = M-CLIP cosine "
+                         "brief_match only, ~100ms/call, structure via "
+                         "symbolic_fitness. cv_clip = numpy pixel-mask "
+                         "structure (chest/pelvic coverage + anatomy "
+                         "overflow) + CLIP brief_match, ~50-100 ms/call, "
+                         "replaces Qwen2.5-VL.")
     ap.add_argument("--judge-concurrent", type=int, default=1,
                     help="vllm judge: number of concurrent calls "
                          "per batch (4-8 typical). Qwen server "

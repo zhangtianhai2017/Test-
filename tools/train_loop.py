@@ -305,7 +305,21 @@ class TrainLoop:
         # 50 iters). With structural gate + lower weight + tightened
         # prompt (which now caps brief_match <= 3 for naked designs),
         # the signal is contained.
+        #
+        # 2026-05-23: CLIP-only mode. When backend is CLIP, the other
+        # sub-scores are dummies (CLIP can't judge them); structural
+        # quality comes through symbolic_fitness instead. Reward is
+        # pure brief_match.
+        #
+        # 2026-05-23 v2: CV+CLIP mode. CV mask CAN judge structure
+        # (it knows skin/bg pixels), so we use the full Qwen-style
+        # weighted formula. Aesthetic sub-scores are still neutral 7s
+        # from the CV judge, but the structural quadrant + brief_match
+        # are real signals. Brief_match weight stays 0.10 + gated.
         def _reward(r) -> float:
+            if r.backend == "clip-mclip-vit-b32":
+                # CLIP-only: pure brief_match (structure via sym_fitness)
+                return r.brief_match / 10.0
             if r.pelvic_coverage or r.chest_coverage:
                 w_struct = (
                     0.25 * r.pelvic_coverage

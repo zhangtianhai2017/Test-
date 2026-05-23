@@ -1111,26 +1111,18 @@ def build_fabric_shell(body_mesh: o3d.geometry.TriangleMesh, body_uvs: np.ndarra
         tri_inside &= tri_y < (_L.y_neck_base + 1.0)
 
         # ---- BodyDeployment-driven must_clear rejection ----
+        # NOTE 2026-05-23: previously applied globally as
+        #   forbidden = INTERSECTION of must_clear across pieces
+        # and any triangle in that region was rejected. That double-gated
+        # with body_region_classifier (which is already applied as a hard
+        # mask above) AND used a stricter "pelvis vs legs" definition
+        # from garment_state.deploy_to_body — which classified the
+        # bikini-bottom fabric-bearing zone as 'legs', killing every
+        # bottom panel. Disabled. body_region_classifier (torso + new
+        # pelvis region, 2026-05-23) is the single source of truth for
+        # which body triangles are fabric-safe.
         if body_deployment is not None and body_deployment.classify_xyz is not None:
-            # Forbidden region = regions in must_clear of ALL pieces (any
-            # triangle in such a region is uniformly forbidden). For v1
-            # bikini that intersection is reliably {legs, arms, head, neck}.
-            mappings = list(body_deployment.piece_mappings.values())
-            if mappings:
-                forbidden = set(mappings[0].must_clear)
-                for m in mappings[1:]:
-                    forbidden &= set(m.must_clear)
-            else:
-                forbidden = {"legs", "arms", "head", "neck"}
-            classify = body_deployment.classify_xyz
-            # Vectorize: classify each triangle centroid
-            centroids = V[T].mean(axis=1)
-            tri_region = np.array([
-                classify(float(c[0]), float(c[1]), float(c[2]))
-                for c in centroids
-            ], dtype=object)
-            forbidden_mask = np.array([r in forbidden for r in tri_region])
-            tri_inside &= ~forbidden_mask
+            pass
         # Per-Y radius cap. Below axilla: torso ~16-17 cm wide.
         # Between axilla and acromion: that's the upper chest / shoulder
         # cap region — radius ~ deltoid (19.9). Between acromion and neck:
