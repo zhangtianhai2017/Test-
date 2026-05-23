@@ -238,6 +238,7 @@ def run(iters: int = 20,
          kl_uniform_coef: float = 0.0, # anti-collapse: KL to uniform
          cont_var_coef: float = 0.0,   # anti-collapse: hue/sat/lit variance bonus
          trunk_var_coef: float = 0.0,  # anti-collapse: hidden-state variance bonus
+         batch_div_coef: float = 0.0,  # shape diversity: batch-avg softmax entropy
          encoder_name: str = "mock",   # "mock" (sha256 hash) or "sbert"
          judge_concurrent: int = 1,    # vllm judge concurrent calls
          judge_backend: str = "mock",
@@ -282,6 +283,7 @@ def run(iters: int = 20,
                       kl_uniform_coef=kl_uniform_coef,
                       cont_var_coef=cont_var_coef,
                       trunk_var_coef=trunk_var_coef,
+                      batch_div_coef=batch_div_coef,
                       run_dir=out_root)
 
     rng = rd.Random(seed)
@@ -345,6 +347,13 @@ def main():
                          "hidden output (loss -= tv * h.std.mean); "
                          "1-10. Forces trunk to not collapse to "
                          "constant output regardless of input.")
+    ap.add_argument("--batch-div-coef", type=float, default=0.0,
+                    help="shape-diversity bonus: per discrete head, "
+                         "reward batch_avg_softmax having high entropy "
+                         "(loss -= bd * mean over heads of normalized "
+                         "entropy[batch_avg_probs]). Pushes the 32 "
+                         "samples to use DIFFERENT archetype/cup/bottom "
+                         "IDs, not all the same. Typical 0.1-0.5.")
     ap.add_argument("--encoder", choices=["mock", "sbert"], default="mock",
                     help="text encoder. mock=sha256 hash (no semantics, "
                          "for tests). sbert=sentence-transformers "
@@ -371,6 +380,7 @@ def main():
          kl_uniform_coef=args.kl_uniform_coef,
          cont_var_coef=args.cont_var_coef,
          trunk_var_coef=args.trunk_var_coef,
+         batch_div_coef=args.batch_div_coef,
          encoder_name=args.encoder,
          judge_concurrent=args.judge_concurrent,
          judge_backend=args.judge, hidden_dim=args.hidden_dim,

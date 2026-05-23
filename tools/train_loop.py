@@ -120,6 +120,7 @@ class TrainLoop:
                  kl_uniform_coef: float = 0.0,
                  cont_var_coef: float = 0.0,
                  trunk_var_coef: float = 0.0,
+                 batch_div_coef: float = 0.0,
                  baseline_alpha: float = 0.9,
                  device: str = "cpu",
                  run_dir: Optional[str] = None):
@@ -173,6 +174,19 @@ class TrainLoop:
         #                 "all-zero trunk weights" no longer the optimum.
         #                 loss -= tv * h.std(dim=0).mean(). Typical 1-10.
         self.trunk_var_coef = trunk_var_coef
+        # batch_div_coef: SHAPE-diversity bonus. For each discrete head,
+        # compute batch_avg_probs = softmax(logits).mean(dim=0), then
+        # add -entropy(batch_avg_probs) to loss. Entropy is maximized
+        # when the batch's softmax probability mass is SPREAD across
+        # multiple distinct actions, not concentrated on one.
+        # Different from entropy_coef (per-sample softmax flatness):
+        # this one rewards the BATCH as a whole using multiple distinct
+        # discrete IDs (varied archetype/cup/bottom across briefs),
+        # not each sample being individually uncertain.
+        # Added 2026-05-23 specifically for shape diversity (user
+        # priority: silhouette/cut variety > color matching).
+        # Typical 0.1-0.5.
+        self.batch_div_coef = batch_div_coef
         self.baseline_R = 0.0
         self.baseline_alpha = baseline_alpha
         self.device = device
@@ -334,7 +348,12 @@ class TrainLoop:
                     + 0.07 * r.silhouette
                 )
                 # Gated brief bonus: only when structure passes.
-                w_brief = (0.10 * r.brief_match
+                # 2026-05-23: brief_match weight 0.10 -> 0.05.
+                # User priority shifted to silhouette/cut diversity;
+                # color matching is a downstream concern. The freed
+                # 0.05 budget is implicitly used by batch_div_coef
+                # in the loss term (different scale / not in reward).
+                w_brief = (0.05 * r.brief_match
                             if r.is_valid_swimsuit else 0.0)
                 return (w_struct + w_aesth + w_brief) / 10.0
             return (r.validity_score + r.aesthetic_score) / 20.0
@@ -409,12 +428,37 @@ class TrainLoop:
         else:
             trunk_var = torch.zeros((), device=self.device)
 
+        # Batch-level shape diversity bonus. For each discrete head,
+        # the mean-of-softmax over the batch should NOT concentrate on
+        # one action — that would mean every brief picks the same
+        # archetype/cup/bottom. Maximize entropy of batch_avg_probs.
+        # Differentiable through logits (we use softmax probs, not
+        # the discrete picks).
+        if self.batch_div_coef > 0 and len(self.gen.discrete_sizes) > 0:
+            batch_div_terms = []
+            for name in self.gen.discrete_sizes:
+                logits = config[f"{name}_logits"]                # (B, K)
+                probs = F.softmax(logits, dim=-1)
+                batch_avg = probs.mean(dim=0)                     # (K,)
+                # Entropy of batch_avg distribution. Max = log(K).
+                h = -(batch_avg * (batch_avg.clamp_min(1e-10)).log()).sum()
+                # Normalize so all heads contribute equally regardless
+                # of K size (archetype K=4 vs fabric K=31).
+                K = float(probs.shape[-1])
+                if K > 1:
+                    batch_div_terms.append(h / float(torch.log(torch.tensor(K))))
+            batch_div = torch.stack(batch_div_terms).mean() if batch_div_terms \
+                else torch.zeros((), device=self.device)
+        else:
+            batch_div = torch.zeros((), device=self.device)
+
         loss_total = (self.w_sym * loss_sym
                        + self.w_rl * loss_rl
                        - self.entropy_coef * mean_entropy
                        + self.kl_uniform_coef * mean_kl_to_u
                        - self.cont_var_coef * cont_var
-                       - self.trunk_var_coef * trunk_var)
+                       - self.trunk_var_coef * trunk_var
+                       - self.batch_div_coef * batch_div)
 
         self.opt.zero_grad()
         loss_total.backward()
