@@ -70,8 +70,13 @@ WEAVE_V_THREADS = 70
 def _uv_to_px(poly_uv: list[tuple[float, float]]) -> list[tuple[int, int]]:
     """Map (u in [-1,1], v in [0,1]) to PIL pixel coords (0..W, 0..H).
 
-    v=0 (hip/groin) is at the bottom of the image so the vertical layout
-    reads naturally from bottom to top like a world map.
+    v=0 (hip/groin) is at the IMAGE BOTTOM (y = (1-v)*H). Open3D's
+    UV sampling uses the OpenGL convention (v=0 at the image bottom),
+    so this flip is correct and required to make poly-paint match
+    shell-sample. Verified empirically: cup at v=0.75 paints at pixel
+    rows 82-190 and Open3D reads it from row 128 — GREEN. Inverting
+    to y=v*H (no flip) shifted cup to pixel rows 333-435 while Open3D
+    still read row 128 → cup turned skin-toned.
     """
     out = []
     for u, v in poly_uv:
@@ -226,8 +231,20 @@ def _draw_pattern_into(layer: Image.Image, poly_px, pattern: str,
                               fill=acc)
 
 
-def genome_to_texture(g: Genome) -> Image.Image:
-    """Rasterize a Genome's UV polygons into a texture PNG (1024x512 RGBA)."""
+def genome_to_texture(g: Genome,
+                       polys_override: list[list[tuple[float, float]]] | None = None
+                       ) -> Image.Image:
+    """Rasterize a Genome's UV polygons into a texture PNG (1024x512 RGBA).
+
+    `polys_override` (added 2026-05-23): when supplied, draws THESE
+    polygons instead of `genome_polygons(g)`. Required when the shell
+    is built from `garm.flatten_polygons()` (outfit -> garment path),
+    because the genome-based polygons differ in shape — notably the
+    front_bottom in `genome_polygons` has a V-notch at the top center
+    that the garment trapezoid doesn't, so shell verts in that notch
+    region sample skin-color from the painted texture and render as
+    bare skin. Passing the garment polygons here aligns texture paint
+    with shell mesh extent."""
     from verify_ga_uv import _secondary_color
     img = Image.new("RGBA", (TEX_W, TEX_H), SKIN_RGB + (255,))
     draw = ImageDraw.Draw(img, "RGBA")
@@ -237,7 +254,9 @@ def genome_to_texture(g: Genome) -> Image.Image:
     r2, g2, b2 = _secondary_color(g)
     secondary_rgba = (int(r2 * 255), int(g2 * 255), int(b2 * 255), 255)
 
-    for poly_uv in genome_polygons(g):
+    polys_to_draw = (polys_override if polys_override is not None
+                      else genome_polygons(g))
+    for poly_uv in polys_to_draw:
         poly_px = _uv_to_px(poly_uv)
         if len(set(poly_px)) < 3:
             continue

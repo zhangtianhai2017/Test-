@@ -230,7 +230,16 @@ def render_views(genome: Genome, params, out_dir: str,
     if len(shell.vertices) > 0:
         # Apply weave shading at `weave_intensity`. 0.0 = unshaded albedo
         # (pure pattern), 1.0 = original effect, >1 = exaggerated.
-        base_tex = genome_to_texture(g)
+        #
+        # Pass polys_uv (= garm.flatten_polygons() when outfit_to_garment
+        # succeeded) into genome_to_texture so the texture is painted
+        # using the EXACT polygon set that build_fabric_shell used to
+        # extract triangles. Without this, the two paths diverge —
+        # genome_polygons returns a V-notched front_bottom while the
+        # garment flatten returns a flat trapezoid, and the shell mesh
+        # in the notch area samples skin-tone texture and renders bare.
+        # Fixed 2026-05-23.
+        base_tex = genome_to_texture(g, polys_override=polys_uv)
         # Bake stitch overlays into the albedo. Two kinds:
         #   - Side seam: vertical line at u=+/-0.5 (panel division)
         #   - Boundary top-stitch: trace each Genome polygon offset 4 mm
