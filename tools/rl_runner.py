@@ -239,6 +239,7 @@ def run(iters: int = 20,
          cont_var_coef: float = 0.0,   # anti-collapse: hue/sat/lit variance bonus
          trunk_var_coef: float = 0.0,  # anti-collapse: hidden-state variance bonus
          encoder_name: str = "mock",   # "mock" (sha256 hash) or "sbert"
+         judge_concurrent: int = 1,    # vllm judge concurrent calls
          judge_backend: str = "mock",
          hidden_dim: int = 256,
          text_dim: int = 384,
@@ -265,7 +266,12 @@ def run(iters: int = 20,
         gen.load_state_dict(torch.load(resume_from)["generator_state"])
         print(f"resumed weights from {resume_from}")
 
-    judge = make_judge(judge_backend)
+    judge_kwargs = {}
+    if judge_backend == "vllm" and judge_concurrent > 1:
+        judge_kwargs["concurrent_calls"] = judge_concurrent
+    judge = make_judge(judge_backend, **judge_kwargs)
+    if judge_concurrent > 1:
+        print(f"  judge: {judge_concurrent} concurrent calls")
     body = load_body_mesh()
     id_lists = get_id_lists()
     render_runner = RenderRunner(out_root, id_lists, body)
@@ -344,6 +350,11 @@ def main():
                          "for tests). sbert=sentence-transformers "
                          "multilingual MiniLM (~120MB, real semantics)")
     ap.add_argument("--judge", choices=["mock", "vllm"], default="mock")
+    ap.add_argument("--judge-concurrent", type=int, default=1,
+                    help="vllm judge: number of concurrent calls "
+                         "per batch (4-8 typical). Qwen server "
+                         "batches them; 8 calls take ~2.5x of 1 call "
+                         "instead of 8x.")
     ap.add_argument("--hidden-dim", type=int, default=256)
     ap.add_argument("--resume", default=None)
     args = ap.parse_args()
@@ -354,6 +365,7 @@ def main():
          cont_var_coef=args.cont_var_coef,
          trunk_var_coef=args.trunk_var_coef,
          encoder_name=args.encoder,
+         judge_concurrent=args.judge_concurrent,
          judge_backend=args.judge, hidden_dim=args.hidden_dim,
          resume_from=args.resume)
 

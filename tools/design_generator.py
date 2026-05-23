@@ -23,6 +23,7 @@ from typing import Iterable, Optional
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 
 # ---------------------------------------------------------------------------
@@ -138,22 +139,56 @@ def discrete_sizes_from_library() -> dict[str, int]:
 # Generator NN
 # ---------------------------------------------------------------------------
 
+class ResidualMLPBlock(nn.Module):
+    """Pre-norm residual MLP block (transformer-style):
+       x -> LN -> Linear(h→h) -> GELU -> Linear(h→h) -> Dropout -> +x
+
+    Cheap, stable to deep stacks because of the residual + pre-LN
+    structure. Used as the building block for the deep narrow trunk.
+    """
+    def __init__(self, dim: int, dropout: float = 0.10):
+        super().__init__()
+        self.ln = nn.LayerNorm(dim)
+        self.lin1 = nn.Linear(dim, dim)
+        self.lin2 = nn.Linear(dim, dim)
+        self.drop = nn.Dropout(dropout)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return x + self.drop(self.lin2(F.gelu(self.lin1(self.ln(x)))))
+
+
+def _multi_layer_head(in_dim: int, out_dim: int, hidden: int = 64,
+                       dropout: float = 0.10) -> nn.Module:
+    """2-layer MLP head per output target, with LayerNorm + GELU.
+    Replaces single-Linear head — gives each output its own small
+    'reasoning' net instead of all heads sharing trunk features
+    via a single linear projection."""
+    return nn.Sequential(
+        nn.LayerNorm(in_dim),
+        nn.Linear(in_dim, hidden),
+        nn.GELU(),
+        nn.Dropout(dropout),
+        nn.Linear(hidden, out_dim),
+    )
+
+
 class DesignGenerator(nn.Module):
     """Pure-PyTorch generator. text_emb -> outfit-config tensors.
 
-    The continuous head outputs values in physical ranges via sigmoid +
-    linear scaling, so symbolic_fitness sees realistic numbers.
-
-    Discrete heads output unnormalised logits; downstream code decides
-    whether to argmax (inference), gumbel-softmax (differentiable
-    sampling for training), or treat as soft distribution (for slot
-    compatibility scoring).
+    Architecture (post-2026-05-23 redesign):
+      - thin trunk: 8 residual MLP blocks at hidden_dim=128 (16 layers
+        total, 2 linears per block) — narrow + deep + residual, the
+        ResNet philosophy applied to 1-D inputs. Pre-LN for stable
+        deep training.
+      - skip connection: concat trunk_out + raw text_emb (kept; this
+        was critical for breaking trunk-collapse, see 2026-05-20).
+      - each output head: 2-layer MLP with LayerNorm (was 1 linear).
     """
 
     def __init__(self,
                  text_dim: int = 384,
-                 hidden_dim: int = 256,
-                 n_hidden_layers: int = 3,
+                 hidden_dim: int = 128,
+                 n_hidden_layers: int = 8,    # now = n_residual_blocks
                  discrete_sizes: Optional[dict[str, int]] = None,
                  dropout: float = 0.10,
                  use_skip: bool = True):
@@ -163,13 +198,27 @@ class DesignGenerator(nn.Module):
         self.use_skip = use_skip
         self.discrete_sizes = discrete_sizes or discrete_sizes_from_library()
 
-        # ---- trunk ----
-        layers: list[nn.Module] = [nn.Linear(text_dim, hidden_dim), nn.GELU()]
-        for _ in range(n_hidden_layers - 1):
-            layers += [nn.Linear(hidden_dim, hidden_dim),
-                       nn.GELU(),
-                       nn.Dropout(dropout)]
-        self.trunk = nn.Sequential(*layers)
+        # ---- input projection + deep residual trunk ----
+        # text_emb (text_dim) -> Linear -> hidden_dim
+        # then n_hidden_layers blocks of ResidualMLPBlock(hidden_dim)
+        self.input_proj = nn.Linear(text_dim, hidden_dim)
+        self.trunk_blocks = nn.ModuleList([
+            ResidualMLPBlock(hidden_dim, dropout=dropout)
+            for _ in range(n_hidden_layers)
+        ])
+        # Compatibility: a .trunk attribute that runs the whole stack
+        # so existing code (`gen.trunk(emb)` in eval probes) keeps
+        # working without modification.
+        class _TrunkAdapter(nn.Module):
+            def __init__(self, gen):
+                super().__init__()
+                self.gen = gen
+            def forward(self, x):
+                h = self.gen.input_proj(x)
+                for blk in self.gen.trunk_blocks:
+                    h = blk(h)
+                return h
+        self.trunk = _TrunkAdapter(self)
 
         # Skip connection: feed text_emb directly into the head layers
         # alongside trunk(h). Without this the trunk can (and empirically
@@ -181,16 +230,17 @@ class DesignGenerator(nn.Module):
         # the head's text_emb columns too — much harder.
         head_in = hidden_dim + (text_dim if use_skip else 0)
 
-        # ---- continuous head ----
-        self.continuous_head = nn.Linear(head_in, len(CONTINUOUS_SPECS))
+        # ---- continuous head (2-layer MLP) ----
+        self.continuous_head = _multi_layer_head(
+            head_in, len(CONTINUOUS_SPECS), hidden=64, dropout=dropout)
         lo = torch.tensor([s[1] for s in CONTINUOUS_SPECS], dtype=torch.float32)
         hi = torch.tensor([s[2] for s in CONTINUOUS_SPECS], dtype=torch.float32)
         self.register_buffer("cont_lo", lo)
         self.register_buffer("cont_hi", hi)
 
-        # ---- discrete heads ----
+        # ---- discrete heads (each 2-layer MLP) ----
         self.discrete_heads = nn.ModuleDict({
-            name: nn.Linear(head_in, n)
+            name: _multi_layer_head(head_in, n, hidden=64, dropout=dropout)
             for name, n in self.discrete_sizes.items()
         })
 
@@ -200,7 +250,10 @@ class DesignGenerator(nn.Module):
           continuous name -> (B,) tensor (in physical range)
           discrete name '<name>_logits' -> (B, n_<name>) tensor
         """
-        h = self.trunk(text_emb)
+        # Deep narrow trunk: input projection then N residual blocks
+        h = self.input_proj(text_emb)
+        for blk in self.trunk_blocks:
+            h = blk(h)
         h_head = torch.cat([h, text_emb], dim=-1) if self.use_skip else h
 
         cont_raw = self.continuous_head(h_head)      # (B, n_cont)

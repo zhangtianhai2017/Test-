@@ -35,8 +35,11 @@ from design_generator import (DesignGenerator, MockTextEncoder,
 from train_loop import DEFAULT_BRIEFS
 from rl_runner import ConfigToOutfit, get_id_lists
 
-# Multi-view names to render per design.
-VIEW_NAMES = ["01_front", "02_three_quarter", "03_side_left", "04_back"]
+# View(s) rendered per design. Simplified back to 1-view 2026-05-23
+# — 4-view subprocess isolation worked but added ~20s/design and made
+# debugging harder. Front view is enough for the current iteration
+# loop. Training path already uses 1-view via rl_runner_wsl.py.
+VIEW_NAMES = ["01_front"]
 
 
 # A curated 8-brief showcase spanning archetypes, palettes, and styles.
@@ -158,6 +161,11 @@ def main():
             print(f"  v{i:02d}  no PNGs produced; subprocess exit "
                   f"{proc.returncode}, stderr: {proc.stderr[-300:]}")
             paths.append("")
+            continue
+        if len(view_pngs) == 1:
+            # Single view — no contact sheet, just use the PNG directly.
+            paths.append(view_pngs[0])
+            print(f"  v{i:02d}  {briefs[i][:40]:40s}  ->  {view_pngs[0]}")
             continue
         if view_pngs:
             imgs = [Image.open(p).convert("RGB") for p in view_pngs]

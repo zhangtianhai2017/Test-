@@ -270,7 +270,9 @@ class TrainLoop:
             log_K = float(torch.log(torch.tensor(float(K))))
             kl_to_uniform.append(log_K - ent)                # (B,)
 
-        # Render + judge. render_fn may return (paths,) or (paths, outfits)
+        # Render + judge. render_fn may return (paths,) or (paths, outfits).
+        # Pass `briefs` through to judge so V4 prompt's brief_match dim
+        # can score "did this design match the requested brief".
         outfits = None
         try:
             rendered = render_fn(config, picks)
@@ -278,7 +280,8 @@ class TrainLoop:
                 image_paths, outfits = rendered
             else:
                 image_paths = rendered
-            results = self.judge.judge_batch(image_paths, verbose=False)
+            results = self.judge.judge_batch(image_paths, briefs=briefs,
+                                              verbose=False)
         except Exception as exc:
             print(f"  render/judge failed: {exc}; using zero reward")
             results = [JudgeResult.from_dict({}, backend="error")
@@ -294,6 +297,14 @@ class TrainLoop:
         # widen the reward distribution.
         #
         # Falls back to legacy (v+a)/20 if sub-scores absent.
+        #
+        # V4-fixed (2026-05-22): brief_match weight cut 0.25 -> 0.10
+        # AND gated by is_valid_swimsuit. The first V4 run rewarded
+        # broken designs that Qwen interpreted as "minimal/avant-
+        # garde" matches to the brief (pass dropped 70% -> 32% in
+        # 50 iters). With structural gate + lower weight + tightened
+        # prompt (which now caps brief_match <= 3 for naked designs),
+        # the signal is contained.
         def _reward(r) -> float:
             if r.pelvic_coverage or r.chest_coverage:
                 w_struct = (
@@ -303,12 +314,15 @@ class TrainLoop:
                     + 0.10 * r.assembly_quality
                 )
                 w_aesth = (
-                    0.10 * r.aesthetic
-                    + 0.10 * r.color_harmony
-                    + 0.10 * r.proportion
-                    + 0.10 * r.silhouette
+                    0.08 * r.aesthetic
+                    + 0.08 * r.color_harmony
+                    + 0.07 * r.proportion
+                    + 0.07 * r.silhouette
                 )
-                return (w_struct + w_aesth) / 10.0
+                # Gated brief bonus: only when structure passes.
+                w_brief = (0.10 * r.brief_match
+                            if r.is_valid_swimsuit else 0.0)
+                return (w_struct + w_aesth + w_brief) / 10.0
             return (r.validity_score + r.aesthetic_score) / 20.0
         base_rewards = [_reward(r) for r in results]
 

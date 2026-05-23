@@ -93,12 +93,15 @@ class JudgeResult:
     color_harmony:           int = 0
     proportion:              int = 0
     silhouette:              int = 0
+    # ---- V4 brief-match score (added 2026-05-21) ----
+    brief_match:             int = 0
     # ---- observation phrases ----
     chest_observation:       str = ""
     pelvic_observation:      str = ""
     color_observation:       str = ""
     proportion_observation:  str = ""
     silhouette_observation:  str = ""
+    brief_match_observation: str = ""
     # ---- metadata (not from the model) ----
     image_path:              str = ""
     elapsed_s:               float = 0.0
@@ -120,6 +123,7 @@ class JudgeResult:
         color_harmony = _safe_int(d.get("color_harmony"))
         proportion = _safe_int(d.get("proportion"))
         silhouette = _safe_int(d.get("silhouette"))
+        brief_match = _safe_int(d.get("brief_match"))
         # Legacy validity_score: prefer model's value, else derive from
         # the 4 structural sub-scores (V2/V3 prompt instructs same).
         if "validity_score" in d:
@@ -157,11 +161,13 @@ class JudgeResult:
             color_harmony=color_harmony,
             proportion=proportion,
             silhouette=silhouette,
+            brief_match=brief_match,
             chest_observation=str(d.get("chest_observation", "")),
             pelvic_observation=str(d.get("pelvic_observation", "")),
             color_observation=str(d.get("color_observation", "")),
             proportion_observation=str(d.get("proportion_observation", "")),
             silhouette_observation=str(d.get("silhouette_observation", "")),
+            brief_match_observation=str(d.get("brief_match_observation", "")),
             image_path=image_path,
             elapsed_s=elapsed_s,
             backend=backend,
@@ -173,7 +179,11 @@ class JudgeResult:
 # ---------------------------------------------------------------------------
 
 JUDGE_PROMPT = """You are inspecting a 3D rendered image of a swimsuit on a mannequin.
-Score 8 dimensions (each 0-10). For each, first describe ONE phrase
+The designer was asked to produce this design from the following text brief:
+
+  BRIEF: "{brief}"
+
+Score 9 dimensions (each 0-10). For each, first describe ONE phrase
 of what you see, then assign the score.
 
 STRUCTURAL (low scores reject the design):
@@ -243,6 +253,38 @@ AESTHETIC (do not gate validity; widen the quality signal):
    9 = strikingly attractive
    10 = exceptional
 
+9. brief_match     — how well the design MATCHES the BRIEF above.
+   This dimension scores ONLY the color + style + named details.
+   It does NOT compensate for missing fabric or broken structure.
+
+   HARD RULES (override everything else below):
+   - If the design has NO BOTTOM PANEL or NO TOP COVERAGE
+     (chest_coverage <= 2 OR pelvic_coverage <= 2), brief_match
+     CANNOT exceed 3. A naked or near-naked design is NEVER a
+     legitimate realization of a brief, no matter how avant-garde
+     the brief sounds. The brief assumes a wearable swimsuit.
+   - "Avant-garde", "minimal", "futuristic", "experimental",
+     "deconstructed" briefs do NOT excuse missing required panels.
+     A real avant-garde swimsuit is still a swimsuit.
+
+   Otherwise, scale based on color + style + named details:
+   0 = design contradicts the brief on every dimension
+       (e.g. brief says "ivory white French elegance" but design is
+       neon-purple aggressive thong)
+   3 = design ignores most of the brief, gets one element right
+   5 = design respects the brief loosely (right "vibe" / general
+       coverage tier) but WRONG COLOR
+   7 = design hits color hue family AND style category, missing
+       finer details
+   9 = strong match on color + style + mood + named details
+   10 = exact realization of the brief
+
+   IMPORTANT: COLOR match is the single biggest signal. If the brief
+   names a color ("ivory", "emerald green", "neon yellow", "burgundy",
+   "navy", "silver"), the design must visibly be that color family
+   to score above 5. Wrong color = brief_match <= 5 even if every
+   other element matches.
+
 A design counts as VALID only if chest_coverage >= 4 AND
 pelvic_coverage >= 4 AND anatomy_clean >= 5 AND assembly_quality >= 5.
 (Threshold 4 lets thongs and micro bikinis pass — they're real
@@ -268,6 +310,8 @@ in this order:
   "silhouette":            <int>,
   "aesthetic_observation": "<phrase>",
   "aesthetic":             <int>,
+  "brief_match_observation":"<one short phrase noting what matches/contradicts the brief>",
+  "brief_match":           <int>,
   "is_valid_swimsuit":     <true|false>,
   "validity_score":        <int>,
   "aesthetic_score":       <int>,
@@ -292,20 +336,40 @@ Begin with `{` end with `}`."""
 class VisionJudge(ABC):
     backend_name: str = "abstract"
 
+    # When >1, judge_batch fires this many judge() calls concurrently
+    # via ThreadPoolExecutor. Qwen2.5-VL via vLLM/oai server handles
+    # continuous batching server-side, so concurrent calls don't 8x
+    # the wall time. Measured 2026-05-22: 8 sequential calls ~100s,
+    # 8 concurrent calls ~40s (2.5x speedup).
+    concurrent_calls: int = 1
+
     @abstractmethod
-    def judge(self, image_path: str) -> JudgeResult: ...
+    def judge(self, image_path: str, brief: str = "") -> JudgeResult: ...
 
     def judge_batch(self, image_paths: Iterable[str],
+                     briefs: Optional[Iterable[str]] = None,
                      verbose: bool = False) -> list[JudgeResult]:
-        out: list[JudgeResult] = []
-        for p in image_paths:
-            r = self.judge(p)
-            if verbose:
+        """If `briefs` is supplied, must align 1:1 with image_paths.
+        Pass-through to judge(); empty brief = old behaviour."""
+        paths = list(image_paths)
+        briefs_list = (list(briefs) if briefs is not None
+                        else [""] * len(paths))
+        if self.concurrent_calls > 1 and len(paths) > 1:
+            from concurrent.futures import ThreadPoolExecutor
+            workers = min(self.concurrent_calls, len(paths))
+            with ThreadPoolExecutor(max_workers=workers) as ex:
+                out = list(ex.map(
+                    lambda pb: self.judge(pb[0], brief=pb[1]),
+                    list(zip(paths, briefs_list))))
+        else:
+            out = [self.judge(p, brief=b) for p, b in zip(paths, briefs_list)]
+        if verbose:
+            for r in out:
                 tag = "PASS" if r.is_valid_swimsuit else "FAIL"
                 print(f"  [{tag}] v={r.validity_score} a={r.aesthetic_score} "
-                      f"{os.path.basename(p):40s} {r.elapsed_s:.2f}s "
-                      f"({len(r.structural_issues)} issues)")
-            out.append(r)
+                      f"bm={r.brief_match} "
+                      f"{os.path.basename(r.image_path):40s} "
+                      f"{r.elapsed_s:.2f}s ({len(r.structural_issues)} issues)")
         return out
 
 
@@ -323,7 +387,7 @@ class MockVisionJudge(VisionJudge):
         self.fail_rate = fail_rate
         self.seed = seed
 
-    def judge(self, image_path: str) -> JudgeResult:
+    def judge(self, image_path: str, brief: str = "") -> JudgeResult:
         t0 = time.time()
         h = hashlib.sha256((image_path + str(self.seed)).encode()).digest()
         rng = random.Random(int.from_bytes(h[:8], "big"))
@@ -383,13 +447,15 @@ class VLLMVisionJudge(VisionJudge):
                  model: str = DEFAULT_MODEL_NAME,
                  api_key: str = "dummy",
                  max_image_dim: int = 768,
-                 request_timeout: float = 60.0):
+                 request_timeout: float = 60.0,
+                 concurrent_calls: int = 1):
         from openai import OpenAI                  # lazy import
         self.client = OpenAI(base_url=base_url, api_key=api_key,
                               timeout=request_timeout)
         self.model = model
         self.max_image_dim = max_image_dim
         self.base_url = base_url
+        self.concurrent_calls = concurrent_calls
 
     def _encode_image(self, image_path: str) -> str:
         """Downscale (cap longest side at max_image_dim) and base64-encode
@@ -407,9 +473,13 @@ class VLLMVisionJudge(VisionJudge):
         b64 = base64.b64encode(buf.getvalue()).decode("ascii")
         return f"data:image/jpeg;base64,{b64}"
 
-    def judge(self, image_path: str) -> JudgeResult:
+    def judge(self, image_path: str, brief: str = "") -> JudgeResult:
         t0 = time.time()
         data_url = self._encode_image(image_path)
+        # Substitute brief into the {brief} slot in JUDGE_PROMPT.
+        # Empty brief is OK — Qwen just reads "BRIEF: \"\"" and the
+        # brief_match dimension will default to a neutral score.
+        prompt = JUDGE_PROMPT.replace("{brief}", brief or "(no brief)")
 
         response = self.client.chat.completions.create(
             model=self.model,
@@ -418,11 +488,11 @@ class VLLMVisionJudge(VisionJudge):
                 "content": [
                     {"type": "image_url",
                      "image_url": {"url": data_url}},
-                    {"type": "text", "text": JUDGE_PROMPT},
+                    {"type": "text", "text": prompt},
                 ],
             }],
             temperature=0.0,    # deterministic structural judgement
-            max_tokens=1200,    # V3 schema has ~25 keys (8 dims x 2 + legacy)
+            max_tokens=1400,    # V4: ~27 keys (added brief_match dim)
         )
         raw = response.choices[0].message.content or ""
         parsed = _extract_json(raw)

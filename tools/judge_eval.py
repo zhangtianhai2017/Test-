@@ -114,7 +114,10 @@ Begin with `{` end with `}`."""
 
 
 def judge_dir(img_dir: Path, prompt: str, label: str) -> list[dict]:
-    """Run the vllm judge with a specific prompt against every PNG in img_dir."""
+    """Run the vllm judge with a specific prompt against every PNG in img_dir.
+
+    Note: brief is NOT supplied here (eval is brief-agnostic), so the
+    V4 prompt's {brief} placeholder resolves to '(no brief)'."""
     # patch the module-level JUDGE_PROMPT
     orig = vj.JUDGE_PROMPT
     vj.JUDGE_PROMPT = prompt
