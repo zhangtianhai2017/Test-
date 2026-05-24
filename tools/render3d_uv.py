@@ -229,6 +229,133 @@ def _draw_pattern_into(layer: Image.Image, poly_px, pattern: str,
                 draw.polygon([(x, y), (x + bw, y + tilt),
                                (x + bw, y + tilt + bh), (x, y + bh)],
                               fill=acc)
+    elif pattern == "pinstripe":
+        # Very thin vertical stripes
+        n = max(20, int(50 / (0.3 + scale)))
+        sw = max(1, w // (n * 4))
+        for i in range(n):
+            cx = x0 + (i + 0.5) * w / n
+            draw.rectangle([cx - sw, y0, cx + sw, y1], fill=acc)
+    elif pattern == "mesh":
+        # See-through grid pattern: thin lines forming squares
+        n = max(8, int(20 / (0.3 + scale)))
+        line_w = max(1, motif // 10)
+        for i in range(n + 1):
+            xx = x0 + i * w / n
+            draw.line([(xx, y0), (xx, y1)], fill=acc, width=line_w)
+        for j in range(int(h / (w / n)) + 1):
+            yy = y0 + j * w / n
+            draw.line([(x0, yy), (x1, yy)], fill=acc, width=line_w)
+    elif pattern == "lace":
+        # Fine repeating floral-like dots in a diagonal grid
+        s = max(6, motif // 2)
+        r = max(2, s // 4)
+        for j in range(int(h / s) + 2):
+            yy = y0 + j * s
+            x_off = (s // 2) if j % 2 else 0
+            for i in range(int(w / s) + 2):
+                cx = x0 + i * s + x_off
+                draw.ellipse([cx - r, yy - r, cx + r, yy + r], fill=acc)
+                # surrounding petals
+                for k in range(4):
+                    ang = np.pi * k / 2
+                    px = cx + int(r * 1.8 * np.cos(ang))
+                    py = yy + int(r * 1.8 * np.sin(ang))
+                    draw.ellipse([px - 1, py - 1, px + 1, py + 1], fill=acc_dim)
+    elif pattern == "snake":
+        # Snakeskin: small diamond scales
+        rng = np.random.default_rng(1)
+        s = max(4, motif // 3)
+        for j in range(int(h / s) + 1):
+            yy = y0 + j * s
+            x_off = (s // 2) if j % 2 else 0
+            for i in range(int(w / s) + 1):
+                cx = x0 + i * s + x_off
+                d = s // 2
+                sh = acc if rng.random() < 0.7 else acc_dim
+                draw.polygon([(cx, yy - d), (cx + d, yy),
+                               (cx, yy + d), (cx - d, yy)], fill=sh)
+    elif pattern == "zebra":
+        # Irregular vertical stripes alternating
+        rng = np.random.default_rng(2)
+        x = x0
+        sw_lo = max(2, motif // 3); sw_hi = max(sw_lo + 1, motif)
+        gap_lo = max(2, motif // 4); gap_hi = max(gap_lo + 1, motif // 2)
+        while x < x1:
+            sw = rng.integers(sw_lo, sw_hi)
+            draw.rectangle([x, y0, min(x1, x + sw), y1], fill=acc)
+            x += sw + rng.integers(gap_lo, gap_hi)
+    elif pattern == "color_block_v":
+        # Vertical split: left half acc, right half stays primary
+        mid = x0 + w // 2
+        draw.rectangle([x0, y0, mid, y1], fill=acc)
+    elif pattern == "color_block_h":
+        # Horizontal split
+        mid = y0 + h // 2
+        draw.rectangle([x0, y0, x1, mid], fill=acc)
+    elif pattern == "color_block_diag":
+        # Diagonal triangle fill
+        draw.polygon([(x0, y0), (x1, y0), (x0, y1)], fill=acc)
+    elif pattern == "houndstooth":
+        # Broken check: tight diamond + rectangle alternation
+        s = max(4, motif // 3)
+        for j in range(int(h / s) + 1):
+            yy = y0 + j * s
+            for i in range(int(w / s) + 1):
+                cx = x0 + i * s
+                if (i + j) % 2 == 0:
+                    draw.polygon([(cx, yy), (cx + s, yy),
+                                   (cx + s // 2, yy + s)], fill=acc)
+                else:
+                    draw.rectangle([cx, yy, cx + s // 2, yy + s], fill=acc_dim)
+    elif pattern == "argyle":
+        # Diamond grid
+        s = max(8, motif)
+        for j in range(int(h / s) + 2):
+            yy = y0 + j * s
+            for i in range(int(w / s) + 2):
+                cx = x0 + i * s + (s // 2 if j % 2 else 0)
+                d = s // 2
+                if (i + j) % 2 == 0:
+                    draw.polygon([(cx, yy - d), (cx + d, yy),
+                                   (cx, yy + d), (cx - d, yy)], fill=acc)
+    elif pattern == "watercolor":
+        # Multiple soft blobs of secondary color
+        rng = np.random.default_rng(3)
+        n = max(4, (w * h) // (motif * motif * 8))
+        for _ in range(n):
+            cx = rng.uniform(x0, x1); cy = rng.uniform(y0, y1)
+            rr = motif * rng.uniform(0.6, 1.6)
+            soft = acc[:3] + (90,)
+            draw.ellipse([cx - rr, cy - rr, cx + rr, cy + rr], fill=soft)
+    elif pattern == "geo_diamond":
+        # Sharp diamond grid (different from argyle: filled & outlined)
+        s = max(8, motif)
+        for j in range(int(h / s) + 1):
+            yy = y0 + j * s
+            for i in range(int(w / s) + 1):
+                cx = x0 + i * s + (s // 2 if j % 2 else 0)
+                d = s // 2
+                if (i + j) % 3 == 0:
+                    draw.polygon([(cx, yy - d), (cx + d, yy),
+                                   (cx, yy + d), (cx - d, yy)],
+                                  fill=acc, outline=acc_dim)
+    elif pattern == "damask":
+        # Stylized floral medallion repeating
+        s = max(20, motif * 2)
+        for j in range(int(h / s) + 1):
+            yy = y0 + j * s + s // 2
+            for i in range(int(w / s) + 1):
+                cx = x0 + i * s + s // 2 + (s // 2 if j % 2 else 0)
+                # 4-petal flower
+                for k in range(4):
+                    ang = np.pi * k / 2
+                    px = cx + int(s // 3 * np.cos(ang))
+                    py = yy + int(s // 3 * np.sin(ang))
+                    pr = s // 5
+                    draw.ellipse([px - pr, py - pr, px + pr, py + pr],
+                                  fill=acc)
+                draw.ellipse([cx - 3, yy - 3, cx + 3, yy + 3], fill=acc_dim)
 
 
 def genome_to_texture(g: Genome,

@@ -45,6 +45,21 @@ PATTERNS = [
     # Batch 1 additions — more print varieties.
     "gingham", "chevron", "floral", "tropical", "leopard",
     "tie_dye", "ombre", "herringbone",
+    # Phase 1e expansion 2026-05-24: 13 new pattern overlays (12 -> 25).
+    # Mix of color blocking, perceptual transparency, and abstract motifs.
+    "pinstripe",      # very thin parallel lines, suiting-inspired
+    "mesh",           # grid pattern simulating see-through mesh fabric
+    "lace",           # fine repeating floral motif over base
+    "snake",          # snakeskin scale pattern
+    "zebra",          # high-contrast irregular stripes
+    "color_block_v",  # vertical 50/50 color split
+    "color_block_h",  # horizontal 50/50 color split
+    "color_block_diag", # diagonal color split
+    "houndstooth",    # classic broken-check pattern
+    "argyle",         # diamond grid with cross-stitches
+    "watercolor",     # soft blended secondary patches
+    "geo_diamond",    # geometric diamond grid (sharp)
+    "damask",         # ornate floral medallion repeat
 ]
 
 # Batch 1 discrete enumerations
@@ -56,6 +71,17 @@ FABRIC_WEAVES = [
     "velvet",       # pile surface, matte
     "crinkle",      # Hunza G signature — high-freq crinkle
     "shiny_knit",   # Missoni-ish shiny knit
+    # Phase 1e: expose the remaining normal-map weaves from
+    # render3d_uv._WEAVE_BUILDERS so the NN can select them.
+    "foam",
+    "sequined",
+    "seersucker",
+    "lace",
+    "fishnet",
+    "neoprene",
+    "slub",
+    "terry",
+    "jacquard",
 ]
 
 # 2025 hardware / trim palette

@@ -120,6 +120,20 @@ def discrete_sizes_from_library() -> dict[str, int]:
     when the library grows."""
     try:
         import library_data as ld
+        # Pattern + weave counts: prefer live lists from verify_ga_uv
+        # so library expansion is picked up automatically (was hardcoded
+        # 12/16 before 2026-05-24 Phase 1e). Fall back to defaults if
+        # the symbol isn't present (defensive).
+        try:
+            from verify_ga_uv import PATTERNS as _PATTERNS
+            n_pattern = len(_PATTERNS)
+        except Exception:
+            n_pattern = 12
+        try:
+            from verify_ga_uv import FABRIC_WEAVES as _WEAVES
+            n_weave = len(_WEAVES)
+        except Exception:
+            n_weave = 16
         return {
             "archetype": 4,
             "cup":       len(ld.CUP_PIECES),
@@ -128,8 +142,8 @@ def discrete_sizes_from_library() -> dict[str, int]:
             "fabric":    len(ld.FABRICS),
             "accessory": len(ld.ACCESSORIES),
             "hardware":  len(ld.HARDWARE),
-            "pattern":   12,
-            "weave":     16,
+            "pattern":   n_pattern,
+            "weave":     n_weave,
         }
     except Exception:
         return dict(DEFAULT_DISCRETE_SIZES)
@@ -206,19 +220,23 @@ class DesignGenerator(nn.Module):
             ResidualMLPBlock(hidden_dim, dropout=dropout)
             for _ in range(n_hidden_layers)
         ])
-        # Compatibility: a .trunk attribute that runs the whole stack
-        # so existing code (`gen.trunk(emb)` in eval probes) keeps
-        # working without modification.
-        class _TrunkAdapter(nn.Module):
+        # Compatibility: a .trunk callable (plain object, NOT
+        # nn.Module — that would create a circular module reference
+        # and recursion-loop .to(device)). Existing probes can still
+        # call `gen.trunk(emb)`.
+        class _TrunkCallable:
+            __slots__ = ("gen_ref",)
             def __init__(self, gen):
-                super().__init__()
-                self.gen = gen
-            def forward(self, x):
-                h = self.gen.input_proj(x)
-                for blk in self.gen.trunk_blocks:
+                # Plain attribute, not registered as submodule.
+                self.gen_ref = gen
+            def __call__(self, x):
+                g = self.gen_ref
+                h = g.input_proj(x)
+                for blk in g.trunk_blocks:
                     h = blk(h)
                 return h
-        self.trunk = _TrunkAdapter(self)
+        # Use object.__setattr__ so PyTorch doesn't try to register it.
+        object.__setattr__(self, "trunk", _TrunkCallable(self))
 
         # Skip connection: feed text_emb directly into the head layers
         # alongside trunk(h). Without this the trunk can (and empirically

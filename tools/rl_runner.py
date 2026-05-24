@@ -58,6 +58,9 @@ from train_loop import TrainLoop, DEFAULT_BRIEFS
 # ---------------------------------------------------------------------------
 
 def get_id_lists() -> dict[str, list]:
+    # 2026-05-24: pattern + weave lists now pulled from verify_ga_uv so
+    # library expansions (Phase 1e) are reflected here automatically.
+    from verify_ga_uv import PATTERNS, FABRIC_WEAVES
     return {
         "archetype": [
             "triangle_string_halter", "bandeau_back_band",
@@ -68,12 +71,8 @@ def get_id_lists() -> dict[str, list]:
         "fabric":    list(ld.FABRICS.keys()),
         "accessory": list(ld.ACCESSORIES.keys()),
         "hardware":  list(ld.HARDWARE.keys()),
-        "pattern":   ["solid", "stripe", "polka", "gingham", "chevron",
-                       "floral", "tropical", "leopard", "tie_dye", "ombre",
-                       "checker", "herringbone"],
-        "weave":     ["plain", "ribbed", "crinkle", "shiny_knit", "velvet",
-                       "mesh", "fishnet", "lace", "crochet", "foam", "sequined",
-                       "seersucker", "slub", "terry", "neoprene", "jacquard"],
+        "pattern":   list(PATTERNS),
+        "weave":     list(FABRIC_WEAVES),
     }
 
 
