@@ -241,6 +241,7 @@ def run(iters: int = 20,
          batch_div_coef: float = 0.0,  # shape diversity: batch-avg softmax entropy
          geom_var_coef: float = 0.0,   # geom variance: batch spread on 11 geometric continuous fields
          hue_circ_coef: float = 0.0,   # hue circular spread: avoid 0/1 bimodal collapse
+         brief_arch_align_coef: float = 0.0,  # brief → archetype semantic alignment
          encoder_name: str = "mock",   # "mock" (sha256 hash) or "sbert"
          judge_concurrent: int = 1,    # vllm judge concurrent calls
          judge_backend: str = "mock",
@@ -288,6 +289,7 @@ def run(iters: int = 20,
                       batch_div_coef=batch_div_coef,
                       geom_var_coef=geom_var_coef,
                       hue_circ_coef=hue_circ_coef,
+                      brief_arch_align_coef=brief_arch_align_coef,
                       run_dir=out_root)
 
     rng = rd.Random(seed)
@@ -370,6 +372,13 @@ def main():
                          "all samples bunch at the two extremes. R = "
                          "magnitude of mean direction vector; minimize "
                          "R to spread on the color wheel. Typical 1-5.")
+    ap.add_argument("--brief-arch-align-coef", type=float, default=0.0,
+                    help="brief -> archetype semantic alignment: encode "
+                         "each archetype with a short descriptor, "
+                         "compute brief vs archetype cosine, soft target. "
+                         "Cross-entropy with generator's archetype logits "
+                         "pushes 'athletic' -> bralette, 'evening' -> "
+                         "bandeau, etc. Typical 0.5-2.0.")
     ap.add_argument("--encoder", choices=["mock", "sbert"], default="mock",
                     help="text encoder. mock=sha256 hash (no semantics, "
                          "for tests). sbert=sentence-transformers "
@@ -399,6 +408,7 @@ def main():
          batch_div_coef=args.batch_div_coef,
          geom_var_coef=args.geom_var_coef,
          hue_circ_coef=args.hue_circ_coef,
+         brief_arch_align_coef=args.brief_arch_align_coef,
          encoder_name=args.encoder,
          judge_concurrent=args.judge_concurrent,
          judge_backend=args.judge, hidden_dim=args.hidden_dim,

@@ -54,6 +54,30 @@ _GEOM_FIELDS = (
 )
 _CONT_SPEC_LO_HI = {name: (lo, hi) for name, lo, hi in CONTINUOUS_SPECS}
 
+# Archetype semantic descriptors — ordered to match rl_runner.get_id_lists
+# ["triangle_string_halter", "bandeau_back_band",
+#  "bralette_shoulder_strap", "one_piece_maillot"].
+# Bilingual phrasing because the user's briefs mix CN/EN and sbert is
+# multilingual; both languages contribute to the sentence embedding.
+ARCHETYPE_DESCRIPTORS = [
+    # 0: triangle_string_halter — bikini, two pieces, classic triangle cups
+    "三角 比基尼, 三角杯, 三角形, 系带, 海滩, 沙滩, 度假, 热带, festival, "
+    "string bikini, triangle bikini, triangle cup, string halter, beach "
+    "tropical, summer festival, classic two-piece bikini",
+    # 1: bandeau_back_band — strapless top, evening dress-up
+    "抹胸, 平直 strapless 抹胸, 无肩带, 直线领口, 抹胸式, 晚装, 亮片, 优雅. "
+    "bandeau strapless tube top, no shoulder strap, sequin metallic evening "
+    "cocktail party gown formal dressy",
+    # 2: bralette_shoulder_strap — sport / athletic top with shoulder straps
+    "运动 bralette, 肩带, racerback, 健身, 冲浪, 高覆盖, 运动型. "
+    "sport bralette, shoulder strap, racerback, athletic gym surf yoga active "
+    "fitness sports workout",
+    # 3: one_piece_maillot — single connected garment, full torso coverage
+    "连体, 连体泳衣, 整件, 一件式, maillot, 整体. "
+    "one piece, one-piece, single piece, maillot, monokini, full torso "
+    "one-piece swimsuit, classic vintage 50s cover-all",
+]
+
 
 # ---------------------------------------------------------------------------
 # Default brief pool — bilingual, covers main archetypes / moods
@@ -136,6 +160,7 @@ class TrainLoop:
                  batch_div_coef: float = 0.0,
                  geom_var_coef: float = 0.0,
                  hue_circ_coef: float = 0.0,
+                 brief_arch_align_coef: float = 0.0,
                  baseline_alpha: float = 0.9,
                  device: str = "cpu",
                  run_dir: Optional[str] = None):
@@ -222,6 +247,27 @@ class TrainLoop:
         # Loss term: + hue_circ_coef * R  (minimize R).
         # Also applied to secondary_hue. Typical 1-5.
         self.hue_circ_coef = hue_circ_coef
+        # brief_arch_align_coef: pulls archetype softmax toward a
+        # target distribution derived from brief semantics. Pre-encode
+        # 4 archetype descriptors (matches rl_runner.get_id_lists order)
+        # once, then for each brief compute cosine vs each archetype,
+        # turn into soft target via softmax, take cross-entropy with
+        # generator's archetype logits.
+        # Result: "athletic sport" briefs bias toward bralette,
+        # "evening sequin" toward bandeau, etc.
+        # Typical 0.5-2.0.
+        self.brief_arch_align_coef = brief_arch_align_coef
+        # Pre-encode archetype descriptors once.
+        self._arch_emb = None
+        if brief_arch_align_coef > 0:
+            try:
+                ae = self.enc.encode(ARCHETYPE_DESCRIPTORS).to(self.device)
+                # Normalize for cosine sim.
+                self._arch_emb = F.normalize(ae, dim=-1)
+            except Exception as exc:
+                print(f"  warning: archetype descriptor encode failed "
+                      f"({exc}); brief_arch_align disabled")
+                self.brief_arch_align_coef = 0.0
         self.baseline_R = 0.0
         self.baseline_alpha = baseline_alpha
         self.device = device
@@ -485,21 +531,56 @@ class TrainLoop:
 
         # Hue circular regularizer. Hue lives on a circle (0 == 1 == red);
         # plain variance can be high while all samples bunch at 0 and 1.
-        # Map hue -> angle, compute R = magnitude of mean direction.
-        # R = 1 -> all at same point (bad); R = 0 -> uniform on circle.
-        # Minimize R to spread on the circle.
+        # 2026-05-24 v2: previous R = |mean direction| approach had a
+        # saddle point at R=1 (all-clustered, gradient ~ 0). Replaced
+        # with pairwise circular repulsion: for each pair (i, j), add
+        # a cost that's HIGH when hues are circularly close, LOW when
+        # far. Specifically use Gaussian-kernel repulsion in angle space:
+        #   pairwise_d = circular_distance(h_i, h_j) in [0, 0.5]
+        #   cost = exp(-(pairwise_d / sigma)^2)
+        # mean over pairs. Gradient is always non-zero (kernel falls off
+        # smoothly with distance), so optimizer can escape clustered state.
+        # sigma = 0.15 means "hues within ~0.15 of each other (54 deg) feel
+        # repulsion".
         if self.hue_circ_coef > 0 and config["hue"].numel() > 1:
-            two_pi = 2.0 * _math.pi
-            def _circ_R(values):
-                ang = two_pi * values
-                c = torch.cos(ang).mean()
-                s = torch.sin(ang).mean()
-                return torch.sqrt(c * c + s * s + 1e-10)
-            R_hue = _circ_R(config["hue"])
-            R_sh  = _circ_R(config["secondary_hue"])
-            hue_circ = (R_hue + R_sh) / 2.0
+            def _circ_repulsion(values, sigma=0.15):
+                # values: (B,) in [0, 1]
+                v = values.view(-1, 1)         # (B, 1)
+                diff = (v - v.T).abs()         # (B, B), in [0, 1]
+                # circular distance: min(d, 1 - d), so wraps at 1
+                circ_d = torch.minimum(diff, 1.0 - diff)
+                # exp kernel: 1.0 when distance=0, falls off at sigma scale
+                kernel = torch.exp(-(circ_d / sigma).pow(2))
+                # exclude self-pairs (diagonal = 1, would dominate)
+                B = values.shape[0]
+                mask = 1.0 - torch.eye(B, device=values.device)
+                # mean over off-diagonal pairs
+                return (kernel * mask).sum() / mask.sum().clamp_min(1.0)
+            r_hue = _circ_repulsion(config["hue"])
+            r_sh  = _circ_repulsion(config["secondary_hue"])
+            hue_circ = (r_hue + r_sh) / 2.0
         else:
             hue_circ = torch.zeros((), device=self.device)
+
+        # Brief → archetype semantic alignment. For each brief, compute
+        # cosine similarity to each archetype descriptor (precomputed
+        # at init), turn into soft target via temperature softmax, and
+        # take cross-entropy with the generator's archetype softmax.
+        # Pushes 'athletic sport' briefs toward bralette, 'evening
+        # sequin' toward bandeau, etc — adds brief→shape semantics on
+        # top of batch_div which only spreads picks horizontally.
+        if (self.brief_arch_align_coef > 0 and self._arch_emb is not None
+                and "archetype_logits" in config):
+            brief_n = F.normalize(emb, dim=-1)                # (B, D)
+            # (B, D) @ (D, 4) -> (B, 4)
+            sim = brief_n @ self._arch_emb.T
+            # Sharp soft target (temperature 0.05 makes top archetype clear)
+            target = F.softmax(sim / 0.05, dim=-1)
+            arch_log_probs = F.log_softmax(config["archetype_logits"], dim=-1)
+            # cross-entropy = -sum(target * log_probs), mean over batch
+            align_loss = -(target * arch_log_probs).sum(dim=-1).mean()
+        else:
+            align_loss = torch.zeros((), device=self.device)
 
         # Batch-level shape diversity bonus. For each discrete head,
         # the mean-of-softmax over the batch should NOT concentrate on
@@ -533,7 +614,8 @@ class TrainLoop:
                        - self.trunk_var_coef * trunk_var
                        - self.batch_div_coef * batch_div
                        - self.geom_var_coef * geom_var
-                       + self.hue_circ_coef * hue_circ)
+                       + self.hue_circ_coef * hue_circ
+                       + self.brief_arch_align_coef * align_loss)
 
         self.opt.zero_grad()
         loss_total.backward()
