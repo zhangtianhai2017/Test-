@@ -178,6 +178,29 @@ class LibraryEntry:
     coverage_class: str = ""             # minimal/medium/full (bottom_piece only)
     foam_thickness_mm: float = 0.0       # cup_piece only
 
+    # --- Per-template polygon data (Phase 2 rewrite, 2026-05-24) ---
+    # These replace the old shared `back_bottom_strips` / `center_gore` /
+    # `side_tie` recipes. Each template self-describes its complete
+    # polygon set instead of inheriting one shared shape.
+    # back_polygon_recipe: name of recipe for THIS template's back-panel
+    #                     (bottoms only). Each geometry_kind has its own
+    #                     back recipe (back_thong / back_brief / etc.)
+    #                     in tools/back_polygons.py.
+    # connector_recipe:   for bottoms with side/hip connectors. Defaults
+    #                     to no connector. Per-template authoring lets a
+    #                     tie-side bottom say "I have a knot at u=±0.4
+    #                     v=0.32" instead of relying on shared side_tie.
+    # inner_bridge_recipe: for cups, the bridge between left+right
+    #                     (replaces shared center_gore). None = no bridge.
+    # anchor_specs:       for hardware/accessory entries, list of
+    #                     (u, v, name) where the mesh attaches. Replaces
+    #                     hardcoded 3-anchor placement in
+    #                     _build_oring_meshes. List of (u, v, name).
+    back_polygon_recipe: str = ""
+    connector_recipe: str = ""
+    inner_bridge_recipe: str = ""
+    anchor_specs: tuple = ()
+
     # --- Hardware / strap dimensions ---
     width_cm: float = 0.0                # strap / FOE / hardware
     diameter_cm: float = 0.0             # ring / slider

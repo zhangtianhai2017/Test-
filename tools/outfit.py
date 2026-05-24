@@ -399,7 +399,18 @@ def _make_pattern_piece_from_cup(cup_entry: LibraryEntry,
 def _make_bottom_pieces(bottom_entry: LibraryEntry,
                           local_params: dict, fabric_id: str
                           ) -> list[PatternPiece]:
-    """Build front bottom + back bottom strips from a bottom_piece entry."""
+    """Build front bottom + back bottom from a bottom_piece entry.
+
+    Phase 2 rewrite (2026-05-24): replaced the shared back_bottom_strips
+    call with per-template back recipe. Each bottom template's back
+    geometry (g_string vs thong vs brief vs sling vs boy_short ...) is
+    now distinct, not a one-size-fits-all hexagonal strip pair.
+
+    Resolution order for the back recipe:
+      1. bottom_entry.back_polygon_recipe (explicit override)
+      2. GEOMETRY_TO_BACK_RECIPE[bottom_entry.geometry_kind] (default)
+      3. back_cheeky (safe fallback for unknown geometry_kind)
+    """
     pieces: list[PatternPiece] = []
     front_poly = polygon_recipes.call_recipe(
         bottom_entry.base_polygon_recipe, local_params)
@@ -412,15 +423,24 @@ def _make_bottom_pieces(bottom_entry: LibraryEntry,
         edge_names=en_front[: len(front_poly) - 1],
         notes=f"library: {bottom_entry.id}",
     ))
-    back_strips = polygon_recipes.back_bottom_strips(local_params)
-    for i, p in enumerate(back_strips):
+    # Per-template back panel (replaces shared back_bottom_strips).
+    from back_polygons import resolve_back_for
+    back_fn = resolve_back_for(
+        bottom_entry.geometry_kind,
+        explicit=bottom_entry.back_polygon_recipe)
+    back_polys = back_fn(local_params)
+    for i, p in enumerate(back_polys):
+        if len(p) < 4:
+            continue
         side = "R" if i == 0 else "L"
         en = ["waistband", "leg_opening", "inseam", "back_seam"]
         pieces.append(PatternPiece(
-            id=f"bottom_back_{side}", role="back_bottom",
+            id=f"bottom_back_{side}" if len(back_polys) > 1 else "bottom_back",
+            role="back_bottom",
             polygon_uv=list(p), count=1, fabric_id=fabric_id,
             layer_role="shell", edge_names=en[: len(p) - 1],
-            notes=f"library: {bottom_entry.id} (back strip)",
+            notes=f"library: {bottom_entry.id} (back via "
+                  f"{back_fn.__name__})",
         ))
     return pieces
 
