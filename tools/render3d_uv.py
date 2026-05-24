@@ -2485,7 +2485,7 @@ def _build_strap_meshes_garment(body_mesh,
     #    "hip_pair" bows or "halter_loop" beads); empty key = legacy
     #    single-anchor formula.
     try:
-        from library import LIBRARY as _LIB
+        from library_data import LIBRARY as _LIB
     except Exception:
         _LIB = {}
     for acc in garment.accessories:

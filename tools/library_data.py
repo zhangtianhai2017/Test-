@@ -1216,6 +1216,128 @@ ACCESSORIES: dict[str, LibraryEntry] = {
         anatomy_hints=("hip_R", "hip_L", "sternum"),
         local_params_schema={"length_cm": (3.0, 8.0, 5.0)},
     ),
+
+    # --- Phase 2 #5 (2026-05-25): multi-anchor placement variants ---
+    # Each of these picks a non-default placement key from
+    # tools/hardware_placements.py so the render emits multiple anchors
+    # instead of the legacy single-anchor formula. Adds visual variety
+    # without changing geometry of existing entries.
+
+    "ACC_BOW_HIP_PAIR_30MM": LibraryEntry(
+        id="ACC_BOW_HIP_PAIR_30MM", kind="accessory",
+        name="Hip-pair bows 30 mm (tie-side)",
+        tags=("bow", "satin", "hip"),
+        anatomy_hints=("hip_R", "hip_L"),
+        local_params_schema={"size_cm": (2.5, 4.5, 3.0)},
+        bow_placement="hip_pair",
+    ),
+    "ACC_BOW_THREE_25MM": LibraryEntry(
+        id="ACC_BOW_THREE_25MM", kind="accessory",
+        name="Trio bows (center + hips) 25 mm",
+        tags=("bow", "satin", "trio"),
+        anatomy_hints=("sternum", "hip_R", "hip_L"),
+        local_params_schema={"size_cm": (2.0, 3.5, 2.5)},
+        bow_placement="three",
+    ),
+    "ACC_BOW_BACK_NECK_40MM": LibraryEntry(
+        id="ACC_BOW_BACK_NECK_40MM", kind="accessory",
+        name="Back-of-neck bow 40 mm (halter knot)",
+        tags=("bow", "satin", "halter"),
+        anatomy_hints=("nape",),
+        local_params_schema={"size_cm": (3.0, 5.5, 4.0)},
+        bow_placement="back_neck",
+    ),
+    "ACC_BOW_BUTT_PAIR_25MM": LibraryEntry(
+        id="ACC_BOW_BUTT_PAIR_25MM", kind="accessory",
+        name="Back-hip bow pair 25 mm",
+        tags=("bow", "satin", "back"),
+        anatomy_hints=("hip_R_back", "hip_L_back"),
+        local_params_schema={"size_cm": (2.0, 3.5, 2.5)},
+        bow_placement="butt_pair",
+    ),
+
+    "ACC_FRINGE_FULL_RING_60MM": LibraryEntry(
+        id="ACC_FRINGE_FULL_RING_60MM", kind="accessory",
+        name="Full-ring hip fringe 60 mm",
+        tags=("fringe", "ring", "boho"),
+        anatomy_hints=("hip_R", "hip_L", "tailbone"),
+        local_params_schema={"length_cm": (4.0, 8.0, 6.0)},
+        fringe_placement="full_ring",
+    ),
+    "ACC_FRINGE_LONG_DRAPE_120MM": LibraryEntry(
+        id="ACC_FRINGE_LONG_DRAPE_120MM", kind="accessory",
+        name="Long draped fringe 120 mm",
+        tags=("fringe", "long", "boho"),
+        anatomy_hints=("hip_R", "hip_L"),
+        local_params_schema={"length_cm": (8.0, 14.0, 12.0)},
+        fringe_placement="long_drape",
+    ),
+    "ACC_FRINGE_SIDE_ASYM_70MM": LibraryEntry(
+        id="ACC_FRINGE_SIDE_ASYM_70MM", kind="accessory",
+        name="One-side fringe 70 mm (asymmetric)",
+        tags=("fringe", "asymmetric"),
+        anatomy_hints=("hip_R",),
+        local_params_schema={"length_cm": (5.0, 10.0, 7.0)},
+        fringe_placement="side_only",
+    ),
+    "ACC_FRINGE_UNDERBUST_40MM": LibraryEntry(
+        id="ACC_FRINGE_UNDERBUST_40MM", kind="accessory",
+        name="Underbust fringe 40 mm (flapper)",
+        tags=("fringe", "underbust", "flapper"),
+        anatomy_hints=("underbust",),
+        local_params_schema={"length_cm": (3.0, 6.0, 4.0)},
+        fringe_placement="upper_band",
+    ),
+
+    "ACC_BEADS_DRAPE_VERTICAL": LibraryEntry(
+        id="ACC_BEADS_DRAPE_VERTICAL", kind="accessory",
+        name="Vertical bead drape (sternum to waist)",
+        tags=("beads", "drape", "vertical"),
+        anatomy_hints=("sternum", "navel"),
+        local_params_schema={"count": (5, 10, 5)},
+        beads_placement="drape_y",
+    ),
+    "ACC_BEADS_HALTER_LOOP": LibraryEntry(
+        id="ACC_BEADS_HALTER_LOOP", kind="accessory",
+        name="Beaded halter loop (neck → cup tops)",
+        tags=("beads", "halter", "loop"),
+        anatomy_hints=("nape", "cup_top_R", "cup_top_L"),
+        local_params_schema={"count": (7, 15, 7)},
+        beads_placement="halter_loop",
+    ),
+    "ACC_BEADS_SIDE_SWAG": LibraryEntry(
+        id="ACC_BEADS_SIDE_SWAG", kind="accessory",
+        name="Side waist beaded swags",
+        tags=("beads", "side", "swag"),
+        anatomy_hints=("waist_R", "waist_L"),
+        local_params_schema={"count": (4, 10, 6)},
+        beads_placement="side_swag",
+    ),
+
+    "ACC_SHELL_COLLAR_ROW": LibraryEntry(
+        id="ACC_SHELL_COLLAR_ROW", kind="accessory",
+        name="Collar shell row (3 small)",
+        tags=("shell_charm", "shell", "collar", "boho"),
+        anatomy_hints=("collarbone",),
+        local_params_schema={"size_cm": (1.0, 2.0, 1.5)},
+        shell_placement="collar_row",
+    ),
+    "ACC_SHELL_NAVEL_CHARM": LibraryEntry(
+        id="ACC_SHELL_NAVEL_CHARM", kind="accessory",
+        name="Navel shell charm (belly chain)",
+        tags=("shell_charm", "shell", "navel"),
+        anatomy_hints=("navel",),
+        local_params_schema={"size_cm": (1.5, 3.0, 2.0)},
+        shell_placement="navel",
+    ),
+    "ACC_SHELL_HIP_PAIR": LibraryEntry(
+        id="ACC_SHELL_HIP_PAIR", kind="accessory",
+        name="Hip shell pair (boho)",
+        tags=("shell_charm", "shell", "hip", "boho"),
+        anatomy_hints=("hip_R", "hip_L"),
+        local_params_schema={"size_cm": (1.5, 3.0, 2.0)},
+        shell_placement="hip_pair",
+    ),
 }
 
 
