@@ -836,14 +836,9 @@ def _build_oring_meshes(g, body_vertices, y_crotch, y_neck, v_to_y):
     return out
 
 
-def _build_bow_mesh(g, body_vertices, v_to_y):
-    """A small bow at the center front. Two triangles + a center knot."""
-    if g.has_bow < 0.5:
-        return []
-    size = 0.8 + 3.2 * g.bow_size   # wingspan 0.8..4.0 cm
-    y = v_to_y(g.top_center_v)
-    p = _body_point_at(body_vertices, 0.0, y)
-    rxz = np.array([p[0], 0.0, p[2]]); rxz /= max(np.linalg.norm(rxz), 1e-6)
+def _build_one_bow(p, rxz, size: float, name_suffix: str = ""):
+    """Build a single bow centered at p (3D position) with outward
+    normal rxz. Returns list[(name, mesh)] for the two wings + knot."""
     tangent = np.array([-rxz[2], 0, rxz[0]])  # horizontal
     up = np.array([0.0, 1.0, 0.0])
     out = p + rxz * 0.4
@@ -865,7 +860,47 @@ def _build_bow_mesh(g, body_vertices, v_to_y):
     knot = o3d.geometry.TriangleMesh.create_sphere(size * 0.22)
     knot.translate(out)
     knot.compute_vertex_normals()
-    return [("bow_R", wing(+1)), ("bow_L", wing(-1)), ("bow_knot", knot)]
+    suf = f"_{name_suffix}" if name_suffix else ""
+    return [(f"bow_R{suf}", wing(+1)),
+            (f"bow_L{suf}", wing(-1)),
+            (f"bow_knot{suf}", knot)]
+
+
+def _build_bow_mesh(g, body_vertices, v_to_y, placement_key: str = ""):
+    """One or more bows. With placement_key="", reproduces the original
+    single-bow-at-front-center behavior (legacy). With a non-empty key
+    that resolves in hardware_placements.BOW_PLACEMENTS, emits one bow
+    per anchor returned by that placement function.
+    """
+    if g.has_bow < 0.5:
+        return []
+    base_size = 0.8 + 3.2 * g.bow_size   # wingspan 0.8..4.0 cm
+
+    anchors: list[tuple[str, float, float, float]] = []
+    if placement_key:
+        try:
+            from hardware_placements import resolve_bow
+            anchors = resolve_bow(placement_key, g)
+        except Exception:
+            anchors = []
+    if not anchors:
+        # legacy: single bow at front-center, scale 1.0
+        anchors = [("bow", 0.0, g.top_center_v, 1.0)]
+
+    out: list = []
+    for name, u, v, scale in anchors:
+        y = v_to_y(v)
+        p = _body_point_at(body_vertices, float(u), y)
+        rxz = np.array([p[0], 0.0, p[2]])
+        rxz /= max(np.linalg.norm(rxz), 1e-6)
+        sized = max(0.4, base_size * float(scale))
+        # If the legacy single-anchor path, keep original mesh names
+        # (downstream materials/seams may match on them).
+        if placement_key:
+            out.extend(_build_one_bow(p, rxz, sized, name_suffix=name))
+        else:
+            out.extend(_build_one_bow(p, rxz, sized))
+    return out
 
 
 def _build_fringe_meshes(g, body_vertices, v_to_y):
