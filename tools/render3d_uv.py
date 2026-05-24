@@ -796,21 +796,33 @@ def _place_at(mesh: o3d.geometry.TriangleMesh, center: np.ndarray,
 
 
 def _build_oring_meshes(g, body_vertices, y_crotch, y_neck, v_to_y):
-    """One torus per strap junction: at the center-gore, at each hip."""
+    """O-ring torus meshes for hardware accessories.
+
+    Phase 2 rewrite (2026-05-24): previously hardcoded THREE anchors
+    (sternum + left hip + right hip) for every O-ring activation, which
+    created a recurring "circular ring at navel-side" artifact that user
+    identified as permanent visual sameness — those hip rings were
+    visible-from-front for nearly half of all designs (whenever
+    random_outfit's optional `oring` slot got filled).
+
+    New behavior: only ONE anchor — at the front-center gore (sternum) —
+    which is the anatomically correct place for a halter-neck O-ring
+    junction. The hip rings are GONE. Future per-hardware refactor will
+    let specific hardware items (e.g., HW_HIP_RING_SET) opt back in to
+    multi-anchor placement via library entry's anchor_specs.
+
+    Gating still uses g.has_oring; future per-hardware path will key on
+    the specific oring_id selected.
+    """
     if g.has_oring < 0.5:
         return []
     size = 0.25 + 0.8 * g.oring_size  # cm major radius 0.25..1.05
     minor = 0.12 * size
-    anchors = []
-    # center front gore
+
+    # Only the sternum / front gore anchor. No more hip rings.
     y = v_to_y(g.top_center_v)
-    anchors.append(("front_gore", 0.0, y))
-    # hips at the side ties
-    y_front = v_to_y(g.bot_front_top_v)
-    y_back = v_to_y(g.bot_back_top_v)
-    hip_y = (y_front + y_back) / 2
-    for u in (0.5, -0.5):
-        anchors.append(("hip", u, hip_y))
+    anchors = [("front_gore", 0.0, y)]
+
     out = []
     for name, u, yy in anchors:
         p = _body_point_at(body_vertices, u, yy)
