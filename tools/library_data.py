@@ -1137,6 +1137,56 @@ HARDWARE: dict[str, LibraryEntry] = {
         anatomy_hints=("neck_base_back",),
         width_cm=0.8, metal_finish="none",
     ),
+
+    # --- Phase 2 #5+ (2026-05-25): O-rings with anchor_specs ---
+    # These opt into multi-anchor placement via the LibraryEntry's
+    # anchor_specs field. Each spec entry is (u, v, name) — u/v in the
+    # body-cylinder UV convention (u: -1..+1, v: 0..1 = crotch..neck).
+
+    "HW_OR_HIP_PAIR_15MM_GOLD": LibraryEntry(
+        id="HW_OR_HIP_PAIR_15MM_GOLD", kind="hardware",
+        name="O-ring pair at hips 15 mm gold (string-tie junctions)",
+        tags=("o_ring", "hip", "gold", "string_tie"),
+        anatomy_hints=("hip_R", "hip_L"),
+        diameter_cm=1.5, metal_finish="gold",
+        anchor_specs=(
+            (-0.45, 0.45, "hip_L"),
+            (+0.45, 0.45, "hip_R"),
+        ),
+    ),
+    "HW_OR_TRIO_12MM_SILVER": LibraryEntry(
+        id="HW_OR_TRIO_12MM_SILVER", kind="hardware",
+        name="O-ring trio (sternum + hips) 12 mm silver",
+        tags=("o_ring", "trio", "silver"),
+        anatomy_hints=("sternum", "hip_R", "hip_L"),
+        diameter_cm=1.2, metal_finish="silver",
+        anchor_specs=(
+            ( 0.0,  0.74, "sternum"),
+            (-0.45, 0.45, "hip_L"),
+            (+0.45, 0.45, "hip_R"),
+        ),
+    ),
+    "HW_OR_BACK_BAND_20MM_GOLD": LibraryEntry(
+        id="HW_OR_BACK_BAND_20MM_GOLD", kind="hardware",
+        name="O-rings at back-band ends 20 mm gold",
+        tags=("o_ring", "back_band", "gold"),
+        anatomy_hints=("spine_mid",),
+        diameter_cm=2.0, metal_finish="gold",
+        anchor_specs=(
+            (-0.95, 0.70, "back_L"),
+            (+0.95, 0.70, "back_R"),
+        ),
+    ),
+    "HW_OR_NAVEL_CHAIN_10MM_GOLD": LibraryEntry(
+        id="HW_OR_NAVEL_CHAIN_10MM_GOLD", kind="hardware",
+        name="Navel O-ring 10 mm gold (chain anchor)",
+        tags=("o_ring", "navel", "small", "gold", "chain"),
+        anatomy_hints=("navel",),
+        diameter_cm=1.0, metal_finish="gold",
+        anchor_specs=(
+            (0.0, 0.50, "navel"),
+        ),
+    ),
 }
 
 
