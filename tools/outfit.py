@@ -384,9 +384,25 @@ def _build_accessory_ref(entry: LibraryEntry) -> AccessoryRef:
 def _make_pattern_piece_from_cup(cup_entry: LibraryEntry,
                                     local_params: dict,
                                     fabric_id: str) -> PatternPiece:
-    """One PatternPiece with count=2 mirror_axis=u for the cup."""
-    poly = polygon_recipes.call_recipe(
-        cup_entry.base_polygon_recipe, local_params, side=1)
+    """One PatternPiece with count=2 mirror_axis=u for the cup.
+
+    Phase 2 #6b (2026-05-24): resolves to one of 20 per-TYPE cup
+    recipes via geometry_kind. Old code called the 6 shared recipes
+    (cup_triangle / cup_balconette / cup_bandeau / cup_softcup /
+    cup_sweetheart / cup_wrap / cup_corset_bands) which all 60 cup
+    library entries collapsed to. Result: visible same-family
+    silhouettes despite library expansion.
+    """
+    try:
+        from cup_polygons import resolve_cup_recipe
+        cup_fn = resolve_cup_recipe(
+            cup_entry.geometry_kind,
+            fallback=cup_entry.base_polygon_recipe)
+        poly = cup_fn(local_params, side=1)
+    except Exception:
+        # Fallback to legacy shared recipe
+        poly = polygon_recipes.call_recipe(
+            cup_entry.base_polygon_recipe, local_params, side=1)
     edge_names = ["cup_outer", "armhole", "underbust", "cup_inner"][:len(poly) - 1]
     return PatternPiece(
         id="cup", role="cup", polygon_uv=list(poly),
