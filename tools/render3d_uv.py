@@ -903,23 +903,12 @@ def _build_bow_mesh(g, body_vertices, v_to_y, placement_key: str = ""):
     return out
 
 
-def _build_fringe_meshes(g, body_vertices, v_to_y):
-    """Hanging short tassels along the bottom panel's leg opening.
-
-    Anchor band runs along the LEG OPENING (lower edge of the front
-    bottom piece), not the waistline — fringe hangs from the hem like a
-    skirt fringe. Length capped to 6 cm so the strands stay above the
-    knees regardless of g.fringe_length."""
-    if g.has_fringe < 0.5:
-        return []
-    length = max(2.0, min(6.0, 1.0 + 4.0 * g.fringe_length))
-    y_front = v_to_y(g.bot_front_top_v)
-    y_back = v_to_y(g.bot_back_top_v)
-    # Hem of the front panel — leg opening sits a few cm below the
-    # panel's top edge. We approximate by going halfway between front_top
-    # and the crotch-y reference.
-    band_y = min(y_front, y_back) - 4.0
-    us = np.linspace(-0.30, 0.30, 9)
+def _build_one_fringe_band(body_vertices, u_start: float, u_end: float,
+                              band_y: float, n_strands: int,
+                              length: float, label: str = ""):
+    """Build one fringe band: n_strands hanging tubes between u_start
+    and u_end at the given body height band_y. Returns one combined mesh."""
+    us = np.linspace(u_start, u_end, max(2, n_strands))
     out = o3d.geometry.TriangleMesh()
     for u in us:
         anchor = _body_point_at(body_vertices, float(u), band_y)
@@ -930,46 +919,142 @@ def _build_fringe_meshes(g, body_vertices, v_to_y):
         seg = _tube_between(p0, p1, radius=0.10, sides=5)
         out += seg
     out.compute_vertex_normals()
-    return [("fringes", out)]
+    name = f"fringes_{label}" if label else "fringes"
+    return [(name, out)]
 
 
-def _build_beads_meshes(g, body_vertices, v_to_y):
-    """Small beads along the top band."""
+def _build_fringe_meshes(g, body_vertices, v_to_y, placement_key: str = ""):
+    """Hanging fringe strands. legacy placement="" → one front-hem band
+    at u∈[-0.30, +0.30], 9 strands. placement_key resolves via
+    FRINGE_PLACEMENTS → can emit full-ring / asymmetric / underbust /
+    long-drape variants.
+    """
+    if g.has_fringe < 0.5:
+        return []
+    base_length = max(2.0, min(6.0, 1.0 + 4.0 * g.fringe_length))
+    y_front = v_to_y(g.bot_front_top_v)
+    y_back = v_to_y(g.bot_back_top_v)
+    band_y_default = min(y_front, y_back) - 4.0
+
+    bands: list[tuple] = []
+    upper_band_y_override = None
+    if placement_key:
+        try:
+            from hardware_placements import resolve_fringe
+            spec = resolve_fringe(placement_key, g)
+            # FRINGE_PLACEMENTS returns either a list of
+            # (u_start, u_end, label, n_strands, length_scale) tuples
+            # OR includes a special "_anchor_v" marker (used by
+            # upper_band) carrying the override v.
+            real_spans = []
+            for tup in spec:
+                if len(tup) == 5 and tup[2] == "_anchor_v":
+                    upper_band_y_override = v_to_y(float(tup[4]))
+                else:
+                    real_spans.append(tup)
+            bands = real_spans
+        except Exception:
+            bands = []
+    if not bands:
+        bands = [(-0.30, +0.30, "front_hem", 9, 1.0)]
+
+    out: list = []
+    for u_start, u_end, label, n_strands, length_scale in bands:
+        by = (upper_band_y_override if upper_band_y_override is not None
+              and label == "underbust" else band_y_default)
+        out.extend(_build_one_fringe_band(
+            body_vertices, float(u_start), float(u_end), by,
+            int(n_strands), base_length * float(length_scale),
+            label=("" if not placement_key else label),
+        ))
+    return out
+
+
+def _build_beads_meshes(g, body_vertices, v_to_y, placement_key: str = ""):
+    """Small bead spheres along a placement curve. legacy → 12 beads
+    around the bust ring (cup_outer → back seam, mirrored). placement_key
+    resolves via BEADS_PLACEMENTS — drape_y / halter_loop / side_swag /
+    bust_ring.
+    """
     if g.has_beads < 0.5:
         return []
-    y = v_to_y(g.top_center_v)
-    cup_outer_u = g.top_inner_u + 2 * g.top_half_u
-    us = np.linspace(cup_outer_u + 0.02, 1.0, 6)
-    us = np.concatenate([us, -us])
+
+    anchors: list[tuple[str, float, float, float]] = []
+    if placement_key:
+        try:
+            from hardware_placements import resolve_beads
+            anchors = resolve_beads(placement_key, g)
+        except Exception:
+            anchors = []
+    if not anchors:
+        # legacy bust-ring fallback
+        y = v_to_y(g.top_center_v)
+        cup_outer_u = g.top_inner_u + 2 * g.top_half_u
+        us = np.linspace(cup_outer_u + 0.02, 1.0, 6)
+        us = np.concatenate([us, -us])
+        anchors = [(f"bead_{i:02d}", float(u), g.top_center_v, 1.0)
+                   for i, u in enumerate(us)]
+
     out = o3d.geometry.TriangleMesh()
-    for u in us:
+    for name, u, v, scale in anchors:
+        y = v_to_y(float(v))
         p = _body_point_at(body_vertices, float(u), y)
         rxz = np.array([p[0], 0.0, p[2]])
         rxz /= max(np.linalg.norm(rxz), 1e-6)
-        bead = o3d.geometry.TriangleMesh.create_sphere(0.28)
+        bead = o3d.geometry.TriangleMesh.create_sphere(0.28 * float(scale))
         bead.translate(p + rxz * 0.35)
         out += bead
     out.compute_vertex_normals()
     return [("beads", out)]
 
 
-def _build_shell_mesh(g, body_vertices, v_to_y):
-    """A shell-like charm hanging from the center gore."""
-    if g.has_shell < 0.5:
-        return []
-    y = v_to_y(g.top_center_v) - 2.5
-    p = _body_point_at(body_vertices, 0.0, y)
-    rxz = np.array([p[0], 0.0, p[2]])
-    rxz /= max(np.linalg.norm(rxz), 1e-6)
-    # a flattened sphere cap as a quick shell approximation
-    shell = o3d.geometry.TriangleMesh.create_sphere(0.85)
-    shell.scale(1.0, center=(0, 0, 0))
+def _build_one_shell(p, rxz, scale: float = 1.0):
+    """Build a single flattened-sphere shell at p with outward normal rxz."""
+    shell = o3d.geometry.TriangleMesh.create_sphere(0.85 * scale)
     verts = np.asarray(shell.vertices)
-    verts[:, 2] *= 0.3          # flatten along world-z ~ anchor normal
+    verts[:, 2] *= 0.3
     shell.vertices = o3d.utility.Vector3dVector(verts)
     shell = _place_at(shell, p + rxz * 0.8, rxz)
     shell.compute_vertex_normals()
-    return [("shell", shell)]
+    return shell
+
+
+def _build_shell_mesh(g, body_vertices, v_to_y, placement_key: str = ""):
+    """One or more shell charms. legacy → single charm below sternum.
+    placement_key resolves via SHELL_PLACEMENTS — single_charm /
+    collar_row / navel / hip_pair.
+    """
+    if g.has_shell < 0.5:
+        return []
+
+    anchors: list[tuple[str, float, float, float]] = []
+    if placement_key:
+        try:
+            from hardware_placements import resolve_shell
+            anchors = resolve_shell(placement_key, g)
+        except Exception:
+            anchors = []
+    if not anchors:
+        # legacy single anchor: 2.5 cm below sternum
+        # (offset baked into v_to_y units; keep equivalent by going to
+        # a v that resolves to the same world-y)
+        anchors = [("shell", 0.0, g.top_center_v, 1.0)]
+        # legacy used y - 2.5 directly. Reproduce by overriding y below.
+        legacy_y = v_to_y(g.top_center_v) - 2.5
+    else:
+        legacy_y = None
+
+    out: list = []
+    for i, (name, u, v, scale) in enumerate(anchors):
+        y = legacy_y if legacy_y is not None else v_to_y(float(v))
+        p = _body_point_at(body_vertices, float(u), y)
+        rxz = np.array([p[0], 0.0, p[2]])
+        rxz /= max(np.linalg.norm(rxz), 1e-6)
+        shell = _build_one_shell(p, rxz, scale=float(scale))
+        # legacy single-shell entry kept the original "shell" name.
+        mname = "shell" if not placement_key else f"shell_{name}"
+        out.append((mname, shell))
+    return out
 
 
 def _build_strap_meshes_legacy(body_mesh: o3d.geometry.TriangleMesh, g,
