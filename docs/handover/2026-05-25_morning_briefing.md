@@ -36,7 +36,7 @@ non-zero bytes, render is back. If it dies before printing `OK`, the
 Open3D pipe is still broken — try a second `wsl --shutdown` or check
 GPU state with `nvidia-smi`.
 
-## Commits landed tonight (10 in order)
+## Commits landed tonight (14 in order)
 
 ```
 0ee039cd  Phase 1f post-mortem: alias 9 of 15 cutout modes to no-op
@@ -49,6 +49,10 @@ b1403c13  Phase 2 #5d: fringe/beads/shell mesh accept placement_key
 c8676f3a  Phase 2 #5e: wire garment.accessories → library_entry.*_placement
 a9068a48  Phase 2 #5f: 14 new accessory library entries, multi-anchor placements
 b7f89ac4  rl_runner: graceful warm-start across head-size changes
+a46a2112  docs: morning briefing (this file's first version)
+93d29700  docs: audit of remaining shared procedural shortcuts after Phase 2 #5
+68a5e321  Phase 2 #5+: wire O-ring anchor_specs from library entry
+7dd00fd5  Phase 2 #5+: 4 new HW O-ring entries using anchor_specs
 ```
 
 Each is independently `git revert`-able if one turns out to misbehave.
@@ -116,13 +120,28 @@ expect the first 5-10 iters to be exploratory on that dimension.
 
 ## Remaining pending work (lower priority)
 
-- **#61 Phase 2 full regression render**: with 223 LIBRARY entries we
+- **#61 Phase 2 full regression render**: with 227 LIBRARY entries we
   should do a sweep render of cup×bottom×accessory combos to catch
   silent crashes. Easier to do once render is unwedged.
 - Cutout NN-bias: 0/8 designs picked `none` in p3_aliased. After
   retrain with `entropy-coef=0.5` should be less collapsed. Won't fix
   perfectly until next cutout head is sized to 6 (would require cold-
   starting that head — defer to next "big retrain" milestone).
+- **P1.1 strap routing per-template** (next biggest visual axis) —
+  see [file:///C:/Users/Administrator/Test-/docs/design/2026-05-25_remaining_shortcuts_audit.md](file:///C:/Users/Administrator/Test-/docs/design/2026-05-25_remaining_shortcuts_audit.md)
+  for the full prioritized list of remaining `共享 procedural shortcut` to
+  attack.
+
+## Head-size changes since 2050 ckpt (warm-start impact)
+
+  accessory:  10 → 24   (Phase 2 #5f: 14 new ACCESSORIES entries)
+  hardware:   10 → 14   (Phase 2 #5+: 4 new HW O-ring entries)
+
+Other heads unchanged: cup60/bot52/strap30/fabric31/cutout15/pattern25/
+weave16/archetype4. Warm-start now uses strict=False fallback in
+rl_runner — accessory and hardware final-Linear layers will reinitialize,
+everything else carries over. Expect a brief exploration phase on those
+two dimensions in the first few iters.
 
 ## What I deliberately did NOT do
 
