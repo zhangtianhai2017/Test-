@@ -455,19 +455,38 @@ def _make_bottom_pieces(bottom_entry: LibraryEntry,
         bottom_entry.geometry_kind,
         explicit=bottom_entry.back_polygon_recipe)
     back_polys = back_fn(local_params)
-    for i, p in enumerate(back_polys):
-        if len(p) < 4:
-            continue
-        side = "R" if i == 0 else "L"
-        en = ["waistband", "leg_opening", "inseam", "back_seam"]
-        pieces.append(PatternPiece(
-            id=f"bottom_back_{side}" if len(back_polys) > 1 else "bottom_back",
-            role="back_bottom",
-            polygon_uv=list(p), count=1, fabric_id=fabric_id,
-            layer_role="shell", edge_names=en[: len(p) - 1],
-            notes=f"library: {bottom_entry.id} (back via "
-                  f"{back_fn.__name__})",
-        ))
+    # 2026-05-24 fix: always use side-suffixed id ("bottom_back_R" /
+    # "bottom_back_L"). Even with one back polygon we use "bottom_back_R"
+    # so the engineering layer's inseam seam join (checks
+    # id.startswith("bottom_back_")) still fires. Without the suffix
+    # the inseam seam was silently skipped for most bottoms — they
+    # had no front-back attachment record, breaking manufacturability.
+    if len(back_polys) == 0:
+        pass   # no back piece for designs that delegate back to body chain
+    elif len(back_polys) == 1:
+        p = back_polys[0]
+        if len(p) >= 4:
+            en = ["waistband", "leg_opening", "inseam", "back_seam"]
+            pieces.append(PatternPiece(
+                id="bottom_back_R", role="back_bottom",
+                polygon_uv=list(p), count=1, fabric_id=fabric_id,
+                layer_role="shell", edge_names=en[: len(p) - 1],
+                notes=f"library: {bottom_entry.id} (back via "
+                      f"{back_fn.__name__})",
+            ))
+    else:
+        for i, p in enumerate(back_polys):
+            if len(p) < 4:
+                continue
+            side = "R" if i == 0 else "L"
+            en = ["waistband", "leg_opening", "inseam", "back_seam"]
+            pieces.append(PatternPiece(
+                id=f"bottom_back_{side}", role="back_bottom",
+                polygon_uv=list(p), count=1, fabric_id=fabric_id,
+                layer_role="shell", edge_names=en[: len(p) - 1],
+                notes=f"library: {bottom_entry.id} (back via "
+                      f"{back_fn.__name__})",
+            ))
     return pieces
 
 
@@ -578,29 +597,34 @@ def outfit_to_garment(outfit: Outfit) -> Garment:
                     edge_names=["waistband"] * (len(p) - 1),
                 ))
 
-    # ---- Side ties (Phase 2 rewrite 2026-05-24) ----
-    # OLD: emit shared side_tie polygon at u=±0.5 whenever outfit had a
-    #      side_tie slot. random_outfit auto-fills optional slots ~50%
-    #      so most outfits got these strips regardless of design intent.
-    #      Result: visible "bowtie" strips on body sides on many renders.
-    # NEW: only emit side-tie panels when the SELECTED bottom template's
-    #      tags explicitly call for them (tie_side / strappy_side /
-    #      brazilian-style bottoms). For other bottoms (brief / highwaist /
-    #      sport boy_short / etc.) the bottom IS continuous and needs no
-    #      separate tie panel.
+    # ---- Side ties / waist-loop connectors (Phase 2 rewrite v2 2026-05-24) ----
+    # ENGINEERING REQUIREMENT: the bikini bottom MUST close into a waist
+    # loop, else the garment doesn't physically stay on. This is achieved
+    # via either:
+    #   (a) wide front + wide back panels that meet at u≈±0.5 forming
+    #       a continuous side seam (brief / highwaist / hipster /
+    #       boy_short with front_half_u ≥ 0.40 and back_half_u ≥ 0.36)
+    #   (b) explicit side_tie panel / string bridging front and back
+    #       at u=±0.5 (everything else: thong / brazilian / cheeky /
+    #       tanga / g_string / micro / sling / side_string / tie_side)
+    #
+    # Old gate (v1) only emitted (b) for templates with tie/brazilian
+    # tag, leaving thong / g_string / cheeky / sling structurally broken
+    # (front and back panels floating separately on body, garment can't
+    # physically stay on). User caught this.
+    #
+    # New gate: emit (b) whenever the bottom's coverage_class is not
+    # "full" — full-coverage bottoms have natural side seam, others need
+    # explicit waist-loop connector.
     side_tie_assn = outfit.first_assignment("side_tie")
     bot_entry_for_tie = (_entry(bot_front_assn.library_id)
                           if bot_front_assn is not None else None)
-    bottom_wants_ties = (
-        bot_entry_for_tie is not None and (
-            "tie_side" in bot_entry_for_tie.tags
-            or "tie-side" in bot_entry_for_tie.tags
-            or "strappy_side" in bot_entry_for_tie.tags
-            or "brazilian" in bot_entry_for_tie.tags
-        )
+    bottom_needs_waist_loop = (
+        bot_entry_for_tie is not None
+        and bot_entry_for_tie.coverage_class != "full"
     )
     if (side_tie_assn is not None and bot_front_assn is not None
-            and bottom_wants_ties):
+            and bottom_needs_waist_loop):
         st_polys = polygon_recipes.side_tie({
             "front_top_v": bot_params.get("front_top_v", 0.25),
             "back_top_v": bot_params.get("back_top_v", 0.25),
