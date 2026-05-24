@@ -1178,6 +1178,7 @@ def build_fabric_shell(body_mesh: o3d.geometry.TriangleMesh, body_uvs: np.ndarra
                        offset: float = 0.3,
                        max_torso_radius: float = 20.0,
                        body_deployment=None,
+                       cutout_polys: list[list[tuple[float, float]]] | None = None,
                        ) -> o3d.geometry.TriangleMesh:
     """Build a thin fabric shell from the body's triangles that fall inside
     any Genome UV polygon. Each such triangle gets offset outward along its
@@ -1281,6 +1282,23 @@ def build_fabric_shell(body_mesh: o3d.geometry.TriangleMesh, body_uvs: np.ndarra
     except Exception:
         # Fallback to constant max_torso_radius
         tri_inside &= tri_r < max_torso_radius
+
+    # Cutout subtraction. A triangle whose CENTROID falls inside any
+    # cutout polygon (defined in genome UV space) is dropped, leaving
+    # the body visible through the hole.
+    # Added 2026-05-24 Phase 1f.
+    if cutout_polys:
+        # Per-vertex genome-uv coords (pts_g) -> per-triangle centroid uv.
+        # pts_g is shape (n_verts_per_tri*3, 2) flattened over triangles.
+        tri_uv_centroid = pts_g.reshape(-1, 3, 2).mean(axis=1)   # (n_tri, 2)
+        cutout_mask = np.zeros(len(tri_uv_centroid), dtype=bool)
+        for cpoly in cutout_polys:
+            if len(cpoly) < 3:
+                continue
+            cp = np.asarray(cpoly, dtype=np.float32)
+            cpath = Path(cp)
+            cutout_mask |= cpath.contains_points(tri_uv_centroid)
+        tri_inside &= ~cutout_mask
 
     if not tri_inside.any():
         return o3d.geometry.TriangleMesh()

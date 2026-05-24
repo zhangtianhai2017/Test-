@@ -151,9 +151,22 @@ def render_views(genome: Genome, params, out_dir: str,
     if polys_uv is None:
         polys_uv = genome_polygons(g)
 
+    # Cutout polygons (Phase 1f, 2026-05-24). Mode is carried on
+    # outfit.global_design['cutout_mode']; defaults to 'none' = no-op.
+    cutout_polys = []
+    if params.outfit is not None:
+        cm = params.outfit.global_design.get("cutout_mode", "none")
+        if cm and cm != "none":
+            try:
+                from cutout_polygons import cutout_polygons as _cop
+                cutout_polys = _cop(cm, params.outfit.archetype)
+            except Exception as exc:
+                print(f"  cutout {cm} failed: {exc}; ignoring")
+
     shell = build_fabric_shell(body_mesh, body_uvs, polys_uv,
                                 offset=params.shell_offset_cm,
-                                body_deployment=body_deployment)
+                                body_deployment=body_deployment,
+                                cutout_polys=cutout_polys)
     if len(shell.vertices) > 0:
         shell = polish_shell(
             shell, body_mesh, polys_uv, yc, yn,

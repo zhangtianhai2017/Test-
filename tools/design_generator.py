@@ -112,6 +112,7 @@ DEFAULT_DISCRETE_SIZES = {
     "hardware":  10,
     "pattern":   12,    # see verify_ga_uv.PATTERNS
     "weave":     16,    # see render3d_uv._WEAVE_BUILDERS
+    "cutout":    15,    # see cutout_polygons.CUTOUT_MODES
 }
 
 
@@ -134,6 +135,11 @@ def discrete_sizes_from_library() -> dict[str, int]:
             n_weave = len(_WEAVES)
         except Exception:
             n_weave = 16
+        try:
+            from cutout_polygons import CUTOUT_MODES as _CUTOUTS
+            n_cutout = len(_CUTOUTS)
+        except Exception:
+            n_cutout = 1   # only "none"
         return {
             "archetype": 4,
             "cup":       len(ld.CUP_PIECES),
@@ -144,6 +150,7 @@ def discrete_sizes_from_library() -> dict[str, int]:
             "hardware":  len(ld.HARDWARE),
             "pattern":   n_pattern,
             "weave":     n_weave,
+            "cutout":    n_cutout,
         }
     except Exception:
         return dict(DEFAULT_DISCRETE_SIZES)

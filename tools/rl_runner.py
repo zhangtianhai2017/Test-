@@ -60,7 +60,9 @@ from train_loop import TrainLoop, DEFAULT_BRIEFS
 def get_id_lists() -> dict[str, list]:
     # 2026-05-24: pattern + weave lists now pulled from verify_ga_uv so
     # library expansions (Phase 1e) are reflected here automatically.
+    # cutout list added Phase 1f.
     from verify_ga_uv import PATTERNS, FABRIC_WEAVES
+    from cutout_polygons import CUTOUT_MODES
     return {
         "archetype": [
             "triangle_string_halter", "bandeau_back_band",
@@ -73,6 +75,7 @@ def get_id_lists() -> dict[str, list]:
         "hardware":  list(ld.HARDWARE.keys()),
         "pattern":   list(PATTERNS),
         "weave":     list(FABRIC_WEAVES),
+        "cutout":    list(CUTOUT_MODES),
     }
 
 
@@ -163,6 +166,9 @@ class ConfigToOutfit:
         outfit.global_design["secondary_hue"]  = float(config["secondary_hue"][i].item())
         outfit.global_design["pattern_overlay"] = self._pick("pattern", picks, i)
         outfit.global_design["pattern_scale"]  = float(config["pattern_scale"][i].item())
+        # Cutout mode (Phase 1f, 2026-05-24). "none" = default no-op.
+        if "cutout" in picks:
+            outfit.global_design["cutout_mode"] = self._pick("cutout", picks, i)
         outfit.global_design["asym_amount"]    = float(config["asym_amount"][i].item())
         outfit.global_design["geom_ratio_pull"] = float(config["geom_ratio_pull"][i].item())
 
