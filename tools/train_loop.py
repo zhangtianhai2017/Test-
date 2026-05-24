@@ -38,8 +38,21 @@ from torch.optim import AdamW
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from symbolic_fitness import total_fitness as sym_fitness, FitnessWeights
-from design_generator import DesignGenerator, MockTextEncoder
+from design_generator import DesignGenerator, MockTextEncoder, CONTINUOUS_SPECS
 from vision_judge import VisionJudge, MockVisionJudge, JudgeResult
+
+import math as _math
+
+# Geometric continuous fields (11) that sym_fitness pulls toward
+# safe-middle values, so they collapse across briefs unless we
+# give them an explicit batch-variance bonus.
+_GEOM_FIELDS = (
+    "top_center_v", "top_half_u", "top_half_v", "top_inner_u",
+    "top_apex_lift", "top_underband_dip",
+    "bot_front_top_v", "bot_front_half_u", "bot_front_leg_curve",
+    "bot_back_top_v", "bot_back_half_u",
+)
+_CONT_SPEC_LO_HI = {name: (lo, hi) for name, lo, hi in CONTINUOUS_SPECS}
 
 
 # ---------------------------------------------------------------------------
@@ -121,6 +134,8 @@ class TrainLoop:
                  cont_var_coef: float = 0.0,
                  trunk_var_coef: float = 0.0,
                  batch_div_coef: float = 0.0,
+                 geom_var_coef: float = 0.0,
+                 hue_circ_coef: float = 0.0,
                  baseline_alpha: float = 0.9,
                  device: str = "cpu",
                  run_dir: Optional[str] = None):
@@ -187,6 +202,26 @@ class TrainLoop:
         # priority: silhouette/cut variety > color matching).
         # Typical 0.1-0.5.
         self.batch_div_coef = batch_div_coef
+        # geom_var_coef: batch variance bonus on the 11 GEOMETRIC
+        # continuous outputs (top_*, bot_*). Without this, sym fitness
+        # pulls them all to "safe middle" and stdev ~ 0.003-0.02
+        # across briefs — even though batch_div diversifies discrete
+        # cup_id/bottom_id picks, the silhouette geometry stays
+        # identical, so renders look like "one design family".
+        # Loss term: - geom_var_coef * sum over 11 fields of
+        #    var(normalized_value), where normalized = (v - lo)/(hi - lo).
+        # Typical 5-20.
+        self.geom_var_coef = geom_var_coef
+        # hue_circ_coef: circular spreading regularizer for hue. Hue
+        # is on a circle (0 == 1 == red), so plain variance can be
+        # high while all samples cluster at 0 and 1 (both red).
+        # We map hue -> angle and minimize the magnitude R of the
+        # mean direction vector:
+        #   R = sqrt(mean(cos 2pi*h))^2 + mean(sin 2pi*h))^2)
+        # R = 1 -> all hues at same point; R = 0 -> uniform on circle.
+        # Loss term: + hue_circ_coef * R  (minimize R).
+        # Also applied to secondary_hue. Typical 1-5.
+        self.hue_circ_coef = hue_circ_coef
         self.baseline_R = 0.0
         self.baseline_alpha = baseline_alpha
         self.device = device
@@ -428,6 +463,44 @@ class TrainLoop:
         else:
             trunk_var = torch.zeros((), device=self.device)
 
+        # Geometric continuous variance bonus. Pushes the 11 geom
+        # params (top_*, bot_*) to have batch-spread, so different
+        # briefs get different silhouettes (cup height, panel width,
+        # leg curve, ...). Without this, sym fitness pulls all of
+        # them to identical safe-middle values across briefs.
+        if self.geom_var_coef > 0 and config["hue"].numel() > 1:
+            geom_vars = []
+            for f in _GEOM_FIELDS:
+                if f not in config:
+                    continue
+                lo, hi = _CONT_SPEC_LO_HI[f]
+                rng = max(hi - lo, 1e-6)
+                normalized = (config[f] - lo) / rng       # ~ [0,1]
+                geom_vars.append(normalized.var(unbiased=False))
+            geom_var = (torch.stack(geom_vars).mean()
+                         if geom_vars
+                         else torch.zeros((), device=self.device))
+        else:
+            geom_var = torch.zeros((), device=self.device)
+
+        # Hue circular regularizer. Hue lives on a circle (0 == 1 == red);
+        # plain variance can be high while all samples bunch at 0 and 1.
+        # Map hue -> angle, compute R = magnitude of mean direction.
+        # R = 1 -> all at same point (bad); R = 0 -> uniform on circle.
+        # Minimize R to spread on the circle.
+        if self.hue_circ_coef > 0 and config["hue"].numel() > 1:
+            two_pi = 2.0 * _math.pi
+            def _circ_R(values):
+                ang = two_pi * values
+                c = torch.cos(ang).mean()
+                s = torch.sin(ang).mean()
+                return torch.sqrt(c * c + s * s + 1e-10)
+            R_hue = _circ_R(config["hue"])
+            R_sh  = _circ_R(config["secondary_hue"])
+            hue_circ = (R_hue + R_sh) / 2.0
+        else:
+            hue_circ = torch.zeros((), device=self.device)
+
         # Batch-level shape diversity bonus. For each discrete head,
         # the mean-of-softmax over the batch should NOT concentrate on
         # one action — that would mean every brief picks the same
@@ -458,7 +531,9 @@ class TrainLoop:
                        + self.kl_uniform_coef * mean_kl_to_u
                        - self.cont_var_coef * cont_var
                        - self.trunk_var_coef * trunk_var
-                       - self.batch_div_coef * batch_div)
+                       - self.batch_div_coef * batch_div
+                       - self.geom_var_coef * geom_var
+                       + self.hue_circ_coef * hue_circ)
 
         self.opt.zero_grad()
         loss_total.backward()

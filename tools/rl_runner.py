@@ -239,6 +239,8 @@ def run(iters: int = 20,
          cont_var_coef: float = 0.0,   # anti-collapse: hue/sat/lit variance bonus
          trunk_var_coef: float = 0.0,  # anti-collapse: hidden-state variance bonus
          batch_div_coef: float = 0.0,  # shape diversity: batch-avg softmax entropy
+         geom_var_coef: float = 0.0,   # geom variance: batch spread on 11 geometric continuous fields
+         hue_circ_coef: float = 0.0,   # hue circular spread: avoid 0/1 bimodal collapse
          encoder_name: str = "mock",   # "mock" (sha256 hash) or "sbert"
          judge_concurrent: int = 1,    # vllm judge concurrent calls
          judge_backend: str = "mock",
@@ -284,6 +286,8 @@ def run(iters: int = 20,
                       cont_var_coef=cont_var_coef,
                       trunk_var_coef=trunk_var_coef,
                       batch_div_coef=batch_div_coef,
+                      geom_var_coef=geom_var_coef,
+                      hue_circ_coef=hue_circ_coef,
                       run_dir=out_root)
 
     rng = rd.Random(seed)
@@ -354,6 +358,18 @@ def main():
                          "entropy[batch_avg_probs]). Pushes the 32 "
                          "samples to use DIFFERENT archetype/cup/bottom "
                          "IDs, not all the same. Typical 0.1-0.5.")
+    ap.add_argument("--geom-var-coef", type=float, default=0.0,
+                    help="batch variance bonus on 11 geometric continuous "
+                         "params (top_*, bot_*). Without it sym_fitness "
+                         "pulls all to safe-middle so silhouettes look "
+                         "identical even when discrete picks vary. "
+                         "Typical 5-20.")
+    ap.add_argument("--hue-circ-coef", type=float, default=0.0,
+                    help="hue circular spreading: hue is on a circle, "
+                         "0==1==red. plain variance can be high while "
+                         "all samples bunch at the two extremes. R = "
+                         "magnitude of mean direction vector; minimize "
+                         "R to spread on the color wheel. Typical 1-5.")
     ap.add_argument("--encoder", choices=["mock", "sbert"], default="mock",
                     help="text encoder. mock=sha256 hash (no semantics, "
                          "for tests). sbert=sentence-transformers "
@@ -381,6 +397,8 @@ def main():
          cont_var_coef=args.cont_var_coef,
          trunk_var_coef=args.trunk_var_coef,
          batch_div_coef=args.batch_div_coef,
+         geom_var_coef=args.geom_var_coef,
+         hue_circ_coef=args.hue_circ_coef,
          encoder_name=args.encoder,
          judge_concurrent=args.judge_concurrent,
          judge_backend=args.judge, hidden_dim=args.hidden_dim,
