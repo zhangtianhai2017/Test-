@@ -552,9 +552,29 @@ def outfit_to_garment(outfit: Outfit) -> Garment:
                     edge_names=["waistband"] * (len(p) - 1),
                 ))
 
-    # ---- Side ties (only for triangle archetype with side_tie slot) ----
+    # ---- Side ties (Phase 2 rewrite 2026-05-24) ----
+    # OLD: emit shared side_tie polygon at u=±0.5 whenever outfit had a
+    #      side_tie slot. random_outfit auto-fills optional slots ~50%
+    #      so most outfits got these strips regardless of design intent.
+    #      Result: visible "bowtie" strips on body sides on many renders.
+    # NEW: only emit side-tie panels when the SELECTED bottom template's
+    #      tags explicitly call for them (tie_side / strappy_side /
+    #      brazilian-style bottoms). For other bottoms (brief / highwaist /
+    #      sport boy_short / etc.) the bottom IS continuous and needs no
+    #      separate tie panel.
     side_tie_assn = outfit.first_assignment("side_tie")
-    if side_tie_assn is not None and bot_front_assn is not None:
+    bot_entry_for_tie = (_entry(bot_front_assn.library_id)
+                          if bot_front_assn is not None else None)
+    bottom_wants_ties = (
+        bot_entry_for_tie is not None and (
+            "tie_side" in bot_entry_for_tie.tags
+            or "tie-side" in bot_entry_for_tie.tags
+            or "strappy_side" in bot_entry_for_tie.tags
+            or "brazilian" in bot_entry_for_tie.tags
+        )
+    )
+    if (side_tie_assn is not None and bot_front_assn is not None
+            and bottom_wants_ties):
         st_polys = polygon_recipes.side_tie({
             "front_top_v": bot_params.get("front_top_v", 0.25),
             "back_top_v": bot_params.get("back_top_v", 0.25),
