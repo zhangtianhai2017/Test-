@@ -41,9 +41,18 @@ V_HI_SAFE = 0.55
 V_LO_SAFE = 0.16
 
 
+# Bottom polygon u SAFETY cap — never let polygon wrap past body
+# side silhouette. Body in cylindrical UV: u=0 is front center,
+# u=±0.5 is body side (90° wrap), beyond is the back. A bottom
+# polygon at u=±0.65 wraps around to the back side, creating a
+# visible "ring across abdomen" when seen from front camera.
+U_BOTTOM_MAX = 0.55
+
+
 def _clip_v(poly, v_lo=V_LO_SAFE, v_hi=V_HI_SAFE):
-    """Clip each vertex's v coord to safe anatomy band."""
-    return [(u, max(v_lo, min(v_hi, v))) for u, v in poly]
+    """Clip each vertex's u to body-front, v to safe anatomy band."""
+    return [(max(-U_BOTTOM_MAX, min(U_BOTTOM_MAX, u)),
+             max(v_lo, min(v_hi, v))) for u, v in poly]
 
 
 # ===========================================================================
@@ -445,15 +454,23 @@ GEOMETRY_TO_BOT_RECIPE = {
 
 def resolve_bot_recipe(geometry_kind: str) -> Callable:
     """Resolve a bottom template's front-polygon recipe by geometry_kind.
-    Returns a wrapped function that clips polygon v coords to anatomy-
-    safe range. highwaist uses a wider v range (allowed up to 0.55).
+    Wraps with:
+      1. coverage bump: front_half_u multiplied 1.15 + front_top_v
+         pulled up 0.03 — gives per-type bottoms more fabric area to
+         clear CV's pelvic_cov gate (Phase 2 #6 had pass-rate drop).
+         Multiplicative bump preserves type identity (minimal still
+         minimal, just enough larger to register).
+      2. v-clip to anatomy-safe band [0.16, 0.55] (highwaist 0.60).
     Falls back to bot_brief for unknown kinds.
     """
     name = GEOMETRY_TO_BOT_RECIPE.get(geometry_kind, "bot_brief")
     fn = BOTTOM_RECIPES[name]
-    # highwaist legitimately extends higher; allow up to 0.60
     v_hi = 0.60 if "highwaist" in name else V_HI_SAFE
     def _wrapped(params):
+        # 2026-05-24 hotfix removed: front_half_u bump compounded
+        # with L-size schema scale and pushed boy_short polygon u
+        # to ±0.71, wrapping past body silhouette as a visible
+        # "abdominal ring" artifact. Use schema params as-is.
         return _clip_v(fn(params), v_hi=v_hi)
     _wrapped.__name__ = fn.__name__
     return _wrapped

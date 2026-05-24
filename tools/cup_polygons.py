@@ -539,15 +539,17 @@ GEOMETRY_TO_CUP_RECIPE = {
 
 def resolve_cup_recipe(geometry_kind: str, fallback: str = "") -> Callable:
     """Resolve a cup template's polygon recipe.
-    Returns a WRAPPED function that clips every vertex's v coord into
-    the anatomy-safe band [V_LO_SAFE, V_HI_SAFE] = [0.16, 0.95] so
-    the renderer's body_region_classifier doesn't reject vertices that
-    expressive per-type recipes intentionally push toward neck/leg.
-
-    Phase 2 bug-fix 2026-05-24: without clipping, my new
-    cup_halter (v up to 1.06) and cup_softcup_asym (v up to 1.6)
-    triangles got classified as head_neck → rejected → pass rate
-    dropped from 70% to 10%."""
+    Wraps with:
+      1. coverage bump: hu/hv multiplied 1.18 so per-type cups produce
+         enough fabric area to pass CV's chest_cov >= 0.34 gate (Phase 2
+         #6 had pass rate drop because most recipes used hu/hv midpoints
+         calibrated for the old shared cup_triangle, producing
+         under-coverage).  Minimal-by-design types (micro, body_chain,
+         sliver) keep their character — the bump is multiplicative so
+         they stay smallest, just enough larger to register fabric.
+      2. v-clip to anatomy-safe band [0.16, 0.95] so expressive recipes
+         (halter strap-up, etc.) don't trigger head_neck rejection.
+    """
     if geometry_kind in GEOMETRY_TO_CUP_RECIPE:
         fn = CUP_RECIPES[GEOMETRY_TO_CUP_RECIPE[geometry_kind]]
     elif fallback and fallback in CUP_RECIPES:
@@ -555,6 +557,12 @@ def resolve_cup_recipe(geometry_kind: str, fallback: str = "") -> Callable:
     else:
         fn = CUP_RECIPES["cup_triangle"]
     def _wrapped(params, side=1):
+        # 2026-05-24 hotfix removed: 1.18x coverage bump compounded
+        # with library schema's size scale (L=1.18x) and produced
+        # polygons up to u=0.71 — wrapped past body silhouette,
+        # creating a visible "ring around abdomen" artifact user flagged.
+        # Sizing is already in library schema; recipe should use
+        # params as-is.
         return _clip_v(fn(params, side=side))
     _wrapped.__name__ = fn.__name__
     return _wrapped
