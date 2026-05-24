@@ -22,6 +22,21 @@ def _p(params: dict, name: str, default: float) -> float:
     return float(params.get(name, default))
 
 
+# v-coordinate safety band — keeps polygon vertices inside the
+# body_region_classifier's torso/pelvis zone. Above 0.95 the renderer
+# rejects triangles as head_neck. Below 0.16 they'd land in legs.
+# Phase 2 bug-fix 2026-05-24: clip every cup polygon vertex into
+# this range before returning, so per-type recipes can specify
+# expressive shapes without anatomy overflow.
+V_HI_SAFE = 0.95
+V_LO_SAFE = 0.16
+
+
+def _clip_v(poly):
+    """Clip each vertex's v coord to safe anatomy band."""
+    return [(u, max(V_LO_SAFE, min(V_HI_SAFE, v))) for u, v in poly]
+
+
 # ===========================================================================
 # CUP POLYGON RECIPES (per TYPE, not shared)
 # Each TYPE has its own polygon shape derived from a real-world cup style.
@@ -524,13 +539,25 @@ GEOMETRY_TO_CUP_RECIPE = {
 
 def resolve_cup_recipe(geometry_kind: str, fallback: str = "") -> Callable:
     """Resolve a cup template's polygon recipe.
-    Falls back to fallback (e.g. base_polygon_recipe) if geometry_kind
-    not in the per-type map, then to cup_triangle as last resort."""
+    Returns a WRAPPED function that clips every vertex's v coord into
+    the anatomy-safe band [V_LO_SAFE, V_HI_SAFE] = [0.16, 0.95] so
+    the renderer's body_region_classifier doesn't reject vertices that
+    expressive per-type recipes intentionally push toward neck/leg.
+
+    Phase 2 bug-fix 2026-05-24: without clipping, my new
+    cup_halter (v up to 1.06) and cup_softcup_asym (v up to 1.6)
+    triangles got classified as head_neck → rejected → pass rate
+    dropped from 70% to 10%."""
     if geometry_kind in GEOMETRY_TO_CUP_RECIPE:
-        return CUP_RECIPES[GEOMETRY_TO_CUP_RECIPE[geometry_kind]]
-    if fallback and fallback in CUP_RECIPES:
-        return CUP_RECIPES[fallback]
-    return CUP_RECIPES["cup_triangle"]
+        fn = CUP_RECIPES[GEOMETRY_TO_CUP_RECIPE[geometry_kind]]
+    elif fallback and fallback in CUP_RECIPES:
+        fn = CUP_RECIPES[fallback]
+    else:
+        fn = CUP_RECIPES["cup_triangle"]
+    def _wrapped(params, side=1):
+        return _clip_v(fn(params, side=side))
+    _wrapped.__name__ = fn.__name__
+    return _wrapped
 
 
 if __name__ == "__main__":

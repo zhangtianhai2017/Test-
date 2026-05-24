@@ -33,6 +33,19 @@ def _p(params: dict, name: str, default: float) -> float:
     return float(params.get(name, default))
 
 
+# v-coordinate safety band for bottom polygons. Below 0.16 lands in
+# legs (rejected by body_region_classifier). Above 0.55 lands in
+# upper torso (above natural waist), only highwaist legitimately
+# reaches there.
+V_HI_SAFE = 0.55
+V_LO_SAFE = 0.16
+
+
+def _clip_v(poly, v_lo=V_LO_SAFE, v_hi=V_HI_SAFE):
+    """Clip each vertex's v coord to safe anatomy band."""
+    return [(u, max(v_lo, min(v_hi, v))) for u, v in poly]
+
+
 # ===========================================================================
 # 19 BOTTOM FRONT POLYGON RECIPES
 # Each TYPE produces a visually distinct silhouette.
@@ -432,9 +445,18 @@ GEOMETRY_TO_BOT_RECIPE = {
 
 def resolve_bot_recipe(geometry_kind: str) -> Callable:
     """Resolve a bottom template's front-polygon recipe by geometry_kind.
-    Falls back to bot_brief for unknown kinds."""
+    Returns a wrapped function that clips polygon v coords to anatomy-
+    safe range. highwaist uses a wider v range (allowed up to 0.55).
+    Falls back to bot_brief for unknown kinds.
+    """
     name = GEOMETRY_TO_BOT_RECIPE.get(geometry_kind, "bot_brief")
-    return BOTTOM_RECIPES[name]
+    fn = BOTTOM_RECIPES[name]
+    # highwaist legitimately extends higher; allow up to 0.60
+    v_hi = 0.60 if "highwaist" in name else V_HI_SAFE
+    def _wrapped(params):
+        return _clip_v(fn(params), v_hi=v_hi)
+    _wrapped.__name__ = fn.__name__
+    return _wrapped
 
 
 if __name__ == "__main__":
