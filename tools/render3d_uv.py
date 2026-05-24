@@ -795,40 +795,44 @@ def _place_at(mesh: o3d.geometry.TriangleMesh, center: np.ndarray,
     return out
 
 
-def _build_oring_meshes(g, body_vertices, y_crotch, y_neck, v_to_y):
+def _build_oring_meshes(g, body_vertices, y_crotch, y_neck, v_to_y,
+                          anchor_specs: tuple = ()):
     """O-ring torus meshes for hardware accessories.
 
     Phase 2 rewrite (2026-05-24): previously hardcoded THREE anchors
     (sternum + left hip + right hip) for every O-ring activation, which
-    created a recurring "circular ring at navel-side" artifact that user
-    identified as permanent visual sameness — those hip rings were
-    visible-from-front for nearly half of all designs (whenever
-    random_outfit's optional `oring` slot got filled).
+    created the recurring "circular ring at navel" artifact (those hip
+    rings visible-from-front whenever random_outfit picked an oring).
 
-    New behavior: only ONE anchor — at the front-center gore (sternum) —
-    which is the anatomically correct place for a halter-neck O-ring
-    junction. The hip rings are GONE. Future per-hardware refactor will
-    let specific hardware items (e.g., HW_HIP_RING_SET) opt back in to
-    multi-anchor placement via library entry's anchor_specs.
-
-    Gating still uses g.has_oring; future per-hardware path will key on
-    the specific oring_id selected.
+    Phase 2 #5 + (2026-05-25): legacy default stays one-anchor at sternum;
+    a library entry can override via anchor_specs = (
+        (u0, v0, "name0"), (u1, v1, "name1"), ...
+    ) — each tuple is (u, v, label) and produces one O-ring at that
+    body-surface location. Empty tuple = legacy sternum-only behavior.
     """
     if g.has_oring < 0.5:
         return []
     size = 0.25 + 0.8 * g.oring_size  # cm major radius 0.25..1.05
     minor = 0.12 * size
 
-    # Only the sternum / front gore anchor. No more hip rings.
-    y = v_to_y(g.top_center_v)
-    anchors = [("front_gore", 0.0, y)]
+    # Build anchor list: prefer library-supplied anchor_specs, else
+    # fall back to the legacy single sternum anchor.
+    anchors: list[tuple[str, float, float]] = []
+    if anchor_specs:
+        for spec in anchor_specs:
+            try:
+                u, v, name = float(spec[0]), float(spec[1]), str(spec[2])
+            except (IndexError, ValueError, TypeError):
+                continue
+            anchors.append((name, u, v_to_y(v)))
+    if not anchors:
+        anchors = [("front_gore", 0.0, v_to_y(g.top_center_v))]
 
     out = []
     for name, u, yy in anchors:
         p = _body_point_at(body_vertices, u, yy)
         rxz = np.array([p[0], 0.0, p[2]])
         rxz /= max(np.linalg.norm(rxz), 1e-6)
-        # torus sits on surface, facing outward
         torus = _build_torus(size, minor)
         mesh = _place_at(torus, p + rxz * (minor + 0.3), rxz)
         mesh.compute_vertex_normals()
@@ -2401,18 +2405,39 @@ def _build_strap_meshes_garment(body_mesh,
         except Exception:
             pass
 
-    # 6) O-rings — at strap junctions when a connector kind=o_ring exists
+    # 6) O-rings — at strap junctions when a connector kind=o_ring exists.
+    # Phase 2 #5+ (2026-05-25): if the connector's library entry has
+    # non-empty anchor_specs, place an O-ring at each (u, v, name)
+    # there; else fall back to the per-cup-top-corner pair.
     rings = [c for c in garment.connectors if c.kind == "o_ring"]
     if rings:
-        # Reuse v1 helper but with our SKU radius.
+        try:
+            from library_data import LIBRARY as _LIB_O
+        except Exception:
+            _LIB_O = {}
         for c in rings:
             radius_cm = c.diameter_cm * 0.5
-            cup_top_v = g.top_center_v + g.top_half_v
-            u_outer = g.top_inner_u + 2 * g.top_half_u
-            y_top = v_to_y(cup_top_v)
-            for u_s, side in ((u_outer, "R"), (-u_outer, "L")):
+            lib_entry = _LIB_O.get(getattr(c, "id", ""), None)
+            specs = tuple(getattr(lib_entry, "anchor_specs", ()) or ())
+
+            anchors_xy = []  # list[(side_label, u, y_world)]
+            if specs:
+                for spec in specs:
+                    try:
+                        u, v, name = float(spec[0]), float(spec[1]), str(spec[2])
+                    except (IndexError, ValueError, TypeError):
+                        continue
+                    anchors_xy.append((name, u, v_to_y(v)))
+            if not anchors_xy:
+                # legacy: pair at cup-top outer corners (R + L)
+                cup_top_v = g.top_center_v + g.top_half_v
+                u_outer = g.top_inner_u + 2 * g.top_half_u
+                y_top = v_to_y(cup_top_v)
+                anchors_xy = [("R", u_outer, y_top), ("L", -u_outer, y_top)]
+
+            for side, u_s, yy in anchors_xy:
                 try:
-                    anc = _body_point_at(V, u_s, y_top, max_torso_radius=18.0)
+                    anc = _body_point_at(V, u_s, yy, max_torso_radius=18.0)
                     ring = _build_torus(anc, radius_cm, tube_radius=0.08)
                     straps.append((f"oring_{side}", ring))
                 except Exception:
