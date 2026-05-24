@@ -304,9 +304,37 @@ def run(iters: int = 20,
         ckpt = torch.load(resume_from)
         # Older saves used "generator_state", newer use "gen_state".
         sd = ckpt.get("gen_state") or ckpt.get("generator_state") or ckpt
-        gen.load_state_dict(sd)
+        # First try strict load — if every tensor matches, fast path.
+        # Otherwise fall back to per-tensor loading that skips heads
+        # whose shape has changed (e.g., a discrete head expanded after
+        # new library entries). Skipped heads keep their random init
+        # and re-learn from scratch; everything else carries over.
+        try:
+            gen.load_state_dict(sd, strict=True)
+            loaded_mode = "strict"
+            skipped = []
+        except RuntimeError:
+            own = gen.state_dict()
+            skipped = []
+            filtered = {}
+            for k, v in sd.items():
+                if k in own and own[k].shape == v.shape:
+                    filtered[k] = v
+                else:
+                    skipped.append(
+                        f"{k} "
+                        f"(ckpt={tuple(v.shape) if hasattr(v,'shape') else '?'} "
+                        f"vs model="
+                        f"{tuple(own[k].shape) if k in own else 'missing'})")
+            gen.load_state_dict(filtered, strict=False)
+            loaded_mode = f"partial — {len(skipped)} tensor(s) reinitialized"
         prev_iter = ckpt.get("iter", "?") if isinstance(ckpt, dict) else "?"
-        print(f"resumed weights from {resume_from} (was iter {prev_iter})")
+        print(f"resumed weights from {resume_from} (was iter {prev_iter}; "
+              f"{loaded_mode})")
+        for s in skipped[:8]:
+            print(f"  reinit: {s}")
+        if len(skipped) > 8:
+            print(f"  ... and {len(skipped)-8} more")
 
     judge_kwargs = {}
     if judge_backend == "vllm" and judge_concurrent > 1:
