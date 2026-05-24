@@ -412,8 +412,18 @@ def _make_bottom_pieces(bottom_entry: LibraryEntry,
       3. back_cheeky (safe fallback for unknown geometry_kind)
     """
     pieces: list[PatternPiece] = []
-    front_poly = polygon_recipes.call_recipe(
-        bottom_entry.base_polygon_recipe, local_params)
+    # Per-bottom-TYPE front polygon (Phase 2 #6a, 2026-05-24). Old path
+    # called polygon_recipes.bottom_thong / bottom_brief shared by 50+
+    # templates — all produced same 7-point hexagon. New path resolves
+    # to one of 19 unique per-type front recipes via geometry_kind.
+    try:
+        from bottom_polygons import resolve_bot_recipe
+        bot_front_fn = resolve_bot_recipe(bottom_entry.geometry_kind)
+        front_poly = bot_front_fn(local_params)
+    except Exception:
+        # Fallback to legacy shared recipe for unknown geometry_kind
+        front_poly = polygon_recipes.call_recipe(
+            bottom_entry.base_polygon_recipe, local_params)
     en_front = ["waistband", "leg_opening", "inseam",
                 "leg_opening", "side_seam", "leg_opening"]
     pieces.append(PatternPiece(
