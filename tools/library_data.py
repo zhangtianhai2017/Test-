@@ -466,6 +466,255 @@ for cov_class, scale in (("S", 0.85), ("M", 1.00)):
 
 
 # ---------------------------------------------------------------------------
+# BOTTOM_PIECES — Phase 1c expansion: 14 new families × 3 sizes = 42
+# new pieces (10 -> 52). Reuses bottom_thong / bottom_brief recipes
+# with new param signatures. Each style is anchored in a real fashion
+# category.
+# References:
+#   hipster        — mid-rise wide brief (Tommy Hilfiger hipster)
+#   boy_short      — boyleg trunk, longer leg-line (Speedo BoyLeg)
+#   tanga          — between thong and brazilian (Vix tanga)
+#   v_front        — sharp V notch in front waistband (Triangl V-front)
+#   high_leg       — standard coverage, very high leg cut (Calzedonia)
+#   strappy_side   — multiple thin side straps (Frankies, House of CB)
+#   asymm_bot      — asymmetric front-band notch
+#   ruched         — gathered-fabric look at center back (Hunza G)
+#   tie_side       — bow-tied side detail (Bali, ZAFUL tie)
+#   double_band    — two parallel side bands (Adore Me cage style)
+#   --- minimal / extreme tier ---
+#   g_string       — ultra-thin strings, near-nude (Honey Birdette)
+#   micro_bot      — between thong and g-string
+#   sling_front    — V-cut down from cup to crotch (sling bikini, monokini)
+#   side_string_only — string side only, fabric near-absent
+# ---------------------------------------------------------------------------
+
+_NEW_BOTTOM_STYLES = {
+    "HIPSTER": {
+        "name_suffix": "hipster",
+        "tags": ("hipster", "medium_coverage", "mid_rise"),
+        "recipe": "bottom_brief",
+        "geometry_kind": "hipster",
+        "coverage_class": "medium",
+        "params": {
+            "front_top_v":   (0.28, 0.36, 0.32),
+            "front_half_u":  (0.40, 0.50, 0.45),
+            "front_leg_curve": (0.20, 0.45, 0.32),
+            "back_top_v":    (0.28, 0.36, 0.32),
+            "back_half_u":   (0.30, 0.42, 0.36),
+        },
+    },
+    "BOY_SHORT": {
+        "name_suffix": "boy-short",
+        "tags": ("boy_short", "trunk", "full_coverage", "sport"),
+        "recipe": "bottom_brief",
+        "geometry_kind": "boy_short",
+        "coverage_class": "full",
+        "params": {
+            "front_top_v":   (0.34, 0.42, 0.38),
+            "front_half_u":  (0.48, 0.58, 0.52),
+            "front_leg_curve": (0.10, 0.30, 0.20),     # flat low-leg
+            "back_top_v":    (0.34, 0.42, 0.38),
+            "back_half_u":   (0.42, 0.55, 0.48),
+        },
+    },
+    "TANGA": {
+        "name_suffix": "tanga",
+        "tags": ("tanga", "cheeky", "minimal"),
+        "recipe": "bottom_thong",
+        "geometry_kind": "tanga",
+        "coverage_class": "minimal",
+        "params": {
+            "front_top_v":   (0.30, 0.38, 0.34),
+            "front_half_u":  (0.26, 0.34, 0.30),
+            "front_leg_curve": (0.55, 0.78, 0.66),
+            "back_top_v":    (0.28, 0.34, 0.31),
+            "back_half_u":   (0.12, 0.20, 0.16),
+        },
+    },
+    "V_FRONT": {
+        "name_suffix": "V-front-notch",
+        "tags": ("v_front", "notched_waistband", "bold"),
+        "recipe": "bottom_brief",
+        "geometry_kind": "v_front",
+        "coverage_class": "medium",
+        "params": {
+            "front_top_v":   (0.32, 0.42, 0.37),
+            "front_half_u":  (0.42, 0.52, 0.46),
+            "front_leg_curve": (0.65, 0.90, 0.78),    # high leg curve for V
+            "back_top_v":    (0.30, 0.38, 0.34),
+            "back_half_u":   (0.30, 0.42, 0.36),
+        },
+    },
+    "HIGH_LEG": {
+        "name_suffix": "high-leg",
+        "tags": ("high_leg", "leg_lengthening", "bold"),
+        "recipe": "bottom_brief",
+        "geometry_kind": "high_leg",
+        "coverage_class": "medium",
+        "params": {
+            "front_top_v":   (0.35, 0.45, 0.40),
+            "front_half_u":  (0.38, 0.48, 0.42),
+            "front_leg_curve": (0.75, 0.95, 0.85),    # extreme high cut
+            "back_top_v":    (0.32, 0.40, 0.36),
+            "back_half_u":   (0.28, 0.38, 0.33),
+        },
+    },
+    "STRAPPY_SIDE": {
+        "name_suffix": "strappy-side",
+        "tags": ("strappy_side", "cage", "asymmetric_detail"),
+        "recipe": "bottom_brief",
+        "geometry_kind": "strappy_side",
+        "coverage_class": "medium",
+        "params": {
+            "front_top_v":   (0.30, 0.40, 0.35),
+            "front_half_u":  (0.36, 0.46, 0.41),
+            "front_leg_curve": (0.50, 0.70, 0.60),
+            "back_top_v":    (0.30, 0.38, 0.34),
+            "back_half_u":   (0.26, 0.36, 0.31),
+        },
+    },
+    "ASYMM_BOT": {
+        "name_suffix": "asymmetric",
+        "tags": ("asymmetric", "modern", "one_side_high"),
+        "recipe": "bottom_brief",
+        "geometry_kind": "asymm_bot",
+        "coverage_class": "medium",
+        "params": {
+            "front_top_v":   (0.33, 0.43, 0.38),
+            "front_half_u":  (0.38, 0.48, 0.43),
+            "front_leg_curve": (0.45, 0.75, 0.60),
+            "back_top_v":    (0.30, 0.38, 0.34),
+            "back_half_u":   (0.28, 0.38, 0.33),
+        },
+    },
+    "RUCHED": {
+        "name_suffix": "ruched",
+        "tags": ("ruched", "gathered", "texture"),
+        "recipe": "bottom_brief",
+        "geometry_kind": "ruched",
+        "coverage_class": "medium",
+        "params": {
+            "front_top_v":   (0.28, 0.38, 0.33),
+            "front_half_u":  (0.36, 0.46, 0.41),
+            "front_leg_curve": (0.45, 0.70, 0.55),
+            "back_top_v":    (0.28, 0.36, 0.32),
+            "back_half_u":   (0.24, 0.36, 0.30),
+        },
+    },
+    "TIE_SIDE": {
+        "name_suffix": "tie-side",
+        "tags": ("tie_side", "bow", "adjustable"),
+        "recipe": "bottom_thong",
+        "geometry_kind": "tie_side",
+        "coverage_class": "medium",
+        "params": {
+            "front_top_v":   (0.30, 0.40, 0.35),
+            "front_half_u":  (0.32, 0.42, 0.37),
+            "front_leg_curve": (0.55, 0.78, 0.66),
+            "back_top_v":    (0.28, 0.36, 0.32),
+            "back_half_u":   (0.14, 0.22, 0.18),
+        },
+    },
+    "DOUBLE_BAND": {
+        "name_suffix": "double-band",
+        "tags": ("double_band", "cage", "structural"),
+        "recipe": "bottom_brief",
+        "geometry_kind": "double_band",
+        "coverage_class": "medium",
+        "params": {
+            "front_top_v":   (0.32, 0.42, 0.37),
+            "front_half_u":  (0.36, 0.46, 0.41),
+            "front_leg_curve": (0.40, 0.65, 0.52),
+            "back_top_v":    (0.30, 0.38, 0.34),
+            "back_half_u":   (0.26, 0.36, 0.31),
+        },
+    },
+    "G_STRING": {
+        "name_suffix": "g-string",
+        "tags": ("g_string", "minimal", "string", "ultra_minimal"),
+        "recipe": "bottom_thong",
+        "geometry_kind": "g_string",
+        "coverage_class": "minimal",
+        # NOTE: front_half_u bumped up to 0.21-0.28 (was 0.15-0.22) so the
+        # polygon is wide enough for the body mesh to catch >0 triangles.
+        # Truly micro coverage isn't renderable at this body mesh density.
+        "params": {
+            "front_top_v":   (0.32, 0.40, 0.36),
+            "front_half_u":  (0.21, 0.28, 0.24),
+            "front_leg_curve": (0.65, 0.90, 0.80),
+            "back_top_v":    (0.30, 0.36, 0.33),
+            "back_half_u":   (0.06, 0.12, 0.08),
+        },
+    },
+    "MICRO_BOT": {
+        "name_suffix": "micro-bottom",
+        "tags": ("micro", "minimal", "string", "bold"),
+        "recipe": "bottom_thong",
+        "geometry_kind": "micro_bot",
+        "coverage_class": "minimal",
+        "params": {
+            "front_top_v":   (0.32, 0.38, 0.35),
+            "front_half_u":  (0.23, 0.30, 0.26),
+            "front_leg_curve": (0.60, 0.85, 0.74),
+            "back_top_v":    (0.30, 0.36, 0.33),
+            "back_half_u":   (0.08, 0.14, 0.10),
+        },
+    },
+    "SLING_FRONT": {
+        "name_suffix": "sling-front",
+        "tags": ("sling", "monokini_inspired", "V_cut", "extreme"),
+        "recipe": "bottom_thong",
+        "geometry_kind": "sling_front",
+        "coverage_class": "minimal",
+        "params": {
+            "front_top_v":   (0.36, 0.46, 0.41),     # extends up toward chest
+            "front_half_u":  (0.16, 0.24, 0.20),     # narrow V
+            "front_leg_curve": (0.70, 0.92, 0.83),
+            "back_top_v":    (0.28, 0.34, 0.31),
+            "back_half_u":   (0.05, 0.10, 0.07),
+        },
+    },
+    "SIDE_STRING_ONLY": {
+        "name_suffix": "side-string-only",
+        "tags": ("side_string", "minimal", "string_dominant", "extreme"),
+        "recipe": "bottom_thong",
+        "geometry_kind": "side_string_only",
+        "coverage_class": "minimal",
+        "params": {
+            "front_top_v":   (0.32, 0.38, 0.35),
+            "front_half_u":  (0.22, 0.28, 0.25),
+            "front_leg_curve": (0.75, 0.95, 0.85),
+            "back_top_v":    (0.30, 0.34, 0.32),
+            "back_half_u":   (0.05, 0.10, 0.07),
+        },
+    },
+}
+
+# Instantiate each style × S/M/L sizes. half_u dims scale; v dims fixed
+# (already anatomically positioned).
+for _size_class, _scale in (("S", 0.85), ("M", 1.00), ("L", 1.18)):
+    for _style_key, _style in _NEW_BOTTOM_STYLES.items():
+        _id = f"BOT_{_style_key}_{_size_class}"
+        _params = {}
+        for _pname, _vals in _style["params"].items():
+            if "half_u" in _pname:
+                _params[_pname] = tuple(round(v * _scale, 4) for v in _vals)
+            else:
+                _params[_pname] = tuple(round(v, 4) for v in _vals)
+        BOTTOM_PIECES[_id] = LibraryEntry(
+            id=_id, kind="bottom_piece",
+            name=f"{_style['name_suffix'].capitalize()} bottom {_size_class}",
+            tags=_style["tags"],
+            anatomy_hints=("front_pelvis", "back_pelvis"),
+            geometry_kind=_style["geometry_kind"],
+            base_polygon_recipe=_style["recipe"],
+            coverage_class=_style["coverage_class"],
+            local_params_schema=_params,
+        )
+
+# 14 new styles × 3 sizes = 42 new bottoms; 10 + 42 = 52 total.
+
+# ---------------------------------------------------------------------------
 # STRAP_PIECES — 12 entries
 # ---------------------------------------------------------------------------
 
