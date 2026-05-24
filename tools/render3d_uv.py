@@ -2479,16 +2479,29 @@ def _build_strap_meshes_garment(body_mesh,
 
     # 9) Accessories — bow / shell_charm / pendant / fringe / beads / tassel /
     #    ring_charm. Each maps to one of the existing _build_*_mesh helpers
-    #    (which take Genome) — we forward to those.
+    #    (which take Genome) — we forward to those. As of Phase 2 #5 each
+    #    accessory's library entry can supply a placement_key naming a
+    #    multi-anchor recipe in tools/hardware_placements.py (e.g.
+    #    "hip_pair" bows or "halter_loop" beads); empty key = legacy
+    #    single-anchor formula.
+    try:
+        from library import LIBRARY as _LIB
+    except Exception:
+        _LIB = {}
     for acc in garment.accessories:
+        lib_entry = _LIB.get(getattr(acc, "id", ""), None) if _LIB else None
         if acc.kind == "bow":
-            straps.extend(_build_bow_mesh(g, V, v_to_y))
+            pk = getattr(lib_entry, "bow_placement", "") if lib_entry else ""
+            straps.extend(_build_bow_mesh(g, V, v_to_y, placement_key=pk))
         elif acc.kind == "fringe":
-            straps.extend(_build_fringe_meshes(g, V, v_to_y))
+            pk = getattr(lib_entry, "fringe_placement", "") if lib_entry else ""
+            straps.extend(_build_fringe_meshes(g, V, v_to_y, placement_key=pk))
         elif acc.kind == "beads":
-            straps.extend(_build_beads_meshes(g, V, v_to_y))
+            pk = getattr(lib_entry, "beads_placement", "") if lib_entry else ""
+            straps.extend(_build_beads_meshes(g, V, v_to_y, placement_key=pk))
         elif acc.kind == "shell_charm":
-            straps.extend(_build_shell_mesh(g, V, v_to_y))
+            pk = getattr(lib_entry, "shell_placement", "") if lib_entry else ""
+            straps.extend(_build_shell_mesh(g, V, v_to_y, placement_key=pk))
 
     # 10) Body jewelry (v2 — bracelets, necklaces, earrings, anklets,
     # body chains). Each library entry resolves through BodyDeployment to
