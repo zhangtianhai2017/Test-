@@ -133,6 +133,118 @@ def cup_bandeau(params: dict, side: int = 1) -> list[tuple[float, float]]:
     ]
 
 
+def cup_sweetheart(params: dict, side: int = 1) -> list[tuple[float, float]]:
+    """Sweetheart: heart-shaped neckline. Top edge has a CENTER dip
+    (where the two breasts meet) and rises toward the outer side, giving
+    the classic heart/V-with-curves shape.
+
+    9-point polygon traces the heart curve: rises from inner-bottom up
+    over a peak at ~30% of the cup width, dips down again at center for
+    the heart V, mirrors on outer half (per side, the recipe returns one
+    side; mirroring is handled by the caller).
+    """
+    cv = _p(params, "center_v", 0.74)
+    hv = _p(params, "half_v", 0.08)
+    hu = _p(params, "half_u", 0.20)
+    inner_u = _p(params, "inner_u", 0.08)
+    apex_drop = _p(params, "apex_lift", 0.20) * 0.45
+    dip = _p(params, "underband_dip", 0.0) * 0.3
+
+    inner = side * inner_u
+    outer = side * (inner_u + 2 * hu)
+    mid_u = (inner + outer) / 2
+    top_v_outer = cv + hv
+    top_v_peak  = cv + hv + apex_drop * 0.5   # peak slightly above outer
+    top_v_inner = cv + hv - apex_drop * 1.2   # V dip at center for heart
+    bot_v_outer = cv - hv
+    bot_v_inner = cv - hv + dip
+    return [
+        (inner,  top_v_inner),
+        (mid_u * 0.5 + inner * 0.5, top_v_peak),     # upward sweep
+        (mid_u, top_v_outer + apex_drop * 0.2),       # heart bump
+        (mid_u * 0.5 + outer * 0.5, top_v_peak),      # second bump
+        (outer,  top_v_outer),
+        (outer,  bot_v_outer),
+        (mid_u,  (bot_v_outer + bot_v_inner) / 2),    # smooth underband
+        (inner,  bot_v_inner),
+        (inner,  top_v_inner),
+    ]
+
+
+def cup_wrap(params: dict, side: int = 1) -> list[tuple[float, float]]:
+    """Wrap / surplice: asymmetric drape where one cup extends inward
+    past midline, simulating one piece wrapping over the other.
+
+    Side=1 (right) extends inward; side=-1 (left) is the back panel
+    (smaller). Asymmetry creates the visual cross-front drape.
+    """
+    cv = _p(params, "center_v", 0.74)
+    hv = _p(params, "half_v", 0.10)
+    hu = _p(params, "half_u", 0.22)
+    inner_u = _p(params, "inner_u", 0.05)
+    asym = _p(params, "asym_amount", 0.15)
+
+    if side > 0:
+        # Right cup: extends inward past midline by asym (wraps over)
+        inner = -asym * 0.5    # crosses midline
+        outer = inner_u + 2 * hu
+        top_v = cv + hv
+        bot_v = cv - hv
+        # Diagonal top edge — pulls down toward the wrap point
+        top_v_inner = cv + hv - asym * 0.2
+        return [
+            (inner, top_v_inner),
+            (outer, top_v),
+            (outer, bot_v),
+            (inner, bot_v + asym * 0.1),
+            (inner, top_v_inner),
+        ]
+    else:
+        # Left cup: smaller, tucks behind
+        inner = -inner_u
+        outer = -(inner_u + 2 * hu * 0.8)   # narrower
+        top_v = cv + hv * 0.85               # lower top
+        bot_v = cv - hv
+        return [
+            (inner, top_v),
+            (outer, top_v),
+            (outer, bot_v),
+            (inner, bot_v),
+            (inner, top_v),
+        ]
+
+
+def cup_corset_bands(params: dict, side: int = 1) -> list[tuple[float, float]]:
+    """Corset-band cup: stacked horizontal bands giving a corset/lingerie
+    look. Approximated as a single polygon spanning full cup height,
+    with the band detail provided by pattern overlay (the renderer
+    paints horizontal stripes in 'stripe' pattern over this shape).
+
+    Geometrically same as bandeau but TALLER. Distinct from cup_bandeau
+    via wider hv default and slight outer chamfer.
+    """
+    cv = _p(params, "center_v", 0.74)
+    hv = _p(params, "half_v", 0.13)     # taller than bandeau
+    hu = _p(params, "half_u", 0.21)
+    inner_u = _p(params, "inner_u", 0.03)
+    chamfer = _p(params, "apex_lift", 0.10) * 0.15
+
+    inner = side * inner_u
+    outer = side * (inner_u + 2 * hu)
+    top_v = cv + hv
+    bot_v = cv - hv
+    # Chamfered outer corners — slight cut at top-outer and bottom-outer
+    return [
+        (inner, top_v),
+        (outer * 0.92, top_v),
+        (outer, top_v - chamfer),
+        (outer, bot_v + chamfer),
+        (outer * 0.92, bot_v),
+        (inner, bot_v),
+        (inner, top_v),
+    ]
+
+
 # ---------------------------------------------------------------------------
 # Bottom recipes
 # ---------------------------------------------------------------------------
@@ -257,6 +369,9 @@ RECIPES: dict[str, Callable] = {
     "cup_triangle":     cup_triangle,
     "cup_balconette":   cup_balconette,
     "cup_bandeau":      cup_bandeau,
+    "cup_sweetheart":   cup_sweetheart,
+    "cup_wrap":         cup_wrap,
+    "cup_corset_bands": cup_corset_bands,
     "bottom_thong":     bottom_thong,
     "bottom_brief":     bottom_brief,
     "back_bottom_strips": back_bottom_strips,

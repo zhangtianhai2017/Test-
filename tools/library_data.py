@@ -364,6 +364,85 @@ for _size_class, _scale in _SIZE_SCALE_MAP:
 # 27 + 24 new = 51 cup pieces total.
 
 # ---------------------------------------------------------------------------
+# Phase 1b: 3 truly-new cup polygon shapes (not parametric variants of
+# existing recipes) — extends to 60 total cups.
+# References:
+#   sweetheart   — Marlies Dekkers, Wacoal heart-neckline series
+#   wrap         — surplice wrap front (Norma Kamali, Karla Colletto)
+#   corset_bands — corset-style horizontal banded cup (Agent Provocateur
+#                  corset bra, Calzedonia control)
+# ---------------------------------------------------------------------------
+
+_NEW_CUP_SHAPES = {
+    "SWEETHEART": {
+        "name_suffix": "sweetheart",
+        "tags": ("sweetheart", "heart_neckline", "feminine", "romantic"),
+        "recipe": "cup_sweetheart",
+        "geometry_kind": "sweetheart",
+        "params": {
+            "half_u":      (0.15, 0.22, 0.18),
+            "half_v":      (0.07, 0.11, 0.09),
+            "inner_u":     (0.06, 0.12, 0.09),
+            "apex_lift":   (0.15, 0.30, 0.22),
+            "underband_dip": (0.0, 0.05, 0.02),
+        },
+        "notes": "Heart-shaped neckline with center V dip and outer peaks.",
+    },
+    "WRAP": {
+        "name_suffix": "wrap-surplice",
+        "tags": ("wrap", "surplice", "asymmetric", "draped", "front_cross"),
+        "recipe": "cup_wrap",
+        "geometry_kind": "wrap",
+        "params": {
+            "half_u":      (0.18, 0.26, 0.22),
+            "half_v":      (0.09, 0.13, 0.11),
+            "inner_u":     (0.03, 0.10, 0.06),
+            "apex_lift":   (0.0, 0.0, 0.0),       # not used by wrap recipe
+            "underband_dip": (0.0, 0.0, 0.0),
+        },
+        "notes": "Asymmetric wrap front; cup extends past midline.",
+    },
+    "CORSET_BANDS": {
+        "name_suffix": "corset-bands",
+        "tags": ("corset", "banded", "structured", "lingerie", "tall"),
+        "recipe": "cup_corset_bands",
+        "geometry_kind": "corset_bands",
+        "params": {
+            "half_u":      (0.18, 0.24, 0.21),
+            "half_v":      (0.11, 0.16, 0.13),     # tall cup
+            "inner_u":     (0.02, 0.06, 0.04),
+            "apex_lift":   (0.05, 0.18, 0.10),     # used as chamfer
+            "underband_dip": (0.0, 0.0, 0.0),
+        },
+        "notes": "Stacked-band corset cup; tall, structured. Pair with "
+                 "'stripe' pattern overlay for the band lines.",
+    },
+}
+
+for _size_class, _scale in (("S", 0.85), ("M", 1.00), ("L", 1.18)):
+    for _style_key, _style in _NEW_CUP_SHAPES.items():
+        _id = f"CUP_{_style_key}_{_size_class}"
+        _params = {}
+        for _pname, _vals in _style["params"].items():
+            if _pname in ("half_u", "half_v"):
+                _params[_pname] = tuple(round(v * _scale, 4) for v in _vals)
+            else:
+                _params[_pname] = tuple(round(v, 4) for v in _vals)
+        CUP_PIECES[_id] = LibraryEntry(
+            id=_id, kind="cup_piece",
+            name=f"Cup {_style['name_suffix']} {_size_class}",
+            tags=_style["tags"],
+            anatomy_hints=("front_chest",),
+            geometry_kind=_style["geometry_kind"],
+            base_polygon_recipe=_style["recipe"],
+            cup_size_class=_size_class,
+            local_params_schema=_params,
+            notes=_style["notes"],
+        )
+
+# 51 + 9 new = 60 cup pieces total.
+
+# ---------------------------------------------------------------------------
 # BOTTOM_PIECES — 10 entries (5 geometry × 2 size class)
 # ---------------------------------------------------------------------------
 
