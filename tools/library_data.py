@@ -851,6 +851,132 @@ STRAP_PIECES: dict[str, LibraryEntry] = {
         width_cm=3.0,
         local_params_schema={"height_cm": (2.5, 5.0, 3.5)},
     ),
+
+    # ---- Phase 1d expansion: 14 new strap types (16 -> 30) -----------
+    # These extend the catalog of selectable strap pieces. Actual rendered
+    # strap geometry routing still comes from build_strap_meshes which
+    # keys off tags; new tags here give the NN's discrete head more
+    # options to pick from and provide richer manufacturable spec sheets.
+
+    "STR_RACERBACK_WIDE": LibraryEntry(
+        id="STR_RACERBACK_WIDE", kind="strap_piece",
+        name="Racerback wide 25 mm",
+        tags=("racerback", "shoulder", "sport", "wide"),
+        anatomy_hints=("back_scapula_R", "back_scapula_L"),
+        width_cm=2.5, length_cm=0.0, elastic=True,
+        local_params_schema={"length_cm": (28.0, 40.0, 34.0)},
+    ),
+    "STR_CROSS_BACK": LibraryEntry(
+        id="STR_CROSS_BACK", kind="strap_piece",
+        name="Cross-back X strap 12 mm",
+        tags=("cross_back", "shoulder", "X_pattern", "structured"),
+        anatomy_hints=("back_scapula_R", "back_scapula_L"),
+        width_cm=1.2, length_cm=0.0, elastic=True,
+        local_params_schema={"length_cm": (30.0, 42.0, 36.0)},
+    ),
+    "STR_X_CHEST": LibraryEntry(
+        id="STR_X_CHEST", kind="strap_piece",
+        name="X across chest 10 mm",
+        tags=("x_chest", "front_cross", "bold", "harness"),
+        anatomy_hints=("front_clavicle_R", "front_clavicle_L"),
+        width_cm=1.0, length_cm=0.0, elastic=True,
+        local_params_schema={"length_cm": (28.0, 40.0, 34.0)},
+    ),
+    "STR_CAGE_MULTI": LibraryEntry(
+        id="STR_CAGE_MULTI", kind="strap_piece",
+        name="Multi-strap cage 3-band",
+        tags=("cage", "multi_strap", "bondage_inspired", "bold"),
+        anatomy_hints=("front_clavicle_R", "back_scapula_R"),
+        width_cm=0.8, length_cm=0.0, elastic=False,
+        local_params_schema={
+            "length_cm": (24.0, 36.0, 30.0),
+            "band_count": (2, 4, 3),
+        },
+    ),
+    "STR_ASYM_SINGLE": LibraryEntry(
+        id="STR_ASYM_SINGLE", kind="strap_piece",
+        name="Asymmetric single shoulder strap 18 mm",
+        tags=("asymmetric", "shoulder", "single_shoulder"),
+        anatomy_hints=("front_clavicle_R", "back_scapula_L"),    # diagonal
+        width_cm=1.8, length_cm=0.0, elastic=True,
+        local_params_schema={"length_cm": (32.0, 44.0, 38.0)},
+    ),
+    "STR_CHAIN_GOLD": LibraryEntry(
+        id="STR_CHAIN_GOLD", kind="strap_piece",
+        name="Gold link chain strap 4 mm",
+        tags=("chain", "hardware", "metallic", "jewelry"),
+        anatomy_hints=("neck_base_back",),
+        width_cm=0.4, length_cm=0.0, elastic=False,
+        local_params_schema={"length_cm": (40.0, 65.0, 52.0)},
+    ),
+    "STR_CHAIN_SILVER_THICK": LibraryEntry(
+        id="STR_CHAIN_SILVER_THICK", kind="strap_piece",
+        name="Silver thick chain strap 8 mm",
+        tags=("chain", "hardware", "metallic", "jewelry", "wide"),
+        anatomy_hints=("neck_base_back",),
+        width_cm=0.8, length_cm=0.0, elastic=False,
+        local_params_schema={"length_cm": (35.0, 55.0, 45.0)},
+    ),
+    "STR_O_RING_HALTER": LibraryEntry(
+        id="STR_O_RING_HALTER", kind="strap_piece",
+        name="O-ring halter with metal ring",
+        tags=("o_ring", "halter", "hardware_detail", "modern"),
+        anatomy_hints=("neck_base_back", "sternum"),
+        width_cm=0.5, length_cm=0.0, elastic=False,
+        local_params_schema={"length_cm": (40.0, 60.0, 50.0)},
+    ),
+    "STR_TIE_LONG_BOW": LibraryEntry(
+        id="STR_TIE_LONG_BOW", kind="strap_piece",
+        name="Long tie ribbon with bow finish 20 mm",
+        tags=("tie", "bow", "ribbon", "feminine", "wide"),
+        anatomy_hints=("hip_R", "hip_L"),
+        width_cm=2.0, length_cm=0.0, elastic=False,
+        local_params_schema={"length_cm": (35.0, 55.0, 45.0)},
+    ),
+    "STR_CORD_BRAIDED": LibraryEntry(
+        id="STR_CORD_BRAIDED", kind="strap_piece",
+        name="Braided cord rope-style 6 mm",
+        tags=("braided", "rope", "cord", "boho", "textured"),
+        anatomy_hints=("neck_base_back",),
+        width_cm=0.6, length_cm=0.0, elastic=False,
+        local_params_schema={"length_cm": (40.0, 65.0, 52.0)},
+    ),
+    "STR_SPORT_RACER_WIDE": LibraryEntry(
+        id="STR_SPORT_RACER_WIDE", kind="strap_piece",
+        name="Sport racerback wide 35 mm",
+        tags=("racerback", "sport", "wide", "athletic", "padded"),
+        anatomy_hints=("back_scapula_R", "back_scapula_L"),
+        width_cm=3.5, length_cm=0.0, elastic=True,
+        local_params_schema={"length_cm": (28.0, 40.0, 34.0)},
+    ),
+    "STR_MULTI_THIN_3X": LibraryEntry(
+        id="STR_MULTI_THIN_3X", kind="strap_piece",
+        name="Three parallel thin straps 4 mm × 3",
+        tags=("multi_strap", "thin", "parallel", "shoulder", "structural"),
+        anatomy_hints=("front_clavicle_R", "back_scapula_R"),
+        width_cm=0.4, length_cm=0.0, elastic=True,
+        local_params_schema={
+            "length_cm": (24.0, 36.0, 30.0),
+            "strand_count": (2, 4, 3),
+            "spacing_mm": (4.0, 12.0, 8.0),
+        },
+    ),
+    "STR_UNDERBUST_WIDE_50MM": LibraryEntry(
+        id="STR_UNDERBUST_WIDE_50MM", kind="strap_piece",
+        name="Underbust band wide 50 mm",
+        tags=("underbust", "FOE", "wide", "structured", "anchored"),
+        anatomy_hints=("sternum",),
+        width_cm=5.0, length_cm=0.0, elastic=True,
+        local_params_schema={"height_cm": (4.0, 7.0, 5.5)},
+    ),
+    "STR_BODY_CHAIN_LINK": LibraryEntry(
+        id="STR_BODY_CHAIN_LINK", kind="strap_piece",
+        name="Body chain decorative link 3 mm",
+        tags=("body_chain", "chain", "decorative", "jewelry", "minimal"),
+        anatomy_hints=("hip_R", "hip_L", "sternum"),
+        width_cm=0.3, length_cm=0.0, elastic=False,
+        local_params_schema={"length_cm": (40.0, 80.0, 60.0)},
+    ),
 }
 
 
