@@ -200,6 +200,168 @@ for _size_class, _scale in _SIZE_SCALES.items() if False else (("S", 0.85), ("M"
 
 # 12 new softcup_squareneck cups (4 styles x 3 sizes) -> 27 cups total.
 
+# ---------------------------------------------------------------------------
+# CUP_PIECES — Phase 1a expansion: 8 new families × 3 sizes = 24 new cups
+# (27 -> 51). Each family reuses an existing polygon recipe but with
+# distinctive parameter signature so the rendered shape is visibly
+# different. References:
+#   halter        — high-set V cup, strap goes up to neck (Frederick's,
+#                   Tropic of C, ZAFUL halter bikini line)
+#   plunge        — extreme deep V between cups (Wolford plunge, Marlies
+#                   Dekkers plunge balcony)
+#   push_up       — small lifted cup with positive apex_lift (Triangl
+#                   pushup, Calzedonia super-push)
+#   demi          — flat top above breast peak, half-cup (lingerie demi)
+#   bandeau_twist — center-twist bandeau (Hunza G, Vix twist bandeau)
+#   micro_triangle — minimal triangle, half_v ≈ 0.04 (Frankies Bikinis micro)
+#   sliver        — thin horizontal sliver, ultra-narrow bandeau
+#                   (Reina Olga sliver, body-chain bra)
+#   body_chain_cup — micro coverage + heavy hardware (chain-bra style,
+#                   Givenchy body chain, Honey Birdette body jewelry)
+# ---------------------------------------------------------------------------
+
+_NEW_CUP_STYLES = {
+    "HALTER": {
+        "name_suffix": "halter-neck",
+        "tags": ("halter", "triangle", "high_neckline", "string"),
+        "recipe": "cup_triangle",
+        "geometry_kind": "halter_triangle",
+        "params": {
+            "half_u":      (0.10, 0.18, 0.14),
+            "half_v":      (0.08, 0.14, 0.11),       # taller cup
+            "inner_u":     (0.08, 0.16, 0.12),
+            "apex_lift":   (0.30, 0.55, 0.42),       # strong upward V
+            "underband_dip": (0.0, 0.08, 0.04),
+        },
+        "notes": "Halter-neck triangle: cup top pulled up toward neck strap.",
+    },
+    "PLUNGE": {
+        "name_suffix": "plunge-deep-V",
+        "tags": ("plunge", "deep_v", "triangle", "bold"),
+        "recipe": "cup_triangle",
+        "geometry_kind": "plunge",
+        "params": {
+            "half_u":      (0.12, 0.22, 0.17),
+            "half_v":      (0.08, 0.13, 0.10),
+            "inner_u":     (0.12, 0.22, 0.17),       # wide gap between cups
+            "apex_lift":   (0.45, 0.70, 0.58),       # extreme V plunge
+            "underband_dip": (0.0, 0.10, 0.05),
+        },
+        "notes": "Plunge: deep V between cups, low inner edge.",
+    },
+    "PUSH_UP": {
+        "name_suffix": "push-up",
+        "tags": ("push_up", "balconette", "structured", "lift"),
+        "recipe": "cup_balconette",
+        "geometry_kind": "push_up",
+        "params": {
+            "half_u":      (0.13, 0.19, 0.16),       # narrower than balconette
+            "half_v":      (0.07, 0.11, 0.09),
+            "inner_u":     (0.05, 0.10, 0.08),
+            "apex_lift":   (0.05, 0.18, 0.12),       # slight lift at top
+            "underband_dip": (-0.08, 0.0, -0.04),    # snug under-band
+        },
+        "notes": "Push-up: small balcony cup, gentle lift, snug underband.",
+    },
+    "DEMI": {
+        "name_suffix": "demi-half-cup",
+        "tags": ("demi", "balconette", "half_cup", "horizontal"),
+        "recipe": "cup_balconette",
+        "geometry_kind": "demi",
+        "params": {
+            "half_u":      (0.16, 0.22, 0.19),
+            "half_v":      (0.04, 0.07, 0.05),       # very low — half-cup
+            "inner_u":     (0.06, 0.12, 0.09),
+            "apex_lift":   (-0.10, 0.0, -0.05),      # flat-ish top
+            "underband_dip": (0.0, 0.05, 0.02),
+        },
+        "notes": "Demi: half cup with flat horizontal top edge above peak.",
+    },
+    "BANDEAU_TWIST": {
+        "name_suffix": "bandeau-twist",
+        "tags": ("bandeau", "twist", "center_detail", "strapless"),
+        "recipe": "cup_bandeau",
+        "geometry_kind": "bandeau_twist",
+        "params": {
+            "half_u":      (0.22, 0.28, 0.25),
+            "half_v":      (0.09, 0.13, 0.11),       # slightly taller bandeau
+            "inner_u":     (0.02, 0.06, 0.04),       # small center gap for twist
+            "apex_lift":   (-0.05, 0.10, 0.02),
+            "underband_dip": (-0.05, 0.05, 0.0),
+        },
+        "notes": "Bandeau with knotted/twisted center; small center gap.",
+    },
+    "MICRO_TRIANGLE": {
+        "name_suffix": "micro-triangle",
+        "tags": ("micro", "triangle", "minimal", "string", "bold"),
+        "recipe": "cup_triangle",
+        "geometry_kind": "micro_triangle",
+        "params": {
+            "half_u":      (0.06, 0.11, 0.08),       # very small
+            "half_v":      (0.03, 0.06, 0.045),
+            "inner_u":     (0.04, 0.10, 0.07),
+            "apex_lift":   (0.15, 0.35, 0.25),
+            "underband_dip": (0.0, 0.05, 0.02),
+        },
+        "notes": "Micro triangle: minimal coverage (~5cm peak-to-peak).",
+    },
+    "SLIVER": {
+        "name_suffix": "sliver-band",
+        "tags": ("sliver", "bandeau", "ultra_thin", "horizontal", "bold"),
+        "recipe": "cup_bandeau",
+        "geometry_kind": "sliver",
+        "params": {
+            "half_u":      (0.18, 0.26, 0.22),
+            "half_v":      (0.02, 0.04, 0.03),       # ultra-thin band
+            "inner_u":     (0.0, 0.02, 0.01),
+            "apex_lift":   (-0.02, 0.02, 0.0),
+            "underband_dip": (-0.02, 0.02, 0.0),
+        },
+        "notes": "Sliver: ultra-thin horizontal band across breasts.",
+    },
+    "BODY_CHAIN_CUP": {
+        "name_suffix": "body-chain-cup",
+        "tags": ("body_chain", "triangle", "micro", "hardware", "minimal"),
+        "recipe": "cup_triangle",
+        "geometry_kind": "body_chain_cup",
+        "params": {
+            "half_u":      (0.05, 0.09, 0.07),       # tiny cup
+            "half_v":      (0.025, 0.05, 0.035),
+            "inner_u":     (0.06, 0.14, 0.10),
+            "apex_lift":   (0.10, 0.30, 0.20),
+            "underband_dip": (0.0, 0.04, 0.02),
+        },
+        "notes": "Body chain micro-cup: minimal fabric, designed to pair "
+                 "with chain/jewelry hardware accessories.",
+    },
+}
+
+# Instantiate each style × 3 size classes. Schema 'params' values are
+# multiplied by size scale for `half_u` and `half_v` (size-affecting
+# dims); others (inner_u, apex_lift, underband_dip) are size-independent.
+_SIZE_SCALE_MAP = (("S", 0.85), ("M", 1.00), ("L", 1.18))
+for _size_class, _scale in _SIZE_SCALE_MAP:
+    for _style_key, _style in _NEW_CUP_STYLES.items():
+        _id = f"CUP_{_style_key}_{_size_class}"
+        _params = {}
+        for _pname, _vals in _style["params"].items():
+            if _pname in ("half_u", "half_v"):
+                _params[_pname] = tuple(round(v * _scale, 4) for v in _vals)
+            else:
+                _params[_pname] = tuple(round(v, 4) for v in _vals)
+        CUP_PIECES[_id] = LibraryEntry(
+            id=_id, kind="cup_piece",
+            name=f"Cup {_style['name_suffix']} {_size_class}",
+            tags=_style["tags"],
+            anatomy_hints=("front_chest",),
+            geometry_kind=_style["geometry_kind"],
+            base_polygon_recipe=_style["recipe"],
+            cup_size_class=_size_class,
+            local_params_schema=_params,
+            notes=_style["notes"],
+        )
+
+# 27 + 24 new = 51 cup pieces total.
 
 # ---------------------------------------------------------------------------
 # BOTTOM_PIECES — 10 entries (5 geometry × 2 size class)
