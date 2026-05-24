@@ -201,6 +201,17 @@ class LibraryEntry:
     inner_bridge_recipe: str = ""
     anchor_specs: tuple = ()
 
+    # --- Hardware placement recipes (Phase 2 #5, 2026-05-25) ---
+    # For hardware/accessory entries that resolve to body-jewelry meshes
+    # (bow / beads / shell / fringe). Each names a placement function in
+    # tools/hardware_placements.py that decides *where* on the body the
+    # piece sits + how many anchor points it gets. Empty = legacy single-
+    # anchor formula in render3d_uv.py.
+    bow_placement:    str = ""
+    beads_placement:  str = ""
+    shell_placement:  str = ""
+    fringe_placement: str = ""
+
     # --- Hardware / strap dimensions ---
     width_cm: float = 0.0                # strap / FOE / hardware
     diameter_cm: float = 0.0             # ring / slider
