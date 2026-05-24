@@ -39,7 +39,7 @@ def classify_vertices(body_verts: np.ndarray,
                        landmarks: AnatomyLandmarks,
                        arm_x_slack_cm: float = 1.0,
                        leg_y_slack_cm: float = 1.5,
-                       pelvis_drop_cm: float = 8.0,
+                       pelvis_drop_cm: float = 12.0,
                        ) -> np.ndarray:
     """Return an array of length len(body_verts) with one region string
     per vertex.
@@ -55,9 +55,13 @@ def classify_vertices(body_verts: np.ndarray,
 
     `pelvis_drop_cm` extends the pelvis region downward from y_pelvis
     by this many centimeters. Anatomically the iliac crest (y_pelvis)
-    sits ~8 cm above the perineum on a standing pose, so 8 cm captures
-    the bikini-bottom / one-piece-crotch fabric-bearing zone. Below
-    y_pelvis - pelvis_drop is the upper thigh = leg.
+    sits ~8-12 cm above the perineum on a standing pose. 2026-05-24
+    bumped to 12 cm because cylindrical_uvs maps polygon v=0 to body
+    y ≈ 56 cm (way below crotch); a polygon with v ∈ [0.06, 0.25]
+    (thong / brazilian) covers body y ∈ [63, 83], and with pelvis_drop=8
+    only the top sliver y > 78 was accepted — thong & brazilian
+    silently produced empty meshes. 12 cm gives them a usable
+    rendering window. Below y_pelvis - pelvis_drop is upper thigh = leg.
 
     Region layout from top to bottom:
       head_neck:   y > y_acromion

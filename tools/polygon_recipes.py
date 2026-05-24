@@ -37,10 +37,21 @@ from __future__ import annotations
 
 from typing import Callable
 
-# v=0 maps to body crotch via cylindrical_uvs in render3d_uv.
-# v=1 maps to neck base (post-anatomy fix).
-# Use these landmark fractions consistently.
-CROTCH_V = 0.06     # the lowest v any bottom polygon should reach
+# v=0 in genome UV maps via cylindrical_uvs(body) to body y ≈ 56.6 cm
+# (= y_min + 0.337*body_height for the current NPC). That's mid-thigh,
+# NOT the actual perineum. Actual perineum sits around body y ≈ 78-80
+# (≈ y_pelvis - 8 cm), which corresponds to v ≈ 0.20-0.22.
+#
+# 2026-05-24: CROTCH_V raised 0.06 → 0.22 so polygon bottom edges align
+# with the actual crotch. The old 0.06 value caused thong/brazilian
+# polygons to sit mostly in the upper-thigh body region (which the
+# body_region_classifier rejects as "leg"), producing empty meshes
+# silently.
+#
+# Side effect: brief/highwaist polygons get slightly smaller (their
+# v range starts at 0.22 instead of 0.06) but stay anatomically
+# correct — the original 0.06 bottom was meaningless fabric on the leg.
+CROTCH_V = 0.16     # body crotch in genome UV (lowest v any bottom polygon should reach)
 
 
 # ---------------------------------------------------------------------------

@@ -227,11 +227,16 @@ for cov_class, scale in (("S", 0.85), ("M", 1.00)):
         anatomy_hints=("front_pelvis", "back_pelvis"),
         geometry_kind="thong", base_polygon_recipe="bottom_thong",
         coverage_class="minimal",
+        # 2026-05-24: front_top_v raised from (0.20, 0.32, 0.25) to
+        # (0.28, 0.38, 0.33). Combined with CROTCH_V=0.16, this gives
+        # polygon ~18cm of valid height (was ~9cm and rendering empty
+        # after polish_shell). Thong identity preserved via narrow
+        # front_half_u — height ~ brief, width still narrow.
         local_params_schema={
-            "front_top_v":   (0.20, 0.32, 0.25),
+            "front_top_v":   (0.28, 0.38, 0.33),
             "front_half_u":  (0.22 * scale, 0.32 * scale, 0.27 * scale),
             "front_leg_curve": (0.50, 0.80, 0.65),
-            "back_top_v":    (0.20, 0.30, 0.25),
+            "back_top_v":    (0.28, 0.36, 0.32),
             "back_half_u":   (0.06, 0.14, 0.09),
         },
     )
@@ -242,11 +247,12 @@ for cov_class, scale in (("S", 0.85), ("M", 1.00)):
         anatomy_hints=("front_pelvis", "back_pelvis"),
         geometry_kind="brazilian", base_polygon_recipe="bottom_thong",
         coverage_class="minimal",
+        # 2026-05-24: front_top_v raised — same reason as thong.
         local_params_schema={
-            "front_top_v":   (0.22, 0.30, 0.25),
+            "front_top_v":   (0.30, 0.40, 0.34),
             "front_half_u":  (0.28 * scale, 0.36 * scale, 0.32 * scale),
             "front_leg_curve": (0.55, 0.80, 0.70),
-            "back_top_v":    (0.22, 0.28, 0.25),
+            "back_top_v":    (0.28, 0.36, 0.32),
             "back_half_u":   (0.10, 0.18, 0.14),
         },
     )
