@@ -193,22 +193,34 @@ class RenderRunner:
     def __call__(self, config: dict, picks: dict):
         """Returns (paths, outfits). train_loop.step_full accepts either
         a plain list or this tuple — the tuple form enables the
-        per-sample diversity bonus (controlled by TrainLoop.w_div)."""
+        per-sample diversity bonus (controlled by TrainLoop.w_div).
+
+        Two render backends:
+          * in-process: fastest, but Filament/Open3D state can leak
+            across designs in long runs causing segfaults
+          * subprocess: spawns _render_one_outfit.py per design — slower
+            (~5s overhead per design) but bulletproof
+        Toggle via env var RL_RENDER_SUBPROC=1 (default off; set when
+        in-process renders are crashing).
+        """
+        import subprocess as _sp
         B = next(iter(picks.values())).shape[0]
         iter_dir = os.path.join(self.out_dir, f"iter_{self.iter:04d}")
         os.makedirs(iter_dir, exist_ok=True)
         paths: list[str] = []
         outfits: list = []
+        use_subproc = os.environ.get("RL_RENDER_SUBPROC", "0") == "1"
+        renderer_script = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "_render_one_outfit.py")
         for i in range(B):
             sub = os.path.join(iter_dir, f"v{i:02d}")
             os.makedirs(sub, exist_ok=True)
             try:
                 outfit = self.converter(config, picks, i)
                 outfits.append(outfit)
-                g = outfit_to_genome(outfit)
-                params = IterParams()
-                params.outfit = outfit
-                # save outfit json for traceability
+                # save outfit json for traceability (used by subprocess
+                # backend too)
                 with open(os.path.join(sub, "outfit.json"), "w") as f:
                     json.dump({
                         "archetype": outfit.archetype,
@@ -219,10 +231,27 @@ class RenderRunner:
                             for a in outfit.slot_assignments],
                         "global_design": dict(outfit.global_design),
                     }, f, indent=2)
-                cap.render_views(g, params, sub, body_mesh=self.body)
+                if use_subproc:
+                    rc = _sp.run(
+                        [sys.executable, renderer_script,
+                         os.path.join(sub, "outfit.json"), sub,
+                         "01_front"],
+                        timeout=120,
+                        capture_output=True, text=True,
+                    )
+                    if rc.returncode != 0:
+                        raise RuntimeError(
+                            f"subprocess render failed rc={rc.returncode}: "
+                            f"{rc.stderr[-200:]}")
+                else:
+                    g = outfit_to_genome(outfit)
+                    params = IterParams()
+                    params.outfit = outfit
+                    cap.render_views(g, params, sub, body_mesh=self.body)
                 paths.append(os.path.join(sub, "01_front.png"))
             except Exception as exc:
-                print(f"  [iter {self.iter} v{i}] render fail: {exc}")
+                print(f"  [iter {self.iter} v{i}] render fail: {exc}",
+                      flush=True)
                 paths.append("")  # empty -> judge will mark invalid
                 outfits.append(None)
         self.iter += 1
@@ -272,8 +301,12 @@ def run(iters: int = 20,
         print(f"  encoder: MockTextEncoder (sha256 hash, dim={text_dim})")
     gen = DesignGenerator(text_dim=text_dim, hidden_dim=hidden_dim)
     if resume_from and os.path.isfile(resume_from):
-        gen.load_state_dict(torch.load(resume_from)["generator_state"])
-        print(f"resumed weights from {resume_from}")
+        ckpt = torch.load(resume_from)
+        # Older saves used "generator_state", newer use "gen_state".
+        sd = ckpt.get("gen_state") or ckpt.get("generator_state") or ckpt
+        gen.load_state_dict(sd)
+        prev_iter = ckpt.get("iter", "?") if isinstance(ckpt, dict) else "?"
+        print(f"resumed weights from {resume_from} (was iter {prev_iter})")
 
     judge_kwargs = {}
     if judge_backend == "vllm" and judge_concurrent > 1:
@@ -300,6 +333,7 @@ def run(iters: int = 20,
     rng = rd.Random(seed)
     history = []
     t_total = time.time()
+    save_every = int(os.environ.get("CKPT_EVERY", "5"))
     for it in range(iters):
         briefs = rng.choices(DEFAULT_BRIEFS, k=batch_size)
         t0 = time.time()
@@ -311,12 +345,18 @@ def run(iters: int = 20,
               f"reward={rec.mean_reward:.3f}  "
               f"pass={n_pass}/{batch_size}  "
               f"loss_sym={rec.loss_sym:.3f} loss_rl={rec.loss_rl:.3f}  "
-              f"{dt:.1f}s")
+              f"{dt:.1f}s",
+              flush=True)
+        # Intermediate checkpoints — keeps progress alive if process dies.
+        if save_every > 0 and (it + 1) % save_every == 0 and it + 1 < iters:
+            mid = os.path.join(out_root, f"generator_iter{it+1:04d}.pt")
+            loop.save(mid)
+            print(f"    [ckpt saved -> {os.path.basename(mid)}]", flush=True)
 
     # Save final checkpoint
     ckpt = os.path.join(out_root, "generator_final.pt")
     loop.save(ckpt)
-    print(f"\nsaved final generator -> {ckpt}")
+    print(f"\nsaved final generator -> {ckpt}", flush=True)
 
     # Summary
     total_pass = sum(sum(1 for r in rec.judge_results if r.get("is_valid_swimsuit"))
