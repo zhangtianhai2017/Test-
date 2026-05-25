@@ -212,8 +212,13 @@ def render_views(genome: Genome, params, out_dir: str,
     # state (Garment) from the Genome and routes to the garment-driven
     # sub-mesh builder, falling back to the legacy raw-Genome path for
     # one-piece archetypes (v2 deferred).
+    # Pass the outfit-derived garment (computed above as `_garm`) so the
+    # strap dispatcher preserves library_id info for accessories /
+    # hardware placement / anchor_specs. Without this it silently falls
+    # back to genome_to_garment which loses everything.
     straps = build_strap_meshes(body_mesh, g, yc, yn,
-                                  body_deployment=body_deployment)
+                                  body_deployment=body_deployment,
+                                  garment=_garm)
     if params.strap_radius_scale != 1.0 and straps:
         scaled = []
         for name, m in straps:
@@ -359,12 +364,25 @@ def render_views(genome: Genome, params, out_dir: str,
             seam_mat.base_color = [0.18, 0.18, 0.20, 1.0]   # dark thread
             seam_mat.base_roughness = 0.4
             R.scene.add_geometry("seams", seam_mesh, seam_mat)
+        _seen_strap_names: set = set()
         for name, m in straps:
             if len(m.vertices) > 0:
                 use_mat = (fabric_strap_mat if (name in FABRIC_STRAP_NAMES
                                                    and fabric_strap_mat is not None)
                             else bind_mat)
-                R.scene.add_geometry(f"strap_{name}", m, use_mat)
+                # Dedup: when an outfit has multiple accessories of the
+                # same kind (e.g. two bow assignments), build_strap_meshes
+                # emits duplicate "bow_R_bow_LH" etc. names. Open3D rejects
+                # the second add_geometry with a warning. Add a numeric
+                # suffix so all copies render distinct.
+                key = f"strap_{name}"
+                if key in _seen_strap_names:
+                    i = 2
+                    while f"{key}_{i}" in _seen_strap_names:
+                        i += 1
+                    key = f"{key}_{i}"
+                _seen_strap_names.add(key)
+                R.scene.add_geometry(key, m, use_mat)
         _frame(R, body_mesh, view)
         img = R.render_to_image()
         path = os.path.join(out_dir, f"{view.name}.png")

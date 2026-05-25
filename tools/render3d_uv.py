@@ -2451,10 +2451,21 @@ def _build_strap_meshes_garment(body_mesh,
             for side, u_s, yy in anchors_xy:
                 try:
                     anc = _body_point_at(V, u_s, yy, max_torso_radius=18.0)
-                    ring = _build_torus(anc, radius_cm, tube_radius=0.08)
-                    straps.append((f"oring_{side}", ring))
-                except Exception:
-                    pass
+                    # _build_torus signature is (major_r, minor_r) — no
+                    # position arg. Old call passed `anc` as major_r and
+                    # `tube_radius=` as unknown kwarg → TypeError → silently
+                    # swallowed by the except below → O-rings never emitted.
+                    # 2026-05-25 fix: build torus at origin then place.
+                    rxz = np.array([anc[0], 0.0, anc[2]])
+                    rxz /= max(np.linalg.norm(rxz), 1e-6)
+                    torus = _build_torus(major_r=radius_cm, minor_r=0.08)
+                    mesh = _place_at(torus, anc + rxz * 0.3, rxz)
+                    mesh.compute_vertex_normals()
+                    straps.append((f"oring_{side}", mesh))
+                except Exception as exc:
+                    # log instead of silent swallow so future regressions
+                    # are visible
+                    print(f"  [oring {side}] build fail: {exc}", flush=True)
 
     # 7) Shoulder straps — driven by shoulder_strap connector + anatomy anchors
     sh_conns = [c for c in garment.connectors if c.kind == "shoulder_strap"]
@@ -2555,22 +2566,34 @@ def _build_strap_meshes_garment(body_mesh,
 
 def build_strap_meshes(body_mesh: o3d.geometry.TriangleMesh, g,
                         y_crotch: float, y_neck: float,
-                        body_deployment=None):
-    """Public dispatcher. Builds the manufacturing Garment latent state
-    from the Genome and routes to the garment-driven sub-mesh builder.
+                        body_deployment=None,
+                        garment=None):
+    """Public dispatcher. Routes to the garment-driven sub-mesh builder
+    when a Garment is available, else falls back to the legacy
+    raw-Genome path.
 
-    body_deployment (optional): a BodyDeployment from
-    garment_state.deploy_to_body. When supplied, accountability rules
-    apply — connectors / accessories without resolved attachments are
-    skipped at strap-build time. The dispatcher computes one internally
-    if not provided.
+    garment (optional, STRONGLY PREFERRED): a Garment already built from
+    the source Outfit (outfit_to_garment). When supplied, the dispatcher
+    uses it directly — preserves library_id back-references that the
+    accessory/hardware placement and anchor_specs systems need.
+
+    If `garment` is None, falls back to building one from genome_to_garment
+    — which LOSES library_id info (Phase 2 #5 placements, anchor_specs,
+    etc. all silently degrade to defaults / disappear). 2026-05-25 bug
+    discovery: this fallback was the only path in iter.capture, so
+    accessories/hardware were never visible in renders. Pass garment from
+    iter.capture (computed via outfit_to_garment) to fix.
+
+    body_deployment (optional): BodyDeployment from
+    garment_state.deploy_to_body. Computed internally if not provided.
     """
     try:
         from garment_state import (genome_to_garment, validate_garment,
                                      deploy_to_body, validate_deployment,
                                      UnsupportedArchetypeV1)
         try:
-            garment = validate_garment(genome_to_garment(g))
+            if garment is None:
+                garment = validate_garment(genome_to_garment(g))
             if body_deployment is None:
                 body_deployment = validate_deployment(
                     garment, deploy_to_body(garment, body_mesh))
