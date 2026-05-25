@@ -64,7 +64,21 @@
 
 ## 工程惯例提示(避免重蹈覆辙)
 
-- **`outfit_to_genome` 里的 `.get(field, default)` 是模板泄漏的元凶**;swimsuit_2 的参数(center_v=0.74 等)曾从这里 100% 传染所有输出。任何新字段都不要用 hardcoded default,要么进 `local_params_schema` 让每件采样,要么从随机 / 隐私种子边界采。
+- **未知 ≠ 0 / 默认值(底层逻辑红线)**。任何 silent fallback ——
+  `.get(k, default)`、`except: pass`、`if x is None: x = 0`、subprocess
+  rc != 0 当 fail、judge 空 dict 当 0 reward —— 都是把"我没观测到"静默
+  改成"我观测到了某个具体值"。喂给训练 = 噪声梯度,数学上能推出任意结论
+  (包括反向)。规则:
+    * 未知就显式标 None / NaN / sentinel(e.g. `backend="unknown"`),
+      不要用 0 或 hardcoded default
+    * 含 unknown 的 sample 从 loss / mean / 评分里**整体剔除**
+    * silent `except: pass` 改成 `print + 计数`,让"未知"可见可计
+  历史踩坑:swimsuit_2 模板泄漏(`.get` hardcoded default,早期);
+  RL reward=0 假信号(rc!=0 当 fail,2026-05-25);halter/shoulder strap
+  silent except 让 NN 收到反向梯度(2026-05-25)。
+  完整 audit:`docs/design/2026-05-25_unknown_as_known_audit.md`。
+
+- **`outfit_to_genome` 里的 `.get(field, default)` 是模板泄漏的元凶**;swimsuit_2 的参数(center_v=0.74 等)曾从这里 100% 传染所有输出。任何新字段都不要用 hardcoded default,要么进 `local_params_schema` 让每件采样,要么从随机 / 隐私种子边界采。**2026-05-25 已加 `_take()` helper**,缺字段会打 WARN 而不是静默 fallback。
 - **腋下/膝间"挂布"问题**已由 `body_region_classifier.py` 强制过滤根治。如果再出现类似身体凹陷处的布料 bug,**第一反应是 anatomy 分类器没接入新代码路径**,而不是再加 polygon 收边补丁。
 - **渲染瓶颈不是 GPU,是 `polish_shell`**(2.21s,占 62%)。Stage 1 符号 fitness 跳过它,GA 评分快 350x。
 - **多样性已稳定 80%+ clearly-distinct**(strategy 10:全栈 stratified + farthest-point);进一步收益要从"判断者"侧解决,不是采样侧。
