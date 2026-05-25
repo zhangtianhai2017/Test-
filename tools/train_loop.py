@@ -368,6 +368,20 @@ class TrainLoop:
         # Render + judge. render_fn may return (paths,) or (paths, outfits).
         # Pass `briefs` through to judge so V4 prompt's brief_match dim
         # can score "did this design match the requested brief".
+        #
+        # UNKNOWN-OUTCOME PROTOCOL (2026-05-25, user demand):
+        # When the render outcome is unknown (RenderRunner returned None
+        # for that index), we MUST NOT fake-record reward=0 — that's
+        # dishonest training signal ("this is bad, avoid") for a sample
+        # whose actual quality we have no evidence about. Instead:
+        #   * the unknown sample is EXCLUDED from the RL loss + reward
+        #     mean. Its discrete-head log-prob doesn't contribute to
+        #     the policy gradient.
+        #   * symbolic fitness gradient still flows for it (fitness is
+        #     computed from genome params, independent of render).
+        #   * judge is NOT called on unknown paths (avoids the judge
+        #     also fake-marking is_valid_swimsuit=False).
+        # known_mask: True for samples whose render produced a valid PNG.
         outfits = None
         try:
             rendered = render_fn(config, picks)
@@ -375,11 +389,31 @@ class TrainLoop:
                 image_paths, outfits = rendered
             else:
                 image_paths = rendered
-            results = self.judge.judge_batch(image_paths, briefs=briefs,
-                                              verbose=False)
+            known_mask = [p is not None and p != "" for p in image_paths]
+            known_paths = [p for p in image_paths if p is not None and p != ""]
+            known_briefs = [b for b, k in zip(briefs, known_mask) if k]
+            if known_paths:
+                known_results = self.judge.judge_batch(
+                    known_paths, briefs=known_briefs, verbose=False)
+            else:
+                known_results = []
+            # Reconstitute full-length results list with an unknown
+            # sentinel for indices where render failed. Anything tagged
+            # backend="unknown" gets masked out of the loss further down.
+            results = []
+            ki = 0
+            for is_known in known_mask:
+                if is_known:
+                    results.append(known_results[ki])
+                    ki += 1
+                else:
+                    r = JudgeResult.from_dict({}, backend="unknown")
+                    results.append(r)
         except Exception as exc:
-            print(f"  render/judge failed: {exc}; using zero reward")
-            results = [JudgeResult.from_dict({}, backend="error")
+            print(f"  render/judge wholesale failed: {exc}; "
+                  f"entire batch marked unknown", flush=True)
+            known_mask = [False] * len(briefs)
+            results = [JudgeResult.from_dict({}, backend="unknown")
                         for _ in briefs]
 
         # Reward uses V3's 8 sub-scores. Structural dims (chest/pelvic/
@@ -468,6 +502,14 @@ class TrainLoop:
         rewards = torch.tensor(
             [b + self.w_div * d for b, d in zip(base_rewards, div_bonuses)],
             dtype=torch.float32, device=self.device)
+        # Unknown-outcome mask: 1 for samples with a known render result,
+        # 0 for samples whose render was unknown (no PNG produced).
+        # The mask is applied to both the advantage and the RL loss so
+        # unknown samples DON'T contribute to the policy gradient.
+        known_mask_t = torch.tensor(
+            [1.0 if k else 0.0 for k in known_mask],
+            dtype=torch.float32, device=self.device)
+        n_known = int(known_mask_t.sum().item())
         # Baseline subtraction for variance reduction.
         advantages = (rewards - self.baseline_R).detach()
         # Per-batch advantage normalization (PPO-style). Without this,
@@ -477,14 +519,28 @@ class TrainLoop:
         # at w_div=0.3 saw mean_reward 0.79 -> 0.71 over 30 iters).
         # Normalization keeps update magnitudes roughly constant across
         # iters regardless of reward distribution shape.
-        if advantages.numel() > 1 and advantages.std().item() > 1e-6:
-            adv = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
+        # Compute mean/std over KNOWN samples only.
+        if n_known > 1:
+            known_adv = advantages[known_mask_t > 0]
+            adv_mean = known_adv.mean()
+            adv_std = known_adv.std()
+            if adv_std.item() > 1e-6:
+                adv = (advantages - adv_mean) / (adv_std + 1e-8)
+            else:
+                adv = advantages - adv_mean
         else:
             adv = advantages
         # Loss: -E[adv * sum_d log p(sampled_d)]  (advantage-normalized
         # REINFORCE; equivalent to PPO with 1 inner epoch).
+        # Mask out unknown samples so their log-prob doesn't drive the
+        # policy in any direction.
         sum_log_p = torch.stack(log_probs, dim=0).sum(dim=0)   # (B,)
-        loss_rl = -(adv * sum_log_p).mean()
+        if n_known > 0:
+            loss_rl = -(adv * sum_log_p * known_mask_t).sum() / n_known
+        else:
+            # Entire batch unknown — RL loss is zero this iter, only
+            # symbolic fitness gradient applies.
+            loss_rl = torch.zeros((), device=self.device)
 
         # Anti-collapse regularizers. Push the discrete softmax
         # distributions toward higher-entropy / closer-to-uniform.
@@ -623,7 +679,17 @@ class TrainLoop:
         self.opt.step()
 
         # Update running baseline (EMA of rewards)
-        r_mean = rewards.mean().item()
+        # mean_reward over KNOWN samples only — unknown samples are
+        # excluded from the average so an iter that lost half its
+        # renders doesn't report a misleading "everything is bad".
+        if n_known > 0:
+            r_mean = (rewards * known_mask_t).sum().item() / n_known
+        else:
+            r_mean = float("nan")  # entire batch unknown
+        n_unknown = int(len(briefs) - n_known)
+        if n_unknown > 0:
+            print(f"  [iter {self.iter}] B={len(briefs)} "
+                  f"unknown={n_unknown} effective={n_known}", flush=True)
         self.baseline_R = (self.baseline_alpha * self.baseline_R +
                             (1 - self.baseline_alpha) * r_mean)
 

@@ -222,6 +222,13 @@ class RenderRunner:
         for i in range(B):
             sub = os.path.join(iter_dir, f"v{i:02d}")
             os.makedirs(sub, exist_ok=True)
+            png_path = os.path.join(sub, "01_front.png")
+            # Remove any stale PNG so existence check after is meaningful
+            if os.path.exists(png_path):
+                try:
+                    os.remove(png_path)
+                except OSError:
+                    pass
             try:
                 outfit = self.converter(config, picks, i)
                 outfits.append(outfit)
@@ -238,26 +245,24 @@ class RenderRunner:
                         "global_design": dict(outfit.global_design),
                     }, f, indent=2)
                 if skip_render:
-                    # No render. Caller is expected to set --w-rl 0 so
-                    # the judge contribution to the loss is zero — only
-                    # symbolic fitness gradient drives learning.
-                    paths.append("")
+                    # No render path. Caller sets --w-rl 0 so judge
+                    # contribution is zero — only symbolic fitness
+                    # gradient drives learning. Path explicitly UNKNOWN
+                    # so judge isn't called and reward isn't fake-zeroed.
+                    paths.append(None)
+                    continue
                 elif use_subproc:
-                    rc = _sp.run(
+                    # Open3D Filament tends to SIGSEGV on subprocess EXIT
+                    # cleanup AFTER successfully writing the PNG. Don't
+                    # judge by returncode — judge by PNG presence + size.
+                    _sp.run(
                         [sys.executable, renderer_script,
                          os.path.join(sub, "outfit.json"), sub,
                          "01_front"],
                         timeout=120,
                         capture_output=True, text=True,
                     )
-                    if rc.returncode != 0:
-                        raise RuntimeError(
-                            f"subprocess render failed rc={rc.returncode}: "
-                            f"{rc.stderr[-200:]}")
                 else:
-                    # Lazy-import Open3D path. Only fires when we're
-                    # actually rendering in-process (NOT subprocess) AND
-                    # SKIP_RENDER is off.
                     if not hasattr(self, "_cap"):
                         import iter.capture as _cap
                         _cap.VIEWS = [v for v in _cap.VIEWS
@@ -268,12 +273,24 @@ class RenderRunner:
                     params.outfit = outfit
                     self._cap.render_views(
                         g, params, sub, body_mesh=self.body)
-                paths.append(os.path.join(sub, "01_front.png"))
             except Exception as exc:
-                print(f"  [iter {self.iter} v{i}] render fail: {exc}",
+                # Render path raised — outcome UNKNOWN, NOT fake-zero.
+                print(f"  [iter {self.iter} v{i}] render UNKNOWN: {exc}",
                       flush=True)
-                paths.append("")  # empty -> judge will mark invalid
-                outfits.append(None)
+                paths.append(None)
+                if len(outfits) < i + 1:
+                    outfits.append(None)
+                continue
+            # Success criterion: PNG exists + non-trivial size. If true
+            # → known good. If false → outcome unknown (treat like the
+            # exception path above — sample is dropped from training,
+            # NOT scored as zero reward).
+            if os.path.exists(png_path) and os.path.getsize(png_path) > 1000:
+                paths.append(png_path)
+            else:
+                print(f"  [iter {self.iter} v{i}] render UNKNOWN: "
+                      f"no PNG / tiny PNG", flush=True)
+                paths.append(None)
         self.iter += 1
         return paths, outfits
 
