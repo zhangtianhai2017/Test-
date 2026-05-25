@@ -1360,8 +1360,20 @@ def build_fabric_shell(body_mesh: o3d.geometry.TriangleMesh, body_uvs: np.ndarra
     _vert_regions = classify_vertices(V, _LM_for_filter)
     _torso_tri_mask = classify_triangles_strict(_vert_regions, T)
 
-    # A triangle is "fabric" if ALL THREE of its per-vertex UVs are inside
-    # at least one polygon. We union the results across polygons.
+    # A triangle is "fabric" if at least 2 of its 3 per-vertex UVs are
+    # inside at least one polygon. We union the inside-mask across all
+    # polygons first, then take the majority test per triangle.
+    #
+    # 2026-05-25: relaxed from strict-3-of-3 to majority-2-of-3. The strict
+    # test produced a visible halo of dropped triangles around the breast
+    # peak: cup polygon edges pass through the dense ring of body-mesh
+    # triangles at the nipple, where many triangles span both inside and
+    # outside the polygon edge → all such boundary triangles dropped →
+    # ring of skin showing through the cup. The user flagged this as a
+    # long-standing artifact. Majority test keeps the boundary triangles
+    # whose centroid is essentially inside, smoothing the polygon edge
+    # without leaking onto out-of-region body parts (the anatomy
+    # classifier on the next line still hard-rejects head/arms/legs).
     inside_any = np.zeros(len(pts_g), dtype=bool)
     for poly in polys_uv:
         if len(poly) < 3:
@@ -1370,7 +1382,8 @@ def build_fabric_shell(body_mesh: o3d.geometry.TriangleMesh, body_uvs: np.ndarra
         path = Path(p)
         inside_any |= path.contains_points(pts_g)
 
-    tri_inside = inside_any.reshape(-1, 3).all(axis=1)
+    inside_per_tri = inside_any.reshape(-1, 3).sum(axis=1)
+    tri_inside = inside_per_tri >= 2
     # Enforce the anatomy classifier as a hard intersection -- triangles
     # outside the torso region are unconditionally rejected.
     tri_inside &= _torso_tri_mask

@@ -31,10 +31,41 @@ def _p(params: dict, name: str, default: float) -> float:
 V_HI_SAFE = 0.95
 V_LO_SAFE = 0.16
 
+# Breast-peak coverage floor (2026-05-25).
+# The body mesh has its bust peak at v ≈ 0.74. The fabric-shell builder
+# uses a STRICT polygon-vertex test (all 3 vertices of a triangle must be
+# inside the cup polygon to keep that triangle). If the cup polygon's
+# upper edge lands AT the breast peak, the dense ring of triangles right
+# around the nipple straddle that edge — many get dropped, leaving a
+# visible halo of skin showing through fabric (the "ring on the breast"
+# the user kept flagging).
+#
+# Floor rule: the polygon's TOP edge (max v of any vertex) must be at
+# least BREAST_PEAK_V + EDGE_CLEARANCE = 0.79. We enforce by lifting the
+# WHOLE polygon (shifting v upward) when its top falls short, rather than
+# clipping individual vertices (which would deform the shape). This
+# preserves each recipe's silhouette but slides it up to clear the peak.
+BREAST_PEAK_V = 0.74
+EDGE_CLEARANCE = 0.05
+BREAST_TOP_FLOOR = BREAST_PEAK_V + EDGE_CLEARANCE   # 0.79
+
 
 def _clip_v(poly):
     """Clip each vertex's v coord to safe anatomy band."""
     return [(u, max(V_LO_SAFE, min(V_HI_SAFE, v))) for u, v in poly]
+
+
+def _lift_above_breast(poly):
+    """If the polygon's top edge is below BREAST_TOP_FLOOR, shift every
+    vertex up by the same delta so the top edge sits at the floor. No-op
+    when the polygon already clears the breast peak.
+
+    Returns a possibly-shifted polygon (same shape, possibly translated)."""
+    top_v = max(v for _, v in poly)
+    if top_v >= BREAST_TOP_FLOOR:
+        return poly
+    delta = BREAST_TOP_FLOOR - top_v
+    return [(u, v + delta) for u, v in poly]
 
 
 # ===========================================================================
@@ -563,7 +594,11 @@ def resolve_cup_recipe(geometry_kind: str, fallback: str = "") -> Callable:
         # creating a visible "ring around abdomen" artifact user flagged.
         # Sizing is already in library schema; recipe should use
         # params as-is.
-        return _clip_v(fn(params, side=side))
+        poly = fn(params, side=side)
+        # 2026-05-25: lift the polygon if its top edge would sit at the
+        # breast peak — eliminates the "ring through nipple" halo.
+        poly = _lift_above_breast(poly)
+        return _clip_v(poly)
     _wrapped.__name__ = fn.__name__
     return _wrapped
 

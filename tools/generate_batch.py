@@ -96,11 +96,31 @@ def main():
         print(f"encoder:    MockTextEncoder (sha256, dim={text_dim})")
     gen = DesignGenerator(text_dim=text_dim, hidden_dim=args.hidden_dim)
     ckpt = torch.load(args.checkpoint, map_location="cpu")
-    # Checkpoint format from train_loop.TrainLoop.save():
-    # {iter, gen_state, opt_state, baseline_R}
-    gen.load_state_dict(ckpt["gen_state"])
+    sd = ckpt.get("gen_state") or ckpt.get("generator_state") or ckpt
+    # Try strict first; on shape mismatch (head expansion) fall back
+    # to per-tensor load skipping mismatched heads (they reinitialize
+    # to random — softmax stays roughly uniform on those dims).
+    try:
+        gen.load_state_dict(sd, strict=True)
+        load_mode = "strict"
+        skipped = []
+    except RuntimeError:
+        own = gen.state_dict()
+        skipped = []
+        filtered = {}
+        for k, v in sd.items():
+            if k in own and own[k].shape == v.shape:
+                filtered[k] = v
+            else:
+                skipped.append(
+                    f"{k} (ckpt={tuple(v.shape) if hasattr(v,'shape') else '?'} "
+                    f"vs model={tuple(own[k].shape) if k in own else 'missing'})")
+        gen.load_state_dict(filtered, strict=False)
+        load_mode = f"partial — {len(skipped)} tensor(s) reinitialized"
     gen.eval()
-    print(f"loaded checkpoint (was iter {ckpt.get('iter', '?')})")
+    print(f"loaded checkpoint (was iter {ckpt.get('iter', '?')}; {load_mode})")
+    for s in skipped[:8]:
+        print(f"  reinit: {s}")
 
     # Pick briefs
     briefs = (SHOWCASE_BRIEFS * ((args.n + 7) // 8))[: args.n]
