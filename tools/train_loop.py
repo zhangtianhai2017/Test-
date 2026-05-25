@@ -398,8 +398,7 @@ class TrainLoop:
             else:
                 known_results = []
             # Reconstitute full-length results list with an unknown
-            # sentinel for indices where render failed. Anything tagged
-            # backend="unknown" gets masked out of the loss further down.
+            # sentinel for indices where render failed.
             results = []
             ki = 0
             for is_known in known_mask:
@@ -409,6 +408,13 @@ class TrainLoop:
                 else:
                     r = JudgeResult.from_dict({}, backend="unknown")
                     results.append(r)
+            # Second filter: judge-side unknowns (JSON parse failure,
+            # backend error, etc.) — also exclude. backend values that
+            # mean "we don't have a real score":
+            UNKNOWN_BACKENDS = {"unknown", "error", "parse_unknown"}
+            for i, r in enumerate(results):
+                if r.backend in UNKNOWN_BACKENDS:
+                    known_mask[i] = False
         except Exception as exc:
             print(f"  render/judge wholesale failed: {exc}; "
                   f"entire batch marked unknown", flush=True)

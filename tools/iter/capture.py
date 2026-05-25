@@ -202,9 +202,10 @@ def render_views(genome: Genome, params, out_dir: str,
                                                             offset=0.05,
                                                             tube_radius=0.10)
             except UnsupportedArchetypeV1:
-                pass
-        except Exception:
-            pass
+                pass  # legitimate — v1 archetype has no garment seams
+        except Exception as exc:
+            print(f"  [seam_mesh build] FAIL "
+                  f"{type(exc).__name__}: {exc}", flush=True)
 
     # Strap radius scale: temporarily monkey-patch by scaling strap meshes.
     # build_strap_meshes is now the post-cutover public dispatcher in
@@ -312,8 +313,10 @@ def render_views(genome: Genome, params, out_dir: str,
                     flat = np.full_like(nm, [128, 128, 255], dtype=np.uint8)
                     nm = (nm * params.weave_intensity + flat * (1.0 - params.weave_intensity)).astype(np.uint8)
                 shell_mat.normal_img = o3d.geometry.Image(nm)
-            except Exception:
-                pass
+            except Exception as exc:
+                print(f"  [shell normal map] FAIL "
+                      f"{type(exc).__name__}: {exc}; "
+                      f"shell renders without normal", flush=True)
 
     bind_mat = o3d.visualization.rendering.MaterialRecord()
     bind_mat.shader = "defaultLit"
@@ -329,8 +332,10 @@ def render_views(genome: Genome, params, out_dir: str,
             r, g_, b = colorsys.hls_to_rgb(g.hue, max(0.05, g.lightness * 0.78),
                                              g.saturation)
             bind_mat.base_color = [float(r), float(g_), float(b), 1.0]
-        except Exception:
-            pass
+        except Exception as exc:
+            print(f"  [bind_mat color from genome] FAIL "
+                  f"{type(exc).__name__}: {exc}; "
+                  f"binding renders white", flush=True)
 
     # Strap classification — some straps are fabric continuations of the
     # main shell (back band, underbust band, gusset, shoulder strap on a

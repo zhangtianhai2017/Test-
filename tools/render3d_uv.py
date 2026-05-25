@@ -822,7 +822,9 @@ def _build_oring_meshes(g, body_vertices, y_crotch, y_neck, v_to_y,
         for spec in anchor_specs:
             try:
                 u, v, name = float(spec[0]), float(spec[1]), str(spec[2])
-            except (IndexError, ValueError, TypeError):
+            except (IndexError, ValueError, TypeError) as exc:
+                print(f"  [oring anchor_specs] bad spec {spec!r}: "
+                      f"{type(exc).__name__}: {exc}", flush=True)
                 continue
             anchors.append((name, u, v_to_y(v)))
     if not anchors:
@@ -1127,8 +1129,9 @@ def _build_strap_meshes_legacy(body_mesh: o3d.geometry.TriangleMesh, g,
         try:
             p = _body_point_at(V, u, y_k, max_torso_radius=18.0)
             inseam_path.append(p)
-        except Exception:
-            pass
+        except Exception as exc:
+            print(f"  [inseam point t={t:.2f}] FAIL {type(exc).__name__}: "
+                  f"{exc}", flush=True)
     if len(inseam_path) >= 2:
         gusset = _arc_tube(np.array(inseam_path), radius=gusset_radius)
         # Suppress for any Genome where the bottom panels are too small
@@ -1240,8 +1243,9 @@ def _build_strap_meshes_legacy(body_mesh: o3d.geometry.TriangleMesh, g,
                 tack.translate(anc.tolist())
                 tack.compute_vertex_normals()
                 straps.append((f"bartack_{tag}", tack))
-            except Exception:
-                pass
+            except Exception as exc:
+                print(f"  [bartack {tag} legacy] FAIL "
+                      f"{type(exc).__name__}: {exc}", flush=True)
 
     # 6) Shoulder straps — anatomically routed from cup top (front) over
     #    the actual ACROMION (shoulder peak detected from the mesh) to
@@ -1973,8 +1977,10 @@ def render_mesh(renderer, mesh: o3d.geometry.TriangleMesh,
             try:
                 weave = getattr(genome, "fabric_weave", "plain") if genome else "plain"
                 shell_mat.normal_img = o3d.geometry.Image(_get_fabric_normal(weave))
-            except AttributeError:
-                pass
+            except AttributeError as exc:
+                # normal-map attr missing — fabric will render flat
+                print(f"  [shell normal map] AttributeError: {exc}; "
+                      f"shell renders without normal", flush=True)
             # sheen -> roughness: matte (0.95) ... satin (0.30)
             sheen = getattr(genome, "fabric_sheen", 0.3) if genome else 0.3
             shell_mat.base_roughness = 0.95 - 0.65 * sheen
@@ -2334,8 +2340,9 @@ def _build_strap_meshes_garment(body_mesh,
                 p1 = p0 - np.array([0.0, dangle_len, 0.0])
                 dangle = _tube_between(p0, p1, radius=0.15, sides=5)
                 straps.append((name, dangle))
-            except Exception:
-                pass
+            except Exception as exc:
+                print(f"  [dangle {name}] FAIL {type(exc).__name__}: {exc}",
+                      flush=True)
 
     # 5) Back-closure tie string — only for archetypes that use a
     # behind-back tie at chest level. The string anchors at the cup
@@ -2389,8 +2396,9 @@ def _build_strap_meshes_garment(body_mesh,
                           0.25)
             back_tie = _arc_tube(np.array(arc_pts), radius=max(0.18, tie_r))
             straps.append(("back_tie_string", back_tie))
-        except Exception:
-            pass
+        except Exception as exc:
+            print(f"  [back_tie_string] FAIL {type(exc).__name__}: {exc}",
+                  flush=True)
 
     # 5b) Halter neck strap — driven by a halter connector + its attachment
     halter_conns = [c for c in garment.connectors if c.kind == "halter_strap"]
@@ -2444,7 +2452,10 @@ def _build_strap_meshes_garment(body_mesh,
                 for spec in specs:
                     try:
                         u, v, name = float(spec[0]), float(spec[1]), str(spec[2])
-                    except (IndexError, ValueError, TypeError):
+                    except (IndexError, ValueError, TypeError) as exc:
+                        print(f"  [oring anchor_specs garment-path] bad spec "
+                              f"{spec!r}: {type(exc).__name__}: {exc}",
+                              flush=True)
                         continue
                     anchors_xy.append((name, u, v_to_y(v)))
             if not anchors_xy:
@@ -2533,8 +2544,9 @@ def _build_strap_meshes_garment(body_mesh,
                 tack.translate(anc.tolist())
                 tack.compute_vertex_normals()
                 straps.append((f"bartack_{tag}", tack))
-            except Exception:
-                pass
+            except Exception as exc:
+                print(f"  [bartack {tag} garment] FAIL "
+                      f"{type(exc).__name__}: {exc}", flush=True)
 
     # 9) Accessories — bow / shell_charm / pendant / fringe / beads / tassel /
     #    ring_charm. Each maps to one of the existing _build_*_mesh helpers

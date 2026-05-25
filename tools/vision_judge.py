@@ -113,6 +113,12 @@ class JudgeResult:
     @classmethod
     def from_dict(cls, d: dict, image_path: str = "",
                   elapsed_s: float = 0.0, backend: str = "") -> "JudgeResult":
+        # If the dict carries _parse_unknown sentinel from _extract_json,
+        # override backend so train_loop's known_mask filter detects this
+        # as UNKNOWN (excluded from policy gradient) rather than as a
+        # real judge verdict.
+        if d.get("_parse_unknown"):
+            backend = "parse_unknown"
         # Structural sub-scores (V2)
         chest = _safe_int(d.get("chest_coverage"))
         pelvic = _safe_int(d.get("pelvic_coverage"))
@@ -537,14 +543,23 @@ def _extract_json(text: str) -> dict:
         text = m.group(0)
     try:
         return json.loads(text)
-    except json.JSONDecodeError:
-        pass
+    except json.JSONDecodeError as exc:
+        print(f"  [judge JSON parse strict-fail] {exc}; trying repair",
+              flush=True)
     try:
         return json.loads(_repair_json(text))
-    except json.JSONDecodeError:
-        # malformed — return a safe "unparseable" result so the
-        # batch pipeline doesn't crash on one bad sample
+    except json.JSONDecodeError as exc:
+        # Malformed even after repair — outcome is genuinely UNKNOWN,
+        # NOT "judge said bad design". Caller (train_loop) detects the
+        # _parse_unknown sentinel and excludes the sample from the
+        # policy gradient. Without this, we'd send the NN a false
+        # negative signal ("avoid this design") for a design the judge
+        # never actually scored.
+        print(f"  [judge JSON parse FAIL] {exc}; "
+              f"sample marked UNKNOWN (will be excluded from training)",
+              flush=True)
         return {
+            "_parse_unknown": True,
             "is_valid_swimsuit": False,
             "validity_score": 0,
             "aesthetic_score": 0,
