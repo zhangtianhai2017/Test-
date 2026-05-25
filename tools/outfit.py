@@ -30,6 +30,10 @@ from dataclasses import dataclass, field, asdict
 from typing import Optional
 import random
 
+# Module-level dedup set for outfit_to_genome missing-field warnings —
+# print each (entry_id, field) pair only once per process run.
+_OUTFIT_TO_GENOME_WARNED: set = set()
+
 from library import (LibraryEntry, SlotSpec, ARCHETYPE_SLOTS,
                        validate_outfit)
 from library_data import (LIBRARY, entries_matching_slot,
@@ -765,6 +769,34 @@ def outfit_to_genome(outfit: Outfit):
     fab_entry = LIBRARY.get(fab_assn.library_id) if fab_assn else None
     cup_entry = LIBRARY.get(cup_assn.library_id) if cup_assn else None
 
+    # --- Missing-field detection (2026-05-25 P0 audit) ---
+    # The 10 .get(field, hardcoded_default) lines below are the historical
+    # template-leak vector flagged in CLAUDE.md: any library entry whose
+    # local_params_schema didn't declare the field falls back to the
+    # default, so NN's continuous-head output for that param has zero
+    # effect ("unknown silently treated as known"). library_data.py now
+    # auto-injects schema for all known cup/bottom entries — but if a
+    # NEW entry is added without one of these fields, the silent fallback
+    # would resume. Warn loudly the first time it ever fires.
+    _UNK = object()
+    _missing_log: list[str] = []
+    def _take(d: dict, key: str, default, source_id: str, slot: str):
+        v = d.get(key, _UNK)
+        if v is _UNK:
+            tag = f"{slot}[{source_id}].{key}"
+            if tag not in _OUTFIT_TO_GENOME_WARNED:
+                _OUTFIT_TO_GENOME_WARNED.add(tag)
+                print(f"  [outfit_to_genome] WARN missing field {tag}; "
+                      f"using default={default}. This means NN's output "
+                      f"for this param is being silently dropped — add "
+                      f"{key!r} to {source_id}.local_params_schema.",
+                      flush=True)
+            return default
+        return v
+
+    cup_lid = cup_assn.library_id if cup_assn else "?"
+    bot_lid = bot_assn.library_id if bot_assn else "?"
+
     has_neck = (outfit.first_assignment("halter_strap") is not None)
     has_shoulder = (outfit.first_assignment("shoulder_strap") is not None)
     has_oring = (outfit.first_assignment("oring") is not None)
@@ -783,23 +815,23 @@ def outfit_to_genome(outfit: Outfit):
 
     g = Genome(
         pattern=outfit.global_design.get("pattern_overlay", "solid"),
-        top_center_v=cup_p.get("center_v", 0.74),
-        top_half_v=cup_p.get("half_v", 0.07),
-        top_half_u=cup_p.get("half_u", 0.16),
-        top_inner_u=cup_p.get("inner_u", 0.10),
-        top_apex_lift=cup_p.get("apex_lift", 0.15),
-        top_underband_dip=cup_p.get("underband_dip", 0.05),
+        top_center_v=_take(cup_p, "center_v", 0.74, cup_lid, "cup"),
+        top_half_v=_take(cup_p, "half_v", 0.07, cup_lid, "cup"),
+        top_half_u=_take(cup_p, "half_u", 0.16, cup_lid, "cup"),
+        top_inner_u=_take(cup_p, "inner_u", 0.10, cup_lid, "cup"),
+        top_apex_lift=_take(cup_p, "apex_lift", 0.15, cup_lid, "cup"),
+        top_underband_dip=_take(cup_p, "underband_dip", 0.05, cup_lid, "cup"),
         top_back_coverage=(0.55 if outfit.archetype in
                                 ("bandeau_back_band", "bralette_shoulder_strap",
                                   "one_piece_maillot")
                             else 0.05),
         top_neck_strap=(0.85 if has_neck else 0.0),
         top_shoulder_strap=(0.85 if has_shoulder else 0.0),
-        bot_front_top_v=bot_p.get("front_top_v", 0.25),
-        bot_front_half_u=bot_p.get("front_half_u", 0.18),
-        bot_front_leg_curve=bot_p.get("front_leg_curve", 0.65),
-        bot_back_top_v=bot_p.get("back_top_v", 0.25),
-        bot_back_half_u=bot_p.get("back_half_u", 0.10),
+        bot_front_top_v=_take(bot_p, "front_top_v", 0.25, bot_lid, "bottom"),
+        bot_front_half_u=_take(bot_p, "front_half_u", 0.18, bot_lid, "bottom"),
+        bot_front_leg_curve=_take(bot_p, "front_leg_curve", 0.65, bot_lid, "bottom"),
+        bot_back_top_v=_take(bot_p, "back_top_v", 0.25, bot_lid, "bottom"),
+        bot_back_half_u=_take(bot_p, "back_half_u", 0.10, bot_lid, "bottom"),
         bot_tie_dangle=0.40 if outfit.first_assignment("side_tie") else 0.0,
         hue=outfit.global_design.get("hue", 0.5),
         saturation=outfit.global_design.get("saturation", 0.6),

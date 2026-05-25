@@ -2415,8 +2415,14 @@ def _build_strap_meshes_garment(body_mesh,
                                    radius=strap_r)
             straps.append(("halter_R", halter_R))
             straps.append(("halter_L", halter_L))
-        except Exception:
-            pass
+        except Exception as exc:
+            # 2026-05-25 audit P0.2: do NOT silently swallow. Previously
+            # a TypeError / numeric error here meant the halter strap
+            # never rendered yet the outfit's has_halter genome flag
+            # stayed True — judge saw "no halter" while NN got reward
+            # as if there was one. Reverse signal during training.
+            print(f"  [halter strap build FAIL] {type(exc).__name__}: {exc}",
+                  flush=True)
 
     # 6) O-rings — at strap junctions when a connector kind=o_ring exists.
     # Phase 2 #5+ (2026-05-25): if the connector's library entry has
@@ -2505,8 +2511,12 @@ def _build_strap_meshes_garment(body_mesh,
                     strap = _arc_tube(np.array([P0, ridge, mid_back, P2]),
                                        radius=strap_r)
                 straps.append((name, strap))
-            except Exception:
-                pass
+            except Exception as exc:
+                # 2026-05-25 audit P0.2: was silent. Same hazard as
+                # halter (above) — NN learns from a "shoulder strap
+                # present" reward signal even when render dropped it.
+                print(f"  [shoulder strap {side} build FAIL] "
+                      f"{type(exc).__name__}: {exc}", flush=True)
 
     # 8) Bar-tacks — at cup-top junctions when shoulder/halter exists
     if g.top_shoulder_strap > 0.15 or g.top_neck_strap > 0.15:

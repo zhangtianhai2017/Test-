@@ -1835,6 +1835,127 @@ for _cup in CUP_PIECES.values():
         _cup.local_params_schema = _new_schema
 
 
+# ---------------------------------------------------------------------------
+# Phase: kill ALL hardcoded `.get(field, default)` fallbacks in
+# outfit_to_genome (2026-05-25 audit P0.1)
+#
+# Background: outfit_to_genome reads cup_p.get("half_v", 0.07) /
+# bot_p.get("front_top_v", 0.25) etc. for 10 fields. If a cup/bottom
+# library entry didn't declare that field in its local_params_schema,
+# the .get() default fires → ALL such entries silently inherit the
+# same hardcoded value → NN's continuous-head output for that
+# parameter has no effect → NN can't learn that dimension.
+#
+# Already fixed: center_v (above) via _center_v_range_for.
+# Now: same defense for the other cup + bottom fields.
+# ---------------------------------------------------------------------------
+
+def _default_cup_schema_for(field: str,
+                             entry: LibraryEntry
+                             ) -> tuple[float, float, float] | None:
+    """Return (lo, hi, default) for a cup_piece field based on geometry
+    kind. Falls back to a kind-agnostic range. None = don't auto-inject
+    (leave the field absent so a runtime error / warning catches it)."""
+    g = entry.geometry_kind
+    if field == "half_v":
+        if g in ("triangle", "brazilian"): return (0.04, 0.10, 0.07)
+        if g == "molded_foam":             return (0.08, 0.14, 0.11)
+        if g == "softcup_squareneck":      return (0.08, 0.15, 0.11)
+        if g == "balconette":              return (0.07, 0.12, 0.10)
+        if g == "bandeau_unified":         return (0.08, 0.14, 0.11)
+        return (0.05, 0.13, 0.09)
+    if field == "half_u":
+        if g in ("triangle", "brazilian"): return (0.10, 0.20, 0.15)
+        if g == "molded_foam":             return (0.16, 0.24, 0.20)
+        if g == "softcup_squareneck":      return (0.18, 0.27, 0.22)
+        if g == "balconette":              return (0.17, 0.25, 0.20)
+        if g == "bandeau_unified":         return (0.20, 0.30, 0.25)
+        return (0.13, 0.23, 0.18)
+    if field == "inner_u":
+        if g in ("triangle", "brazilian"): return (0.08, 0.16, 0.12)
+        if g == "softcup_squareneck":      return (0.02, 0.10, 0.06)
+        if g == "balconette":              return (0.04, 0.10, 0.07)
+        if g == "bandeau_unified":         return (0.00, 0.06, 0.03)
+        return (0.04, 0.14, 0.09)
+    if field == "apex_lift":
+        if g == "molded_foam":             return (0.10, 0.25, 0.18)
+        if g == "softcup_squareneck":      return (-0.15, 0.50, 0.15)
+        if g == "balconette":              return (0.05, 0.20, 0.12)
+        if g == "bandeau_unified":         return (-0.05, 0.10, 0.02)
+        return (0.00, 0.30, 0.15)
+    if field == "underband_dip":
+        if g == "molded_foam":             return (0.02, 0.08, 0.05)
+        if g == "softcup_squareneck":      return (0.00, 0.06, 0.02)
+        return (0.00, 0.10, 0.05)
+    return None
+
+
+def _default_bottom_schema_for(field: str,
+                                entry: LibraryEntry
+                                ) -> tuple[float, float, float] | None:
+    """Same as _default_cup_schema_for but for bottom_piece fields."""
+    g = entry.geometry_kind
+    if field == "front_top_v":
+        if g in ("thong", "g_string", "micro", "tanga"):
+            return (0.18, 0.32, 0.25)
+        if g in ("highwaist",):
+            return (0.40, 0.55, 0.48)
+        if g in ("brief", "hipster", "boy_short"):
+            return (0.28, 0.42, 0.35)
+        return (0.22, 0.42, 0.30)
+    if field == "front_half_u":
+        if g in ("thong", "g_string", "micro"):
+            return (0.08, 0.18, 0.12)
+        if g in ("brief", "highwaist", "boy_short", "hipster"):
+            return (0.40, 0.55, 0.48)
+        return (0.18, 0.45, 0.30)
+    if field == "front_leg_curve":
+        return (0.40, 0.85, 0.65)
+    if field == "back_top_v":
+        if g in ("highwaist",):
+            return (0.40, 0.55, 0.48)
+        return (0.20, 0.42, 0.30)
+    if field == "back_half_u":
+        if g in ("thong", "g_string"):
+            return (0.02, 0.10, 0.05)
+        if g in ("brief", "highwaist", "boy_short", "hipster"):
+            return (0.32, 0.48, 0.40)
+        if g in ("brazilian", "cheeky", "tanga"):
+            return (0.15, 0.28, 0.20)
+        return (0.08, 0.30, 0.18)
+    return None
+
+
+CUP_FIELDS_NEEDED = ("half_v", "half_u", "inner_u",
+                      "apex_lift", "underband_dip")
+BOTTOM_FIELDS_NEEDED = ("front_top_v", "front_half_u", "front_leg_curve",
+                         "back_top_v", "back_half_u")
+
+for _cup in CUP_PIECES.values():
+    _changed = False
+    _new_schema = dict(_cup.local_params_schema)
+    for _f in CUP_FIELDS_NEEDED:
+        if _f not in _new_schema:
+            _spec = _default_cup_schema_for(_f, _cup)
+            if _spec is not None:
+                _new_schema[_f] = _spec
+                _changed = True
+    if _changed:
+        _cup.local_params_schema = _new_schema
+
+for _bot in BOTTOM_PIECES.values():
+    _changed = False
+    _new_schema = dict(_bot.local_params_schema)
+    for _f in BOTTOM_FIELDS_NEEDED:
+        if _f not in _new_schema:
+            _spec = _default_bottom_schema_for(_f, _bot)
+            if _spec is not None:
+                _new_schema[_f] = _spec
+                _changed = True
+    if _changed:
+        _bot.local_params_schema = _new_schema
+
+
 def entries_by_kind(kind: str) -> list[LibraryEntry]:
     return [e for e in LIBRARY.values() if e.kind == kind]
 
