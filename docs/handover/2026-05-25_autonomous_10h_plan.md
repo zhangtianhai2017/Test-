@@ -6,7 +6,19 @@
 
 | 时间 | 动作 | 结果 | 回退 |
 |------|------|------|------|
-| 00:50 | 启 60iter warm-start training | 待确认 healthy | rm 输出目录 |
+| 00:50 | 启 60iter warm-start training | ❌ argparse 不接受 --out-dir | n/a |
+| 00:55 | 修 + 重启 | ❌ resume key 'generator_state' vs 'gen_state' mismatch | n/a |
+| 01:00 | 修 resume keys + 重启 setsid | ❌ WSL2 reaped 进程没存活 | n/a |
+| 01:02 | bash run_in_background 12 iter | ❌ Open3D segfault 在 iter 0 v1 | n/a |
+| 01:05 | smoke 2x2 + mock judge | ❌ 同样 segfault | n/a |
+| 01:08 | 加 RL_RENDER_SUBPROC=1 重试 | ❌ subprocess 也 segfault (deterministic crash 不是 state leak) | n/a |
+| 01:10 | 单独渲 p3_aliased v00(已知 good) | ❌ Open3D init 后立即 crash → 环境性 bug | n/a |
+| 01:11 | 杀 zombie PID 299+364 重试 | ❌ 同样 crash → 需 WSL restart(留给用户) | n/a |
+| 01:15 | **PIVOT** → authoring | 启 Phase 2 #5 | git revert per-commit |
+| 01:25 | commit cutout alias + rl_runner 修 | ✅ 3 commits 本地 | git revert |
+| 01:40 | Phase 2 #5a-f 全部完成 | ✅ 6 commits, 14 新 accessory entries | git revert per-commit |
+| 01:55 | rl_runner strict=False fallback | ✅ commit ready,warm-start across head 变化 graceful | git revert |
+| 02:00 | 清理 dead 输出,写 morning briefing | ✅ ready for user | n/a |
 
 ## 计划阶段
 
