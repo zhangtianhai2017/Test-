@@ -37,12 +37,15 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import torch
 
-import iter.capture as cap
-cap.VIEWS = [v for v in cap.VIEWS if v.name == "01_front"]
+# IMPORTANT: do NOT import iter.capture / render3d_uv at module top.
+# Those pull in Open3D, which loads Filament/EGL state in the parent
+# process. When rl_runner later subprocesses _render_one_outfit.py
+# (RL_RENDER_SUBPROC=1), the child Open3D init collides with parent
+# state and segfaults — observed consistently in this WSL session.
+# Lazy-import them only when in-process render is actually needed.
 
 from outfit import Outfit, SlotAssignment, random_outfit, outfit_to_genome
 from iter.params import IterParams
-from render3d_uv import load_body_mesh
 import library as lib
 import library_data as ld
 from output_paths import dated_dir
@@ -195,13 +198,15 @@ class RenderRunner:
         a plain list or this tuple — the tuple form enables the
         per-sample diversity bonus (controlled by TrainLoop.w_div).
 
-        Two render backends:
-          * in-process: fastest, but Filament/Open3D state can leak
-            across designs in long runs causing segfaults
-          * subprocess: spawns _render_one_outfit.py per design — slower
-            (~5s overhead per design) but bulletproof
-        Toggle via env var RL_RENDER_SUBPROC=1 (default off; set when
-        in-process renders are crashing).
+        Three render backends, picked by env var:
+          * SKIP_RENDER=1: skip rendering entirely (return empty paths).
+            Used when training purely on symbolic_fitness gradient — judge
+            output ignored anyway (caller sets --w-rl 0). Zero Open3D
+            touch, zero crash risk, ~30s/iter at batch 32.
+          * RL_RENDER_SUBPROC=1: spawn _render_one_outfit.py per design.
+            ~5-10s overhead per design but isolates Open3D state.
+          * default (in-process): fastest, but Filament/Open3D state can
+            leak across designs causing segfaults.
         """
         import subprocess as _sp
         B = next(iter(picks.values())).shape[0]
@@ -209,6 +214,7 @@ class RenderRunner:
         os.makedirs(iter_dir, exist_ok=True)
         paths: list[str] = []
         outfits: list = []
+        skip_render = os.environ.get("SKIP_RENDER", "0") == "1"
         use_subproc = os.environ.get("RL_RENDER_SUBPROC", "0") == "1"
         renderer_script = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
@@ -231,7 +237,12 @@ class RenderRunner:
                             for a in outfit.slot_assignments],
                         "global_design": dict(outfit.global_design),
                     }, f, indent=2)
-                if use_subproc:
+                if skip_render:
+                    # No render. Caller is expected to set --w-rl 0 so
+                    # the judge contribution to the loss is zero — only
+                    # symbolic fitness gradient drives learning.
+                    paths.append("")
+                elif use_subproc:
                     rc = _sp.run(
                         [sys.executable, renderer_script,
                          os.path.join(sub, "outfit.json"), sub,
@@ -244,10 +255,19 @@ class RenderRunner:
                             f"subprocess render failed rc={rc.returncode}: "
                             f"{rc.stderr[-200:]}")
                 else:
+                    # Lazy-import Open3D path. Only fires when we're
+                    # actually rendering in-process (NOT subprocess) AND
+                    # SKIP_RENDER is off.
+                    if not hasattr(self, "_cap"):
+                        import iter.capture as _cap
+                        _cap.VIEWS = [v for v in _cap.VIEWS
+                                       if v.name == "01_front"]
+                        self._cap = _cap
                     g = outfit_to_genome(outfit)
                     params = IterParams()
                     params.outfit = outfit
-                    cap.render_views(g, params, sub, body_mesh=self.body)
+                    self._cap.render_views(
+                        g, params, sub, body_mesh=self.body)
                 paths.append(os.path.join(sub, "01_front.png"))
             except Exception as exc:
                 print(f"  [iter {self.iter} v{i}] render fail: {exc}",
@@ -342,7 +362,18 @@ def run(iters: int = 20,
     judge = make_judge(judge_backend, **judge_kwargs)
     if judge_concurrent > 1:
         print(f"  judge: {judge_concurrent} concurrent calls")
-    body = load_body_mesh()
+    # Lazy body-mesh load: only the in-process render path needs the
+    # body mesh in this Python process. SKIP_RENDER + subprocess modes
+    # don't need it (subprocess loads its own body in the child).
+    skip_render = os.environ.get("SKIP_RENDER", "0") == "1"
+    use_subproc = os.environ.get("RL_RENDER_SUBPROC", "0") == "1"
+    if skip_render or use_subproc:
+        body = None
+        print(f"  body mesh load skipped "
+              f"(SKIP_RENDER={skip_render}, SUBPROC={use_subproc})")
+    else:
+        from render3d_uv import load_body_mesh as _load_body_mesh
+        body = _load_body_mesh()
     id_lists = get_id_lists()
     render_runner = RenderRunner(out_root, id_lists, body)
 
