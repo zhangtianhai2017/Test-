@@ -54,6 +54,64 @@ b369be7b  briefing update
 
 仍然是 `tools/output/2026-05-24/2050_rl_run/generator_final.pt`(昨晚训出来的)。今天的 retrain 没有超越它。
 
+---
+
+## Wave 2(深夜继续,~21:00 后)
+
+### 触发
+
+回头审 p11 regression catalog,发现 accessory + hardware 24+14 entry **全部不显示**。挖出 3 个深层 bug。
+
+### 修了
+
+| commit | 内容 |
+|---|---|
+| 9c267ddd | Fix 3 render bugs: dispatcher 用 genome 而非 outfit / O-ring `_build_torus` 签名错 / 重复 accessory 被 Open3D 拒 |
+| 3d412754 | RL reward=0 假信号(rc!=0 当 fail) → known_mask + unknown 排除 |
+| b9ff7e3f | audit doc:"未知当已知"反模式全代码库扫描 |
+| 315caf3d | P0 修:outfit.py 9 个 .get default + halter/shoulder silent except |
+| f4205f2d | P1+P2+P3 修:8 个 render3d_uv silent except + 3 个 capture silent except + judge parse UNKNOWN 传播 + 颜色 .get |
+| bdf000f0 | CLAUDE.md 加"未知 ≠ 0"红线 |
+
+### Wave 2 关键发现
+
+1. **dispatcher 用 genome_to_garment 而不是 outfit_to_garment**:Phase 2 #5 的 hardware placement / anchor_specs 系统全部失效;NN 训练时也看不到这些信息流到 reward 信号
+2. **`_build_torus(anc, radius_cm, tube_radius=0.08)` 签名错** — 自 Phase 2 #2 ship 以来,**没有一张 render 出现过 O-ring**(TypeError 被 silent except 吞掉)
+3. **subprocess Open3D rc=-11 假 fail** — 之前 9 小时训练 reward=0 的真因不是 Open3D 真崩,而是判定逻辑用 rc 而不是 PNG-existence。改后 5×4 smoke 立刻看到 reward 0.45-0.64,iter 1 还有 2/4 pass
+4. **未知 ≠ 0 反模式扫描**:118 个 `.get(field, default)` + 22 个 `except: pass` 跨 8 文件;最毒在 outfit.py(10 个未修的 .get hardcoded default,跟历史 swimsuit_2 模板泄漏同根)+ render3d_uv halter/shoulder silent except(让 NN 收到反向 reward)
+
+### Smoke 验证
+
+5×4 cv_clip(应用全部 Wave 2 修复后):
+```
+iter 0  fitness=0.525  reward=0.453  pass=0/4
+iter 1  fitness=0.542  reward=0.639  pass=2/4  ← 真过结构 gate
+iter 2  fitness=0.509  reward=0.527  pass=0/4
+```
+
+vs Wave 1 早期 35 iter 全 reward=0.000 / pass=0/32。视觉判官 RL 信号**真通了**。
+
+### 最佳 ckpt 仍然是 2050,但训练管线现在可信
+
+之前所有 retrain attempt 都因为 reward=0 假信号被污染。今晚不重训(累计 commit 数太多需要先稳一稳)。
+
+---
+
+## 今晚总账
+
+**26 commits 全部本地落地**(branch `claude/add-diverse-seeds-handover-sBSs3`)
+
+| 类别 | 数 |
+|---|---|
+| 真 bug 修(visible artifact) | 5(navel ring / breast ring / O-ring 不出 / dispatcher / reward 假信号) |
+| 反模式修(silent bug) | 19+(18 个 .get、12 个 silent except,见 audit) |
+| 新系统 | 2(hardware_placements、regression render + catalog) |
+| 文档 | 5(audit / morning briefing / autonomous plan / session summary / Phase 2 #5 design) |
+
+**库**:227 entries(60 cup / 52 bottom / 30 strap / 25 pattern / 16 weave / 31 fabric / 24 accessory / 14 hardware / 4 archetype / 15 cutout)
+
+**输出磁盘**:153MB 在 tools/output/2026-05-25/(去掉 950MB 失败 run + 30MB 中间 smoke 后)
+
 ## 现存输出目录(2026-05-25)
 
 ```
