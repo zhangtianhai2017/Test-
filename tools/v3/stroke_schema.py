@@ -197,6 +197,42 @@ class Stroke:
 
 # ─── Validation ────────────────────────────────────────────────────────
 
+def stroke_to_dict(s: Stroke) -> dict:
+    """Serialize a Stroke to a JSON-safe dict."""
+    return {
+        "start_anchor": int(s.start_anchor),
+        "start_uv": list(s.start_uv) if s.start_uv is not None else None,
+        "end_anchor": int(s.end_anchor),
+        "end_uv": list(s.end_uv) if s.end_uv is not None else None,
+        "bezier_internal": [list(s.bezier_internal[0]),
+                             list(s.bezier_internal[1])],
+        "width_profile": list(s.width_profile),
+        "tension": float(s.tension),
+        "color_id": int(s.color_id),
+        "material_mix": [[int(i), float(w)] for i, w in s.material_mix],
+        "decoration_mix": [[int(i), float(w)] for i, w in s.decoration_mix],
+        "is_end": bool(s.is_end),
+    }
+
+
+def stroke_from_dict(d: dict) -> Stroke:
+    """Deserialize a Stroke from a JSON dict."""
+    return Stroke(
+        start_anchor=Anchor(d["start_anchor"]),
+        start_uv=tuple(d["start_uv"]) if d["start_uv"] is not None else None,
+        end_anchor=Anchor(d["end_anchor"]),
+        end_uv=tuple(d["end_uv"]) if d["end_uv"] is not None else None,
+        bezier_internal=(tuple(d["bezier_internal"][0]),
+                          tuple(d["bezier_internal"][1])),
+        width_profile=tuple(d["width_profile"]),
+        tension=float(d["tension"]),
+        color_id=int(d["color_id"]),
+        material_mix=[(int(i), float(w)) for i, w in d.get("material_mix", [])],
+        decoration_mix=[(int(i), float(w)) for i, w in d.get("decoration_mix", [])],
+        is_end=bool(d.get("is_end", False)),
+    )
+
+
 def validate_stroke(stroke: Stroke) -> list[str]:
     """Return list of error messages (empty list = valid)."""
     errs = []

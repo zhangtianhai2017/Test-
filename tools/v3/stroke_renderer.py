@@ -256,6 +256,72 @@ def render_design_png(strokes: list[Stroke],
     return out_path
 
 
+# ─── 2D UV sketch (GPU-free fallback for smoke) ───────────────────────
+
+def render_uv_sketch(strokes: list[Stroke],
+                      out_path: str,
+                      W: int = 480, H: int = 720,
+                      anchor_uv: dict = None,
+                      title: str | None = None):
+    """Fallback 2D renderer — draws strokes in body UV space.
+
+    Useful when GPU/EGL is contested (vLLM holding most of A6000)
+    and the Open3D OffscreenRenderer crashes. Information equivalent
+    to the 3D render for smoke validation: shows stroke topology and
+    color in the body's cylindrical UV layout.
+    """
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    import matplotlib.patches as mpatches
+
+    if anchor_uv is None:
+        anchor_uv = DEFAULT_ANCHOR_UV
+
+    fig, ax = plt.subplots(figsize=(W / 100, H / 100), dpi=100)
+
+    # Body schematic — front view in UV (u ∈ [0.1, 0.9] is "front of body")
+    body_color = (0.92, 0.85, 0.82)
+    # head
+    ax.add_patch(mpatches.Ellipse((0.5, 0.90), 0.14, 0.10, color=body_color))
+    # torso
+    ax.add_patch(mpatches.Rectangle((0.30, 0.42), 0.40, 0.42, color=body_color))
+    # arms (small)
+    ax.add_patch(mpatches.Rectangle((0.18, 0.55), 0.08, 0.28, color=body_color, alpha=0.6))
+    ax.add_patch(mpatches.Rectangle((0.74, 0.55), 0.08, 0.28, color=body_color, alpha=0.6))
+    # legs
+    ax.add_patch(mpatches.Rectangle((0.32, 0.05), 0.15, 0.40, color=body_color, alpha=0.8))
+    ax.add_patch(mpatches.Rectangle((0.53, 0.05), 0.15, 0.40, color=body_color, alpha=0.8))
+
+    # Anchor dots (light)
+    for a, (u, v) in anchor_uv.items():
+        ax.scatter([u], [v], s=14, c='gray', alpha=0.4, marker='+')
+
+    # Strokes: each as a colored polyline with thickness ~ width
+    for i, s in enumerate(strokes):
+        path = s.sample_path(n_samples=32, anchor_uv=anchor_uv)
+        us = [p[0] for p in path]
+        vs = [p[1] for p in path]
+        c = PALETTE[max(0, min(255, s.color_id))]
+        # width in cm → linewidth in pt; visible scale
+        lw = max(1.0, float(np.mean(s.width_profile)) * 1.5)
+        ax.plot(us, vs, color=tuple(c), linewidth=lw, alpha=0.92,
+                 solid_capstyle='round')
+
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.set_aspect('auto')
+    ax.set_xticks([0.0, 0.25, 0.5, 0.75, 1.0])
+    ax.set_xticklabels(['back', 'side R', 'front', 'side L', 'back'], fontsize=7)
+    ax.set_yticks([])
+    if title:
+        ax.set_title(title, fontsize=9)
+    os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
+    plt.savefig(out_path, bbox_inches='tight', dpi=100)
+    plt.close(fig)
+    return out_path
+
+
 # ─── smoke ────────────────────────────────────────────────────────────
 
 def _smoke():
