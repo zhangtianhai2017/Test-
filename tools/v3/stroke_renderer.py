@@ -103,7 +103,13 @@ def _hsl_to_rgb(h: float, s: float, L: float) -> np.ndarray:
     return np.array([r, g, b], dtype=np.float32)
 
 
-PALETTE = default_palette(256)
+# Use the proper named palette from v3/palette.py if available, else fall
+# back to the in-file HSL approximation.
+try:
+    from v3.palette import rgb_array as _palette_rgb_array
+    PALETTE = _palette_rgb_array()
+except ImportError:
+    PALETTE = default_palette(256)
 
 
 # ─── anchor resolution ────────────────────────────────────────────────
