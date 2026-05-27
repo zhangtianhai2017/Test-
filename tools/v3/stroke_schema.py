@@ -313,6 +313,136 @@ def example_classical_bikini() -> list[Stroke]:
     ]
 
 
+def example_sculptural_one_piece() -> list[Stroke]:
+    """Iris van Herpen-style sculptural one-piece: full coverage front,
+    bone-form silhouette via swooping bezier curves."""
+    return [
+        Stroke(
+            start_anchor=Anchor.SHOULDER_L, end_anchor=Anchor.WAIST_R,
+            bezier_internal=((0.55, 0.78), (0.40, 0.65)),
+            width_profile=(2.0, 12.0, 4.0),
+            tension=0.85, color_id=6,  # orange
+        ),
+        Stroke(
+            start_anchor=Anchor.SHOULDER_R, end_anchor=Anchor.WAIST_L,
+            bezier_internal=((0.45, 0.78), (0.60, 0.65)),
+            width_profile=(2.0, 12.0, 4.0),
+            tension=0.85, color_id=6,
+        ),
+        Stroke(
+            start_anchor=Anchor.WAIST_L, end_anchor=Anchor.HIP_R,
+            bezier_internal=((0.65, 0.54), (0.40, 0.50)),
+            width_profile=(4.0, 8.0, 2.0),
+            tension=0.90, color_id=6,
+        ),
+        Stroke(
+            start_anchor=Anchor.WAIST_R, end_anchor=Anchor.HIP_L,
+            bezier_internal=((0.35, 0.54), (0.60, 0.50)),
+            width_profile=(4.0, 8.0, 2.0),
+            tension=0.90, color_id=6, is_end=True,
+        ),
+    ]
+
+
+def example_cyberpunk_cage_harness() -> list[Stroke]:
+    """Multi-strap cage harness: lots of crossing thin straps,
+    cyberpunk magenta + black."""
+    return [
+        Stroke(start_anchor=Anchor.COLLARBONE, end_anchor=Anchor.HIP_L,
+                bezier_internal=((0.55, 0.65), (0.65, 0.55)),
+                width_profile=(1.0, 0.8, 1.0), tension=1.0, color_id=21),
+        Stroke(start_anchor=Anchor.COLLARBONE, end_anchor=Anchor.HIP_R,
+                bezier_internal=((0.45, 0.65), (0.35, 0.55)),
+                width_profile=(1.0, 0.8, 1.0), tension=1.0, color_id=21),
+        Stroke(start_anchor=Anchor.SHOULDER_L, end_anchor=Anchor.WAIST_R,
+                bezier_internal=((0.55, 0.70), (0.40, 0.62)),
+                width_profile=(0.8, 0.6, 0.8), tension=1.0, color_id=1),
+        Stroke(start_anchor=Anchor.SHOULDER_R, end_anchor=Anchor.WAIST_L,
+                bezier_internal=((0.45, 0.70), (0.60, 0.62)),
+                width_profile=(0.8, 0.6, 0.8), tension=1.0, color_id=1),
+        Stroke(start_anchor=Anchor.HIP_L, end_anchor=Anchor.HIP_R,
+                bezier_internal=((0.65, 0.46), (0.35, 0.46)),
+                width_profile=(2.5, 4.0, 2.5), tension=0.9, color_id=1,
+                is_end=True),
+    ]
+
+
+def example_athletic_sports() -> list[Stroke]:
+    """Sporty: wider straps, neon yellow, full-coverage top, boyshort bottom."""
+    return [
+        Stroke(start_anchor=Anchor.SHOULDER_L, end_anchor=Anchor.UNDERBUST,
+                bezier_internal=((0.65, 0.75), (0.55, 0.71)),
+                width_profile=(3.5, 4.0, 6.0), tension=1.0, color_id=9),  # neon yellow
+        Stroke(start_anchor=Anchor.SHOULDER_R, end_anchor=Anchor.UNDERBUST,
+                bezier_internal=((0.35, 0.75), (0.45, 0.71)),
+                width_profile=(3.5, 4.0, 6.0), tension=1.0, color_id=9),
+        Stroke(start_anchor=Anchor.UNDERBUST, end_anchor=Anchor.WAIST_L,
+                bezier_internal=((0.55, 0.65), (0.65, 0.61)),
+                width_profile=(6.0, 5.0, 4.0), tension=1.0, color_id=9),
+        Stroke(start_anchor=Anchor.UNDERBUST, end_anchor=Anchor.WAIST_R,
+                bezier_internal=((0.45, 0.65), (0.35, 0.61)),
+                width_profile=(6.0, 5.0, 4.0), tension=1.0, color_id=9),
+        Stroke(start_anchor=Anchor.HIP_L, end_anchor=Anchor.HIP_R,
+                bezier_internal=((0.62, 0.42), (0.38, 0.42)),
+                width_profile=(7.0, 10.0, 7.0), tension=1.0, color_id=9,
+                is_end=True),
+    ]
+
+
+def example_ethnic_body_chain() -> list[Stroke]:
+    """Cultural / body chain feel: minimal thin gold lines + small triangle cups,
+    inspired by Berber / Hindu / Aztec body chain motifs."""
+    return [
+        Stroke(start_anchor=Anchor.NECK_BACK, end_anchor=Anchor.STERNUM,
+                bezier_internal=((0.20, 0.78), (0.40, 0.74)),
+                width_profile=(0.4, 0.4, 0.4), tension=1.0, color_id=25),  # gold
+        Stroke(start_anchor=Anchor.STERNUM, end_anchor=Anchor.HIP_L,
+                bezier_internal=((0.55, 0.65), (0.65, 0.55)),
+                width_profile=(0.4, 0.4, 0.4), tension=1.0, color_id=25),
+        Stroke(start_anchor=Anchor.STERNUM, end_anchor=Anchor.HIP_R,
+                bezier_internal=((0.45, 0.65), (0.35, 0.55)),
+                width_profile=(0.4, 0.4, 0.4), tension=1.0, color_id=25),
+        Stroke(start_anchor=Anchor.SHOULDER_L, end_anchor=Anchor.STERNUM,
+                bezier_internal=((0.62, 0.78), (0.55, 0.75)),
+                width_profile=(0.5, 4.0, 0.5), tension=0.9, color_id=8),  # burgundy
+        Stroke(start_anchor=Anchor.SHOULDER_R, end_anchor=Anchor.STERNUM,
+                bezier_internal=((0.38, 0.78), (0.45, 0.75)),
+                width_profile=(0.5, 4.0, 0.5), tension=0.9, color_id=8),
+        Stroke(start_anchor=Anchor.HIP_L, end_anchor=Anchor.HIP_R,
+                bezier_internal=((0.62, 0.46), (0.38, 0.46)),
+                width_profile=(1.0, 4.0, 1.0), tension=0.95, color_id=8,
+                is_end=True),
+    ]
+
+
+def example_draped_wrap() -> list[Stroke]:
+    """Single continuous wrap design: starts at one shoulder, drapes
+    diagonally across body to opposite hip — sari / toga influence."""
+    return [
+        Stroke(start_anchor=Anchor.SHOULDER_L, end_anchor=Anchor.HIP_R,
+                bezier_internal=((0.55, 0.72), (0.40, 0.55)),
+                width_profile=(12.0, 14.0, 8.0),
+                tension=0.70, color_id=13),  # mauve
+        Stroke(start_anchor=Anchor.UNDERBUST, end_anchor=Anchor.WAIST_R,
+                bezier_internal=((0.55, 0.65), (0.40, 0.60)),
+                width_profile=(3.0, 5.0, 3.0),
+                tension=0.95, color_id=13, is_end=True),
+    ]
+
+
+def all_reference_designs() -> dict[str, list[Stroke]]:
+    """All 7 hand-crafted reference designs as {name: strokes}."""
+    return {
+        "classical_bikini":      example_classical_bikini(),
+        "avant_garde_harness":   example_avant_garde_harness(),
+        "sculptural_one_piece":  example_sculptural_one_piece(),
+        "cyberpunk_cage":        example_cyberpunk_cage_harness(),
+        "athletic_sports":       example_athletic_sports(),
+        "ethnic_body_chain":     example_ethnic_body_chain(),
+        "draped_wrap":           example_draped_wrap(),
+    }
+
+
 def example_avant_garde_harness() -> list[Stroke]:
     """A 'cross-body harness' — only expressible in v3, not v2."""
     return [

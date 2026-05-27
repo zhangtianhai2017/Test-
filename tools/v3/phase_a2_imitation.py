@@ -37,34 +37,57 @@ for p in [_TOOLS_DIR, _THIS_DIR]:
 from design_generator import SentenceTransformerEncoder         # noqa: E402
 from v3.design_generator_v3 import DesignGeneratorV3              # noqa: E402
 from v3.stroke_schema import (                                     # noqa: E402
-    example_classical_bikini, example_avant_garde_harness,
-    Stroke, MAX_STROKES,
+    all_reference_designs, Stroke, MAX_STROKES,
 )
 from v3.stroke_tensor import encode_design, STROKE_TENSOR_DIM      # noqa: E402
 from v3.stroke_renderer import render_uv_sketch                    # noqa: E402
 
 
-# Teacher brief paraphrases (so decoder sees variety, not 1 example each)
-TEACHER_BRIEFS_CLASSICAL = [
-    "classic triangle bikini, simple, ivory white",
-    "古典三角比基尼, 象牙白",
-    "minimalist white triangle two-piece, beach",
-    "basic two-triangle bikini, white-cream, elegant",
-    "white triangle cup bikini with hip wrap",
-    "ivory classical 4-stroke bikini, French style",
-    "white triangle bra + thong bikini, classic",
-    "象牙白经典款比基尼, 简约风",
-]
-TEACHER_BRIEFS_HARNESS = [
-    "avant-garde black cross-body harness, two diagonal straps",
-    "前卫风黑色交叉束带, 双肩到反侧胯, harness 风",
-    "BDSM-inspired black multi-strap harness swim",
-    "diagonal cross-body cage harness, dark, dramatic",
-    "asymmetric body cage harness, charcoal black",
-    "dark crossing harness with underbust band + hip wrap",
-    "Mugler-inspired diagonal harness, black, sculptural",
-    "dramatic 4-stroke harness: 2 diagonals + underbust + hip",
-]
+# Teacher brief paraphrases — 4 per reference design = 28 total pairs
+TEACHER_BRIEFS_BY_NAME: dict[str, list[str]] = {
+    "classical_bikini": [
+        "classic triangle bikini, simple, ivory white",
+        "古典三角比基尼, 象牙白, 经典款",
+        "minimalist white triangle two-piece, beach",
+        "ivory classical 4-stroke bikini, French elegant",
+    ],
+    "avant_garde_harness": [
+        "avant-garde black cross-body harness, two diagonals",
+        "前卫风黑色交叉束带, 双肩到反侧胯",
+        "BDSM-inspired black multi-strap harness",
+        "Mugler-inspired diagonal harness, dramatic black",
+    ],
+    "sculptural_one_piece": [
+        "sculptural orange one-piece, swooping curves, van Herpen style",
+        "雕塑感橙色连体, Iris van Herpen 风, 大幅曲线",
+        "biomorphic orange monokini, sculpted silhouette",
+        "high-art orange one-piece with bone-form swoops",
+    ],
+    "cyberpunk_cage": [
+        "cyberpunk magenta + black cage harness, multi-strap",
+        "赛博朋克紫红+黑色多绳笼形束带",
+        "neon-pink BDSM cage swim, multi-axis straps",
+        "cybergoth cage bikini, magenta + void black",
+    ],
+    "athletic_sports": [
+        "athletic sports bikini, neon yellow, full-coverage",
+        "运动型比基尼, 荧光黄, 高覆盖",
+        "high-performance sport swim, neon yellow, thick straps",
+        "race-ready neon yellow sport bikini, boyshort bottom",
+    ],
+    "ethnic_body_chain": [
+        "ethnic gold body chain + burgundy triangle cups",
+        "民族风金色身链+酒红三角杯",
+        "Berber-inspired gold body jewelry with burgundy bikini",
+        "Aztec body chain swim, gold + blood-red triangles",
+    ],
+    "draped_wrap": [
+        "draped one-shoulder mauve wrap, sari-inspired, asymmetric",
+        "单肩垂坠藕紫色围裹, 莎丽风, 不对称",
+        "asymmetric mauve draped wrap, single shoulder",
+        "ethereal mauve toga drape across body, single shoulder",
+    ],
+}
 
 
 def main():
@@ -90,20 +113,27 @@ def main():
 
     # ─── teacher data ────────────────────────────────────────────────
     print("[data] encoding teacher designs...")
-    teacher_classical = example_classical_bikini()
-    teacher_harness = example_avant_garde_harness()
-    enc_classical, mask_classical = encode_design(teacher_classical)
-    enc_harness, mask_harness = encode_design(teacher_harness)
+    refs = all_reference_designs()
+    print(f"        {len(refs)} reference designs:")
+    encoded_by_name = {}
+    for name, strokes in refs.items():
+        et, em = encode_design(strokes)
+        encoded_by_name[name] = (et, em)
+        print(f"          {name:<22} {len(strokes)} strokes")
 
     # Build paired (brief, target_tensor, target_mask) dataset
-    all_briefs = TEACHER_BRIEFS_CLASSICAL + TEACHER_BRIEFS_HARNESS
-    all_targets = ([enc_classical] * len(TEACHER_BRIEFS_CLASSICAL)
-                    + [enc_harness] * len(TEACHER_BRIEFS_HARNESS))
-    all_masks = ([mask_classical] * len(TEACHER_BRIEFS_CLASSICAL)
-                  + [mask_harness] * len(TEACHER_BRIEFS_HARNESS))
+    all_briefs, all_targets, all_masks, all_names = [], [], [], []
+    for name, briefs in TEACHER_BRIEFS_BY_NAME.items():
+        et, em = encoded_by_name[name]
+        for b in briefs:
+            all_briefs.append(b)
+            all_targets.append(et)
+            all_masks.append(em)
+            all_names.append(name)
     target_stack = torch.stack(all_targets)         # (N, MAX_STROKES, D)
     mask_stack = torch.stack(all_masks)              # (N, MAX_STROKES)
-    print(f"        teacher set: {len(all_briefs)} (brief, design) pairs")
+    print(f"        teacher set: {len(all_briefs)} (brief, design) pairs "
+          f"({len(refs)} designs × ~4 paraphrases each)")
 
     # Pre-encode all teacher briefs
     print("[data] encoding teacher briefs via sbert...")
@@ -165,10 +195,11 @@ def main():
     print(f"  total[last] = {losses[-1]:.3f}")
 
     # ─── eval: have the (now-trained) decoder produce designs for the
-    # two teacher briefs and compare ─────────────────────────────────
-    print("\n[eval] generating trained decoder output for both teachers...")
+    # first brief of each reference, and compare ─────────────────────
+    print("\n[eval] generating trained decoder output for all teachers...")
     gen.eval()
-    eval_briefs = [TEACHER_BRIEFS_CLASSICAL[0], TEACHER_BRIEFS_HARNESS[0]]
+    eval_briefs = [briefs[0] for briefs in TEACHER_BRIEFS_BY_NAME.values()]
+    eval_names = list(TEACHER_BRIEFS_BY_NAME.keys())
     eval_emb = enc.encode(eval_briefs)
     if not isinstance(eval_emb, torch.Tensor):
         eval_emb = torch.tensor(eval_emb)
@@ -182,21 +213,17 @@ def main():
         decoded_eval[i] = strokes[:end_at]
         print(f"  {b[:50]:<50}  {len(decoded_eval[i])} strokes")
 
-    # render comparison: teacher (left) vs decoder (right) for both
-    print("[eval] rendering teacher-vs-decoder UV sketches...")
-    cmp_paths = []
-    for name, teacher_strokes, decoder_strokes, brief in [
-        ("classical", teacher_classical, decoded_eval[0], eval_briefs[0]),
-        ("harness", teacher_harness, decoded_eval[1], eval_briefs[1]),
-    ]:
+    # render comparison: teacher (left) vs decoder (right) for all 7
+    print("[eval] rendering teacher-vs-decoder UV sketches for all refs...")
+    for name, brief, decoder_strokes in zip(eval_names, eval_briefs, decoded_eval):
+        teacher_strokes = refs[name]
         out_teacher = os.path.join(args.out_dir, f"{name}_teacher.png")
         out_decoder = os.path.join(args.out_dir, f"{name}_decoder.png")
         render_uv_sketch(teacher_strokes, out_teacher,
                           title=f"{name} TEACHER ({len(teacher_strokes)} strokes)")
         render_uv_sketch(decoder_strokes, out_decoder,
                           title=f"{name} DECODER ({len(decoder_strokes)} strokes)\n{brief[:50]}")
-        cmp_paths.append((out_teacher, out_decoder))
-        print(f"  ✓ {name}: teacher={out_teacher}  decoder={out_decoder}")
+        print(f"  ✓ {name}: T={len(teacher_strokes)}  D={len(decoder_strokes)}")
 
     # ─── save ────────────────────────────────────────────────────────
     ckpt = os.path.join(args.out_dir, "decoder_pretrained.pt")
@@ -249,10 +276,14 @@ def main():
         "loss_first_5_mean": sum(losses[:5]) / 5,
         "loss_last_5_mean": sum(losses[-5:]) / 5,
         "loss_drop_ratio": sum(losses[:5]) / max(1e-6, sum(losses[-5:])),
-        "decoded_strokes_classical": len(decoded_eval[0]),
-        "decoded_strokes_harness": len(decoded_eval[1]),
-        "teacher_strokes_classical": len(teacher_classical),
-        "teacher_strokes_harness": len(teacher_harness),
+        "n_teachers": len(refs),
+        "n_paired": len(all_briefs),
+        "decoded_strokes_per_ref": {
+            name: len(d) for name, d in zip(eval_names, decoded_eval)
+        },
+        "teacher_strokes_per_ref": {
+            name: len(s) for name, s in refs.items()
+        },
     }
     with open(os.path.join(args.out_dir, "summary.json"), "w") as f:
         json.dump(summary, f, indent=2)
