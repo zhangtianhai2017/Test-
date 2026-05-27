@@ -317,6 +317,7 @@ def run(iters: int = 20,
          judge_concurrent: int = 1,    # vllm judge concurrent calls
          judge_backend: str = "mock",
          hidden_dim: int = 256,
+         n_trunk_layers: int = 8,
          text_dim: int = 384,
          seed: int = 20260518,
          resume_from: str | None = None,
@@ -336,7 +337,8 @@ def run(iters: int = 20,
     else:
         enc = MockTextEncoder(dim=text_dim)
         print(f"  encoder: MockTextEncoder (sha256 hash, dim={text_dim})")
-    gen = DesignGenerator(text_dim=text_dim, hidden_dim=hidden_dim)
+    gen = DesignGenerator(text_dim=text_dim, hidden_dim=hidden_dim,
+                            n_hidden_layers=n_trunk_layers)
     if resume_from and os.path.isfile(resume_from):
         ckpt = torch.load(resume_from)
         # Older saves used "generator_state", newer use "gen_state".
@@ -350,6 +352,7 @@ def run(iters: int = 20,
             gen.load_state_dict(sd, strict=True)
             loaded_mode = "strict"
             skipped = []
+            new_in_model = []
         except RuntimeError:
             own = gen.state_dict()
             skipped = []
@@ -363,8 +366,14 @@ def run(iters: int = 20,
                         f"(ckpt={tuple(v.shape) if hasattr(v,'shape') else '?'} "
                         f"vs model="
                         f"{tuple(own[k].shape) if k in own else 'missing'})")
+            # ALSO log params that exist in the (new, possibly larger)
+            # model but were NOT in the ckpt at all — these stay at
+            # random init. Important for "add new trunk layers on top"
+            # case where new layers are entirely new keys.
+            new_in_model = sorted(set(own.keys()) - set(sd.keys()))
             gen.load_state_dict(filtered, strict=False)
-            loaded_mode = f"partial — {len(skipped)} tensor(s) reinitialized"
+            loaded_mode = (f"partial — {len(skipped)} tensor(s) reinit, "
+                            f"{len(new_in_model)} new tensor(s) random-init")
         prev_iter = ckpt.get("iter", "?") if isinstance(ckpt, dict) else "?"
         print(f"resumed weights from {resume_from} (was iter {prev_iter}; "
               f"{loaded_mode})")
@@ -372,6 +381,11 @@ def run(iters: int = 20,
             print(f"  reinit: {s}")
         if len(skipped) > 8:
             print(f"  ... and {len(skipped)-8} more")
+        for k in new_in_model[:8]:
+            print(f"  new (random-init): {k} "
+                  f"{tuple(gen.state_dict()[k].shape)}")
+        if len(new_in_model) > 8:
+            print(f"  ... and {len(new_in_model)-8} more new")
 
     judge_kwargs = {}
     if judge_backend == "vllm" and judge_concurrent > 1:
@@ -518,6 +532,12 @@ def main():
                          "batches them; 8 calls take ~2.5x of 1 call "
                          "instead of 8x.")
     ap.add_argument("--hidden-dim", type=int, default=256)
+    ap.add_argument("--n-trunk-layers", type=int, default=8,
+                     help="number of ResidualMLPBlock layers in the "
+                          "trunk. Default 8 (original). Increasing to "
+                          "12+ adds depth on top of warm-start ckpt — "
+                          "new layers init near-identity (residual), "
+                          "old layers reuse warm-start weights.")
     ap.add_argument("--resume", default=None)
     args = ap.parse_args()
     run(iters=args.iters, batch_size=args.batch, lr=args.lr,
@@ -533,6 +553,7 @@ def main():
          encoder_name=args.encoder,
          judge_concurrent=args.judge_concurrent,
          judge_backend=args.judge, hidden_dim=args.hidden_dim,
+         n_trunk_layers=args.n_trunk_layers,
          resume_from=args.resume)
 
 
