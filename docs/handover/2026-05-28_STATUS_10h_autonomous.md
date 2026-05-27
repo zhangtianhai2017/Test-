@@ -1,13 +1,15 @@
 # 10-Hour Autonomous Work Status (2026-05-27 → 2026-05-28)
 
 **Branch:** `claude/add-diverse-seeds-handover-sBSs3`
-**Commits added (this session):** 5 in order
+**Commits added (this session):** 8 in order
 1. `v3 schema foundation: tag pool + stroke schema`
 2. `v3 generator + renderer: encoder/decoder + stroke→PNG bridge`
 3. `v3 end-to-end smoke: brief → strokes → UV sketch (8/8 OK)`
 4. `v3 Phase A1+A2 smoke training (both pass)`
 5. `v3 named 256-color palette + renderer integration`
 6. `v3 audit: trained-vs-random comparison on 8 UNSEEN briefs`
+7. `STATUS: 10h autonomous v3 build (handover doc)`  ← this file
+8. `Phase A2 expanded: 7 diverse teachers, strong semantic transfer`  ★ best result
 
 ---
 
@@ -17,12 +19,23 @@
 TagEmbeddingBank → VAE encoder + noise mix → Anchor-Plan +
 Transformer stroke decoder → list[Stroke] → UV-sketch PNG. Phase A1
 (self-supervised tag) and Phase A2 (teacher imitation) smoke trainings
-both converge (148× and 426× loss drops). On 8 UNSEEN briefs, the
-trained decoder shows **clear semantic conditioning**: "Maori-inspired
-**harness**" → black cross-body diagonals (the harness teacher's
-signature), other briefs → ivory + cup-like (the classical teacher's
-vocabulary). This is the first evidence that v3 can learn meaningful
-brief→design mappings.
+both converge.
+
+**Best single result:** Phase A2 trained on 7 diverse hand-crafted
+teachers (28 brief-pairs) shows **strong semantic transfer** to 8
+unseen briefs:
+
+  | unseen brief | trained output | teacher pulled from |
+  |---|---|---|
+  | "cyberpunk magenta + black" | magenta strokes | cyberpunk_cage |
+  | "Iris van Herpen sculptural" | orange swooping curves | sculptural_one_piece |
+  | "Bayonetta deep violet" | mauve single diagonal | draped_wrap |
+  | "Dune Fremen desert sand" | minimal tan | classical_bikini |
+  | "K/DA idol neon" | magenta + black straps | cyberpunk_cage |
+
+The decoder learned `brief_keyword → teacher_signature` mappings from
+28 training pairs and applies them to novel briefs. See
+`tools/output/2026-05-28/p23_audit_diverse/audit_grid.png`.
 
 **Nothing destructive.** All work is in new files (`tools/v3/*`,
 `tools/tag_data.py`, `tools/tag_embeddings.py`, new docs).
@@ -213,10 +226,12 @@ swatch: tools/output/2026-05-27/p21_palette/palette_swatch.png
 
 In this order — should take ~15 min to digest:
 
-1. **Visual evidence:**
-   `tools/output/2026-05-28/p22_v3_audit/audit_grid.png`
-   — Look at row v04 (Maori harness): trained column shows black
-   crossing diagonals. That's transfer-learning working.
+1. **★ Visual evidence (strongest):**
+   `tools/output/2026-05-28/p23_audit_diverse/audit_grid.png`
+   — 8 UNSEEN briefs, 2-col grid. The TRAINED column shows clear
+   color + topology matching to brief keywords (cyberpunk → magenta,
+   sculptural → orange swoops, violet → mauve drape, desert → tan).
+   This is the most compelling result of the session.
 
 2. **Architecture doc:**
    `docs/design/2026-05-27_schema_redesign_v3.md`
