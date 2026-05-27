@@ -61,6 +61,10 @@ def main():
     ap.add_argument("--out-dir", required=True)
     ap.add_argument("--n", type=int, default=8)
     ap.add_argument("--hidden-dim", type=int, default=256)
+    ap.add_argument("--n-trunk-layers", type=int, default=8,
+                    help="Number of trunk ResidualMLPBlocks. Must match "
+                         "the checkpoint (8 = old runs, 12 = 2026-05-27 "
+                         "deeper-trunk experiment).")
     ap.add_argument("--text-dim", type=int, default=384)
     ap.add_argument("--encoder", choices=["mock", "sbert"], default="mock",
                     help="Must match the encoder used during training. "
@@ -94,7 +98,8 @@ def main():
         text_dim = args.text_dim
         enc = MockTextEncoder(dim=text_dim)
         print(f"encoder:    MockTextEncoder (sha256, dim={text_dim})")
-    gen = DesignGenerator(text_dim=text_dim, hidden_dim=args.hidden_dim)
+    gen = DesignGenerator(text_dim=text_dim, hidden_dim=args.hidden_dim,
+                          n_hidden_layers=args.n_trunk_layers)
     ckpt = torch.load(args.checkpoint, map_location="cpu")
     sd = ckpt.get("gen_state") or ckpt.get("generator_state") or ckpt
     # Try strict first; on shape mismatch (head expansion) fall back
