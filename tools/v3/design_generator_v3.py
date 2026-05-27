@@ -434,12 +434,35 @@ class DesignGeneratorV3(nn.Module):
         loss_material = kl_mixture_at(_OFF_MATERIAL, N_MATERIAL_VFX_TAGS)
         loss_decoration = kl_mixture_at(_OFF_DECORATION, N_MATERIAL_VFX_TAGS)
 
-        # is_end: binary cross entropy
+        # is_end: binary cross entropy WITH positive-class upweight.
+        # Each design has typically 1 positive (the last stroke) vs 3-15
+        # negatives — the loss must be heavily upweighted on the positive
+        # or it just learns "always say no" (BCE → 0 per stroke, but
+        # decoder never terminates).
         pe = pred_tensor[:, :, _OFF_IS_END]
         te = target_tensor[:, :, _OFF_IS_END]
+        is_end_target = torch.sigmoid(te)
+        # weight = 5x for positives, 1x for negatives (per-position)
+        pos_weight = 1.0 + 4.0 * is_end_target
         bce = F.binary_cross_entropy_with_logits(
-            pe, torch.sigmoid(te), reduction="none")
+            pe, is_end_target, reduction="none") * pos_weight
         loss_is_end = (bce * target_mask).sum() / target_mask.sum().clamp(min=1)
+        # extra: explicit penalty if decoder doesn't fire is_end within mask
+        # (encourages termination at the right position)
+        prob_end = torch.sigmoid(pe)
+        # for each design, the predicted "first is_end position" should
+        # match the target's. Use a soft cumulative not-yet-ended prob and
+        # penalize tail mass past the true end.
+        # not_end = (1 - prob_end). cumprod = prob still active at step t.
+        # target_mask sums to N_true_strokes (= true end position + 1).
+        # We want prob_end ≈ 1 at position (N_true - 1), 0 before.
+        true_end_pos = target_mask.sum(dim=-1).long() - 1   # (B,)
+        # gather predicted prob at true_end_pos
+        B = pe.shape[0]
+        idx = torch.arange(B, device=pe.device)
+        prob_at_end = prob_end[idx, true_end_pos]
+        loss_term = -torch.log(prob_at_end.clamp(min=1e-6)).mean()
+        loss_is_end = loss_is_end + 0.5 * loss_term
 
         total = (loss_start + loss_end + loss_color
                  + loss_uv_free + loss_bezier + loss_width + loss_tension
