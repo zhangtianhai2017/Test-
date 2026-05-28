@@ -566,29 +566,122 @@ def all_reference_designs() -> dict[str, list[Stroke]]:
 # These use Panel for fabric regions (cups, bottoms, wrap surfaces) and
 # Stroke for straps/harness/decoration. They flow into v2's full chain
 # via tokens_to_garment to produce real fabric meshes.
+#
+# DESIGN PRINCIPLE (per 2026-05-27 user direction): NO classical/basic/
+# everyday/conservative designs. The reference set should bias the NN
+# toward imaginative, stylized, fantasy, game-aesthetic outputs.
+# Concrete "do NOT include" list:
+#   - basic triangle bikini / classical halter / everyday sport bikini /
+#     racer-back competition / minimal beachwear / generic push-up
+# Concrete "DO include" target axes (color + topology):
+#   - cool/metallic colors (silver / chrome / iridescent / jade / teal)
+#   - warm/dramatic (blood crimson / void black / gold)
+#   - cultural register (Maori / Aztec / Tibetan / Heian)
+#   - non-bikini topologies (cross-body wrap / asymmetric monokini /
+#     harness / chainmail / feather cape attached)
 
-def example_classical_bikini_v31() -> list:
-    """Classical white bikini = 2 cup panels (one + mirror) + 1 bottom + 2 shoulder straps."""
+
+def example_chainmail_armor_v31() -> list:
+    """Fantasy chainmail bikini armor — silver/chrome metallic look with
+    real metal-plate cup geometry + visible link chains as straps."""
     return [
-        # Left cup (mirror_axis="u" → tokens_to_garment will auto-mirror)
+        # Metallic plate cup (small, like armor)
         Panel(
-            boundary_uv=[(0.30, 0.78), (0.45, 0.78), (0.49, 0.70),
-                          (0.42, 0.66), (0.32, 0.68), (0.28, 0.74)],
-            anchors=[Anchor.SHOULDER_L, Anchor.STERNUM, Anchor.UNDERBUST],
-            color_id=0, fabric_id="F_ECONYL_PLAIN_LIGHT",  # ivory
+            boundary_uv=[(0.33, 0.76), (0.47, 0.76), (0.50, 0.68),
+                          (0.42, 0.64), (0.32, 0.68)],
+            anchors=[Anchor.SHOULDER_L, Anchor.STERNUM],
+            color_id=3, fabric_id="F_QNOVA_RIBBED",  # silver
         ),
-        # Bottom front (spans centerline)
+        # Plate hip armor (separate L/R, no centerline)
         Panel(
-            boundary_uv=[(0.30, 0.50), (0.70, 0.50), (0.62, 0.40),
-                          (0.55, 0.36), (0.45, 0.36), (0.38, 0.40)],
+            boundary_uv=[(0.30, 0.50), (0.45, 0.50), (0.45, 0.42),
+                          (0.32, 0.40), (0.28, 0.45)],
+            anchors=[Anchor.HIP_L, Anchor.WAIST_L],
+            color_id=3, fabric_id="F_QNOVA_RIBBED",
+        ),
+        # Chain straps (thin, multiple from shoulder to opposite hip)
+        Stroke(start_anchor=Anchor.SHOULDER_L, end_anchor=Anchor.HIP_R,
+                bezier_internal=((0.55, 0.70), (0.45, 0.55)),
+                width_profile=(0.4, 0.4, 0.4), color_id=25),  # gold chain
+        Stroke(start_anchor=Anchor.SHOULDER_R, end_anchor=Anchor.HIP_L,
+                bezier_internal=((0.45, 0.70), (0.55, 0.55)),
+                width_profile=(0.4, 0.4, 0.4), color_id=25),
+        # Connector chain across underbust
+        Stroke(start_anchor=Anchor.UNDERBUST, end_anchor=Anchor.HIP_L,
+                width_profile=(0.3, 0.3, 0.3), color_id=25),
+        Stroke(start_anchor=Anchor.UNDERBUST, end_anchor=Anchor.HIP_R,
+                width_profile=(0.3, 0.3, 0.3), color_id=25, is_end=True),
+    ]
+
+
+def example_nier_gothic_lace_v31() -> list:
+    """NieR 2B-inspired gothic asymmetric monokini — black with lace
+    cutouts hinted by panel geometry."""
+    return [
+        # Asymmetric main panel: covers L side fully, R side narrow
+        Panel(
+            boundary_uv=[(0.20, 0.80), (0.62, 0.80),
+                          (0.65, 0.65), (0.58, 0.50),
+                          (0.50, 0.40), (0.30, 0.40),
+                          (0.22, 0.55), (0.20, 0.70)],
+            anchors=[Anchor.SHOULDER_L, Anchor.STERNUM,
+                     Anchor.HIP_L, Anchor.HIP_R],
+            color_id=24, fabric_id="F_VIRGIN_VELVET",  # void black
+        ),
+        # Single thin black ribbon strap across back (asymmetric)
+        Stroke(start_anchor=Anchor.SHOULDER_R, end_anchor=Anchor.WAIST_L,
+                bezier_internal=((0.45, 0.70), (0.55, 0.60)),
+                width_profile=(0.8, 0.8, 0.8), color_id=1),  # black
+        # Lace edge accent (small stroke under bust)
+        Stroke(start_anchor=Anchor.UNDERBUST, end_anchor=Anchor.WAIST_R,
+                width_profile=(0.6, 0.6, 0.6), color_id=1, is_end=True),
+    ]
+
+
+def example_maori_feather_tribal_v31() -> list:
+    """Maori/Polynesian tribal — bone-white wrap + ochre/copper accents,
+    asymmetric leaf-shaped coverage."""
+    return [
+        # Wrap chest panel (bone-white, asymmetric)
+        Panel(
+            boundary_uv=[(0.30, 0.78), (0.55, 0.78), (0.62, 0.65),
+                          (0.50, 0.58), (0.30, 0.62)],
+            anchors=[Anchor.SHOULDER_L, Anchor.SHOULDER_R, Anchor.STERNUM],
+            color_id=30, fabric_id="F_CROCHET_COTTON",  # pearl-white
+        ),
+        # Copper-toned waist wrap
+        Panel(
+            boundary_uv=[(0.28, 0.50), (0.72, 0.50), (0.65, 0.40),
+                          (0.50, 0.36), (0.35, 0.40)],
             anchors=[Anchor.HIP_L, Anchor.HIP_R],
-            color_id=0, fabric_id="F_ECONYL_PLAIN_LIGHT",
+            color_id=26, fabric_id="F_CROCHET_COTTON",  # copper
         ),
-        # Shoulder straps
-        Stroke(start_anchor=Anchor.SHOULDER_L, end_anchor=Anchor.UNDERBUST,
-                width_profile=(1.0, 1.0, 1.0), color_id=0),
-        Stroke(start_anchor=Anchor.SHOULDER_R, end_anchor=Anchor.UNDERBUST,
-                width_profile=(1.0, 1.0, 1.0), color_id=0, is_end=True),
+        # Bone-accent stroke from neck to sternum
+        Stroke(start_anchor=Anchor.NECK_BACK, end_anchor=Anchor.STERNUM,
+                bezier_internal=((0.25, 0.80), (0.40, 0.76)),
+                width_profile=(0.5, 0.5, 0.5), color_id=30),
+        # Feather-like decorative drape from waist
+        Stroke(start_anchor=Anchor.WAIST_R, end_anchor=Anchor.HIP_L,
+                bezier_internal=((0.45, 0.55), (0.55, 0.50)),
+                width_profile=(2.0, 1.5, 0.5), color_id=26, is_end=True),
+    ]
+
+
+def example_iridescent_holo_monokini_v31() -> list:
+    """Holographic iridescent futuristic monokini — full body wrap in
+    cyber-teal / chrome. Single dramatic panel."""
+    return [
+        Panel(
+            boundary_uv=[(0.22, 0.80), (0.78, 0.80),
+                          (0.74, 0.66), (0.70, 0.52),
+                          (0.62, 0.42), (0.55, 0.38),
+                          (0.45, 0.38), (0.38, 0.42),
+                          (0.30, 0.52), (0.26, 0.66)],
+            anchors=[Anchor.SHOULDER_L, Anchor.SHOULDER_R,
+                     Anchor.STERNUM, Anchor.HIP_L, Anchor.HIP_R],
+            color_id=20, fabric_id="F_MISSONI_SHINY_KNIT",  # cyber teal
+            is_end=True,
+        ),
     ]
 
 
@@ -658,32 +751,11 @@ def example_cyberpunk_cage_v31() -> list:
     ]
 
 
-def example_athletic_sports_v31() -> list:
-    """Sport bikini = full-coverage panels + thick straps."""
-    return [
-        # Wide sport top — single panel spanning centerline
-        Panel(
-            boundary_uv=[(0.28, 0.78), (0.72, 0.78),
-                          (0.70, 0.66), (0.60, 0.62),
-                          (0.40, 0.62), (0.30, 0.66)],
-            anchors=[Anchor.SHOULDER_L, Anchor.SHOULDER_R,
-                     Anchor.STERNUM, Anchor.UNDERBUST],
-            color_id=9, fabric_id="F_AMNI_SOUL_RIBBED",  # neon yellow
-        ),
-        # Boyshort bottom
-        Panel(
-            boundary_uv=[(0.25, 0.50), (0.75, 0.50),
-                          (0.68, 0.38), (0.55, 0.34),
-                          (0.45, 0.34), (0.32, 0.38)],
-            anchors=[Anchor.HIP_L, Anchor.HIP_R],
-            color_id=9, fabric_id="F_AMNI_SOUL_RIBBED",
-        ),
-        # Wide shoulder straps
-        Stroke(start_anchor=Anchor.SHOULDER_L, end_anchor=Anchor.UNDERBUST,
-                width_profile=(3.0, 3.5, 4.0), color_id=9),
-        Stroke(start_anchor=Anchor.SHOULDER_R, end_anchor=Anchor.UNDERBUST,
-                width_profile=(3.0, 3.5, 4.0), color_id=9, is_end=True),
-    ]
+# DROPPED in v3.1 (per "no conservative/basic" principle):
+#   - example_classical_bikini_v31 (replaced by chainmail_armor)
+#   - example_athletic_sports_v31  (replaced by iridescent_holo_monokini)
+# These were too close to mainstream sport/everyday swimwear — the
+# project explicitly rejects competing in that already-saturated space.
 
 
 def example_ethnic_body_chain_v31() -> list:
@@ -735,15 +807,27 @@ def example_draped_wrap_v31() -> list:
 
 def all_reference_designs_v31() -> dict[str, list]:
     """v3.1 mixed Panel+Stroke reference designs.
+
+    9 stylized designs covering: cross-body harness (black), sculptural
+    one-piece (orange), cage harness (magenta), body-chain (burgundy+gold),
+    draped wrap (mauve), chainmail armor (silver+gold), gothic asymmetric
+    (void black), tribal feather (bone+copper), iridescent holo (cyber teal).
+
+    NO classical/basic/athletic-sport designs — explicitly excluded per
+    "no mainstream swimwear" project principle.
     These flow into v2's full chain via tokens_to_garment."""
     return {
-        "classical_bikini":      example_classical_bikini_v31(),
+        # imagined/avant-garde (5)
         "avant_garde_harness":   example_avant_garde_harness_v31(),
         "sculptural_one_piece":  example_sculptural_one_piece_v31(),
         "cyberpunk_cage":        example_cyberpunk_cage_v31(),
-        "athletic_sports":       example_athletic_sports_v31(),
         "ethnic_body_chain":     example_ethnic_body_chain_v31(),
         "draped_wrap":           example_draped_wrap_v31(),
+        # cool/metallic + cultural + futuristic (4 new)
+        "chainmail_armor":       example_chainmail_armor_v31(),
+        "nier_gothic_lace":      example_nier_gothic_lace_v31(),
+        "maori_feather_tribal":  example_maori_feather_tribal_v31(),
+        "iridescent_holo":       example_iridescent_holo_monokini_v31(),
     }
 
 
