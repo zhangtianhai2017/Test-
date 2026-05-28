@@ -207,7 +207,9 @@ def main():
         out = gen(be, teacher_tokens=tt, noise_sigma=0.5)
         loss_d = gen.imitation_loss(out.stroke_tensor, tt, tm)
         kl = gen.kl_loss(out.style_mu, out.style_logvar)
-        loss = loss_d["total"] + args.kl_weight * kl
+        # length loss: dense per-design signal for termination
+        length_l = gen.length_loss(out.length_logits, tm)
+        loss = loss_d["total"] + args.kl_weight * kl + 1.0 * length_l
 
         opt.zero_grad()
         loss.backward()
@@ -255,7 +257,9 @@ def main():
     eval_emb = eval_emb.float().to(device)
     with torch.no_grad():
         out_eval = gen(eval_emb, noise_sigma=0.0)   # deterministic for eval
-    decoded_eval = gen.decode_strokes(out_eval.stroke_tensor.cpu())
+    decoded_eval = gen.decode_strokes(
+        out_eval.stroke_tensor.cpu(),
+        length_logits=out_eval.length_logits.cpu())
     for i, (b, strokes) in enumerate(zip(eval_briefs, decoded_eval)):
         end_at = next((j + 1 for j, s in enumerate(strokes) if s.is_end),
                       len(strokes))

@@ -16,8 +16,8 @@ from v3.design_generator_v3 import DesignGeneratorV3
 from v3.full_chain_render import render_design_3d
 from PIL import Image, ImageDraw, ImageFont
 
-CKPT = "tools/output/2026-05-28/p32_phase_a2_v31_wider/decoder_pretrained.pt"
-OUT_DIR = "tools/output/2026-05-28/p33_v31_wider_trained_3d"
+CKPT = "tools/output/2026-05-28/p35_length_head/decoder_pretrained.pt"
+OUT_DIR = "tools/output/2026-05-28/p36_length_head_3d"
 
 DEMO_BRIEFS = [
     "Bayonetta gothic black lace asymmetric",
@@ -49,7 +49,9 @@ def main():
         emb = torch.tensor(emb)
     with torch.no_grad():
         out = gen(emb.float(), noise_sigma=0.3)
-    designs = gen.decode_strokes(out.stroke_tensor.cpu())
+    designs = gen.decode_strokes(
+        out.stroke_tensor.cpu(),
+        length_logits=out.length_logits.cpu())
     for i, tokens in enumerate(designs):
         end_at = next((j + 1 for j, s in enumerate(tokens) if s.is_end),
                       len(tokens))

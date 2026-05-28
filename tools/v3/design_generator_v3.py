@@ -253,6 +253,7 @@ class V3Output:
     anchor_plan:     torch.Tensor      # (B, N_ANCHORS)
     stroke_tensor:   torch.Tensor      # (B, T, STROKE_TENSOR_DIM)
     head_input:      torch.Tensor      # (B, latent_dim) after noise mix
+    length_logits:   torch.Tensor = None  # (B, MAX_STROKES) — predicted token count
 
 
 class DesignGeneratorV3(nn.Module):
@@ -289,6 +290,16 @@ class DesignGeneratorV3(nn.Module):
 
         # anchor plan head
         self.anchor_plan_head = AnchorPlan(latent_dim, N_ANCHORS)
+
+        # NEW: length head — predicts how many tokens this design has.
+        # Sparse autoregressive is_end can't learn termination from
+        # ~4 paraphrases per design; an explicit per-design length signal
+        # gives the model a single, dense target per sample.
+        self.length_head = nn.Sequential(
+            nn.Linear(latent_dim, 64),
+            nn.GELU(),
+            nn.Linear(64, max_strokes),
+        )
 
         # stroke decoder
         self.decoder = StrokeTransformerDecoder(
@@ -370,13 +381,14 @@ class DesignGeneratorV3(nn.Module):
         head_input = self.inject_noise(z, sigma=noise_sigma)             # (B, L)
 
         anchor_plan = self.anchor_plan_head(head_input)                  # (B, N_ANCHORS)
+        length_logits = self.length_head(head_input)                     # (B, MAX_STROKES)
 
         stroke_tensor = self.decoder(head_input, anchor_plan,
                                        teacher_tokens=teacher_tokens)
         return V3Output(
             style_mu=mu, style_logvar=logvar, style_latent=z,
             anchor_plan=anchor_plan, stroke_tensor=stroke_tensor,
-            head_input=head_input,
+            head_input=head_input, length_logits=length_logits,
         )
 
     # ─── losses ───────────────────────────────────────────────────────
@@ -452,13 +464,20 @@ class DesignGeneratorV3(nn.Module):
         loss_color = ce_at(o["color"], N_PALETTE)
         loss_material = kl_at(o["material"], N_MATERIAL_VFX_TAGS)
         loss_decoration = kl_at(o["decoration"], N_MATERIAL_VFX_TAGS)
-        loss_is_end = bce_at(o["is_end"], pos_weight_factor=5.0)
-        # extra termination penalty: at true_end_pos, prob_end should be ~1
+        # is_end pos_weight bumped 5→20 (2026-05-28): multi-token designs
+        # were overshooting because per-step the BCE could be tiny while
+        # the model never fires is_end=1. Now the 1 positive sample per
+        # design pulls 20x harder than each negative.
+        loss_is_end = bce_at(o["is_end"], pos_weight_factor=20.0)
+        # extra termination penalty: at true_end_pos, prob_end should be ~1.
+        # Add a "no early end" penalty too: positions BEFORE true_end should
+        # have prob_end ≈ 0 (use BCE-style explicit loss).
         prob_end = torch.sigmoid(pred_tensor[:, :, o["is_end"]])
         true_end_pos = m.sum(dim=-1).long() - 1
         idx = torch.arange(B, device=pred_tensor.device)
         prob_at_end = prob_end[idx, true_end_pos.clamp(min=0)]
-        loss_is_end = loss_is_end + 0.5 * -torch.log(prob_at_end.clamp(min=1e-6)).mean()
+        # weight 2.0 (was 0.5) — explicitly push prob_at_end → 1
+        loss_is_end = loss_is_end + 2.0 * -torch.log(prob_at_end.clamp(min=1e-6)).mean()
 
         # ====== STROKE heads (only on stroke tokens) ======
         loss_s_start = ce_at(o["s_start_log"], N_ANCHOR_LOGITS,
@@ -508,6 +527,17 @@ class DesignGeneratorV3(nn.Module):
             "p_fabric": loss_p_fabric, "p_layer": loss_p_layer,
         }
 
+    def length_loss(self, length_logits: torch.Tensor,
+                     target_mask: torch.Tensor) -> torch.Tensor:
+        """CE loss on predicted vs actual token count (1..MAX_STROKES).
+        Encoder predicts the count once per design — much denser signal
+        than per-position is_end."""
+        # true length = number of non-padding tokens
+        true_length = target_mask.sum(dim=-1).long()             # (B,)
+        # 1-indexed → 0-indexed for CE
+        true_idx = (true_length - 1).clamp(min=0, max=length_logits.shape[-1] - 1)
+        return F.cross_entropy(length_logits, true_idx)
+
     def kl_loss(self, mu: torch.Tensor, logvar: torch.Tensor) -> torch.Tensor:
         """Standard VAE KL divergence to N(0, I)."""
         return -0.5 * (1 + logvar - mu.pow(2) - logvar.exp()).sum(dim=-1).mean()
@@ -515,9 +545,22 @@ class DesignGeneratorV3(nn.Module):
     # ─── decode helpers ───────────────────────────────────────────────
 
     def decode_strokes(self, stroke_tensor: torch.Tensor,
-                        enforce_anchored: bool = True):
-        """(B, T, D) tensor -> batch of stroke lists."""
-        return decode_batch(stroke_tensor, enforce_anchored=enforce_anchored)
+                        enforce_anchored: bool = True,
+                        length_logits: torch.Tensor = None):
+        """(B, T, D) tensor -> batch of stroke lists.
+
+        If length_logits is given, hard-truncate each design at the
+        predicted length (argmax of the length head, +1 since 0-indexed)."""
+        decoded = decode_batch(stroke_tensor, enforce_anchored=enforce_anchored)
+        if length_logits is not None:
+            pred_lengths = (length_logits.argmax(dim=-1) + 1).tolist()
+            for b, n in enumerate(pred_lengths):
+                if n < len(decoded[b]):
+                    decoded[b] = decoded[b][:n]
+                # ensure last is_end=True
+                if decoded[b]:
+                    decoded[b][-1].is_end = True
+        return decoded
 
 
 # ─── smoke test ────────────────────────────────────────────────────────
