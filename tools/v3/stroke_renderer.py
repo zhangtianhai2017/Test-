@@ -165,8 +165,11 @@ def stroke_to_mesh(stroke: Stroke,
         pts_3d.append(p)
     pts_3d = np.asarray(pts_3d, dtype=np.float64)
 
-    # tube radius = mean width / 2 in cm (project uses cm)
-    radius = max(0.2, 0.5 * float(np.mean(stroke.width_profile)))
+    # tube radius = mean width / 2 in cm, with a visibility floor.
+    # Body mesh is ~170 cm tall, rendered at 720 px → ~4 px/cm.
+    # A 3 cm-wide tube is ~12 px which is hard to see on a 480-wide image.
+    # Boost radius 2x for legibility (matches v2's rendering convention).
+    radius = max(0.6, 1.0 * float(np.mean(stroke.width_profile)))
     tube = _arc_tube(pts_3d, radius=radius, sides=8)
     if len(tube.vertices) == 0:
         return tube
