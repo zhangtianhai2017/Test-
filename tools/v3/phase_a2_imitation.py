@@ -194,6 +194,7 @@ def main():
         "total", "type", "color", "material", "decoration", "is_end",
         "s_start", "s_end", "s_bezier", "s_width", "s_tension", "s_uv_free",
         "p_boundary", "p_anchors", "p_fabric", "p_layer", "kl",
+        "length", "h1", "h2_proxy",
     ]}
     t0 = time.time()
     gen.train()
@@ -209,7 +210,24 @@ def main():
         kl = gen.kl_loss(out.style_mu, out.style_logvar)
         # length loss: dense per-design signal for termination
         length_l = gen.length_loss(out.length_logits, tm)
-        loss = loss_d["total"] + args.kl_weight * kl + 1.0 * length_l
+        # Manufacturability loss DISABLED (kept code, log values only).
+        # 2026-05-28 experiments p37 (H1+H2 proxy) and p38 (H1 only)
+        # both made H2 violations WORSE:
+        #   baseline p35:  H2=8  drop=19%
+        #   p37 H1+H2:     H2=9  drop=27%
+        #   p38 H1 only:   H2=20 drop=49%
+        # Mechanism: H1 grad pushes polygon vertices outward → easy way
+        # to add area is to extrude one point → creates self-intersect.
+        # H1 alone has no counter-balance against H2; H2 proxy (perim²/area)
+        # is the wrong signal. Real H1+H2 needs REINFORCE in Phase A3
+        # (non-differentiable, like the visual judge).
+        manuf = gen.manufacturability_loss(out.stroke_tensor, tm)
+        loss = (loss_d["total"]
+                 + args.kl_weight * kl
+                 + 1.0 * length_l)        # no manuf grad
+        loss_d["h1"] = manuf["h1"]              # log only
+        loss_d["h2_proxy"] = manuf["h2_proxy"]  # log only
+        loss_d["length"] = length_l
 
         opt.zero_grad()
         loss.backward()

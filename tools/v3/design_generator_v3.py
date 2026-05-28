@@ -527,6 +527,62 @@ class DesignGeneratorV3(nn.Module):
             "p_fabric": loss_p_fabric, "p_layer": loss_p_layer,
         }
 
+    def manufacturability_loss(self, pred_tensor: torch.Tensor,
+                                 target_mask: torch.Tensor
+                                 ) -> dict[str, torch.Tensor]:
+        """Differentiable subset of validate_garment's hard rules.
+
+        Returns dict with 'h1' (area >= 8 cm²) and 'h2_proxy' (convexity
+        ratio for non-self-intersection). Applied only to predicted-panel
+        tokens. Non-differentiable rules (catalog membership, anatomy
+        filter) go through REINFORCE in Phase A3 instead.
+
+        Scale: v3 UV is [0,1]^2; v2 Genome UV is [-1,1]×[0,1]; conversion
+        factor for area = 2× (u doubled). v2 _uv_area_to_body_cm2 = ×4500.
+        So v3_uv_area → cm² = ×9000.
+        """
+        o = _OFFSETS
+        B, T, _ = pred_tensor.shape
+
+        # mask: only panel tokens contribute (use argmax of type)
+        type_logits = pred_tensor[:, :, o["type"]:o["type"] + N_TOKEN_TYPES]
+        is_panel = ((type_logits.argmax(dim=-1) == TOKEN_TYPE_PANEL).float()
+                    * target_mask)  # (B, T)
+        denom = is_panel.sum().clamp(min=1)
+
+        # extract boundary (B, T, 12) → (B, T, 6, 2) — already in [0,1] via decode,
+        # but the raw logit slice is unbounded; clamp via sigmoid? No — the
+        # encode_token writes raw u,v floats in [0,1]. Pred head outputs raw
+        # floats too. Use as-is; will train them into [0,1] range naturally.
+        boundary = pred_tensor[:, :, o["p_boundary"]
+                                      :o["p_boundary"] + 2 * PANEL_BOUNDARY_POINTS]
+        boundary = boundary.view(B, T, PANEL_BOUNDARY_POINTS, 2)
+        u = boundary[..., 0]
+        v = boundary[..., 1]
+        u_next = torch.roll(u, -1, dims=-1)
+        v_next = torch.roll(v, -1, dims=-1)
+
+        # shoelace area (signed → absolute via square trick to stay differentiable)
+        signed = 0.5 * (u * v_next - u_next * v).sum(dim=-1)        # (B, T)
+        area_uv = torch.sqrt(signed.pow(2) + 1e-8)                   # |signed| smoothed
+        area_cm2 = area_uv * 9000.0                                   # v3 UV → cm²
+
+        # H1: penalize area < 8 cm²
+        MIN_CM2 = 8.0
+        h1_per = torch.relu(MIN_CM2 - area_cm2).pow(2) / (MIN_CM2 ** 2)
+        loss_h1 = (h1_per * is_panel).sum() / denom
+
+        # H2 proxy: perimeter² / area ratio. Convex regular ~ 12.6 (4π).
+        # Self-intersecting / star: blows up. Penalize ratio > 40 (very loose).
+        seg_u = u_next - u
+        seg_v = v_next - v
+        perim_uv = torch.sqrt(seg_u.pow(2) + seg_v.pow(2) + 1e-8).sum(dim=-1)
+        ratio = perim_uv.pow(2) / (area_uv + 1e-4)
+        h2_per = torch.relu(ratio - 40.0).pow(2) / 100.0
+        loss_h2 = (h2_per * is_panel).sum() / denom
+
+        return {"h1": loss_h1, "h2_proxy": loss_h2}
+
     def length_loss(self, length_logits: torch.Tensor,
                      target_mask: torch.Tensor) -> torch.Tensor:
         """CE loss on predicted vs actual token count (1..MAX_STROKES).
