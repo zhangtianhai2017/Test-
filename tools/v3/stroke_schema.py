@@ -805,6 +805,77 @@ def example_draped_wrap_v31() -> list:
     ]
 
 
+def example_liquid_chrome_v31() -> list:
+    """Mugler-style liquid metal — single full-body silver monokini with
+    chrome-shine fabric. Anchors the 'silver/chrome/mercury' color
+    cluster that earlier runs missed."""
+    return [
+        Panel(
+            boundary_uv=[(0.22, 0.80), (0.78, 0.80),
+                          (0.74, 0.64), (0.68, 0.50),
+                          (0.58, 0.40), (0.50, 0.36),
+                          (0.42, 0.40), (0.32, 0.50),
+                          (0.26, 0.64)],
+            anchors=[Anchor.SHOULDER_L, Anchor.SHOULDER_R,
+                     Anchor.STERNUM, Anchor.HIP_L, Anchor.HIP_R],
+            color_id=3, fabric_id="F_MISSONI_SHINY_KNIT",  # silver
+            is_end=True,
+        ),
+    ]
+
+
+def example_turquoise_dakini_v31() -> list:
+    """Tibetan dakini ritual — turquoise/jade panels + small gold chain.
+    Cultural register that adds aqua/teal-green to the teacher palette."""
+    return [
+        # Jade-green chest panel (small triangle)
+        Panel(
+            boundary_uv=[(0.33, 0.76), (0.47, 0.76), (0.50, 0.68),
+                          (0.40, 0.64), (0.32, 0.70)],
+            anchors=[Anchor.SHOULDER_L, Anchor.STERNUM],
+            color_id=27, fabric_id="F_VIRGIN_VELVET",  # jade
+        ),
+        # Turquoise wrap waist panel
+        Panel(
+            boundary_uv=[(0.28, 0.50), (0.72, 0.50), (0.64, 0.40),
+                          (0.50, 0.36), (0.36, 0.40)],
+            anchors=[Anchor.HIP_L, Anchor.HIP_R],
+            color_id=27, fabric_id="F_VIRGIN_VELVET",  # jade
+        ),
+        # Gold ritual chain across collarbone
+        Stroke(start_anchor=Anchor.SHOULDER_L, end_anchor=Anchor.SHOULDER_R,
+                bezier_internal=((0.40, 0.82), (0.60, 0.82)),
+                width_profile=(0.4, 0.4, 0.4), color_id=25),  # gold
+        # Gold chain from sternum to hip
+        Stroke(start_anchor=Anchor.STERNUM, end_anchor=Anchor.HIP_L,
+                bezier_internal=((0.55, 0.62), (0.65, 0.55)),
+                width_profile=(0.4, 0.4, 0.4), color_id=25, is_end=True),
+    ]
+
+
+def example_vaporwave_holographic_v31() -> list:
+    """Y2K vaporwave — two-color iridescent (cyber teal + neon magenta)
+    asymmetric monokini. Anchors the 'multi-color / rainbow / holographic'
+    cluster."""
+    return [
+        # Teal upper panel
+        Panel(
+            boundary_uv=[(0.25, 0.78), (0.55, 0.78), (0.60, 0.58),
+                          (0.45, 0.55), (0.28, 0.62)],
+            anchors=[Anchor.SHOULDER_L, Anchor.SHOULDER_R, Anchor.STERNUM],
+            color_id=20, fabric_id="F_MISSONI_SHINY_KNIT",  # cyber teal
+        ),
+        # Magenta lower panel (asymmetric crossover)
+        Panel(
+            boundary_uv=[(0.28, 0.52), (0.72, 0.52), (0.65, 0.40),
+                          (0.50, 0.36), (0.32, 0.42)],
+            anchors=[Anchor.HIP_L, Anchor.HIP_R, Anchor.WAIST_R],
+            color_id=21, fabric_id="F_MISSONI_SHINY_KNIT",  # neon magenta
+            is_end=True,
+        ),
+    ]
+
+
 def all_reference_designs_v31() -> dict[str, list]:
     """v3.1 mixed Panel+Stroke reference designs.
 
@@ -823,11 +894,15 @@ def all_reference_designs_v31() -> dict[str, list]:
         "cyberpunk_cage":        example_cyberpunk_cage_v31(),
         "ethnic_body_chain":     example_ethnic_body_chain_v31(),
         "draped_wrap":           example_draped_wrap_v31(),
-        # cool/metallic + cultural + futuristic (4 new)
+        # cool/metallic + cultural + futuristic (4 first wave)
         "chainmail_armor":       example_chainmail_armor_v31(),
         "nier_gothic_lace":      example_nier_gothic_lace_v31(),
         "maori_feather_tribal":  example_maori_feather_tribal_v31(),
         "iridescent_holo":       example_iridescent_holo_monokini_v31(),
+        # color-gap fillers (silver / jade-turquoise / vaporwave)
+        "liquid_chrome":         example_liquid_chrome_v31(),
+        "turquoise_dakini":      example_turquoise_dakini_v31(),
+        "vaporwave_holographic": example_vaporwave_holographic_v31(),
     }
 
 

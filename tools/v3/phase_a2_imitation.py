@@ -101,6 +101,25 @@ TEACHER_BRIEFS_BY_NAME: dict[str, list[str]] = {
         "futuristic chrome iridescent one-piece, cyber teal",
         "Tron-inspired holographic monokini, cyber-teal shimmer",
     ],
+    # ─── color-gap fillers (added 2026-05-28 after palette audit) ───
+    "liquid_chrome": [
+        "Mugler liquid metal silver monokini, chrome mirror finish",
+        "穆格勒液态金属银色连体泳装, 镜面铬",
+        "T-1000 inspired liquid silver bodysuit",
+        "silver chrome metallic full-body suit, shiny mercury",
+    ],
+    "turquoise_dakini": [
+        "Tibetan dakini ritual armor, turquoise + bronze, mystical",
+        "西藏空行母仪式装, 松石青 + 古铜, 神秘感",
+        "Hindu goddess jade green sacred bikini with gold chains",
+        "Buddhist tantric ritual swim, jade + gold, ceremonial",
+    ],
+    "vaporwave_holographic": [
+        "vaporwave Y2K holographic two-tone, teal + magenta",
+        "蒸汽波 Y2K 全息双色, 青绿 + 紫红",
+        "iridescent rainbow chromatic monokini, vaporwave aesthetic",
+        "K-pop idol stage iridescent two-color suit, neon teal pink",
+    ],
 }
 
 

@@ -16,8 +16,8 @@ from v3.design_generator_v3 import DesignGeneratorV3
 from v3.full_chain_render import render_design_3d
 from PIL import Image, ImageDraw, ImageFont
 
-CKPT = "tools/output/2026-05-28/p30b_phase_a2_v31/decoder_pretrained.pt"
-OUT_DIR = "tools/output/2026-05-28/p31_v31_trained_3d"
+CKPT = "tools/output/2026-05-28/p32_phase_a2_v31_wider/decoder_pretrained.pt"
+OUT_DIR = "tools/output/2026-05-28/p33_v31_wider_trained_3d"
 
 DEMO_BRIEFS = [
     "Bayonetta gothic black lace asymmetric",
