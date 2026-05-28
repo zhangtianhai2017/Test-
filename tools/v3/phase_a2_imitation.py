@@ -40,6 +40,9 @@ from v3.stroke_schema import (                                     # noqa: E402
     all_reference_designs_v31, Stroke, Panel, MAX_STROKES,
 )
 from v3.token_tensor import encode_design, TOKEN_TENSOR_DIM        # noqa: E402
+from v3.v2_lib_to_teachers import (                                # noqa: E402
+    make_v2_lib_teachers, make_teacher_brief,
+)
 from v3.stroke_renderer import render_uv_sketch                    # noqa: E402
 
 
@@ -133,6 +136,9 @@ def main():
     ap.add_argument("--log-every", type=int, default=50)
     ap.add_argument("--device", default="auto",
                     choices=["auto", "cuda", "cpu"])
+    ap.add_argument("--v2-lib-teachers", type=int, default=0,
+                    help="Number of v2-library-converted teachers to "
+                         "MIX IN with the 12 hand-crafted v3.1 references.")
     args = ap.parse_args()
 
     device = (("cuda" if torch.cuda.is_available() else "cpu")
@@ -153,7 +159,16 @@ def main():
 
     # ─── teacher data ────────────────────────────────────────────────
     print("[data] encoding teacher designs (v3.1 Panel+Stroke)...")
-    refs = all_reference_designs_v31()
+    refs = dict(all_reference_designs_v31())
+    if args.v2_lib_teachers > 0:
+        v2lib = make_v2_lib_teachers(n=args.v2_lib_teachers, seed=7)
+        print(f"        adding {len(v2lib)} v2-library teachers")
+        # auto-generate briefs for v2lib teachers
+        for name, tokens in v2lib.items():
+            refs[name] = tokens
+            TEACHER_BRIEFS_BY_NAME[name] = make_teacher_brief(
+                name, tokens[0].color_id)
+        print(f"        total teachers: {len(refs)}")
     print(f"        {len(refs)} reference designs:")
     encoded_by_name = {}
     for name, strokes in refs.items():
