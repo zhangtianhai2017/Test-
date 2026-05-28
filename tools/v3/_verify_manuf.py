@@ -99,9 +99,9 @@ def run_ckpt(ckpt_path, label):
 if __name__ == "__main__":
     base = "tools/output/2026-05-28"
     h1_a, h2_a, drop_a, total_a = run_ckpt(f"{base}/p35_length_head/decoder_pretrained.pt",
-                                            "WITHOUT manuf loss (p35, baseline)")
-    h1_b, h2_b, drop_b, total_b = run_ckpt(f"{base}/p38_manuf_h1only/decoder_pretrained.pt",
-                                            "WITH H1-only manuf loss (p38)")
+                                            "p35 baseline (length_head only)")
+    h1_b, h2_b, drop_b, total_b = run_ckpt(f"{base}/p39_manuf_rl/decoder_rl.pt",
+                                            "p39 + REINFORCE on validate_garment")
     print("\n========== DELTA ==========")
     print(f"  H1 violations: {h1_a} → {h1_b}  ({'IMPROVED' if h1_b < h1_a else 'WORSE' if h1_b > h1_a else 'SAME'})")
     print(f"  H2 violations: {h2_a} → {h2_b}  ({'IMPROVED' if h2_b < h2_a else 'WORSE' if h2_b > h2_a else 'SAME'})")
