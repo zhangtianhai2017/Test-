@@ -82,14 +82,18 @@ from tag_embeddings import TagEmbeddingBank, SBERT_DIM            # noqa: E402
 from tag_data import AXES                                          # noqa: E402
 from v3.stroke_schema import (                                     # noqa: E402
     Anchor, N_ANCHORS, MAX_STROKES,
-)
-from v3.stroke_tensor import (                                     # noqa: E402
-    STROKE_TENSOR_DIM, encode_design, decode_batch,
-    _OFF_START_LOGITS, _OFF_END_LOGITS, _OFF_COLOR, _OFF_MATERIAL,
-    _OFF_DECORATION, _OFF_IS_END, _OFF_TENSION, _OFF_BEZIER, _OFF_WIDTH,
-    _OFF_START_UV_FREE, _OFF_END_UV_FREE,
     N_ANCHOR_LOGITS, N_PALETTE, N_MATERIAL_VFX_TAGS, WIDTH_SEGMENTS,
+    PANEL_BOUNDARY_POINTS,
+    TOKEN_TYPE_PANEL, TOKEN_TYPE_STROKE,
 )
+# v3.1: use the unified Panel+Stroke token tensor
+from v3.token_tensor import (                                      # noqa: E402
+    TOKEN_TENSOR_DIM, encode_design, decode_batch, offsets,
+    N_FABRICS, N_LAYER_ROLES, N_TOKEN_TYPES,
+)
+# Backward-compat alias
+STROKE_TENSOR_DIM = TOKEN_TENSOR_DIM
+_OFFSETS = offsets()
 
 
 # ─── small modules ─────────────────────────────────────────────────────
@@ -382,98 +386,126 @@ class DesignGeneratorV3(nn.Module):
                         target_tensor: torch.Tensor,
                         target_mask: torch.Tensor,
                         ) -> dict[str, torch.Tensor]:
-        """Phase A2 imitation loss decomposed by sub-head.
+        """v3.1 imitation loss with type-masked Panel + Stroke heads.
 
-        pred_tensor: (B, T, STROKE_TENSOR_DIM)
-        target_tensor: (B, T, STROKE_TENSOR_DIM)
-        target_mask: (B, T) — 1 for real strokes, 0 for padding
+        pred_tensor:   (B, T, TOKEN_TENSOR_DIM=709)
+        target_tensor: (B, T, TOKEN_TENSOR_DIM=709)
+        target_mask:   (B, T) — 1 for real tokens, 0 for padding
+
+        Loss structure:
+          - shared heads (color/material/decoration/is_end/type)  → always
+          - stroke heads → masked: only contribute where target type=stroke
+          - panel heads  → masked: only contribute where target type=panel
         """
         B, T, D = pred_tensor.shape
-        # broadcast mask
-        m = target_mask.unsqueeze(-1)  # (B, T, 1)
+        o = _OFFSETS
+        m = target_mask  # (B, T)
+        m_pos = m.sum().clamp(min=1)
 
-        # categorical heads: cross-entropy between predicted logits and
-        # argmax of target's one-hot (since teacher produces large logits at one slot)
-        def cross_entropy_at(offset, n_classes):
+        # --- determine target token type per position from one-hot at offset 0
+        type_logits_target = target_tensor[:, :, o["type"]:o["type"] + N_TOKEN_TYPES]
+        target_type = type_logits_target.argmax(dim=-1)   # (B, T) ∈ {0=panel, 1=stroke}
+        is_target_panel = (target_type == TOKEN_TYPE_PANEL).float() * m
+        is_target_stroke = (target_type == TOKEN_TYPE_STROKE).float() * m
+        m_panel = is_target_panel.sum().clamp(min=1)
+        m_stroke = is_target_stroke.sum().clamp(min=1)
+
+        # --- helpers
+        def ce_at(offset, n_classes, mask=m, denom=None):
+            """Cross-entropy at offset, masked by `mask` (B,T). denom defaults to mask.sum()."""
+            denom = denom if denom is not None else mask.sum().clamp(min=1)
             pl = pred_tensor[:, :, offset:offset + n_classes]
             tl = target_tensor[:, :, offset:offset + n_classes]
-            tgt = tl.argmax(dim=-1)                                       # (B, T)
+            tgt = tl.argmax(dim=-1)                                # (B, T)
             ce = F.cross_entropy(pl.reshape(-1, n_classes),
                                   tgt.reshape(-1), reduction="none")
             ce = ce.view(B, T)
-            return (ce * target_mask).sum() / target_mask.sum().clamp(min=1)
+            return (ce * mask).sum() / denom
 
-        loss_start = cross_entropy_at(_OFF_START_LOGITS, N_ANCHOR_LOGITS)
-        loss_end = cross_entropy_at(_OFF_END_LOGITS, N_ANCHOR_LOGITS)
-        loss_color = cross_entropy_at(_OFF_COLOR, N_PALETTE)
-
-        # continuous heads: MSE
-        def mse_at(offset, span):
+        def mse_at(offset, span, mask=m, denom=None):
+            denom = (denom if denom is not None else mask.sum().clamp(min=1)) * span
             p = pred_tensor[:, :, offset:offset + span]
             t = target_tensor[:, :, offset:offset + span]
-            return ((p - t).pow(2) * m).sum() / (m.sum() * span).clamp(min=1)
+            return ((p - t).pow(2) * mask.unsqueeze(-1)).sum() / denom.clamp(min=1)
 
-        loss_uv_free = (mse_at(_OFF_START_UV_FREE, 2) +
-                         mse_at(_OFF_END_UV_FREE, 2)) * 0.5
-        loss_bezier = mse_at(_OFF_BEZIER, 4)
-        loss_width = mse_at(_OFF_WIDTH, WIDTH_SEGMENTS)
-        loss_tension = mse_at(_OFF_TENSION, 1)
-
-        # soft mixture heads: KL between teacher softmax and predicted softmax
-        # (treat teacher's sparse mixture as a target distribution)
-        def kl_mixture_at(offset, span):
+        def kl_at(offset, span, mask=m, denom=None):
+            denom = denom if denom is not None else mask.sum().clamp(min=1)
             pl = pred_tensor[:, :, offset:offset + span]
             tl = target_tensor[:, :, offset:offset + span]
-            # teacher might be sparse with raw values (not logits); softmax it
-            # but to keep zero-mass valid, add a small floor
             t_prob = F.softmax(tl + 1e-6, dim=-1)
             log_p = F.log_softmax(pl, dim=-1)
-            kl = (t_prob * (t_prob.clamp_min(1e-8).log() - log_p)).sum(dim=-1)  # (B, T)
-            return (kl * target_mask).sum() / target_mask.sum().clamp(min=1)
+            kl = (t_prob * (t_prob.clamp_min(1e-8).log() - log_p)).sum(dim=-1)
+            return (kl * mask).sum() / denom
 
-        loss_material = kl_mixture_at(_OFF_MATERIAL, N_MATERIAL_VFX_TAGS)
-        loss_decoration = kl_mixture_at(_OFF_DECORATION, N_MATERIAL_VFX_TAGS)
+        def bce_at(offset, mask=m, denom=None, pos_weight_factor=5.0):
+            denom = denom if denom is not None else mask.sum().clamp(min=1)
+            pe = pred_tensor[:, :, offset]
+            te = target_tensor[:, :, offset]
+            tgt = torch.sigmoid(te)
+            pw = 1.0 + (pos_weight_factor - 1.0) * tgt
+            bce = F.binary_cross_entropy_with_logits(
+                pe, tgt, reduction="none") * pw
+            return (bce * mask).sum() / denom
 
-        # is_end: binary cross entropy WITH positive-class upweight.
-        # Each design has typically 1 positive (the last stroke) vs 3-15
-        # negatives — the loss must be heavily upweighted on the positive
-        # or it just learns "always say no" (BCE → 0 per stroke, but
-        # decoder never terminates).
-        pe = pred_tensor[:, :, _OFF_IS_END]
-        te = target_tensor[:, :, _OFF_IS_END]
-        is_end_target = torch.sigmoid(te)
-        # weight = 5x for positives, 1x for negatives (per-position)
-        pos_weight = 1.0 + 4.0 * is_end_target
-        bce = F.binary_cross_entropy_with_logits(
-            pe, is_end_target, reduction="none") * pos_weight
-        loss_is_end = (bce * target_mask).sum() / target_mask.sum().clamp(min=1)
-        # extra: explicit penalty if decoder doesn't fire is_end within mask
-        # (encourages termination at the right position)
-        prob_end = torch.sigmoid(pe)
-        # for each design, the predicted "first is_end position" should
-        # match the target's. Use a soft cumulative not-yet-ended prob and
-        # penalize tail mass past the true end.
-        # not_end = (1 - prob_end). cumprod = prob still active at step t.
-        # target_mask sums to N_true_strokes (= true end position + 1).
-        # We want prob_end ≈ 1 at position (N_true - 1), 0 before.
-        true_end_pos = target_mask.sum(dim=-1).long() - 1   # (B,)
-        # gather predicted prob at true_end_pos
-        B = pe.shape[0]
-        idx = torch.arange(B, device=pe.device)
-        prob_at_end = prob_end[idx, true_end_pos]
-        loss_term = -torch.log(prob_at_end.clamp(min=1e-6)).mean()
-        loss_is_end = loss_is_end + 0.5 * loss_term
+        # ====== SHARED heads (all tokens) ======
+        loss_type = ce_at(o["type"], N_TOKEN_TYPES)
+        loss_color = ce_at(o["color"], N_PALETTE)
+        loss_material = kl_at(o["material"], N_MATERIAL_VFX_TAGS)
+        loss_decoration = kl_at(o["decoration"], N_MATERIAL_VFX_TAGS)
+        loss_is_end = bce_at(o["is_end"], pos_weight_factor=5.0)
+        # extra termination penalty: at true_end_pos, prob_end should be ~1
+        prob_end = torch.sigmoid(pred_tensor[:, :, o["is_end"]])
+        true_end_pos = m.sum(dim=-1).long() - 1
+        idx = torch.arange(B, device=pred_tensor.device)
+        prob_at_end = prob_end[idx, true_end_pos.clamp(min=0)]
+        loss_is_end = loss_is_end + 0.5 * -torch.log(prob_at_end.clamp(min=1e-6)).mean()
 
-        total = (loss_start + loss_end + loss_color
-                 + loss_uv_free + loss_bezier + loss_width + loss_tension
-                 + loss_material + loss_decoration + loss_is_end)
+        # ====== STROKE heads (only on stroke tokens) ======
+        loss_s_start = ce_at(o["s_start_log"], N_ANCHOR_LOGITS,
+                              mask=is_target_stroke, denom=m_stroke)
+        loss_s_end = ce_at(o["s_end_log"], N_ANCHOR_LOGITS,
+                            mask=is_target_stroke, denom=m_stroke)
+        loss_s_bezier = mse_at(o["s_bezier"], 4,
+                                mask=is_target_stroke, denom=m_stroke)
+        loss_s_width = mse_at(o["s_width"], WIDTH_SEGMENTS,
+                               mask=is_target_stroke, denom=m_stroke)
+        loss_s_tension = mse_at(o["s_tension"], 1,
+                                 mask=is_target_stroke, denom=m_stroke)
+        loss_s_uv_free = (
+            mse_at(o["s_start_uv"], 2, mask=is_target_stroke, denom=m_stroke) +
+            mse_at(o["s_end_uv"], 2, mask=is_target_stroke, denom=m_stroke)
+        ) * 0.5
+
+        # ====== PANEL heads (only on panel tokens) ======
+        loss_p_boundary = mse_at(o["p_boundary"], 2 * PANEL_BOUNDARY_POINTS,
+                                  mask=is_target_panel, denom=m_panel)
+        # anchor_active: sigmoid per anchor
+        anc_pred = pred_tensor[:, :, o["p_anchors"]:o["p_anchors"] + N_ANCHORS]
+        anc_target = torch.sigmoid(target_tensor[:, :, o["p_anchors"]:o["p_anchors"] + N_ANCHORS])
+        bce_anc = F.binary_cross_entropy_with_logits(
+            anc_pred, anc_target, reduction="none").mean(dim=-1)  # (B, T)
+        loss_p_anchors = (bce_anc * is_target_panel).sum() / m_panel
+        loss_p_fabric = ce_at(o["p_fabric"], N_FABRICS,
+                               mask=is_target_panel, denom=m_panel)
+        loss_p_layer = ce_at(o["p_layer"], N_LAYER_ROLES,
+                              mask=is_target_panel, denom=m_panel)
+
+        # ====== total ======
+        total = (loss_type + loss_color
+                 + loss_material + loss_decoration + loss_is_end
+                 + loss_s_start + loss_s_end + loss_s_bezier
+                 + loss_s_width + loss_s_tension + loss_s_uv_free
+                 + loss_p_boundary + loss_p_anchors + loss_p_fabric + loss_p_layer)
         return {
             "total": total,
-            "start": loss_start, "end": loss_end, "color": loss_color,
-            "uv_free": loss_uv_free, "bezier": loss_bezier,
-            "width": loss_width, "tension": loss_tension,
+            "type": loss_type, "color": loss_color,
             "material": loss_material, "decoration": loss_decoration,
             "is_end": loss_is_end,
+            "s_start": loss_s_start, "s_end": loss_s_end,
+            "s_bezier": loss_s_bezier, "s_width": loss_s_width,
+            "s_tension": loss_s_tension, "s_uv_free": loss_s_uv_free,
+            "p_boundary": loss_p_boundary, "p_anchors": loss_p_anchors,
+            "p_fabric": loss_p_fabric, "p_layer": loss_p_layer,
         }
 
     def kl_loss(self, mu: torch.Tensor, logvar: torch.Tensor) -> torch.Tensor:

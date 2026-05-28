@@ -37,20 +37,16 @@ for p in [_TOOLS_DIR, _THIS_DIR]:
 from design_generator import SentenceTransformerEncoder         # noqa: E402
 from v3.design_generator_v3 import DesignGeneratorV3              # noqa: E402
 from v3.stroke_schema import (                                     # noqa: E402
-    all_reference_designs, Stroke, MAX_STROKES,
+    all_reference_designs_v31, Stroke, Panel, MAX_STROKES,
 )
-from v3.stroke_tensor import encode_design, STROKE_TENSOR_DIM      # noqa: E402
+from v3.token_tensor import encode_design, TOKEN_TENSOR_DIM        # noqa: E402
 from v3.stroke_renderer import render_uv_sketch                    # noqa: E402
 
 
-# Teacher brief paraphrases — 4 per reference design = 28 total pairs
+# v3.1 — 9 stylized designs × 4 brief paraphrases each = 36 pairs
+# (replacing the v3 7-design set; classical_bikini + athletic_sports
+# explicitly dropped as "mainstream" per project principle)
 TEACHER_BRIEFS_BY_NAME: dict[str, list[str]] = {
-    "classical_bikini": [
-        "classic triangle bikini, simple, ivory white",
-        "古典三角比基尼, 象牙白, 经典款",
-        "minimalist white triangle two-piece, beach",
-        "ivory classical 4-stroke bikini, French elegant",
-    ],
     "avant_garde_harness": [
         "avant-garde black cross-body harness, two diagonals",
         "前卫风黑色交叉束带, 双肩到反侧胯",
@@ -69,12 +65,6 @@ TEACHER_BRIEFS_BY_NAME: dict[str, list[str]] = {
         "neon-pink BDSM cage swim, multi-axis straps",
         "cybergoth cage bikini, magenta + void black",
     ],
-    "athletic_sports": [
-        "athletic sports bikini, neon yellow, full-coverage",
-        "运动型比基尼, 荧光黄, 高覆盖",
-        "high-performance sport swim, neon yellow, thick straps",
-        "race-ready neon yellow sport bikini, boyshort bottom",
-    ],
     "ethnic_body_chain": [
         "ethnic gold body chain + burgundy triangle cups",
         "民族风金色身链+酒红三角杯",
@@ -86,6 +76,30 @@ TEACHER_BRIEFS_BY_NAME: dict[str, list[str]] = {
         "单肩垂坠藕紫色围裹, 莎丽风, 不对称",
         "asymmetric mauve draped wrap, single shoulder",
         "ethereal mauve toga drape across body, single shoulder",
+    ],
+    "chainmail_armor": [
+        "chainmail bikini armor, silver plate + gold chain straps",
+        "链甲比基尼, 银色金属片 + 金色链条",
+        "fantasy chainmail warrior bikini, polished silver + gold",
+        "Lost Ark-style metal plate bikini with chain harness",
+    ],
+    "nier_gothic_lace": [
+        "NieR 2B gothic asymmetric monokini, void black lace",
+        "尼尔机械纪元 2B 风, 暗黑非对称连体, 黑色蕾丝",
+        "dark gothic asymmetric bodysuit, lace cutouts, black",
+        "void black asymmetric goth monokini, dramatic",
+    ],
+    "maori_feather_tribal": [
+        "Maori-Polynesian tribal wrap, bone-white + copper accents",
+        "毛利波利尼西亚部落围裹, 骨白 + 紫铜配色",
+        "Pacific tribal swimwear, asymmetric wrap, bone + ochre",
+        "Polynesian ritual swim, feathered wrap, tribal motif",
+    ],
+    "iridescent_holo": [
+        "holographic iridescent cyber monokini, full-body teal",
+        "全息虹彩赛博连体泳衣, 青色 + 镜面",
+        "futuristic chrome iridescent one-piece, cyber teal",
+        "Tron-inspired holographic monokini, cyber-teal shimmer",
     ],
 }
 
@@ -119,8 +133,8 @@ def main():
     gen = gen.to(device)
 
     # ─── teacher data ────────────────────────────────────────────────
-    print("[data] encoding teacher designs...")
-    refs = all_reference_designs()
+    print("[data] encoding teacher designs (v3.1 Panel+Stroke)...")
+    refs = all_reference_designs_v31()
     print(f"        {len(refs)} reference designs:")
     encoded_by_name = {}
     for name, strokes in refs.items():
@@ -158,8 +172,9 @@ def main():
     print(f"\n[train] {args.iters} iters @ batch {args.batch}  lr={args.lr}")
     losses = []
     losses_decomp = {k: [] for k in [
-        "total", "start", "end", "color", "uv_free", "bezier",
-        "width", "tension", "material", "decoration", "is_end", "kl",
+        "total", "type", "color", "material", "decoration", "is_end",
+        "s_start", "s_end", "s_bezier", "s_width", "s_tension", "s_uv_free",
+        "p_boundary", "p_anchors", "p_fabric", "p_layer", "kl",
     ]}
     t0 = time.time()
     gen.train()
@@ -188,11 +203,12 @@ def main():
 
         if (it + 1) % args.log_every == 0 or it == 0:
             print(f"  iter {it+1:>4}  total={loss.item():.3f}  "
-                  f"start={loss_d['start'].item():.2f}  "
-                  f"end={loss_d['end'].item():.2f}  "
+                  f"type={loss_d['type'].item():.2f}  "
                   f"color={loss_d['color'].item():.2f}  "
-                  f"is_end={loss_d['is_end'].item():.2f}  "
-                  f"kl={kl.item():.2f}")
+                  f"s_start={loss_d['s_start'].item():.2f}  "
+                  f"p_bound={loss_d['p_boundary'].item():.3f}  "
+                  f"p_fab={loss_d['p_fabric'].item():.2f}  "
+                  f"is_end={loss_d['is_end'].item():.2f}")
 
     elapsed = time.time() - t0
     print(f"\n[train] done in {elapsed:.1f}s "
@@ -200,6 +216,13 @@ def main():
     print(f"  total[0]    = {losses[0]:.3f}")
     print(f"  total[mid]  = {losses[len(losses)//2]:.3f}")
     print(f"  total[last] = {losses[-1]:.3f}")
+
+    # ─── save ckpt FIRST (before eval that might crash) ─────────────
+    ckpt = os.path.join(args.out_dir, "decoder_pretrained.pt")
+    torch.save({"gen_state": gen.state_dict(),
+                 "losses": losses, "losses_decomp": losses_decomp,
+                 "args": vars(args)}, ckpt)
+    print(f"\nsaved ckpt -> {ckpt}")
 
     # ─── eval: have the (now-trained) decoder produce designs for the
     # first brief of each reference, and compare ─────────────────────
@@ -220,24 +243,29 @@ def main():
         decoded_eval[i] = strokes[:end_at]
         print(f"  {b[:50]:<50}  {len(decoded_eval[i])} strokes")
 
-    # render comparison: teacher (left) vs decoder (right) for all 7
-    print("[eval] rendering teacher-vs-decoder UV sketches for all refs...")
+    # render comparison: teacher (left) vs decoder (right) for all 9
+    # NOTE: tokens may be mix of Panel + Stroke; the renderer only
+    # plots Strokes in its UV sketch. This eval render is best-effort.
+    print("[eval] rendering teacher-vs-decoder UV sketches (strokes only)...")
     for name, brief, decoder_strokes in zip(eval_names, eval_briefs, decoded_eval):
         teacher_strokes = refs[name]
+        ts = [t for t in teacher_strokes if isinstance(t, Stroke)]
+        ds = [t for t in decoder_strokes if isinstance(t, Stroke)]
+        if not ts and not ds:
+            continue
         out_teacher = os.path.join(args.out_dir, f"{name}_teacher.png")
         out_decoder = os.path.join(args.out_dir, f"{name}_decoder.png")
-        render_uv_sketch(teacher_strokes, out_teacher,
-                          title=f"{name} TEACHER ({len(teacher_strokes)} strokes)")
-        render_uv_sketch(decoder_strokes, out_decoder,
-                          title=f"{name} DECODER ({len(decoder_strokes)} strokes)\n{brief[:50]}")
-        print(f"  ✓ {name}: T={len(teacher_strokes)}  D={len(decoder_strokes)}")
+        try:
+            render_uv_sketch(ts, out_teacher,
+                              title=f"{name} TEACHER strokes ({len(ts)})")
+            render_uv_sketch(ds, out_decoder,
+                              title=f"{name} DECODER strokes ({len(ds)})\n{brief[:50]}")
+            print(f"  ✓ {name}: T={len(teacher_strokes)}  D={len(decoder_strokes)} "
+                  f"(rendered strokes only: T={len(ts)} D={len(ds)})")
+        except Exception as e:
+            print(f"  ! {name} render skipped: {e}")
 
-    # ─── save ────────────────────────────────────────────────────────
-    ckpt = os.path.join(args.out_dir, "decoder_pretrained.pt")
-    torch.save({"gen_state": gen.state_dict(),
-                 "losses": losses, "losses_decomp": losses_decomp,
-                 "args": vars(args)}, ckpt)
-    print(f"\nsaved ckpt -> {ckpt}")
+    # (ckpt was saved earlier, before eval)
 
     # loss plots
     try:
@@ -250,14 +278,14 @@ def main():
         ax.set_title("total loss"); ax.set_yscale("log")
         ax.grid(alpha=0.3)
         ax = axes[0, 1]
-        for k in ("start", "end", "color"):
+        for k in ("type", "color", "s_start", "s_end"):
             ax.plot(losses_decomp[k], label=k, alpha=0.7)
-        ax.set_title("categorical CE losses"); ax.legend()
+        ax.set_title("shared+stroke CE losses"); ax.legend()
         ax.set_yscale("log"); ax.grid(alpha=0.3)
         ax = axes[1, 0]
-        for k in ("bezier", "width", "tension", "uv_free"):
+        for k in ("p_boundary", "p_fabric", "p_anchors", "p_layer"):
             ax.plot(losses_decomp[k], label=k, alpha=0.7)
-        ax.set_title("continuous MSE losses"); ax.legend()
+        ax.set_title("panel losses"); ax.legend()
         ax.set_yscale("log"); ax.grid(alpha=0.3)
         ax = axes[1, 1]
         for k in ("material", "decoration", "is_end", "kl"):
