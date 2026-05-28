@@ -562,6 +562,191 @@ def all_reference_designs() -> dict[str, list[Stroke]]:
     }
 
 
+# ─── v3.1 Panel+Stroke mixed reference designs ────────────────────────
+# These use Panel for fabric regions (cups, bottoms, wrap surfaces) and
+# Stroke for straps/harness/decoration. They flow into v2's full chain
+# via tokens_to_garment to produce real fabric meshes.
+
+def example_classical_bikini_v31() -> list:
+    """Classical white bikini = 2 cup panels (one + mirror) + 1 bottom + 2 shoulder straps."""
+    return [
+        # Left cup (mirror_axis="u" → tokens_to_garment will auto-mirror)
+        Panel(
+            boundary_uv=[(0.30, 0.78), (0.45, 0.78), (0.49, 0.70),
+                          (0.42, 0.66), (0.32, 0.68), (0.28, 0.74)],
+            anchors=[Anchor.SHOULDER_L, Anchor.STERNUM, Anchor.UNDERBUST],
+            color_id=0, fabric_id="F_ECONYL_PLAIN_LIGHT",  # ivory
+        ),
+        # Bottom front (spans centerline)
+        Panel(
+            boundary_uv=[(0.30, 0.50), (0.70, 0.50), (0.62, 0.40),
+                          (0.55, 0.36), (0.45, 0.36), (0.38, 0.40)],
+            anchors=[Anchor.HIP_L, Anchor.HIP_R],
+            color_id=0, fabric_id="F_ECONYL_PLAIN_LIGHT",
+        ),
+        # Shoulder straps
+        Stroke(start_anchor=Anchor.SHOULDER_L, end_anchor=Anchor.UNDERBUST,
+                width_profile=(1.0, 1.0, 1.0), color_id=0),
+        Stroke(start_anchor=Anchor.SHOULDER_R, end_anchor=Anchor.UNDERBUST,
+                width_profile=(1.0, 1.0, 1.0), color_id=0, is_end=True),
+    ]
+
+
+def example_avant_garde_harness_v31() -> list:
+    """Harness = 0 panels + 4 strokes (cross-body straps + underbust + hip)."""
+    return [
+        Stroke(start_anchor=Anchor.SHOULDER_L, end_anchor=Anchor.HIP_R,
+                bezier_internal=((0.55, 0.70), (0.45, 0.55)),
+                width_profile=(2.0, 1.5, 2.0), color_id=1),  # black
+        Stroke(start_anchor=Anchor.SHOULDER_R, end_anchor=Anchor.HIP_L,
+                bezier_internal=((0.45, 0.70), (0.55, 0.55)),
+                width_profile=(2.0, 1.5, 2.0), color_id=1),
+        Stroke(start_anchor=Anchor.WAIST_L, end_anchor=Anchor.WAIST_R,
+                bezier_internal=((0.55, 0.66), (0.45, 0.66)),
+                width_profile=(3.0, 3.0, 3.0), color_id=1),
+        Stroke(start_anchor=Anchor.HIP_L, end_anchor=Anchor.HIP_R,
+                bezier_internal=((0.6, 0.46), (0.4, 0.46)),
+                width_profile=(2.0, 5.0, 2.0), color_id=1, is_end=True),
+    ]
+
+
+def example_sculptural_one_piece_v31() -> list:
+    """One-piece monokini = 1 large panel covering torso + 0 strokes."""
+    return [
+        Panel(
+            boundary_uv=[(0.25, 0.80), (0.75, 0.80),
+                          (0.72, 0.64), (0.70, 0.50),
+                          (0.62, 0.40), (0.55, 0.36),
+                          (0.45, 0.36), (0.38, 0.40),
+                          (0.30, 0.50), (0.28, 0.64)],
+            anchors=[Anchor.SHOULDER_L, Anchor.SHOULDER_R,
+                     Anchor.STERNUM, Anchor.HIP_L, Anchor.HIP_R],
+            color_id=6, fabric_id="F_HUNZA_CRINKLE",  # orange
+            is_end=True,
+        ),
+    ]
+
+
+def example_cyberpunk_cage_v31() -> list:
+    """Cage harness = small triangle cups + many thin straps."""
+    return [
+        # Small triangle cup
+        Panel(
+            boundary_uv=[(0.35, 0.74), (0.46, 0.74), (0.48, 0.66),
+                          (0.40, 0.64), (0.33, 0.68)],
+            anchors=[Anchor.SHOULDER_L, Anchor.STERNUM],
+            color_id=21, fabric_id="F_QNOVA_RIBBED",  # neon magenta
+        ),
+        # Diagonal cage strap
+        Stroke(start_anchor=Anchor.COLLARBONE, end_anchor=Anchor.HIP_L,
+                bezier_internal=((0.55, 0.65), (0.65, 0.55)),
+                width_profile=(0.8, 0.5, 0.8), color_id=1),
+        Stroke(start_anchor=Anchor.COLLARBONE, end_anchor=Anchor.HIP_R,
+                bezier_internal=((0.45, 0.65), (0.35, 0.55)),
+                width_profile=(0.8, 0.5, 0.8), color_id=1),
+        Stroke(start_anchor=Anchor.SHOULDER_L, end_anchor=Anchor.WAIST_R,
+                bezier_internal=((0.55, 0.70), (0.40, 0.62)),
+                width_profile=(0.8, 0.5, 0.8), color_id=1),
+        # Bottom panel + hip band
+        Panel(
+            boundary_uv=[(0.35, 0.46), (0.65, 0.46), (0.60, 0.40),
+                          (0.50, 0.36), (0.40, 0.40)],
+            anchors=[Anchor.HIP_L, Anchor.HIP_R],
+            color_id=21, fabric_id="F_QNOVA_RIBBED",
+            is_end=True,
+        ),
+    ]
+
+
+def example_athletic_sports_v31() -> list:
+    """Sport bikini = full-coverage panels + thick straps."""
+    return [
+        # Wide sport top — single panel spanning centerline
+        Panel(
+            boundary_uv=[(0.28, 0.78), (0.72, 0.78),
+                          (0.70, 0.66), (0.60, 0.62),
+                          (0.40, 0.62), (0.30, 0.66)],
+            anchors=[Anchor.SHOULDER_L, Anchor.SHOULDER_R,
+                     Anchor.STERNUM, Anchor.UNDERBUST],
+            color_id=9, fabric_id="F_AMNI_SOUL_RIBBED",  # neon yellow
+        ),
+        # Boyshort bottom
+        Panel(
+            boundary_uv=[(0.25, 0.50), (0.75, 0.50),
+                          (0.68, 0.38), (0.55, 0.34),
+                          (0.45, 0.34), (0.32, 0.38)],
+            anchors=[Anchor.HIP_L, Anchor.HIP_R],
+            color_id=9, fabric_id="F_AMNI_SOUL_RIBBED",
+        ),
+        # Wide shoulder straps
+        Stroke(start_anchor=Anchor.SHOULDER_L, end_anchor=Anchor.UNDERBUST,
+                width_profile=(3.0, 3.5, 4.0), color_id=9),
+        Stroke(start_anchor=Anchor.SHOULDER_R, end_anchor=Anchor.UNDERBUST,
+                width_profile=(3.0, 3.5, 4.0), color_id=9, is_end=True),
+    ]
+
+
+def example_ethnic_body_chain_v31() -> list:
+    """Ethnic = small triangle cups (burgundy) + gold body chains."""
+    return [
+        # Triangle cup
+        Panel(
+            boundary_uv=[(0.33, 0.76), (0.47, 0.76), (0.50, 0.68),
+                          (0.40, 0.66), (0.32, 0.70)],
+            anchors=[Anchor.SHOULDER_L, Anchor.STERNUM],
+            color_id=8, fabric_id="F_VIRGIN_VELVET",  # burgundy
+        ),
+        # Triangle bottom
+        Panel(
+            boundary_uv=[(0.36, 0.48), (0.64, 0.48), (0.58, 0.40),
+                          (0.50, 0.36), (0.42, 0.40)],
+            anchors=[Anchor.HIP_L, Anchor.HIP_R],
+            color_id=8, fabric_id="F_VIRGIN_VELVET",
+        ),
+        # Gold body chain (back to sternum)
+        Stroke(start_anchor=Anchor.NECK_BACK, end_anchor=Anchor.STERNUM,
+                bezier_internal=((0.20, 0.78), (0.40, 0.74)),
+                width_profile=(0.4, 0.4, 0.4), color_id=25),  # gold
+        # Chains from sternum to hips
+        Stroke(start_anchor=Anchor.STERNUM, end_anchor=Anchor.HIP_L,
+                bezier_internal=((0.55, 0.65), (0.65, 0.55)),
+                width_profile=(0.4, 0.4, 0.4), color_id=25),
+        Stroke(start_anchor=Anchor.STERNUM, end_anchor=Anchor.HIP_R,
+                bezier_internal=((0.45, 0.65), (0.35, 0.55)),
+                width_profile=(0.4, 0.4, 0.4), color_id=25, is_end=True),
+    ]
+
+
+def example_draped_wrap_v31() -> list:
+    """Draped wrap = 1 large asymmetric panel + 1 wide drape stroke."""
+    return [
+        # Asymmetric wrap panel (covers most of torso, diagonally)
+        Panel(
+            boundary_uv=[(0.25, 0.78), (0.55, 0.78),
+                          (0.65, 0.60), (0.70, 0.42),
+                          (0.45, 0.36), (0.32, 0.50),
+                          (0.30, 0.65)],
+            anchors=[Anchor.SHOULDER_L, Anchor.HIP_R],
+            color_id=13, fabric_id="F_HUNZA_CRINKLE",  # mauve
+            is_end=True,
+        ),
+    ]
+
+
+def all_reference_designs_v31() -> dict[str, list]:
+    """v3.1 mixed Panel+Stroke reference designs.
+    These flow into v2's full chain via tokens_to_garment."""
+    return {
+        "classical_bikini":      example_classical_bikini_v31(),
+        "avant_garde_harness":   example_avant_garde_harness_v31(),
+        "sculptural_one_piece":  example_sculptural_one_piece_v31(),
+        "cyberpunk_cage":        example_cyberpunk_cage_v31(),
+        "athletic_sports":       example_athletic_sports_v31(),
+        "ethnic_body_chain":     example_ethnic_body_chain_v31(),
+        "draped_wrap":           example_draped_wrap_v31(),
+    }
+
+
 def example_avant_garde_harness() -> list[Stroke]:
     """A 'cross-body harness' — only expressible in v3, not v2."""
     return [
