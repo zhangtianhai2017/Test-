@@ -97,8 +97,14 @@ def main():
     ap.add_argument("--lr", type=float, default=3e-4)
     ap.add_argument("--kl-weight", type=float, default=1e-3)
     ap.add_argument("--out-dir", default="tools/output/2026-05-27/p20_phase_a2")
-    ap.add_argument("--log-every", type=int, default=20)
+    ap.add_argument("--log-every", type=int, default=50)
+    ap.add_argument("--device", default="auto",
+                    choices=["auto", "cuda", "cpu"])
     args = ap.parse_args()
+
+    device = (("cuda" if torch.cuda.is_available() else "cpu")
+              if args.device == "auto" else args.device)
+    print(f"[device] {device}")
 
     os.makedirs(args.out_dir, exist_ok=True)
     torch.manual_seed(0)
@@ -110,6 +116,7 @@ def main():
     print("[setup] DesignGeneratorV3 + init tag bank...")
     gen = DesignGeneratorV3()
     gen.init_tag_bank(sbert=enc.model)
+    gen = gen.to(device)
 
     # ─── teacher data ────────────────────────────────────────────────
     print("[data] encoding teacher designs...")
@@ -130,8 +137,8 @@ def main():
             all_targets.append(et)
             all_masks.append(em)
             all_names.append(name)
-    target_stack = torch.stack(all_targets)         # (N, MAX_STROKES, D)
-    mask_stack = torch.stack(all_masks)              # (N, MAX_STROKES)
+    target_stack = torch.stack(all_targets).to(device)     # (N, MAX_STROKES, D)
+    mask_stack = torch.stack(all_masks).to(device)         # (N, MAX_STROKES)
     print(f"        teacher set: {len(all_briefs)} (brief, design) pairs "
           f"({len(refs)} designs × ~4 paraphrases each)")
 
@@ -140,7 +147,7 @@ def main():
     brief_embs = enc.encode(all_briefs)
     if not isinstance(brief_embs, torch.Tensor):
         brief_embs = torch.tensor(brief_embs)
-    brief_embs = brief_embs.float()                  # (N, 384)
+    brief_embs = brief_embs.float().to(device)        # (N, 384)
 
     N = brief_embs.shape[0]
     n_params = sum(p.numel() for p in gen.parameters() if p.requires_grad)
@@ -158,7 +165,7 @@ def main():
     gen.train()
     for it in range(args.iters):
         # sample a batch from teacher set
-        idx = torch.randperm(N)[:args.batch]
+        idx = torch.randperm(N, device=device)[:args.batch]
         be = brief_embs[idx]
         tt = target_stack[idx]
         tm = mask_stack[idx]
@@ -203,10 +210,10 @@ def main():
     eval_emb = enc.encode(eval_briefs)
     if not isinstance(eval_emb, torch.Tensor):
         eval_emb = torch.tensor(eval_emb)
-    eval_emb = eval_emb.float()
+    eval_emb = eval_emb.float().to(device)
     with torch.no_grad():
         out_eval = gen(eval_emb, noise_sigma=0.0)   # deterministic for eval
-    decoded_eval = gen.decode_strokes(out_eval.stroke_tensor)
+    decoded_eval = gen.decode_strokes(out_eval.stroke_tensor.cpu())
     for i, (b, strokes) in enumerate(zip(eval_briefs, decoded_eval)):
         end_at = next((j + 1 for j, s in enumerate(strokes) if s.is_end),
                       len(strokes))

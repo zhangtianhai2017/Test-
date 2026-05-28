@@ -27,14 +27,18 @@ from v3.design_generator_v3 import DesignGeneratorV3
 from v3.stroke_renderer import design_to_meshes
 
 DEMO_BRIEFS = [
+    "classical white triangle bikini, French elegant, ivory",
+    "avant-garde black cross-body harness, two diagonal straps",
+    "Iris van Herpen sculptural orange one-piece, swooping",
+    "cyberpunk magenta + black cage harness, multi-strap",
+    "athletic sports bikini, neon yellow, full coverage",
+    "ethnic gold body chain + burgundy triangle cups",
+    "draped mauve one-shoulder wrap, sari-inspired asymmetric",
     "Bayonetta 风, 黑色蕾丝紧身, 戏剧化",
-    "cyberpunk neon-trim corset, magenta + chrome",
-    "Iris van Herpen sculptural one-piece, orange swooping",
-    "classical white triangle bikini, French elegant",
 ]
 
-CKPT = "tools/output/2026-05-28/p20c_phase_a2_diverse/decoder_pretrained.pt"
-OUT_DIR = "tools/output/2026-05-28/p25_3d_render"
+CKPT = "tools/output/2026-05-28/p26b_phase_a2_long_gpu/decoder_pretrained.pt"
+OUT_DIR = "tools/output/2026-05-28/p27_3d_render_long"
 W, H = 480, 720
 
 
