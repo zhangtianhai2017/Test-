@@ -100,6 +100,15 @@ WIDTH_SEGMENTS = 3                # start / mid / end widths
 N_PALETTE = 256                   # color palette size (per discussion D8 palette)
 N_MATERIAL_VFX_TAGS = 189         # from tag_data.py axis "material_vfx"
 
+# Panel: closed UV polygon (a piece of fabric). 6 boundary points = enough
+# for cup/bottom/wrap shapes; matches v2 verify_ga_uv polygon resolution.
+PANEL_BOUNDARY_POINTS = 6
+
+
+# Token type discriminator (NN output's 2-way head)
+TOKEN_TYPE_PANEL = 0
+TOKEN_TYPE_STROKE = 1
+
 
 @dataclass
 class Stroke:
@@ -197,9 +206,100 @@ class Stroke:
 
 # ─── Validation ────────────────────────────────────────────────────────
 
+@dataclass
+class Panel:
+    """A 2D closed fabric panel in body-cylindrical UV space.
+
+    This is v3's bridge to v2's real-fabric rendering. A Panel becomes a
+    PatternPiece in the Garment object, which goes through the full v2
+    pipeline (validate_garment → build_fabric_shell → polish_shell →
+    apply_wrinkles → binding → seam_lines).
+
+    Anchors don't appear in the rendering directly (the polygon defines
+    the fabric region by itself); they're used as a constraint signal at
+    sampling time: the panel must overlap or contain at least one anchor.
+    """
+
+    # Closed polygon in UV space, traversed CCW.
+    # PANEL_BOUNDARY_POINTS vertices (default 6). u ∈ [0,1], v ∈ [0,1].
+    boundary_uv: list[tuple[float, float]] = field(
+        default_factory=lambda: [(0.5, 0.5)] * PANEL_BOUNDARY_POINTS)
+
+    # Body anchors that this panel is conceptually anchored to (1-3
+    # typical). Currently informational; future: use for tension-direction
+    # alignment in fabric simulation.
+    anchors: list[Anchor] = field(default_factory=list)
+
+    # Color: one of N_PALETTE palette entries.
+    color_id: int = 0
+
+    # Soft distributions over material_vfx tags.
+    material_mix: list[tuple[int, float]] = field(default_factory=list)
+    decoration_mix: list[tuple[int, float]] = field(default_factory=list)
+
+    # Fabric SKU from catalogs.FABRICS. If empty, tokens_to_garment picks
+    # a default ("FABRIC_ECONYL_LIGHT") based on color_id family.
+    fabric_id: str = ""
+
+    # Layer role: "shell" (visible fabric) / "lining" / "padding" / "trim".
+    # 99% of panels are shell.
+    layer_role: str = "shell"
+
+    # Sequence terminator (when this panel is the last token in a design).
+    is_end: bool = False
+
+    def area_uv(self) -> float:
+        """Shoelace area of the polygon (signed, but absolute returned)."""
+        n = len(self.boundary_uv)
+        if n < 3:
+            return 0.0
+        s = 0.0
+        for i in range(n):
+            x0, y0 = self.boundary_uv[i]
+            x1, y1 = self.boundary_uv[(i + 1) % n]
+            s += x0 * y1 - x1 * y0
+        return abs(s) * 0.5
+
+
+# Token is the union of Panel and Stroke for the NN's variable-length output.
+# Decoder per-step picks token_type (0=panel, 1=stroke) and produces the
+# corresponding parameters.
+Token = "Union[Panel, Stroke]"   # alias just for type-hint readability
+
+
+# ─── Panel serialization ─────────────────────────────────────────────
+
+def panel_to_dict(p: Panel) -> dict:
+    return {
+        "_type": "panel",
+        "boundary_uv": [list(uv) for uv in p.boundary_uv],
+        "anchors": [int(a) for a in p.anchors],
+        "color_id": int(p.color_id),
+        "material_mix": [[int(i), float(w)] for i, w in p.material_mix],
+        "decoration_mix": [[int(i), float(w)] for i, w in p.decoration_mix],
+        "fabric_id": p.fabric_id,
+        "layer_role": p.layer_role,
+        "is_end": bool(p.is_end),
+    }
+
+
+def panel_from_dict(d: dict) -> Panel:
+    return Panel(
+        boundary_uv=[tuple(uv) for uv in d["boundary_uv"]],
+        anchors=[Anchor(a) for a in d.get("anchors", [])],
+        color_id=int(d.get("color_id", 0)),
+        material_mix=[(int(i), float(w)) for i, w in d.get("material_mix", [])],
+        decoration_mix=[(int(i), float(w)) for i, w in d.get("decoration_mix", [])],
+        fabric_id=d.get("fabric_id", ""),
+        layer_role=d.get("layer_role", "shell"),
+        is_end=bool(d.get("is_end", False)),
+    )
+
+
 def stroke_to_dict(s: Stroke) -> dict:
     """Serialize a Stroke to a JSON-safe dict."""
     return {
+        "_type": "stroke",
         "start_anchor": int(s.start_anchor),
         "start_uv": list(s.start_uv) if s.start_uv is not None else None,
         "end_anchor": int(s.end_anchor),
@@ -213,6 +313,25 @@ def stroke_to_dict(s: Stroke) -> dict:
         "decoration_mix": [[int(i), float(w)] for i, w in s.decoration_mix],
         "is_end": bool(s.is_end),
     }
+
+
+def token_to_dict(tok) -> dict:
+    """Serialize either Panel or Stroke. Uses '_type' discriminator."""
+    if isinstance(tok, Panel):
+        return panel_to_dict(tok)
+    if isinstance(tok, Stroke):
+        return stroke_to_dict(tok)
+    raise TypeError(f"unknown token type: {type(tok)}")
+
+
+def token_from_dict(d: dict):
+    """Deserialize either Panel or Stroke by '_type' discriminator."""
+    t = d.get("_type", "stroke")  # default for backward compat
+    if t == "panel":
+        return panel_from_dict(d)
+    if t == "stroke":
+        return stroke_from_dict(d)
+    raise ValueError(f"unknown _type: {t}")
 
 
 def stroke_from_dict(d: dict) -> Stroke:
