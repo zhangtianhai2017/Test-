@@ -35,7 +35,9 @@ for p in [_TOOLS_DIR, _THIS_DIR]:
         sys.path.insert(0, p)
 
 from design_generator import SentenceTransformerEncoder         # noqa: E402
-from v3.design_generator_v3 import DesignGeneratorV3              # noqa: E402
+from v3.design_generator_v3 import (                              # noqa: E402
+    DesignGeneratorV3, clean_reencode_rows,
+)
 from v3.stroke_schema import (                                     # noqa: E402
     all_reference_designs_v31, Stroke, Panel, MAX_STROKES,
 )
@@ -139,6 +141,16 @@ def main():
     ap.add_argument("--v2-lib-teachers", type=int, default=0,
                     help="Number of v2-library-converted teachers to "
                          "MIX IN with the 12 hand-crafted v3.1 references.")
+    ap.add_argument("--scheduled-sampling", type=float, default=0.0,
+                    help="Max scheduled-sampling probability (0=pure teacher "
+                         "forcing = legacy p40). When >0, two-pass training: "
+                         "with prob eps replace each teacher input token by the "
+                         "clean re-encode of the model's own prediction, so the "
+                         "decoder learns to consume its own (clean-feedback) "
+                         "outputs -> defeats autoregressive exposure bias.")
+    ap.add_argument("--ss-warmup-frac", type=float, default=0.3,
+                    help="Fraction of iters with eps=0 before linearly ramping "
+                         "eps up to --scheduled-sampling.")
     args = ap.parse_args()
 
     device = (("cuda" if torch.cuda.is_available() else "cpu")
@@ -220,7 +232,33 @@ def main():
         tt = target_stack[idx]
         tm = mask_stack[idx]
 
-        out = gen(be, teacher_tokens=tt, noise_sigma=0.5)
+        # ── scheduled-sampling epsilon (0 during warmup, then linear ramp) ──
+        ss_eps = 0.0
+        if args.scheduled_sampling > 0.0:
+            warmup = int(args.ss_warmup_frac * args.iters)
+            if it >= warmup:
+                ss_eps = args.scheduled_sampling * (
+                    (it - warmup) / max(1, args.iters - warmup))
+
+        if ss_eps > 0.0:
+            # PASS 1 — teacher forcing to get the model's own predictions
+            with torch.no_grad():
+                out1 = gen(be, teacher_tokens=tt, noise_sigma=0.5)
+                Bc, Tc, Dc = out1.stroke_tensor.shape
+                # replace teacher input token by clean self-prediction w.p. eps,
+                # re-encoding ONLY the selected positions (cheap)
+                sel = (torch.rand(Bc, Tc, device=device) < ss_eps) & (tm > 0.5)
+                mixed_flat = tt.reshape(Bc * Tc, Dc).clone()
+                idx = sel.reshape(-1).nonzero(as_tuple=True)[0]
+                if idx.numel() > 0:
+                    pred_flat = out1.stroke_tensor.reshape(Bc * Tc, Dc)
+                    mixed_flat[idx] = clean_reencode_rows(pred_flat[idx])
+                mixed = mixed_flat.reshape(Bc, Tc, Dc)
+            # PASS 2 — feed mixed inputs, but supervise against real teacher tt
+            out = gen(be, teacher_tokens=mixed, noise_sigma=0.5)
+        else:
+            out = gen(be, teacher_tokens=tt, noise_sigma=0.5)
+
         loss_d = gen.imitation_loss(out.stroke_tensor, tt, tm)
         kl = gen.kl_loss(out.style_mu, out.style_logvar)
         # length loss: dense per-design signal for termination
@@ -256,7 +294,7 @@ def main():
         losses_decomp["kl"].append(kl.item())
 
         if (it + 1) % args.log_every == 0 or it == 0:
-            print(f"  iter {it+1:>4}  total={loss.item():.3f}  "
+            print(f"  iter {it+1:>4}  ss_eps={ss_eps:.2f}  total={loss.item():.3f}  "
                   f"type={loss_d['type'].item():.2f}  "
                   f"color={loss_d['color'].item():.2f}  "
                   f"s_start={loss_d['s_start'].item():.2f}  "

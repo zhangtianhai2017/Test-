@@ -89,6 +89,7 @@ from v3.stroke_schema import (                                     # noqa: E402
 # v3.1: use the unified Panel+Stroke token tensor
 from v3.token_tensor import (                                      # noqa: E402
     TOKEN_TENSOR_DIM, encode_design, decode_batch, offsets,
+    decode_token, encode_token,
     N_FABRICS, N_LAYER_ROLES, N_TOKEN_TYPES,
 )
 # Backward-compat alias
@@ -139,6 +140,22 @@ class AnchorPlan(nn.Module):
 
     def forward(self, z: torch.Tensor) -> torch.Tensor:
         return self.net(z)   # logits, shape (B, N_ANCHORS)
+
+
+@torch.no_grad()
+def clean_reencode_rows(rows: torch.Tensor) -> torch.Tensor:
+    """Re-project raw head-output rows onto the training token distribution.
+
+    rows: (N, TOKEN_TENSOR_DIM) raw decoder head outputs (off-distribution
+    vs the clean one-hot/­magnitude tokens token_in saw during teacher
+    forcing). Decode each to a Panel/Stroke and re-encode → (N, DIM) clean
+    tokens. Fixes autoregressive exposure bias: the fed-back token now
+    matches what the model was trained to consume.
+    """
+    device = rows.device
+    out = [encode_token(decode_token(rows[i].detach().cpu()))
+           for i in range(rows.shape[0])]
+    return torch.stack(out, dim=0).to(device)
 
 
 class StrokeTransformerDecoder(nn.Module):
@@ -204,11 +221,16 @@ class StrokeTransformerDecoder(nn.Module):
     def forward(self,
                 head_input: torch.Tensor,
                 anchor_plan: torch.Tensor,
-                teacher_tokens: torch.Tensor | None = None
+                teacher_tokens: torch.Tensor | None = None,
+                clean_feedback: bool = True,
                 ) -> torch.Tensor:
         """If teacher_tokens given (B, T, STROKE_TENSOR_DIM), train via
         teacher forcing — predict the t-th stroke from previous strokes.
-        Otherwise inference: autoregressive sampling (slower)."""
+        Otherwise inference: autoregressive sampling (slower).
+
+        clean_feedback (inference only): re-encode each predicted row to the
+        training token distribution before feeding it back (fixes exposure
+        bias). Set False for the legacy raw-row feedback path."""
         B = head_input.shape[0]
         device = head_input.device
         memory = self.make_memory(head_input, anchor_plan)  # (B, 1, d_model)
@@ -236,8 +258,14 @@ class StrokeTransformerDecoder(nn.Module):
                 out = self.decoder(tgt=seq, memory=memory, tgt_mask=causal)
                 row = self.head(out[:, -1:])                # (B, 1, STROKE_TENSOR_DIM)
                 tokens.append(row)
-                # feed the predicted row back as the next input
-                prev = torch.cat([prev, self.token_in(row)], dim=1)
+                # feed the predicted row back as the next input.
+                # clean_feedback re-projects onto the training distribution
+                # (decode->re-encode) to defeat autoregressive exposure bias.
+                if clean_feedback:
+                    feed = clean_reencode_rows(row[:, 0]).unsqueeze(1)
+                else:
+                    feed = row
+                prev = torch.cat([prev, self.token_in(feed)], dim=1)
                 # early-exit not possible per-batch (different lengths) — caller
                 # truncates at is_end downstream
             return torch.cat(tokens, dim=1)  # (B, MAX_STROKES, STROKE_TENSOR_DIM)
@@ -364,10 +392,13 @@ class DesignGeneratorV3(nn.Module):
                 explicit_tag_ids: list[str] | None = None,
                 noise_sigma: float = 1.0,
                 teacher_tokens: torch.Tensor | None = None,
+                clean_feedback: bool = True,
                 ) -> V3Output:
         """brief_emb: (B, sbert_dim) precomputed sbert embeddings.
         Optional axis_weights / explicit_tag_ids for tag conditioning.
-        teacher_tokens: (B, T, STROKE_TENSOR_DIM) for training; None for inference."""
+        teacher_tokens: (B, T, STROKE_TENSOR_DIM) for training; None for inference.
+        clean_feedback: at inference, re-encode each predicted token to the
+        training distribution before feeding back (fixes exposure bias)."""
         B = brief_emb.shape[0]
         device = brief_emb.device
 
@@ -384,7 +415,8 @@ class DesignGeneratorV3(nn.Module):
         length_logits = self.length_head(head_input)                     # (B, MAX_STROKES)
 
         stroke_tensor = self.decoder(head_input, anchor_plan,
-                                       teacher_tokens=teacher_tokens)
+                                       teacher_tokens=teacher_tokens,
+                                       clean_feedback=clean_feedback)
         return V3Output(
             style_mu=mu, style_logvar=logvar, style_latent=z,
             anchor_plan=anchor_plan, stroke_tensor=stroke_tensor,
